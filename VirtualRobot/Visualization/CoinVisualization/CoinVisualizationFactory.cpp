@@ -3645,10 +3645,11 @@ namespace VirtualRobot
         Eigen::Vector3f camPos = MathTools::getTranslation(camPose);
         float sc = 1.0f;//0.001f;
         cam->position.setValue(camPos[0]*sc, camPos[1]*sc, camPos[2]*sc);
-        SbRotation align(SbVec3f(1, 0, 0), (float)(M_PI)); // first align from  default direction -z to +z by rotating with 180 degree around x axis
-        SbRotation align2(SbVec3f(0, 0, 1), (float)(-M_PI / 2.0)); // align up vector by rotating with -90 degree around z axis
+
+        // align from default direction -z to +z by rotating with 180 degree around y axis
+        SbRotation align(SbVec3f(0, 1, 0), (float)(M_PI)); 
         SbRotation trans(CoinVisualizationFactory::getSbMatrix(camPose)); // get rotation from global pose
-        cam->orientation.setValue(align2 * align * trans); // perform total transformation
+        cam->orientation.setValue(align * trans ); // perform total transformation
 
         // todo: check these values....
         cam->nearDistance.setValue(zNear);
