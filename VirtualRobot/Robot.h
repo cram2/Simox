@@ -33,6 +33,7 @@
 #include <unordered_map>
 #include <vector>
 #include <map>
+#include <optional>
 
 #include <Eigen/Core>
 
