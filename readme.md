@@ -71,7 +71,7 @@ pp. 585 - 594, 2012
 Nikolaus Vahrenkamp
 vahrenkamp at kit dot edu
 
-Repostory:
+Repository:
 https://git.h2t.iar.kit.edu/sw/simox/simox
 
 Mailing list:
