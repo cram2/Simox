@@ -6,6 +6,13 @@ Simox consists of three libraries (Virtual Robot, Saba and Grasp Studio) and num
 examples showing how these libraries can be used to build complex tools in the
 context of mobile manipulation.
 
+**Simox Utility** is a utility library providing general-purpose code tools to help working with,
+among others,
+C++ strings and containers,
+mathematics (e.g. pose, radians and degrees, scaling, clamping, periodic mean, ...),
+data file formats (e.g. JSON, XMl), colors and color maps,
+as well as shapes like axis-aligned and oriented (bounding) boxes.
+
 The library **Virtual Robot** can be used to define complex robot systems,
 which may cover multiple robots with many degrees of freedom.
 The robot structure and its visualization can be easily defined via XML files and environments with
