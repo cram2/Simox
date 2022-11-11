@@ -355,6 +355,17 @@ namespace simox
             return corner(c).template cast<T>();
         }
 
+        std::vector<vector_t> corners() const
+        {
+            std::vector<Eigen::Vector3f> points;
+            points.reserve(8);
+            for (std::uint8_t i = 0; i < 8; ++i)
+            {
+                points.emplace_back(corner(i));
+            }
+            return points;
+        }
+
     protected:
         transform_t _t{transform_t::Identity()};
         vector_t _d{vector_t::Zero()};
