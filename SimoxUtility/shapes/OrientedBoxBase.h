@@ -267,7 +267,7 @@ namespace simox
             return from_box_frame(p).template cast<T>();
         }
 
-        bool contains(const vector_t& p)
+        bool contains(const vector_t& p) const
         {
             const vector_t b = to_box_frame(p);
             const auto check_dim = [&](int i)
@@ -279,7 +279,7 @@ namespace simox
             return check_dim(0) && check_dim(1) && check_dim(2);
         }
 
-        bool contains_by(const vector_t& p, float_t thresh = 0)
+        bool contains_by(const vector_t& p, float_t thresh = 0) const
         {
             const vector_t b = to_box_frame(p);
             const auto check_dim = [&](int i)
