@@ -341,7 +341,7 @@ namespace simox
             {
                 throw std::invalid_argument{"corner has to be in [0, 7]"};
             }
-            const Eigen::Vector3f b
+            const vector_t b
             {
                 (c % 2) ? 0 : _d(0),
                 ((c / 2) % 2) ? 0 : _d(1),
@@ -357,7 +357,7 @@ namespace simox
 
         std::vector<vector_t> corners() const
         {
-            std::vector<Eigen::Vector3f> points;
+            std::vector<vector_t> points;
             points.reserve(8);
             for (std::uint8_t i = 0; i < 8; ++i)
             {
