@@ -179,7 +179,7 @@ namespace VirtualRobot
         VR_ASSERT_MESSAGE(initialized, "Not initialized");
         VR_ASSERT_MESSAGE((!std::isnan(q) && !std::isinf(q)), "Not a valid number...");
 
-        if (limitless)
+        if (limitless and enforceJointLimits)
         {
             // limitless joint: map q to allowed interval
             if (q > jointLimitHi)
