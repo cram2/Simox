@@ -923,6 +923,7 @@ namespace VirtualRobot
         {
             result->registerHumanMapping(getHumanMapping().value());
         }
+        result->primitiveApproximation = primitiveApproximation.clone();
 
         return result;
     }

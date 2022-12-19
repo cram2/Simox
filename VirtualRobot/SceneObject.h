@@ -30,6 +30,9 @@
 #include <string>
 #include <vector>
 #include <filesystem>
+#include <map>
+#include <set>
+#include "Primitive.h"
 
 
 namespace VirtualRobot
@@ -84,6 +87,21 @@ namespace VirtualRobot
             Eigen::Matrix3f inertiaMatrix; //! in kg*m^2
             SimulationType simType;
             std::vector< std::string > ignoreCollisions; // ignore collisions with other objects (only used within collision engines)
+        };
+
+        struct VIRTUAL_ROBOT_IMPORT_EXPORT PrimitiveApproximation
+        {
+            std::vector<Primitive::PrimitivePtr> getModels(const std::vector<std::string> &ids, bool loadDefault = true) const;
+
+            void addModel(const std::vector<Primitive::PrimitivePtr> &primitives, const std::string &id = std::string());
+
+            void getPrimitiveApproximationIDs(std::set<std::string> &ids) const;
+
+            PrimitiveApproximation clone() const;
+
+        private:
+            std::vector<Primitive::PrimitivePtr> defaultPrimitives;
+            std::map<std::string, std::vector<Primitive::PrimitivePtr>> primitives;
         };
 
         /*!
@@ -398,6 +416,19 @@ namespace VirtualRobot
 
         const std::string& getVisualizationModelXML() const;
 
+        const PrimitiveApproximation& getPrimitiveApproximation() const;
+
+        PrimitiveApproximation& getPrimitiveApproximation();
+
+        void setPrimitiveApproximation(const PrimitiveApproximation& primitiveApproximation)
+        {
+            this->primitiveApproximation = primitiveApproximation;
+        }
+
+        void setPrimitiveApproximationModel(const std::vector<std::string> &ids, bool loadDefault = true);
+
+        void getPrimitiveApproximationIDs(std::set<std::string> &ids) const;
+
     protected:
         virtual SceneObject* _clone(const std::string& name, CollisionCheckerPtr colChecker = CollisionCheckerPtr(), float scaling = 1.0f) const;
 
@@ -447,6 +478,8 @@ namespace VirtualRobot
         CollisionCheckerPtr collisionChecker;
 
         float scaling = 1.0f;
+
+        PrimitiveApproximation primitiveApproximation;
     };
 
 

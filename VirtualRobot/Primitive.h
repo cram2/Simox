@@ -20,6 +20,8 @@ namespace VirtualRobot
 
             virtual std::string toXMLString(int tabs) = 0;
 
+            virtual std::unique_ptr<Primitive> clone() const = 0;
+
         protected:
             Primitive(int type) : type(type), transform(Eigen::Matrix4f::Identity()) {}
             std::string getTransformString(int tabs = 0);
@@ -38,6 +40,11 @@ namespace VirtualRobot
             float height;
             float depth;
             std::string toXMLString(int tabs = 0) override;
+
+            std::unique_ptr<Primitive> clone() const final
+            {
+                return std::make_unique<Box>(width, height, depth);
+            }
         };
 
         class VIRTUAL_ROBOT_IMPORT_EXPORT Sphere : public Primitive
@@ -48,6 +55,11 @@ namespace VirtualRobot
             Sphere(float radius) : Primitive(TYPE), radius(radius) {}
             float radius;
             std::string toXMLString(int tabs = 0) override;
+
+            std::unique_ptr<Primitive> clone() const final
+            {
+                return std::make_unique<Sphere>(radius);
+            }
         };
 
         class VIRTUAL_ROBOT_IMPORT_EXPORT Cylinder : public Primitive
@@ -59,6 +71,30 @@ namespace VirtualRobot
             float radius;
             float height;
             std::string toXMLString(int tabs = 0) override;
+
+            std::unique_ptr<Primitive> clone() const final
+            {
+                return std::make_unique<Cylinder>(radius, height);
+            }
+        };
+
+        /**
+         * @brief The Capsule class. The capsule is extended along the y-axis.
+         */
+        class VIRTUAL_ROBOT_IMPORT_EXPORT Capsule : public Primitive
+        {
+        public:
+            static const int TYPE = 4;
+            Capsule() : Primitive(TYPE) {}
+            Capsule(float radius, float height) : Primitive(TYPE), radius(radius), height(height) {}
+            float radius;
+            float height;
+            std::string toXMLString(int tabs = 0) override;
+
+            std::unique_ptr<Primitive> clone() const final
+            {
+                return std::make_unique<Capsule>(radius, height);
+            }
         };
 
         typedef std::shared_ptr<Primitive> PrimitivePtr;

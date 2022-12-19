@@ -1258,6 +1258,22 @@ namespace VirtualRobot
         return collisionModel;
     }
 
+    void BaseIO::processPrimitiveModelTag(SceneObject::PrimitiveApproximation& primitiveApproximation,
+                                          const rapidxml::xml_node<char>* primitiveApproximationXMLNode)
+    {
+        rapidxml::xml_attribute<>* attr = primitiveApproximationXMLNode->first_attribute("enable", 0, false);
+        if (!attr || isTrue(attr->value()))
+        {
+            auto primitives = processPrimitives(primitiveApproximationXMLNode);
+            rapidxml::xml_attribute<>* idAttr = primitiveApproximationXMLNode->first_attribute("id", 0, false);
+            std::string id = idAttr ? idAttr->value() : std::string();
+            if (primitives.size() > 0)
+            {
+                primitiveApproximation.addModel(primitives, id);
+            }
+        }
+    }
+
     std::vector<VisualizationNodePtr> BaseIO::processVisuFiles(const rapidxml::xml_node<char>* visualizationXMLNode, const std::string& basePath, std::string& fileType)
     {
         const rapidxml::xml_node<>* node = visualizationXMLNode;
@@ -1414,6 +1430,13 @@ namespace VirtualRobot
                 cylinder->radius = convertToFloat(primitiveXMLNode->first_attribute("radius", 0, false)->value()) * lenFactor;
                 cylinder->height = convertToFloat(primitiveXMLNode->first_attribute("height", 0, false)->value()) * lenFactor;
                 primitive.reset(cylinder);
+            }
+            else if (pName == "capsule")
+            {
+                Primitive::Capsule* capsule = new Primitive::Capsule;
+                capsule->radius = convertToFloat(primitiveXMLNode->first_attribute("radius", 0, false)->value()) * lenFactor;
+                capsule->height = convertToFloat(primitiveXMLNode->first_attribute("height", 0, false)->value()) * lenFactor;
+                primitive.reset(capsule);
             }
             else
             {

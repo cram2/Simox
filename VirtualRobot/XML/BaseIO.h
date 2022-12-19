@@ -98,6 +98,7 @@ namespace VirtualRobot
 
         static VisualizationNodePtr processVisualizationTag(const rapidxml::xml_node<char>* visuXMLNode, const std::string& tagName, const std::string& basePath, bool& useAsColModel);
         static CollisionModelPtr processCollisionTag(const rapidxml::xml_node<char>* colXMLNode, const std::string& tagName, const std::string& basePath);
+        static void processPrimitiveModelTag(SceneObject::PrimitiveApproximation& primitiveApproximation, const rapidxml::xml_node<char>* colXMLNode);
         static std::vector<Primitive::PrimitivePtr> processPrimitives(const rapidxml::xml_node<char>* primitivesXMLNode);
         static void processPhysicsTag(const rapidxml::xml_node<char>* physicsXMLNode, const std::string& nodeName, SceneObject::Physics& physics);
         static RobotNodeSetPtr processRobotNodeSet(const rapidxml::xml_node<char>* setXMLNode, RobotPtr robo, const std::string& robotRootNode, int& robotNodeSetCounter);

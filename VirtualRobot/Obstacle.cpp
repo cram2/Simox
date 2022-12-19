@@ -301,6 +301,7 @@ namespace VirtualRobot
         ObstaclePtr result(new Obstacle(name, clonedVisualizationNode, clonedCollisionModel, physics, colChecker));
 
         result->setGlobalPose(getGlobalPose());
+        result->primitiveApproximation = primitiveApproximation;
 
         appendSensorsTo(result);
         appendGraspSetsTo(result);

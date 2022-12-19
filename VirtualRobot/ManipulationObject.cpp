@@ -109,6 +109,7 @@ namespace VirtualRobot
         ManipulationObjectPtr result(new ManipulationObject(name, clonedVisualizationNode, clonedCollisionModel, physics, colChecker));
 
         result->setGlobalPose(getGlobalPose());
+        result->primitiveApproximation = primitiveApproximation;
 
         appendSensorsTo(result);
         appendGraspSetsTo(result);

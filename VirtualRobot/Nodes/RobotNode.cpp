@@ -611,6 +611,7 @@ namespace VirtualRobot
         }
         result->basePath = basePath;
         result->setScaling(actualScaling);
+        result->primitiveApproximation = primitiveApproximation.clone();
         return result;
     }
 
