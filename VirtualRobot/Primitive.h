@@ -43,7 +43,9 @@ namespace VirtualRobot
 
             std::unique_ptr<Primitive> clone() const final
             {
-                return std::make_unique<Box>(width, height, depth);
+                auto clone = std::make_unique<Box>(width, height, depth);
+                clone->transform = transform;
+                return clone;
             }
         };
 
@@ -58,7 +60,9 @@ namespace VirtualRobot
 
             std::unique_ptr<Primitive> clone() const final
             {
-                return std::make_unique<Sphere>(radius);
+                auto clone = std::make_unique<Sphere>(radius);
+                clone->transform = transform;
+                return clone;
             }
         };
 
@@ -74,7 +78,9 @@ namespace VirtualRobot
 
             std::unique_ptr<Primitive> clone() const final
             {
-                return std::make_unique<Cylinder>(radius, height);
+                auto clone = std::make_unique<Cylinder>(radius, height);
+                clone->transform = transform;
+                return clone;
             }
         };
 
@@ -93,7 +99,9 @@ namespace VirtualRobot
 
             std::unique_ptr<Primitive> clone() const final
             {
-                return std::make_unique<Capsule>(radius, height);
+                auto clone = std::make_unique<Capsule>(radius, height);
+                clone->transform = transform;
+                return clone;
             }
         };
 
