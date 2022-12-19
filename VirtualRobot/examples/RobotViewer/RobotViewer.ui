@@ -15,7 +15,7 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="0">
+    <item row="0" column="1">
      <widget class="QSplitter" name="splitter">
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
@@ -26,6 +26,12 @@
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>600</width>
+         <height>0</height>
+        </size>
        </property>
        <property name="frameShape">
         <enum>QFrame::StyledPanel</enum>
@@ -49,8 +55,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>841</width>
-          <height>1092</height>
+          <width>483</width>
+          <height>1094</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -293,59 +299,66 @@
             <item row="0" column="0" colspan="2">
              <widget class="QWidget" name="widget" native="true">
               <layout class="QGridLayout" name="gridLayout_5">
-               <item row="6" column="0">
-                <widget class="QCheckBox" name="checkBoxPhysicsCoM">
-                 <property name="text">
-                  <string>CoM</string>
+               <item row="2" column="1">
+                <widget class="QComboBox" name="comboBoxPrimitiveModel">
+                 <property name="placeholderText">
+                  <string/>
                  </property>
                 </widget>
                </item>
-               <item row="6" column="1">
-                <widget class="QCheckBox" name="checkBoxPhysicsInertia">
-                 <property name="text">
-                  <string>Inertia</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="4" column="0" colspan="2">
-                <widget class="QCheckBox" name="checkBoxRobotCoordSystems">
-                 <property name="text">
-                  <string>Coordinate systems</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="5" column="0" colspan="2">
-                <widget class="QCheckBox" name="checkBoxRobotSensors">
-                 <property name="text">
-                  <string>Sensors</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="3" column="0" colspan="2">
-                <widget class="QCheckBox" name="checkBoxStructure">
-                 <property name="text">
-                  <string>Robot structure</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="2" column="0" colspan="2">
-                <widget class="QCheckBox" name="checkBoxFullModel">
-                 <property name="text">
-                  <string>IV Model</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="0" colspan="2">
+               <item row="5" column="0">
                 <widget class="QLabel" name="label">
                  <property name="text">
                   <string>Full model options</string>
                  </property>
                 </widget>
                </item>
-               <item row="0" column="0" colspan="2">
+               <item row="8" column="0">
+                <widget class="QCheckBox" name="checkBoxRobotCoordSystems">
+                 <property name="text">
+                  <string>Coordinate systems</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="9" column="0">
+                <widget class="QCheckBox" name="checkBoxRobotSensors">
+                 <property name="text">
+                  <string>Sensors</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="0">
                 <widget class="QCheckBox" name="checkBoxColModel">
                  <property name="text">
                   <string>Collision model</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="6" column="0">
+                <widget class="QCheckBox" name="checkBoxFullModel">
+                 <property name="text">
+                  <string>IV Model</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="7" column="0">
+                <widget class="QCheckBox" name="checkBoxStructure">
+                 <property name="text">
+                  <string>Robot structure</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="10" column="0">
+                <widget class="QCheckBox" name="checkBoxPhysicsCoM">
+                 <property name="text">
+                  <string>CoM</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="10" column="1">
+                <widget class="QCheckBox" name="checkBoxPhysicsInertia">
+                 <property name="text">
+                  <string>Inertia</string>
                  </property>
                 </widget>
                </item>

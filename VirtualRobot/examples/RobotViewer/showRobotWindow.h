@@ -49,6 +49,7 @@ public slots:
     void rebuildVisualization();
     void showRobot();
     void loadRobot();
+    void selectPrimitiveModel(int nr);
     void selectJoint(int nr);
     void selectRNS(int nr);
     void jointValueChanged(int pos);
