@@ -3,8 +3,14 @@
     "tools/ccache/default": {},
     "simox": {},
 
-    "mmm/core": {},
     "# mmm/tools": {},
+
+    "apt/nlopt": {},
+    "semantic-object-relations": {},
+    "mmm/core": {},
+    "deps/eigen3": {},
+
+
 
     "apt/libqt5bluetooth5": {},
     "apt/libqt5designer5": {},
