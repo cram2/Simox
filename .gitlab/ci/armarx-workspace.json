@@ -3,6 +3,8 @@
     "tools/ccache/default": {},
     "simox": {},
 
+    "apt/libpcl-dev": {},
+
     "# mmm/tools": {},
 
     "# apt/nlopt": {},
@@ -13,7 +15,6 @@
 
     "# apt/boost": {},
     "# apt/eigen3": {},
-    "apt/pcl": {},
 
     "# apt/libqt5bluetooth5": {},
     "# apt/libqt5designer5": {},
