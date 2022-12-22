@@ -1,7 +1,8 @@
 {
   "modules": {
     "tools/ccache/default": {},
-    "simox": {}
+    "simox": {},
+    "apt/qt5-default": {}
   },
   "global": {
     "prepare": {
