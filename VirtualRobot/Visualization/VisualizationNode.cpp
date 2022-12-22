@@ -80,7 +80,6 @@ namespace VirtualRobot
 
     void VisualizationNode::setGlobalPose(const Eigen::Matrix4f& globalPose)
     {
-        std::cout << "VisuModel->setGlobalPose() with \n" << globalPose << std::endl;
         this->globalPose = globalPose;
     }
 
@@ -91,11 +90,7 @@ namespace VirtualRobot
 
     void VisualizationNode::setGlobalParentPose(const Eigen::Matrix4f& globalParentPose)
     {
-        std::cout << "VisuModel->setGlobalParentPose() with \n" << globalParentPose
-                  << "\n and local pose \n" << localPose
-                  << std::endl;
-        this->globalPose = globalParentPose * localPose;
-        // setGlobalPose(globalParentPose * localPose);
+        setGlobalPose(globalParentPose * localPose);
     }
 
     void VisualizationNode::setLocalPose(const Eigen::Matrix4f& localPose)
