@@ -4,7 +4,7 @@
     "simox": {},
     "armarx/ArmarXCore": {},
     "armarx/ArmarXGui": {},
-    "# armarx/RobotAPI": {},
+    "armarx/RobotAPI": {},
     "# armarx/MemoryX": {},
     "# armarx/VisionX": {},
     "# armarx/RobotComponents": {},
