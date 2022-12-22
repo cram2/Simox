@@ -2,7 +2,32 @@
   "modules": {
     "tools/ccache/default": {},
     "simox": {},
-    "armarx": {}
+    "armarx/ArmarXCore": {},
+    "armarx/ArmarXGui": {},
+    "# armarx/RobotAPI": {},
+    "# armarx/MemoryX": {},
+    "# armarx/VisionX": {},
+    "# armarx/RobotComponents": {},
+    "# armarx/RobotSkillTemplates": {},
+    "# armarx/ArmarXSimulation": {},
+    "# armarx/Spoac": {},
+    "# armarx/SpeechX": {},
+
+    "# armarx/meta/academy": {},
+    "# armarx/meta/ArmarXDoc": {},
+
+    "# armarx/core/arviz_godot": {},
+    "# armarx/core/externalization": {},
+
+    "# armarx/skills/control": {},
+    "# armarx/skills/kinesthetic_learning": {},
+    "# armarx/skills/localization_and_mapping": {},
+    "# armarx/skills/manipulation": {},
+    "# armarx/skills/navigation": {},
+    "# armarx/skills/view_selection": {},
+
+    "# armarx/python3-armarx": {},
+    "# armarx/core/python3-armarxctl": {}
   },
   "global": {
     "prepare": {
