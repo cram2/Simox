@@ -67,5 +67,5 @@ build-and-test:
 
     # Test.
     # ToDo: Add and use `axii ws test -m simox`
-    # - cd "$PROJECT_PATH_IN_WORKSPACE/build"
+    - cd "$PROJECT_PATH_IN_WORKSPACE/build"
     # - ctest .

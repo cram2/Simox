@@ -2,9 +2,12 @@
   "modules": {
     "tools/ccache/default": {},
     "simox": {},
-    "armarx/ArmarXCore": {},
-    "armarx/ArmarXGui": {},
-    "armarx/RobotAPI": {},
+
+    "apt/qt5-bluetooth": {},
+
+    "# armarx/ArmarXCore": {},
+    "# armarx/ArmarXGui": {},
+    "# armarx/RobotAPI": {},
     "# armarx/MemoryX": {},
     "# armarx/VisionX": {},
     "# armarx/RobotComponents": {},
