@@ -8,8 +8,8 @@ namespace simox::fs
     inline std::filesystem::path
     make_relative(std::filesystem::path a_From, std::filesystem::path a_To)
     {
-        a_From = std::filesystem::canonical(a_From);
-        a_To = std::filesystem::canonical(a_To);
+        a_From = std::filesystem::weakly_canonical(a_From);
+        a_To = std::filesystem::weakly_canonical(a_To);
         std::filesystem::path ret;
         std::filesystem::path::const_iterator itrFrom(a_From.begin()), itrTo(a_To.begin());
         // Find common base
