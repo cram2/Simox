@@ -52,6 +52,10 @@ build-and-test:
     - axii workspace update --prefer-https
     - _axii_auto_env_refresh
 
+    # deps/coin/soqt says:
+    # qmake: could not find a Qt installation of ''
+    - apt-get install qt5-default --yes
+
     # Upgrade.
     - axii workspace upgrade
     - _axii_auto_env_refresh
