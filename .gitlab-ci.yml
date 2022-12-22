@@ -30,7 +30,7 @@ build-and-test:
     - _axii_auto_env_refresh
 
     # Use workspace configuration from project.
-    - cp "$CI_PROJECT_DIR/.gitlab/ci/workspace.json" "$ARMARX_WORKSPACE/armarx-workspace.json"
+    - cp "$CI_PROJECT_DIR/.gitlab/ci/armarx-workspace.json" "$ARMARX_WORKSPACE/armarx-workspace.json"
     - cat "$ARMARX_WORKSPACE/armarx-workspace.json"
 
     - axii workspace env
