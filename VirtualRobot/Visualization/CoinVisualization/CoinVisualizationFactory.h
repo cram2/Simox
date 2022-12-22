@@ -107,10 +107,6 @@ namespace VirtualRobot
             \return A VisualizationNode containing the visualization.
         */
         VisualizationNodePtr createEllipse(float x, float y, float z, bool showAxes = true, float axesHeight = 4.0f, float axesWidth = 8.0f) override;
-        /*!
-            Move local visualization by homogeneous matrix m. MM is used.
-        */
-        void applyDisplacement(VisualizationNodePtr o, Eigen::Matrix4f& m) override;
 
         /*!
             Create an empty VisualizationNode.

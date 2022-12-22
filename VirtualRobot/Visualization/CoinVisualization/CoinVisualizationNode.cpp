@@ -237,7 +237,7 @@ namespace VirtualRobot
 
     void CoinVisualizationNode::setGlobalPose(const Eigen::Matrix4f& m)
     {
-        globalPose = m;
+        Base::setGlobalPose(m);
 
         if (globalPoseTransform && updateVisualization)
         {
@@ -357,6 +357,7 @@ namespace VirtualRobot
         //else -> lazy generation
 
         p->setUpdateVisualization(updateVisualization);
+        p->setLocalPose(getLocalPose());
         p->setGlobalPose(getGlobalPose());
         p->setFilename(filename, boundingBox);
 

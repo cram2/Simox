@@ -59,14 +59,16 @@ namespace VirtualRobot
         /*!
             Sets the position of the internal data structure.
         */
-        virtual void setGlobalPose(const Eigen::Matrix4f& m)
-        {
-            globalPose = m;
-        }
-        inline const Eigen::Matrix4f& getGlobalPose() const
-        {
-            return globalPose;
-        }
+        virtual void setGlobalPose(const Eigen::Matrix4f& globalPose);
+        const Eigen::Matrix4f& getGlobalPose() const;
+
+        /*!
+            Set this node's global pose according to the given parent coordinate system pose.
+        */
+        virtual void setGlobalParentPose(const Eigen::Matrix4f& globalParentPose);
+
+        virtual void setLocalPose(const Eigen::Matrix4f& localPose);
+        const Eigen::Matrix4f& getLocalPose() const;
 
         /*!
             Clone this visualization.
@@ -162,9 +164,13 @@ namespace VirtualRobot
         virtual void createTriMeshModel();
 
     protected:
-        bool boundingBox; //!< Indicates, if the bounding box model was used
-        std::string filename; //!< if the visualization was build from a file, the filename is stored here
+        /// Indicates whether the bounding box model was used
+        bool boundingBox;
+        /// If the visualization was build from a file the filename is stored here.
+        std::string filename;
 
+        /// The local pose in the parent coordinate system.
+        Eigen::Matrix4f localPose = Eigen::Matrix4f::Identity();
         Eigen::Matrix4f globalPose;
         bool updateVisualization;
 
