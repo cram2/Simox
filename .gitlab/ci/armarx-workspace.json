@@ -1,8 +1,7 @@
 {
   "modules": {
     "tools/ccache/default": {},
-    "simox": {},
-    "armarx": {}
+    "simox": {}
   },
   "global": {
     "prepare": {
