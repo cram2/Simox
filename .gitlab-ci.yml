@@ -57,15 +57,15 @@ build-and-test:
     # - apt-get install qt5-default --yes
 
     # Upgrade.
-    - axii workspace upgrade -m deps/coin/soqt
-    - cd "$deps__coin__soqt__PATH/build"
-    - cmake -DSOQT_USE_QT5=true -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER_LAUNCHER=/usr/bin/ccache -DCMAKE_CXX_COMPILER_LAUNCHER=/usr/bin/ccache -DCMAKE_C_COMPILER=/usr/bin/gcc-8 -DCMAKE_CXX_COMPILER=/usr/bin/g++-8 ..
-    # - axii workspace upgrade -m simox
-    # - _axii_auto_env_refresh
+    # - axii workspace upgrade -m deps/coin/soqt
+    # - cd "$deps__coin__soqt__PATH/build"
+    # - cmake -DSOQT_USE_QT5=true -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER_LAUNCHER=/usr/bin/ccache -DCMAKE_CXX_COMPILER_LAUNCHER=/usr/bin/ccache -DCMAKE_C_COMPILER=/usr/bin/gcc-8 -DCMAKE_CXX_COMPILER=/usr/bin/g++-8 ..
+    - axii workspace upgrade -m simox
+    - _axii_auto_env_refresh
 
-    # - ccache --show-stats
+    - ccache --show-stats
 
     # Test.
     # ToDo: Add and use `axii ws test -m simox`
-    # - cd "$PROJECT_PATH_IN_WORKSPACE/build"
+    - cd "$PROJECT_PATH_IN_WORKSPACE/build"
     # - ctest .
