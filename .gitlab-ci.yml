@@ -61,4 +61,8 @@ build-and-test:
     # Test.
     # ToDo: Add and use `axii ws test -m simox`
     - cd "$PROJECT_PATH_IN_WORKSPACE/build"
+    - ctest . || true
+    - ctest --rerun-failed --output-on-failure .
+    - cat Temporary/LastTest.log
+    # Once again to make the job fail if an error occurs.
     - ctest .
