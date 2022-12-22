@@ -41,9 +41,11 @@ build-and-test:
     - axii workspace list-modules --deps
     - axii workspace info
 
+    - export PROJECT_PATH_IN_WORKSPACE="$simox__PATH"
+
     # Symlink project directory into Axii workspace.
-    - mkdir -p "$(dirname $armarx__meta__documentation__PATH)"
-    - ln -s "$CI_PROJECT_DIR" "$armarx__meta__documentation__PATH"
+    - mkdir -p "$(dirname $PROJECT_PATH_IN_WORKSPACE)"
+    - ln -s "$CI_PROJECT_DIR" "$PROJECT_PATH_IN_WORKSPACE"
 
     # Upgrade.
     - axii workspace system --accept-apt-install
@@ -58,5 +60,5 @@ build-and-test:
 
     # Test.
     # ToDo: Add and use `axii ws test -m simox`
-    - cd "$simox__PATH/build"
+    - cd "$PROJECT_PATH_IN_WORKSPACE/build"
     - ctest .
