@@ -15,21 +15,20 @@
     "# apt/eigen3": {},
     "apt/pcl": {},
 
+    "# apt/libqt5bluetooth5": {},
+    "# apt/libqt5designer5": {},
+    "# apt/libqt5designercomponents5": {},
+    "# apt/libqt5svg5-dev": {},
 
-    "apt/libqt5bluetooth5": {},
-    "apt/libqt5designer5": {},
-    "apt/libqt5designercomponents5": {},
-    "apt/libqt5svg5-dev": {},
-
-    "apt/qt5": {},
+    "# apt/qt5": {},
     "# apt/qt5-qmake": {},
     "# apt/qtbase5-dev": {},
     "# apt/qtbase5-dev-tools": {},
     "# apt/qtchooser": {},
-    "apt/qtconnectivity5-dev": {},
+    "# apt/qtconnectivity5-dev": {},
     "# apt/qtscript5-dev": {},
     "# apt/qttools5-dev": {},
-    "apt/qt5-bluetooth": {},
+    "# apt/qt5-bluetooth": {},
 
     "# armarx/ArmarXCore": {},
     "# armarx/ArmarXGui": {},
