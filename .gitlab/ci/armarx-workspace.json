@@ -6,9 +6,14 @@
     "# mmm/tools": {},
 
     "apt/nlopt": {},
-    "# semantic-object-relations": {},
     "# mmm/core": {},
     "deps/eigen3": {},
+
+    "# semantic-object-relations": {},
+
+    "apt/boost": {},
+    "apt/eigen3": {},
+    "apt/pcl": {},
 
 
     "apt/libqt5bluetooth5": {},
