@@ -4345,45 +4345,6 @@ namespace VirtualRobot
         return root;
     }
 
-    void CoinVisualizationFactory::applyDisplacement(VisualizationNodePtr o, Eigen::Matrix4f& m)
-    {
-        if (!o)
-        {
-            return;
-        }
-
-
-        if (o->getType() != getName())
-        {
-            VR_ERROR << "Skipping Visualization type " << o->getType() << ", but factory is of type " << getName() << std::endl;
-            return;
-        }
-
-        CoinVisualizationNode* cvn = dynamic_cast<CoinVisualizationNode*>(o.get());
-
-        if (cvn)
-        {
-            SoNode* n = cvn->getCoinVisualization();
-
-            if (n)
-            {
-                SoSeparator* s = new SoSeparator;
-                s->ref();
-                SoMatrixTransform* ma = getMatrixTransformScaleMM2M(m);
-                s->addChild(ma);
-                s->addChild(n->copy(FALSE));
-
-                cvn->setVisualization(s);
-                //o.reset(new CoinVisualizationNode(s));
-                s->unrefNoDelete();
-            }
-        }
-        else
-        {
-            VR_WARNING << "Invalid type casting to CoinVisualizationNode?!" << std::endl;
-        }
-    }
-
 
     SoGroup* CoinVisualizationFactory::convertSoFileChildren(SoGroup* orig)
     {

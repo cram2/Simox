@@ -347,6 +347,7 @@ SET(SOURCES
     Visualization/TriMeshModel.cpp
     Visualization/TriMeshUtils.cpp
     Visualization/Visualization.cpp
+    Visualization/VisualizationFactory.cpp
     Visualization/VisualizationNode.cpp
 
     Workspace/Manipulability.cpp

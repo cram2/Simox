@@ -58,6 +58,7 @@ namespace VirtualRobot
 
 
         p->setUpdateVisualization(updateVisualization);
+        p->setLocalPose(getLocalPose());
         p->setGlobalPose(getGlobalPose());
         p->setFilename(filename, boundingBox);
 
@@ -75,6 +76,31 @@ namespace VirtualRobot
     VirtualRobot::TriMeshModelPtr VisualizationNode::getTriMeshModel()
     {
         return triMeshModel;
+    }
+
+    void VisualizationNode::setGlobalPose(const Eigen::Matrix4f& globalPose)
+    {
+        this->globalPose = globalPose;
+    }
+
+    const Eigen::Matrix4f& VisualizationNode::getGlobalPose() const
+    {
+        return globalPose;
+    }
+
+    void VisualizationNode::setGlobalParentPose(const Eigen::Matrix4f& globalParentPose)
+    {
+        setGlobalPose(globalParentPose * localPose);
+    }
+
+    void VisualizationNode::setLocalPose(const Eigen::Matrix4f& localPose)
+    {
+        this->localPose = localPose;
+    }
+
+    const Eigen::Matrix4f& VisualizationNode::getLocalPose() const
+    {
+        return localPose;
     }
 
     void VisualizationNode::attachVisualization(const std::string& name, VisualizationNodePtr v)
@@ -322,7 +348,6 @@ namespace VirtualRobot
 
     void VisualizationNode::createTriMeshModel()
     {
-
     }
 
 } // namespace VirtualRobot
