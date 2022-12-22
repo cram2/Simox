@@ -3,6 +3,15 @@
     "tools/ccache/default": {},
     "simox": {},
 
+    "# apt/libvtk7-qt-dev": {},
+
+    "apt/libqt5opengl5-dev": {},
+    "apt/libqt5webkit5-dev": {},
+    "apt/libvtk7-dev": {},
+    "apt/libvtk7.1p-qt": {},
+    "apt/qtbase5-dev": {},
+    "apt/qttools5-private-dev": {},
+
     "# apt/libboost-all-dev": {},
     "# apt/libeigen3-dev": {},
     "# apt/libflann-dev": {},
@@ -30,7 +39,6 @@
     "# apt/libpcl-visualization1.10": {},
     "# apt/libqhull-dev": {},
     "# apt/libvtk7-dev": {},
-    "apt/libvtk7-qt-dev": {},
 
     "# mmm/tools": {},
 
