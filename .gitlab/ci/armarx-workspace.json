@@ -2,7 +2,7 @@
   "modules": {
     "tools/ccache/default": {},
     "simox": {},
-    "apt/qt5-default": {}
+    "armarx": {}
   },
   "global": {
     "prepare": {
