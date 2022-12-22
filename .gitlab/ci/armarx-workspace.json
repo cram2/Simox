@@ -3,9 +3,9 @@
     "tools/ccache/default": {},
     "simox": {},
 
-    "apt/libboost-all-dev": {},
-    "apt/libeigen3-dev": {},
-    "apt/libflann-dev": {},
+    "# apt/libboost-all-dev": {},
+    "# apt/libeigen3-dev": {},
+    "# apt/libflann-dev": {},
     "# apt/libopenni-dev": {},
     "# apt/libopenni2-dev": {},
     "# apt/libpcl-apps1.10": {},
@@ -30,7 +30,7 @@
     "# apt/libpcl-visualization1.10": {},
     "# apt/libqhull-dev": {},
     "# apt/libvtk7-dev": {},
-    "# apt/libvtk7-qt-dev": {},
+    "apt/libvtk7-qt-dev": {},
 
     "# mmm/tools": {},
 
