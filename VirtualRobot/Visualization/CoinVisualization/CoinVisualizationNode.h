@@ -41,6 +41,7 @@ namespace VirtualRobot
 
     class VIRTUAL_ROBOT_IMPORT_EXPORT CoinVisualizationNode : virtual public VisualizationNode
     {
+        using Base = VisualizationNode;
         friend class CoinVisualizationFactory;
     public:
         CoinVisualizationNode(const TriMeshModelPtr &tri);
