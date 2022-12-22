@@ -5,12 +5,12 @@
 
     "# apt/libvtk7-qt-dev": {},
 
+    "# apt/qtbase5-dev": {},
     "apt/libqt5opengl5-dev": {},
     "apt/libqt5webkit5-dev": {},
+    "# apt/qttools5-private-dev": {},
     "# apt/libvtk7-dev": {},
     "# apt/libvtk7.1p-qt": {},
-    "apt/qtbase5-dev": {},
-    "apt/qttools5-private-dev": {},
 
     "# apt/libboost-all-dev": {},
     "# apt/libeigen3-dev": {},
