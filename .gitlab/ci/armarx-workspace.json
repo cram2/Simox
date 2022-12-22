@@ -7,9 +7,8 @@
 
     "apt/nlopt": {},
     "semantic-object-relations": {},
-    "mmm/core": {},
+    "# mmm/core": {},
     "deps/eigen3": {},
-
 
 
     "apt/libqt5bluetooth5": {},
