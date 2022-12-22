@@ -1,13 +1,14 @@
 {
   "modules": {
     "tools/ccache/default": {},
-    "simox": {}
+    "armarx": {},
+    "armarx/meta/documentation": {}
   },
   "global": {
     "prepare": {
       "cmake": {
         "definitions": {
-          "CMAKE_BUILD_TYPE": "Release",
+          "CMAKE_BUILD_TYPE": "RelWithDebInfo",
           "CMAKE_C_COMPILER_LAUNCHER": "$CCACHE",
           "CMAKE_CXX_COMPILER_LAUNCHER": "$CCACHE"
         }
