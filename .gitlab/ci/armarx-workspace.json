@@ -13,7 +13,7 @@
 
     "apt/boost": {},
     "apt/eigen3": {},
-    "apt/pcl": {},
+    "# apt/pcl": {},
 
 
     "apt/libqt5bluetooth5": {},
