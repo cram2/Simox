@@ -2,9 +2,9 @@
   "modules": {
     "tools/ccache/default": {},
     "simox": {},
-    
+
     "mmm/core": {},
-    "mmm/tools": {},
+    "# mmm/tools": {},
 
     "apt/libqt5bluetooth5": {},
     "apt/libqt5designer5": {},
