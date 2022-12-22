@@ -54,13 +54,13 @@ build-and-test:
 
     # deps/coin/soqt says:
     # qmake: could not find a Qt installation of ''
-    - apt-get install qt5-default --yes
+    # - apt-get install qt5-default --yes
 
     # Upgrade.
-    - axii workspace upgrade -m deps/coin/coin
-    - cd "$deps__coin__soqt__PATH/build"
-    - cmake -DSOQT_USE_QT5=true -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER_LAUNCHER=/usr/bin/ccache -DCMAKE_CXX_COMPILER_LAUNCHER=/usr/bin/ccache -DCMAKE_C_COMPILER=/usr/bin/gcc-8 -DCMAKE_CXX_COMPILER=/usr/bin/g++-8 ..
-    - axii workspace upgrade
+    - axii workspace upgrade -m deps/coin/soqt
+    # - cd "$deps__coin__soqt__PATH/build"
+    # - cmake -DSOQT_USE_QT5=true -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER_LAUNCHER=/usr/bin/ccache -DCMAKE_CXX_COMPILER_LAUNCHER=/usr/bin/ccache -DCMAKE_C_COMPILER=/usr/bin/gcc-8 -DCMAKE_CXX_COMPILER=/usr/bin/g++-8 ..
+    - axii workspace upgrade -m simox
     - _axii_auto_env_refresh
 
     - ccache --show-stats
