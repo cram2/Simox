@@ -29,8 +29,8 @@
     "# apt/libpcl-tracking1.10": {},
     "# apt/libpcl-visualization1.10": {},
     "# apt/libqhull-dev": {},
-    "apt/libvtk7-dev": {},
-    "apt/libvtk7-qt-dev": {},
+    "# apt/libvtk7-dev": {},
+    "# apt/libvtk7-qt-dev": {},
 
     "# mmm/tools": {},
 
