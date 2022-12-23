@@ -17,7 +17,7 @@ build-and-test:
     # Ccache configuration and introspection.
     - apt-get install ccache --yes
     - ccache --set-config=cache_dir="$CI_PROJECT_DIR/.ccache"
-    - ccache --max-size=20G
+    - ccache --max-size=5G
     - ccache --show-stats
 
     # Activate Axii.
