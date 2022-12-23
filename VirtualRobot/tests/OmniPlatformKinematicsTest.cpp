@@ -74,6 +74,10 @@ BOOST_AUTO_TEST_CASE(testInv)
     BOOST_CHECK_CLOSE(vAngle, velocities(2), 0.001);
 }
 
+
+#define VAROUT(var) #var " = " << var
+
+
 BOOST_AUTO_TEST_CASE(testMoveForward)
 {
     const VirtualRobot::OmniWheelPlatformKinematicsParams params = ARMAR7_OMNI_PLATFORM_CONFIG;
@@ -84,14 +88,16 @@ BOOST_AUTO_TEST_CASE(testMoveForward)
     const auto wheelVelocities = p.calcWheelVelocity(velForward);
 
     // front wheel should not move
-    BOOST_CHECK_CLOSE(0.0, wheelVelocities(0), 0.1);
+    BOOST_TEST_INFO(0.0 << " | " << VAROUT(wheelVelocities(0)));
+    BOOST_CHECK_LE(std::abs(0.0 - wheelVelocities(0)), 0.02);
 
     // rear wheels should move at the same speed ...
-    BOOST_CHECK_CLOSE(std::abs(wheelVelocities(1)), std::abs(wheelVelocities(2)), 0.001);
+    BOOST_TEST_INFO(VAROUT(wheelVelocities(1)) << " | " << VAROUT(wheelVelocities(2)));
+    BOOST_CHECK_LE(std::abs(std::abs(wheelVelocities(1)) - std::abs(wheelVelocities(2))), 0.02);
 
     // .. but with different signs
     BOOST_CHECK_GE(wheelVelocities(1), 0.0);
-    BOOST_CHECK_LE(wheelVelocities(2), 0.0);
+    BOOST_CHECK_LE(wheelVelocities(2), 1e-8);
 }
 
 BOOST_AUTO_TEST_CASE(testRotate)
