@@ -1,0 +1,68 @@
+
+stages:
+  - build-and-test
+
+
+build-and-test:
+  stage: build-and-test
+  image: git.h2t.iar.kit.edu:5050/sw/armarx/meta/axii:latest-bionic
+
+  cache:
+    # https://docs.gitlab.com/ee/ci/caching/#share-caches-across-jobs-in-different-branches
+    key: one-key-to-rule-them-all
+    paths:
+      - .ccache
+
+  before_script:
+    # Ccache configuration and introspection.
+    - apt-get install ccache --yes
+    - ccache --set-config=cache_dir="$CI_PROJECT_DIR/.ccache"
+    - ccache --max-size=5G
+    - ccache --show-stats
+
+    # Activate Axii.
+    - source /axii/scripts/install_axii.sh
+
+  script:
+    # Create workspace.
+    - axii workspace create ~/workspace workspace
+    - axii workspace activate workspace
+    - _axii_auto_env_refresh
+
+    # Use workspace configuration from project.
+    - cp "$CI_PROJECT_DIR/.gitlab/ci/armarx-workspace.json" "$ARMARX_WORKSPACE/armarx-workspace.json"
+    - cat "$ARMARX_WORKSPACE/armarx-workspace.json"
+
+    - axii workspace env
+    - _axii_auto_env_refresh
+
+    - echo "Workspace information:"
+    - axii workspace list-modules
+    - axii workspace list-modules --deps
+    - axii workspace info
+
+    - export PROJECT_PATH_IN_WORKSPACE="$simox__PATH"
+
+    # Symlink project directory into Axii workspace.
+    - mkdir -p "$(dirname $PROJECT_PATH_IN_WORKSPACE)"
+    - ln -s "$CI_PROJECT_DIR" "$PROJECT_PATH_IN_WORKSPACE"
+
+    # Upgrade.
+    - axii workspace system --accept-apt-install
+    - axii workspace update --prefer-https
+    - _axii_auto_env_refresh
+
+    # Upgrade.
+    - axii workspace upgrade -m simox
+    - _axii_auto_env_refresh
+
+    - ccache --show-stats
+
+    # Test.
+    # ToDo: Add and use `axii ws test -m simox`
+    - cd "$PROJECT_PATH_IN_WORKSPACE/build"
+    - ctest . || true
+    - ctest --rerun-failed --output-on-failure . || true
+    - cat Temporary/LastTest.log || true
+    # Once again to make the job fail if an error occurs.
+    - ctest .
