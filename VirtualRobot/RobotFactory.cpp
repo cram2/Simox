@@ -13,6 +13,8 @@
 #include "Visualization//VisualizationFactory.h"
 #include "VirtualRobotException.h"
 
+#include <SimoxUtility/math/pose/invert.h>
+
 #include <algorithm>
 #include <cassert>
 #include <deque>
@@ -321,6 +323,7 @@ namespace VirtualRobot
         RobotNodePtr newRN = rnf->createRobotNode(robot, name, v, c, 0, 0, 0, transformation, Eigen::Vector3f::Zero(), Eigen::Vector3f::Zero(), p);
         rn->attachChild(newRN);
         newRN->initialize(rn);
+        newRN->primitiveApproximation = o->getPrimitiveApproximation().clone();
         return true;
     }
 
@@ -656,15 +659,9 @@ namespace VirtualRobot
     {
         THROW_VR_EXCEPTION_IF(!robot, "NULL data");
         THROW_VR_EXCEPTION_IF(!nodeA, "NULL data");
-        auto rnf = RobotNodeFixedFactory::createInstance(nullptr);
-        SceneObject::Physics p;
-        VisualizationNodePtr v;
-        CollisionModelPtr c;
-
         if (nodeA == nodeB)
         {
-            RobotNodePtr newRN = rnf->createRobotNode(robot, nodeA->getName() + "_non_trafo", v, c, 0, 0, 0, Eigen::Matrix4f::Identity(), Eigen::Vector3f::Zero(), Eigen::Vector3f::Zero(), p);
-            return newRN;
+            return RobotNodePtr();
         }
 
         std::vector<RobotNodePtr> childNodes;
@@ -684,7 +681,7 @@ namespace VirtualRobot
         {
             Eigen::Matrix4f startPose = nodeA->getGlobalPose();
             Eigen::Matrix4f goalPose = nodeB->getParent()->getGlobalPose();
-            storeTrafo = goalPose * startPose.inverse();
+            storeTrafo = simox::math::inverted_pose(startPose) * goalPose;
         }
 
         RobotNodePtr res = createUnitedRobotNode(robot, childNodes, nodeA, nodeAClone, Eigen::Matrix4f::Identity(), childSensorNodes);
@@ -751,7 +748,7 @@ namespace VirtualRobot
             v = vf->createUnitedVisualization(visus)->clone();
             if (parent)
             {
-                Eigen::Matrix4f invTr = parent->getGlobalPose().inverse();
+                Eigen::Matrix4f invTr = simox::math::inverted_pose(parent->getGlobalPose());
                 vf->applyDisplacement(v, invTr);
             }
         }
@@ -761,7 +758,7 @@ namespace VirtualRobot
             VisualizationNodePtr colVisu = vf->createUnitedVisualization(colVisus)->clone();
             if (parent)
             {
-                Eigen::Matrix4f invTr = parent->getGlobalPose().inverse();
+                Eigen::Matrix4f invTr = simox::math::inverted_pose(parent->getGlobalPose());
                 vf->applyDisplacement(colVisu, invTr);
             }
             c.reset(new CollisionModel(colVisu, nodes[0]->getName()));
@@ -773,20 +770,57 @@ namespace VirtualRobot
 
         newRN->initialize(parentClone);
 
+        const Eigen::Matrix4f trafoToNewRN = parent ? parent->getGlobalPose() * trafo : trafo;
+
+        // add primitive models
+        for (const auto& node : nodes)
+        {
+            const auto& primitiveApproximation = node->getPrimitiveApproximation();
+            const Eigen::Matrix4f localTransformation = simox::math::inverted_pose(trafoToNewRN) * node->getGlobalPose();
+            newRN->getPrimitiveApproximation().join(primitiveApproximation.clone().localTransformation(localTransformation));
+        }
+
         // attach sensors
         for (const auto& sensor : sensors)
         {
             SensorPtr s = sensor->clone(newRN);
-            Eigen::Matrix4f trafoToNewRN = parent ? parent->getGlobalPose() * trafo : trafo;
-            Eigen::Matrix4f t = trafoToNewRN.inverse() * sensor->getGlobalPose();
+            Eigen::Matrix4f t = simox::math::inverted_pose(trafoToNewRN) * sensor->getGlobalPose();
             s->setRobotNodeToSensorTransformation(t);
         }
 
         return newRN;
     }
 
+    void RobotFactory::cloneRNS(const Robot& from, RobotPtr to)
+    {
+        for (const auto& rns : from.getRobotNodeSets())
+        {
+            bool hasNodes = true;
+            for (const auto& nodeName : rns->getNodeNames())
+            {
+                if (!to->hasRobotNode(nodeName))
+                {
+                    hasNodes = false;
+                    break;
+                }
+            }
+            const auto &tcp = rns->getTCP();
+            if (hasNodes && (!tcp || to->hasRobotNode(tcp->getName())))
+            {
+                if (const auto& kinRoot = rns->getKinematicRoot())
+                {
+                    if (!to->hasRobotNode(kinRoot->getName()))
+                    {
+                        rns->clone(to, to->getRootNode());
+                        continue;
+                    }
+                }
+                rns->clone(to);
+            }
+        }
+    }
 
-    RobotPtr RobotFactory::cloneSubSet(RobotPtr robot, RobotNodeSetPtr rns, const std::string& name)
+    RobotPtr RobotFactory::cloneSubSet(RobotPtr robot, RobotNodeSetPtr rns, const std::string& name, bool addTCP)
     {
         THROW_VR_EXCEPTION_IF(!robot, "NULL data");
         THROW_VR_EXCEPTION_IF(!rns, "NULL data");
@@ -796,8 +830,8 @@ namespace VirtualRobot
         THROW_VR_EXCEPTION_IF(nodes.size() == 0, "0 data");
 
         // ensure tcp is part of nodes
-        //if (rns->getTCP() && !rns->hasRobotNode(rns->getTCP()))
-        //    nodes.push_back(rns->getTCP());
+        if (addTCP && rns->getTCP() && !rns->hasRobotNode(rns->getTCP()))
+            nodes.push_back(rns->getTCP());
 
         // ensure kinemtic root is part of nodes
         if (rns->getKinematicRoot() && !rns->hasRobotNode(rns->getKinematicRoot()))
@@ -904,7 +938,13 @@ namespace VirtualRobot
             }
         }
 
+        cloneRNS(*robot.get(), result);
+
         result->setGlobalPose(robot->getGlobalPose());
+        if(robot->getHumanMapping().has_value())
+        {
+            result->registerHumanMapping(robot->getHumanMapping().value());
+        }
         return result;
     }
 
@@ -931,34 +971,7 @@ namespace VirtualRobot
 
         cloneRecursiveUnite(result, currentNode, currentNodeClone, uniteWithAllChildren);
 
-        // clone RNS
-        std::vector<RobotNodeSetPtr> rnsets = robot->getRobotNodeSets();
-        for (auto rns : rnsets)
-        {
-            bool ok = true;
-            for (const auto& j : uniteWithAllChildren)
-            {
-                RobotNodePtr rn = robot->getRobotNode(j);
-                std::vector<RobotNodePtr> allChildren;
-                rn->collectAllRobotNodes(allChildren);
-                for (auto& k : allChildren)
-                {
-                    if (k == rn)
-                    {
-                        continue;
-                    }
-                    if (rns->hasRobotNode(k->getName()) || rns->getTCP() == k)
-                    {
-                        ok = false;
-                        break;
-                    }
-                }
-            }
-            if (ok)
-            {
-                rns->clone(result);
-            }
-        }
+        cloneRNS(*robot.get(), result);
 
         result->setGlobalPose(robot->getGlobalPose());
         if(robot->getHumanMapping().has_value())
@@ -966,6 +979,186 @@ namespace VirtualRobot
             result->registerHumanMapping(robot->getHumanMapping().value());
         }
         return result;
+    }
+
+    RobotPtr RobotFactory::createReducedModel(Robot &robot, const std::vector<std::string> &actuatedJointNames,
+                                              const std::vector<std::string> &otherNodeNames)
+    {
+        std::set<std::string> joint_set(actuatedJointNames.begin(), actuatedJointNames.end());
+        std::set<std::string> other_set(otherNodeNames.begin(), otherNodeNames.end());
+
+        // Check joint nodes and set robot joints to default value
+        std::map<std::string, float> joint_values;
+        for (const auto& joint_name : actuatedJointNames)
+        {
+            if (robot.hasRobotNode(joint_name))
+            {
+                auto node = robot.getRobotNode(joint_name);
+                if (!node->isJoint())
+                {
+                    VR_WARNING << "Robot node " << joint_name << " is not a joint node";
+                    return nullptr;
+                }
+                joint_values[joint_name] = node->getJointValue();
+                // Set joints do default starting value
+                node->setJointValueNoUpdate(0.);
+            }
+            else
+            {
+                VR_WARNING << "Robot does not contain node " << joint_name;
+                return nullptr;
+            }
+        }
+        robot.updatePose();
+
+        RobotPtr reducedModel = std::make_shared<LocalRobot>("Reduced_" + robot.getName(), robot.getType());
+
+        struct Node
+        {
+            RobotNodePtr node;
+            RobotNodePtr node_cloned = nullptr;
+            bool is_actuated_joint = false;
+            RobotNodePtr parentNode_cloned = nullptr;
+            std::vector<RobotNodePtr> childNodes = std::vector<RobotNodePtr>();
+        };
+        std::queue<Node> nodes;
+        nodes.push(Node { .node = robot.getRootNode() });
+
+        std::function<void(RobotNodePtr, Node&)> collect;
+        collect = [joint_set, other_set, &collect, &nodes](RobotNodePtr currentNode, Node& node) -> void
+        {
+            for (const auto &child : currentNode->getChildren())
+            {
+                if (const auto& childNode = std::dynamic_pointer_cast<RobotNode>(child))
+                {
+                    const bool is_actuated_joint = joint_set.count(childNode->getName()) > 0;
+                    if (!is_actuated_joint && other_set.count(childNode->getName()) == 0)
+                    {
+                        node.childNodes.push_back(childNode);
+                        collect(childNode, node);
+                    }
+                    else
+                    {
+                        nodes.push(Node { .node = childNode, .is_actuated_joint=is_actuated_joint, .parentNode_cloned = node.node_cloned });
+                    }
+                }
+            }
+        };
+
+        const auto fixed_node_factory = RobotNodeFixedFactory::createInstance(nullptr);
+        while(!nodes.empty())
+        {
+            auto n = nodes.front();
+            nodes.pop();
+
+            // If node is a joint but is not part of the joints it will be converted to a fixed transformation node
+            if (!n.is_actuated_joint && n.node->isJoint())
+            {
+                n.node_cloned = fixed_node_factory->createRobotNode(reducedModel, n.node->getName(),
+                                                                    n.node->getVisualization() ? n.node->getVisualization()->clone() : nullptr,
+                                                                    n.node->getCollisionModel() ? n.node->getCollisionModel()->clone() : nullptr,
+                                                                    0.f, 0.f, 0.f,
+                                                                    n.node->getLocalTransformation(),
+                                                                    Eigen::Vector3f::Zero(), Eigen::Vector3f::Zero(),
+                                                                    n.node->getPhysics());
+                n.node_cloned->primitiveApproximation = n.node->getPrimitiveApproximation().clone();
+                if (n.parentNode_cloned)
+                {
+                    n.node_cloned->initialize(n.parentNode_cloned);
+                }
+                n.node_cloned->basePath = n.node->basePath;
+            }
+            else
+            {
+                n.node_cloned = n.node->clone(reducedModel, false, n.parentNode_cloned);
+            }
+            // Probably will not be valid anymore after reducing robot as models will be missing
+            n.node_cloned->visualizationModelXML = std::string();
+            n.node_cloned->collisionModelXML = std::string();
+
+            collect(n.node, n);
+
+            if (!n.parentNode_cloned)
+            {
+                reducedModel->setRootNode(n.node_cloned);
+            }
+            else
+            {
+                Eigen::Matrix4f localTransformation = simox::math::inverted_pose(n.parentNode_cloned->getGlobalPose()) * n.node->getGlobalPose();
+                n.node_cloned->setLocalTransformation(localTransformation);
+                n.node_cloned->updateTransformationMatrices();
+            }
+
+            const VisualizationFactoryPtr vf = VisualizationFactory::first(NULL);
+            std::vector<VisualizationNodePtr> visus;
+            std::vector<VisualizationNodePtr> colVisus;
+            for (const auto& childNode : n.childNodes)
+            {
+                if (childNode->getVisualization())
+                {
+                    visus.push_back(childNode->getVisualization());
+                }
+                if (childNode->getCollisionModel() && childNode->getCollisionModel()->getVisualization())
+                {
+                    colVisus.push_back(childNode->getCollisionModel()->getVisualization());
+                }
+                n.node_cloned->physics.massKg += childNode->getMass(); // TODO fix physics somehow
+            }
+            const Eigen::Matrix4f globalPoseInv = simox::math::inverted_pose(n.node_cloned->getGlobalPose());
+            if (!visus.empty())
+            {
+                if (const auto visu = n.node->getVisualization())
+                {
+                    visus.insert(visus.begin(), visu->clone());
+                }
+                auto v = vf->createUnitedVisualization(visus);
+                if (n.parentNode_cloned)
+                {
+                    vf->applyDisplacement(v, globalPoseInv);
+                }
+                n.node_cloned->setVisualization(v);
+            }
+            if (!colVisus.empty())
+            {
+                if (const auto colModel = n.node->getCollisionModel())
+                {
+                    if (const auto vis = colModel->getVisualization())
+                    {
+                        colVisus.insert(colVisus.begin(), vis->clone());
+                    }
+                }
+                auto colVisu = vf->createUnitedVisualization(colVisus);
+                if (n.parentNode_cloned)
+                {
+                    vf->applyDisplacement(colVisu, globalPoseInv);
+                }
+                n.node_cloned->setCollisionModel(std::make_shared<CollisionModel>(colVisu, n.node->getName()));
+            }
+
+            for (const auto& childNode : n.childNodes)
+            {
+                const auto& primitiveApproximation = childNode->getPrimitiveApproximation();
+                n.node_cloned->getPrimitiveApproximation().join(primitiveApproximation.clone().localTransformation(globalPoseInv * childNode->getGlobalPose()));
+
+                // attach sensors
+                for (const auto& sensor : childNode->getSensors())
+                {
+                    SensorPtr s = sensor->clone(n.node_cloned);
+                    s->setRobotNodeToSensorTransformation(globalPoseInv * sensor->getGlobalPose());
+                }
+            }
+        }
+
+        reducedModel->setGlobalPose(robot.getGlobalPose());
+        reducedModel->setJointValues(joint_values);
+
+        cloneRNS(robot, reducedModel);
+
+        if(robot.getHumanMapping().has_value())
+        {
+            reducedModel->registerHumanMapping(robot.getHumanMapping().value());
+        }
+        return reducedModel;
     }
 
     void RobotFactory::cloneRecursiveUnite(RobotPtr robot, RobotNodePtr currentNode, RobotNodePtr currentNodeClone, std::vector<std::string> uniteWithAllChildren)

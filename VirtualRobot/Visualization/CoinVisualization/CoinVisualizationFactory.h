@@ -110,7 +110,7 @@ namespace VirtualRobot
         /*!
             Move local visualization by homogeneous matrix m. MM is used.
         */
-        void applyDisplacement(VisualizationNodePtr o, Eigen::Matrix4f& m) override;
+        void applyDisplacement(VisualizationNodePtr o, const Eigen::Matrix4f& m) override;
 
         /*!
             Create an empty VisualizationNode.

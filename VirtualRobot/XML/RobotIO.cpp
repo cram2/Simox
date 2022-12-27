@@ -641,8 +641,8 @@ namespace VirtualRobot
         // collision information
         bool colProcessed = false;
 
-        VisualizationNodePtr visualizationNode;
-        CollisionModelPtr collisionModel;
+        VisualizationNodePtr visualizationNode = nullptr;
+        CollisionModelPtr collisionModel = nullptr;
         RobotNodePtr robotNode;
         std::string visualizationModelXML;
         std::string collisionModelXML;
@@ -650,7 +650,6 @@ namespace VirtualRobot
         bool physicsDefined = false;
         Eigen::Matrix4f transformMatrix = Eigen::Matrix4f::Identity();
         SceneObject::PrimitiveApproximation primitiveApproximation;
-        //primitiveApproximation.addModel({ std::make_shared<Primitive::Cylinder>(10, 10) }, "test");
 
         rapidxml::xml_node<>* node = robotNodeXMLNode->first_node();
         rapidxml::xml_node<>* jointNodeXML = nullptr;

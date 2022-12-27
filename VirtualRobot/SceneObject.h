@@ -99,6 +99,12 @@ namespace VirtualRobot
 
             PrimitiveApproximation clone() const;
 
+            PrimitiveApproximation& localTransformation(const Eigen::Matrix4f &localTransformation);
+
+            void join(const PrimitiveApproximation& primitiveApproximation, const Eigen::Matrix4f& localTransformation = Eigen::Matrix4f::Identity());
+
+            bool empty() const;
+
         private:
             std::vector<Primitive::PrimitivePtr> defaultPrimitives;
             std::map<std::string, std::vector<Primitive::PrimitivePtr>> primitives;

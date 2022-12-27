@@ -6,6 +6,7 @@
 #include <VirtualRobot/RuntimeEnvironment.h>
 #include <VirtualRobot/Import/RobotImporterFactory.h>
 #include <VirtualRobot/CollisionDetection/CDManager.h>
+#include <VirtualRobot/RobotFactory.h>
 
 #include <SimoxUtility/algorithm/string/string_tools.h>
 
@@ -105,7 +106,6 @@ void showRobotWindow::setupUI()
 
     // setup
     viewer->setBackgroundColor(SbColor(1.0f, 1.0f, 1.0f));
-
 
     viewer->setGLRenderAction(new SoLineHighlightRenderAction);
     viewer->setTransparencyType(SoGLRenderAction::SORTED_OBJECT_BLEND);
@@ -257,10 +257,7 @@ void showRobotWindow::rebuildVisualization()
 
     robotSep->removeAllChildren();
 
-    bool useIVModel = UI.checkBoxFullModel->checkState() == Qt::Checked;
-    useColModel = UI.checkBoxColModel->checkState() == Qt::Checked;
-
-    if (useColModel)
+    if (UI.checkBoxColModel->checkState() == Qt::Checked)
     {
         visualization = robot->getVisualization<CoinVisualization>(SceneObject::Collision);
         SoNode* visualisationNode = nullptr;
@@ -276,7 +273,10 @@ void showRobotWindow::rebuildVisualization()
         }
     }
 
-    if (useIVModel)
+    if (UI.checkBoxFullModel->checkState() == Qt::Checked
+        || UI.checkBoxStructure->checkState() == Qt::Checked
+        || UI.checkBoxRobotSensors->checkState() == Qt::Checked
+        || UI.checkBoxRobotCoordSystems->checkState() == Qt::Checked)
     {
         visualization = robot->getVisualization<CoinVisualization>(SceneObject::Full);
         SoNode* visualisationNode = nullptr;
@@ -788,8 +788,6 @@ void showRobotWindow::loadRobot()
         }
 
         robot = importer->loadFromFile(m_sRobotFilename, RobotIO::eFull);
-
-
     }
     catch (VirtualRobotException& e)
     {

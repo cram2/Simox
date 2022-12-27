@@ -1618,4 +1618,44 @@ namespace VirtualRobot
         return cloned;
     }
 
+    SceneObject::PrimitiveApproximation &SceneObject::PrimitiveApproximation::localTransformation(const Eigen::Matrix4f &localTransformation)
+    {
+        for (auto& primitive : this->defaultPrimitives)
+        {
+            primitive->transform = localTransformation * primitive->transform;
+        }
+
+        for (auto& [id, primitives] : this->primitives)
+        {
+            for (auto& primitive : primitives)
+            {
+                primitive->transform = localTransformation * primitive->transform;
+            }
+        }
+        return *this;
+    }
+
+    void SceneObject::PrimitiveApproximation::join(const PrimitiveApproximation &primitiveApproximation, const Eigen::Matrix4f &localTransformation)
+    {
+        auto cloned = primitiveApproximation.clone().localTransformation(localTransformation);
+        this->defaultPrimitives.insert(this->defaultPrimitives.end(), cloned.defaultPrimitives.begin(), cloned.defaultPrimitives.end());
+
+        for (auto& [id, primitives] : cloned.primitives)
+        {
+            if (this->primitives.count(id) > 0)
+            {
+                this->primitives.at(id).insert(this->primitives.at(id).end(), primitives.begin(), primitives.end());
+            }
+            else
+            {
+                this->primitives[id] = primitives;
+            }
+        }
+    }
+
+    bool SceneObject::PrimitiveApproximation::empty() const
+    {
+        return defaultPrimitives.empty() && primitives.empty();
+    }
+
 } // namespace

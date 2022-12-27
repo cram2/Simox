@@ -301,9 +301,6 @@
               <layout class="QGridLayout" name="gridLayout_5">
                <item row="2" column="1">
                 <widget class="QComboBox" name="comboBoxPrimitiveModel">
-                 <property name="placeholderText">
-                  <string/>
-                 </property>
                 </widget>
                </item>
                <item row="5" column="0">

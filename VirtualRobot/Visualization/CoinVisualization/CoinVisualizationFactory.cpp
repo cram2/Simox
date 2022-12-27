@@ -146,14 +146,11 @@ namespace VirtualRobot
         SoSeparator* coinVisualization = new SoSeparator();
         coinVisualization->ref();
 
-        Eigen::Matrix4f currentTransform = Eigen::Matrix4f::Identity();
-
         for (auto p : primitives)
         {
-            currentTransform *= p->transform;
             SoSeparator* soSep = new SoSeparator();
             SoNode* pNode = GetNodeFromPrimitive(p, boundingBox, color);
-            soSep->addChild(getMatrixTransformScaleMM2M(currentTransform));
+            soSep->addChild(getMatrixTransformScaleMM2M(p->transform));
             soSep->addChild(pNode);
             coinVisualization->addChild(soSep);
         }
@@ -4376,7 +4373,7 @@ namespace VirtualRobot
         return root;
     }
 
-    void CoinVisualizationFactory::applyDisplacement(VisualizationNodePtr o, Eigen::Matrix4f& m)
+    void CoinVisualizationFactory::applyDisplacement(VisualizationNodePtr o, const Eigen::Matrix4f& m)
     {
         if (!o)
         {
