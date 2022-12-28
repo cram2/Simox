@@ -272,7 +272,7 @@ target_link_libraries(SimoxUtility PUBLIC stdc++fs)
 # Setup dependencies
 #######################################################################
 #### Eigen
-target_include_directories(SimoxUtility SYSTEM PUBLIC ${Eigen3_INCLUDE_DIR})
+target_link_libraries(SimoxUtility PUBLIC Eigen3::Eigen)
 
 #### BOOST
 target_link_libraries(SimoxUtility PUBLIC
