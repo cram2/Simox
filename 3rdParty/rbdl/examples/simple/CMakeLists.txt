@@ -11,7 +11,7 @@ FIND_PACKAGE (RBDL REQUIRED)
 FIND_PACKAGE (Eigen3 3.0.0 REQUIRED)
 
 # Add the include directory to the include paths
-INCLUDE_DIRECTORIES ( ${RBDL_INCLUDE_DIR} ${EIGEN3_INCLUDE_DIR} )
+target_link_libraries(rbdl PUBLIC Eigen3::Eigen)
 
 # Create an executable
 ADD_EXECUTABLE (example example.cc)
