@@ -70,6 +70,9 @@ FIND_PACKAGE(Boost ${Simox_BOOST_VERSION} EXACT COMPONENTS
     regex
     QUIET)
 
+find_package(doctest QUIET)
+
+
 FIND_PACKAGE(SoQt QUIET)
 
 if (NOT (Simox_FIND_QUIETLY OR VirtualRobot_FIND_QUIETLY))
