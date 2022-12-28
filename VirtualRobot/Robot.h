@@ -502,6 +502,8 @@ namespace VirtualRobot
 
         void registerHumanMapping(const HumanMapping& humanMapping);
 
+        /*! Removes all sensors (for faster forward kinematics) */
+        void removeAllSensors();
 
     protected:
         Robot();

@@ -129,6 +129,25 @@ namespace VirtualRobot
         enforceJointLimits = value;
     }
 
+    void RobotNode::removeAllSensors(bool recursive)
+    {
+        for (auto it = children.begin(); it != children.end();)
+        {
+            if (auto node = std::dynamic_pointer_cast<RobotNode>(*it))
+            {
+                if (recursive) node->removeAllSensors(recursive);
+            }
+            else if (auto node = std::dynamic_pointer_cast<Sensor>(*it))
+            {
+                //(*it)->detachedFromParent();
+                it = children.erase(it);
+                continue;
+            }
+            it++;
+        }
+        sensors.clear();
+    }
+
     RobotPtr RobotNode::getRobot() const
     {
         RobotPtr result(robot);
@@ -604,6 +623,7 @@ namespace VirtualRobot
 
 
         newRobot->registerRobotNode(result);
+        result->primitiveApproximation = primitiveApproximation.clone();
 
         if (initializeWithParent)
         {
@@ -611,7 +631,7 @@ namespace VirtualRobot
         }
         result->basePath = basePath;
         result->setScaling(actualScaling);
-        result->primitiveApproximation = primitiveApproximation.clone();
+
         return result;
     }
 

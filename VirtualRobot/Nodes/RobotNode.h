@@ -401,6 +401,9 @@ namespace VirtualRobot
         bool getEnforceJointLimits() const;
         void setEnforceJointLimits(bool value);
 
+        /*! Removes all sensors (for faster forward kinematics) */
+        void removeAllSensors(bool recursive = true);
+
     protected:
         /*!
             Queries parent for global pose and updates visualization accordingly
