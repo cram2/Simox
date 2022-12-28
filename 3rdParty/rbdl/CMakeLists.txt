@@ -159,7 +159,7 @@ ENDIF (RBDL_BUILD_STATIC)
 # Find and use the system's Eigen3 library
 
 FIND_PACKAGE (Eigen3 REQUIRED)
-target_include_directories(rbdl SYSTEM PUBLIC ${Eigen3_INCLUDE_DIR})
+target_link_libraries(rbdl PUBLIC Eigen3::Eigen)
 
 IF (RBDL_STORE_VERSION)
 	# Set versioning information that can be queried during runtime

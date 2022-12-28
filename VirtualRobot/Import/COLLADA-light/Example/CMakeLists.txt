@@ -3,8 +3,8 @@ project (collada)
 
 add_executable(collada ../collada.cpp ../inventor.cpp viewer.cpp ../pugixml/pugixml.cpp)
 
-TARGET_INCLUDE_DIRECTORIES(collada PUBLIC "../pugixml" "/usr/include/qt4" "/usr/include/qt4/QT" "/usr/include/qt4/QtCore" "/usr/include/eigen3" )
-target_link_libraries(collada Coin SoQt boost_system boost_timer)
+TARGET_INCLUDE_DIRECTORIES(collada PUBLIC "../pugixml" "/usr/include/qt4" "/usr/include/qt4/QT" "/usr/include/qt4/QtCore" )
+target_link_libraries(collada Coin SoQt boost_system boost_timer Eigen3::Eigen)
 target_compile_definitions(collada PUBLIC -DTIMER_DEBUG)
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
 
