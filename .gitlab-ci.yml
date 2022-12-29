@@ -66,6 +66,10 @@ stages:
     # Once again to make the job fail if an error occurs.
     - ctest .
 
+    # Generate documentation.
+    - cd "$PROJECT_PATH_IN_WORKSPACE/build"
+    - make doc
+
 
 build-and-test-bionic:
   stage: build-and-test
@@ -73,23 +77,14 @@ build-and-test-bionic:
 
   image: git.h2t.iar.kit.edu:5050/sw/armarx/meta/axii:latest-bionic
 
+  artifacts:
+    name: "Simox-Documentation-$CI_COMMIT_REF_NAME"
+    paths:
+      - build/doc/html/
+
 
 build-and-test-jammy:
   stage: build-and-test
   extends: .build-and-test
 
   image: git.h2t.iar.kit.edu:5050/sw/armarx/meta/axii:latest-jammy
-
-
-generate-documentation:
-  stage: documentation
-  image: git.h2t.iar.kit.edu:5050/sw/armarx/meta/axii:latest-bionic
-
-  script:
-    - cd build
-    - make doc
-
-  artifacts:
-    name: "Simox-Documentation-$CI_COMMIT_REF_NAME"
-    paths:
-      - build/doc/html/
