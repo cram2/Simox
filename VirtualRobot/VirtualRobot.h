@@ -41,7 +41,7 @@
   examples showing how these libraries can be used to build complex tools in the
   context of mobile manipulation.
 
-  Further information and documentation can be found at the wiki pages: https://gitlab.com/Simox/simox/-/wikis/home
+  Further information and documentation can be found at the wiki pages: https://git.h2t.iar.kit.edu/sw/simox/simox/-/wikis/home
 
   \section SimoxUtility SimoxUtility
 
@@ -100,7 +100,7 @@
   functionality. As a reference implementation Simox offers Coin3D/SoQt-based visualization
   support.
 
-  Please have a look at the wiki pages: https://gitlab.com/Simox/simox/-/wikis/home
+  Please have a look at the wiki pages: https://git.h2t.iar.kit.edu/sw/simox/simox/-/wikis/home
  *
  */
 
