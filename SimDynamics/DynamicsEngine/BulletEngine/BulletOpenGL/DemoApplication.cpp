@@ -1360,12 +1360,9 @@ void DemoApplication::showProfileInfo(int& xOffset, int& yStart, int yIncr)
         yStart += yIncr;
 
     }
-
+#else
+    (void) xOffset, (void) yStart, (void) yIncr;
 #endif//BT_NO_PROFILE
-
-
-
-
 }
 
 

@@ -1,0 +1,20 @@
+{
+  "modules": {
+    "tools/ccache/default": {},
+    "simox": {},
+
+    "# Missing for deps/coin/soqt": {},
+    "apt/libqt5opengl5-dev": {}
+  },
+  "global": {
+    "prepare": {
+      "cmake": {
+        "definitions": {
+          "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+          "CMAKE_C_COMPILER_LAUNCHER": "$CCACHE",
+          "CMAKE_CXX_COMPILER_LAUNCHER": "$CCACHE"
+        }
+      }
+    }
+  }
+}

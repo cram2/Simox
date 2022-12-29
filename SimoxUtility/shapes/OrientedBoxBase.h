@@ -267,7 +267,7 @@ namespace simox
             return from_box_frame(p).template cast<T>();
         }
 
-        bool contains(const vector_t& p)
+        bool contains(const vector_t& p) const
         {
             const vector_t b = to_box_frame(p);
             const auto check_dim = [&](int i)
@@ -279,7 +279,7 @@ namespace simox
             return check_dim(0) && check_dim(1) && check_dim(2);
         }
 
-        bool contains_by(const vector_t& p, float_t thresh = 0)
+        bool contains_by(const vector_t& p, float_t thresh = 0) const
         {
             const vector_t b = to_box_frame(p);
             const auto check_dim = [&](int i)
@@ -341,7 +341,7 @@ namespace simox
             {
                 throw std::invalid_argument{"corner has to be in [0, 7]"};
             }
-            const Eigen::Vector3f b
+            const vector_t b
             {
                 (c % 2) ? 0 : _d(0),
                 ((c / 2) % 2) ? 0 : _d(1),
@@ -357,7 +357,7 @@ namespace simox
 
         std::vector<vector_t> corners() const
         {
-            std::vector<Eigen::Vector3f> points;
+            std::vector<vector_t> points;
             points.reserve(8);
             for (std::uint8_t i = 0; i < 8; ++i)
             {

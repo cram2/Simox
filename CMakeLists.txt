@@ -116,6 +116,7 @@ set (Simox_BUILD_VirtualRobot TRUE CACHE BOOL "Build Virtual Robot library")
 set (Simox_BUILD_Saba TRUE CACHE BOOL "Build Motion Planning library")
 set (Simox_BUILD_GraspStudio TRUE CACHE BOOL "Build Grasp Planning library")
 set (Simox_BUILD_SimDynamics TRUE CACHE BOOL "Build Dynamic Simulation")
+set (Simox_BUILD_GeometricPlanning TRUE CACHE BOOL "Build Geometric Planning Library")
 
 MESSAGE (STATUS "** SIMOX BUILD SimoxUtility: TRUE (can't be turned off)")
 MESSAGE (STATUS "** SIMOX BUILD SimoxQtUtility: TRUE (can't be turned off)")
@@ -123,6 +124,7 @@ MESSAGE (STATUS "** SIMOX BUILD VirtualRobot: ${Simox_BUILD_VirtualRobot}")
 MESSAGE (STATUS "** SIMOX BUILD Saba        : ${Simox_BUILD_Saba}")
 MESSAGE (STATUS "** SIMOX BUILD GraspStudio : ${Simox_BUILD_GraspStudio}")
 MESSAGE (STATUS "** SIMOX BUILD SimDynamics : ${Simox_BUILD_SimDynamics}")
+MESSAGE (STATUS "** SIMOX BUILD GeometricPlanning : ${GeometricPlanning}")
 ############################# SETUP PATHS #############################
 if(WIN32 AND NOT CYGWIN)
     set(INSTALL_CMAKE_DIR CMake             CACHE PATH "Installation directory for CMake files")
@@ -244,6 +246,13 @@ if (Simox_BUILD_GraspStudio)
     add_subdirectory(GraspPlanning)
     list(APPEND SIMOX_EXPORT_TARGET_LIST GraspStudio)
     list (APPEND Simox_LIBRARIES GraspStudio)
+endif()
+
+#######################################################################################
+if (Simox_BUILD_GeometricPlanning)
+    add_subdirectory(GeometricPlanning)
+    list(APPEND SIMOX_EXPORT_TARGET_LIST GeometricPlanning)
+    list (APPEND Simox_LIBRARIES GeometricPlanning)
 endif()
 
 #######################################################################################

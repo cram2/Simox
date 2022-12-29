@@ -315,7 +315,7 @@ namespace VirtualRobot
         globalPose = other->globalPose;
         if (visualizationModel && updateVisualization)
         {
-            visualizationModel->setGlobalPose(globalPose);
+            visualizationModel->setGlobalParentPose(globalPose);
         }
         if (collisionModel && updateCollisionModel)
         {

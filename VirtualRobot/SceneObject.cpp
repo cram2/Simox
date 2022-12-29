@@ -128,7 +128,7 @@ namespace VirtualRobot
     {
         if (visualizationModel && updateVisualization)
         {
-            visualizationModel->setGlobalPose(globalPose);
+            visualizationModel->setGlobalParentPose(globalPose);
         }
 
         if (collisionModel && updateCollisionModel)
@@ -137,10 +137,12 @@ namespace VirtualRobot
         }
 
         if (updateChildren)
+        {
             for (size_t i = 0; i < children.size(); i++)
             {
                 children[i]->updatePose(globalPose);
             }
+        }
     }
 
     void SceneObject::copyPoseFrom(const SceneObjectPtr& other)
@@ -151,7 +153,7 @@ namespace VirtualRobot
         globalPose = other->globalPose;
         if (visualizationModel && updateVisualization)
         {
-            visualizationModel->setGlobalPose(globalPose);
+            visualizationModel->setGlobalParentPose(globalPose);
         }
         if (collisionModel && updateCollisionModel)
         {
@@ -532,7 +534,7 @@ namespace VirtualRobot
         if (visualizationModel)
         {
             visualizationModel->setUpdateVisualization(updateVisualization);
-            visualizationModel->setGlobalPose(globalPose);
+            visualizationModel->setGlobalParentPose(globalPose);
         }
     }
 
