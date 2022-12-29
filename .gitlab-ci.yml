@@ -69,8 +69,8 @@ stages:
     # Generate documentation.
     - cd "$PROJECT_PATH_IN_WORKSPACE/build"
     - make doc
-
-    - du -sh build/*
+    - du -sh *
+    - du -sh doc/*
 
 
 build-and-test-bionic:
