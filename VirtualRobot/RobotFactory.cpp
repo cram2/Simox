@@ -984,6 +984,9 @@ namespace VirtualRobot
     RobotPtr RobotFactory::createReducedModel(Robot &robot, const std::vector<std::string> &actuatedJointNames,
                                               const std::vector<std::string> &otherNodeNames)
     {
+        const Eigen::Matrix4f globalPose = robot.getGlobalPose();
+        robot.setGlobalPose(Eigen::Matrix4f::Identity());
+
         std::set<std::string> joint_set(actuatedJointNames.begin(), actuatedJointNames.end());
         std::set<std::string> other_set(otherNodeNames.begin(), otherNodeNames.end());
 
@@ -1149,7 +1152,7 @@ namespace VirtualRobot
             }
         }
 
-        reducedModel->setGlobalPose(robot.getGlobalPose());
+        reducedModel->setGlobalPose(globalPose);
         reducedModel->setJointValues(joint_values);
 
         cloneRNS(robot, reducedModel);
