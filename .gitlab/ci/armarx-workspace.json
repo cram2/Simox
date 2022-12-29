@@ -1,10 +1,7 @@
 {
   "modules": {
     "tools/ccache/default": {},
-    "simox": {},
-
-    "# Missing for deps/coin/soqt": {},
-    "apt/libqt5opengl5-dev": {}
+    "simox": {}
   },
   "global": {
     "prepare": {
