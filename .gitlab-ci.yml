@@ -3,9 +3,7 @@ stages:
   - build-and-test
 
 
-build-and-test:
-  stage: build-and-test
-  image: git.h2t.iar.kit.edu:5050/sw/armarx/meta/axii:latest-bionic
+.build-and-test:
 
   cache:
     # https://docs.gitlab.com/ee/ci/caching/#share-caches-across-jobs-in-different-branches
@@ -66,3 +64,17 @@ build-and-test:
     - cat Temporary/LastTest.log || true
     # Once again to make the job fail if an error occurs.
     - ctest .
+
+
+build-and-test-bionic:
+  stage: build-and-test
+  extends: .build-and-test
+
+  image: git.h2t.iar.kit.edu:5050/sw/armarx/meta/axii:latest-bionic
+
+
+build-and-test-jammy:
+  stage: build-and-test
+  extends: .build-and-test
+
+  image: git.h2t.iar.kit.edu:5050/sw/armarx/meta/axii:latest-jammy
