@@ -1,6 +1,7 @@
 
 stages:
   - build-and-test
+  - documentation
 
 
 .build-and-test:
@@ -78,3 +79,17 @@ build-and-test-jammy:
   extends: .build-and-test
 
   image: git.h2t.iar.kit.edu:5050/sw/armarx/meta/axii:latest-jammy
+
+
+generate-documentation:
+  stage: documentation
+  image: git.h2t.iar.kit.edu:5050/sw/armarx/meta/axii:latest-bionic
+
+  script:
+    - cd build
+    - make doc
+
+  artifacts:
+    name: "Simox-Documentation-$CI_COMMIT_REF_NAME"
+    paths:
+      - build/doc/html/
