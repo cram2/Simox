@@ -1,6 +1,7 @@
 {
   "modules": {
     "tools/ccache/default": {},
+    "deps/doxygen": {},
     "simox": {}
   },
   "global": {

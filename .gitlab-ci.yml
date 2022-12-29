@@ -70,6 +70,8 @@ stages:
     - cd "$PROJECT_PATH_IN_WORKSPACE/build"
     - make doc
 
+    - du -sh build/*
+
 
 build-and-test-bionic:
   stage: build-and-test
