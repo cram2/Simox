@@ -923,6 +923,7 @@ namespace VirtualRobot
         {
             result->registerHumanMapping(getHumanMapping().value());
         }
+        result->primitiveApproximation = primitiveApproximation.clone();
 
         return result;
     }
@@ -1285,6 +1286,13 @@ namespace VirtualRobot
         this->humanMapping = humanMapping;
     }
 
+    void Robot::removeAllSensors()
+    {
+        if (auto rootNode = getRootNode())
+        {
+            rootNode->removeAllSensors();
+        }
+    }
 
     const NodeMapping& Robot::getNodeMapping() const
     {

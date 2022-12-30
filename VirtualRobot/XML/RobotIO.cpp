@@ -641,14 +641,15 @@ namespace VirtualRobot
         // collision information
         bool colProcessed = false;
 
-        VisualizationNodePtr visualizationNode;
-        CollisionModelPtr collisionModel;
+        VisualizationNodePtr visualizationNode = nullptr;
+        CollisionModelPtr collisionModel = nullptr;
         RobotNodePtr robotNode;
         std::string visualizationModelXML;
         std::string collisionModelXML;
         SceneObject::Physics physics;
         bool physicsDefined = false;
         Eigen::Matrix4f transformMatrix = Eigen::Matrix4f::Identity();
+        SceneObject::PrimitiveApproximation primitiveApproximation;
 
         rapidxml::xml_node<>* node = robotNodeXMLNode->first_node();
         rapidxml::xml_node<>* jointNodeXML = nullptr;
@@ -718,6 +719,10 @@ namespace VirtualRobot
                     collisionModelXML = ss.str();
                 }
             }
+            else if (nodeName == "primitivemodel")
+            {
+                processPrimitiveModelTag(primitiveApproximation, node);
+            }
             else if (nodeName == "child")
             {
                 processChildNode(node, childrenNames);
@@ -776,6 +781,7 @@ namespace VirtualRobot
         robotNode->basePath = basePath;
         robotNode->visualizationModelXML = visualizationModelXML;
         robotNode->collisionModelXML = collisionModelXML;
+        robotNode->setPrimitiveApproximation(primitiveApproximation);
 
         // process sensors
         for (auto& sensorTag : sensorTags)

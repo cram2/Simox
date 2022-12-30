@@ -987,6 +987,7 @@ namespace VirtualRobot
         result->setGlobalPose(getGlobalPose());
         result->scaling = scaling;
         result->basePath = basePath;
+        result->primitiveApproximation = primitiveApproximation.clone();
         return result;
     }
 
@@ -1472,9 +1473,14 @@ namespace VirtualRobot
             std::vector<char> cstr(collisionModelXML.size() + 1);  // Create char buffer to store string copy
             strcpy(cstr.data(), collisionModelXML.c_str());             // Copy string into char buffer
             doc.parse<0>(cstr.data());
-            collisionModel = BaseIO::processCollisionTag(doc.first_node(), name, basePath);
-            if (collisionModel && scaling != 1.0f) { 
-                collisionModel = collisionModel->clone(collisionChecker, scaling);
+            auto collisionModel = BaseIO::processCollisionTag(doc.first_node(), name, basePath);
+            if (collisionModel && scaling != 1.0f)
+            {
+                setCollisionModel(collisionModel->clone(collisionChecker, scaling));
+            }
+            else
+            {
+                setCollisionModel(collisionModel);
             }
             reloaded = true;
         }
@@ -1485,10 +1491,18 @@ namespace VirtualRobot
             strcpy(cstr.data(), visualizationModelXML.c_str());             // Copy string into char buffer
             doc.parse<0>(cstr.data());
             bool useAsColModel;
-            visualizationModel = BaseIO::processVisualizationTag(doc.first_node(), name, basePath, useAsColModel);
-            if (visualizationModel && scaling != 1.0f) visualizationModel = visualizationModel->clone(true, scaling);
-            if (visualizationModel && collisionModel == nullptr && (useVisAsColModelIfMissing || useAsColModel)) {
-                collisionModel.reset(new CollisionModel(visualizationModel->clone(true), getName() + "_VISU_ColModel", CollisionCheckerPtr()));
+            auto visualizationModel = BaseIO::processVisualizationTag(doc.first_node(), name, basePath, useAsColModel);
+            if (visualizationModel && scaling != 1.0f)
+            {
+                setVisualization(visualizationModel->clone(true, scaling));
+            }
+            else
+            {
+                setVisualization(visualizationModel);
+            }
+            if (visualizationModel && collisionModel == nullptr && (useVisAsColModelIfMissing || useAsColModel))
+            {
+                setCollisionModel(std::make_shared<CollisionModel>(visualizationModel->clone(true), getName() + "_VISU_ColModel", CollisionCheckerPtr()));
             }
             reloaded = true;
         }
@@ -1501,4 +1515,149 @@ namespace VirtualRobot
     const std::string &SceneObject::getVisualizationModelXML() const {
         return visualizationModelXML;
     }
+
+    const SceneObject::PrimitiveApproximation &SceneObject::getPrimitiveApproximation() const
+    {
+        return primitiveApproximation;
+    }
+
+    SceneObject::PrimitiveApproximation &SceneObject::getPrimitiveApproximation()
+    {
+        return primitiveApproximation;
+    }
+
+    void SceneObject::setPrimitiveApproximationModel(const std::vector<std::string> &ids, bool loadDefault)
+    {
+        auto primitives = getPrimitiveApproximation().getModels(ids, loadDefault);
+        if (primitives.empty())
+        {
+            setCollisionModel(nullptr);
+        }
+        else
+        {
+            VisualizationFactoryPtr visualizationFactory = VisualizationFactory::first(NULL);
+            setCollisionModel(std::make_shared<CollisionModel>(visualizationFactory->getVisualizationFromPrimitives(primitives),
+                                                               getName() + "_PrimitiveModel", CollisionCheckerPtr()));
+        }
+
+        // recursive
+        for (auto &child : children)
+        {
+            child->setPrimitiveApproximationModel(ids, loadDefault);
+        }
+    }
+
+    void SceneObject::getPrimitiveApproximationIDs(std::set<std::string> &ids) const
+    {
+        primitiveApproximation.getPrimitiveApproximationIDs(ids);
+
+        // recursive
+        for (auto &child : children)
+        {
+            child->getPrimitiveApproximationIDs(ids);
+        }
+    }
+
+
+
+    std::vector<Primitive::PrimitivePtr> SceneObject::PrimitiveApproximation::getModels(const std::vector<std::string> &ids, bool loadDefault) const
+    {
+        std::vector<Primitive::PrimitivePtr> result;
+        if (loadDefault)
+        {
+            result.insert(result.end(), defaultPrimitives.begin(), defaultPrimitives.end());
+        }
+        for (const std::string &id : ids)
+        {
+            if (primitives.count(id) > 0)
+            {
+                result.insert(result.end(), primitives.at(id).begin(), primitives.at(id).end());
+            }
+        }
+        return result;
+    }
+
+
+    void SceneObject::PrimitiveApproximation::addModel(const std::vector<Primitive::PrimitivePtr> &primitives, const std::string &id)
+    {
+        if (id.empty())
+        {
+            defaultPrimitives.insert(defaultPrimitives.end(), primitives.begin(), primitives.end());
+        }
+        else if (this->primitives.count(id) == 0)
+        {
+            this->primitives[id] = primitives;
+        }
+        else
+        {
+            this->primitives[id].insert(this->primitives[id].end(), primitives.begin(), primitives.end());
+        }
+    }
+
+    void SceneObject::PrimitiveApproximation::getPrimitiveApproximationIDs(std::set<std::string> &ids) const
+    {
+        for (const auto& [id, _] : primitives) {
+            ids.insert(id);
+        }
+    }
+
+    SceneObject::PrimitiveApproximation SceneObject::PrimitiveApproximation::clone() const
+    {
+        PrimitiveApproximation cloned;
+        for (const auto &primitive : this->defaultPrimitives)
+        {
+            cloned.defaultPrimitives.push_back(primitive->clone());
+        }
+        for (const auto &[id, primitives] : this->primitives)
+        {
+            std::vector<Primitive::PrimitivePtr> clonedPrimitives;
+            for (const auto &primitive : primitives)
+            {
+                clonedPrimitives.push_back(primitive->clone());
+            }
+            cloned.primitives[id] = clonedPrimitives;
+        }
+        return cloned;
+    }
+
+    SceneObject::PrimitiveApproximation &SceneObject::PrimitiveApproximation::localTransformation(const Eigen::Matrix4f &localTransformation)
+    {
+        for (auto& primitive : this->defaultPrimitives)
+        {
+            primitive->transform = localTransformation * primitive->transform;
+        }
+
+        for (auto& [id, primitives] : this->primitives)
+        {
+            for (auto& primitive : primitives)
+            {
+                primitive->transform = localTransformation * primitive->transform;
+            }
+        }
+        return *this;
+    }
+
+    void SceneObject::PrimitiveApproximation::join(const PrimitiveApproximation &primitiveApproximation, const Eigen::Matrix4f &localTransformation)
+    {
+        auto cloned = primitiveApproximation.clone().localTransformation(localTransformation);
+        this->defaultPrimitives.insert(this->defaultPrimitives.end(), cloned.defaultPrimitives.begin(), cloned.defaultPrimitives.end());
+
+        for (auto& [id, primitives] : cloned.primitives)
+        {
+            if (this->primitives.count(id) > 0)
+            {
+                this->primitives.at(id).insert(this->primitives.at(id).end(), primitives.begin(), primitives.end());
+            }
+            else
+            {
+                this->primitives[id] = primitives;
+            }
+        }
+    }
+
+    bool SceneObject::PrimitiveApproximation::empty() const
+    {
+        return defaultPrimitives.empty() && primitives.empty();
+    }
+
 } // namespace

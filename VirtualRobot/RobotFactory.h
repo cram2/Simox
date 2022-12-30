@@ -80,20 +80,43 @@ namespace VirtualRobot
         static RobotPtr clone(RobotPtr robot, const std::string& name, CollisionCheckerPtr collisionChecker = CollisionCheckerPtr(), float scaling = 1.0f);
 
         /*!
+         * \brief Clones all nodesets from one robot to another that fullfill the condition that all nodes are contained in the other robot
+         * \param from The nodesets copied from
+         * \param to The nodesets copied to
+         */
+        static void cloneRNS(const Robot& from, RobotPtr to);
+
+        /*!
         Clones the robot, but only leave the defined joints active. ALl other joints are accumulated and set to one model which is fixed (may result in faster updates)
+        The human mapping is cloned but it is not guranteed that all joints are still contained in the robot.
         \param robot The robot to clone
         \param rns The robot node set of active joints. The joints must be given as an ordered set, i.e. node i must be located before node i+1 in the kinematic structure of the robot.
         \param name The new name
+        \param addTCP Wheter the tcp of the robot node set should also be added
         */
-        static RobotPtr cloneSubSet(RobotPtr robot, RobotNodeSetPtr rns, const std::string& name);
+        static RobotPtr cloneSubSet(RobotPtr robot, RobotNodeSetPtr rns, const std::string& name, bool addTCP = false);
 
         /*!
             Creates a robot clone with reduced structure.
+            The human mapping is cloned but it is not guranteed that all joints are still contained in the robot.
             \param robot The robot to clone.
             \param uniteWithAllChildren List of RobotNodeNames. Each listed robot ndoe is united with all of its children to one fixed RobotNode.
                                         This means that all related coordinate systems and joints will not be present in the clone. The visualizations are united.
         */
         static RobotPtr cloneUniteSubsets(RobotPtr robot, const std::string& name, std::vector<std::string> uniteWithAllChildren);
+
+        /*!
+         * Creates a cloned robot model that only include the given nodes by joining nodes together.
+         * The human mapping is cloned but it is not guranteed that all joints are still contained in the robot.
+         * Physics parameters such as segment inertia or information about whether to ignore collision between nodes are not (yet) updated correctly.
+         * \param robot The original robot
+         * \param actuatedJointNames The actuated joint nodes
+         * \param otherNodeNames Other robot nodes that should be contained with a fixed transformation (given current pose if actuated joint as these are converted to RobotNodeFixed)
+         * \return The reduced robot model or nullptr (if actuatedJointNames contains not only joint nodes that are in robot)
+         */
+        static VirtualRobot::RobotPtr
+        createReducedModel(Robot &robot, const std::vector<std::string>& actuatedJointNames,
+                           const std::vector<std::string>& otherNodeNames = std::vector<std::string>());
 
         /*!
             Creates a clone with changed structure, so that the given robot node is the new root of the resulting kinematic tree.
@@ -123,7 +146,6 @@ namespace VirtualRobot
         static bool attach(RobotPtr robot, SceneObjectPtr o, RobotNodePtr rn, const Eigen::Matrix4f& transformation);
 
         static bool detach(RobotPtr robot, RobotNodePtr rn);
-
 
     protected:
 

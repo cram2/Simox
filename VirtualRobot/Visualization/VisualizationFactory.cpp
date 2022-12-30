@@ -14,7 +14,7 @@ namespace VirtualRobot
 
     void
     VisualizationFactory::applyDisplacement(VisualizationNodePtr visu,
-                                            Eigen::Matrix4f& displacement)
+                                            const Eigen::Matrix4f& displacement)
     {
         if (visu)
         {

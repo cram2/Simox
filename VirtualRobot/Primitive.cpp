@@ -63,5 +63,13 @@ namespace VirtualRobot
             return getXMLString("Cylinder", format.str(), tabs);
         }
 
+        std::string Capsule::toXMLString(int tabs)
+        {
+            std::stringstream format;
+            format << "radius=\"" << radius
+                   << "\" height=\"" << height << "\"";
+            return getXMLString("Capsule", format.str(), tabs);
+        }
+
     } //namespace Primitive
 } //namespace VirtualRobot

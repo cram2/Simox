@@ -6,6 +6,7 @@
 #include <VirtualRobot/RuntimeEnvironment.h>
 #include <VirtualRobot/Import/RobotImporterFactory.h>
 #include <VirtualRobot/CollisionDetection/CDManager.h>
+#include <VirtualRobot/RobotFactory.h>
 
 #include <SimoxUtility/algorithm/string/string_tools.h>
 
@@ -106,7 +107,6 @@ void showRobotWindow::setupUI()
     // setup
     viewer->setBackgroundColor(SbColor(1.0f, 1.0f, 1.0f));
 
-
     viewer->setGLRenderAction(new SoLineHighlightRenderAction);
     viewer->setTransparencyType(SoGLRenderAction::SORTED_OBJECT_BLEND);
     viewer->setFeedbackVisibility(true);
@@ -133,6 +133,7 @@ void showRobotWindow::setupUI()
     connect(UI.checkBoxPhysicsInertia, SIGNAL(clicked()), this, SLOT(displayPhysics()));
 
     connect(UI.checkBoxColModel, SIGNAL(clicked()), this, SLOT(rebuildVisualization()));
+    connect(UI.comboBoxPrimitiveModel, SIGNAL(activated(int)), this, SLOT(selectPrimitiveModel(int)));
     connect(UI.checkBoxRobotSensors, SIGNAL(clicked()), this, SLOT(showSensors()));
     connect(UI.checkBoxStructure, SIGNAL(clicked()), this, SLOT(robotStructure()));
     UI.checkBoxFullModel->setChecked(true);
@@ -240,6 +241,9 @@ void showRobotWindow::robotFullModel()
 
     bool showFullModel = UI.checkBoxFullModel->checkState() == Qt::Checked;
 
+    if (UI.checkBoxColModel->checkState())
+        rebuildVisualization();
+
     robot->setupVisualization(showFullModel, true);
 
 }
@@ -252,29 +256,46 @@ void showRobotWindow::rebuildVisualization()
     }
 
     robotSep->removeAllChildren();
-    //setRobotModelShape(UI.checkBoxColModel->state() == QCheckBox::On);
-    useColModel = UI.checkBoxColModel->checkState() == Qt::Checked;
-    //bool sensors = UI.checkBoxRobotSensors->checkState() == Qt::Checked;
-    SceneObject::VisualizationType colModel = (UI.checkBoxColModel->isChecked()) ? SceneObject::Collision : SceneObject::Full;
 
-    visualization = robot->getVisualization<CoinVisualization>(colModel);
-    SoNode* visualisationNode = nullptr;
-
-    if (visualization)
+    if (UI.checkBoxColModel->checkState() == Qt::Checked)
     {
-        visualisationNode = visualization->getCoinVisualization();
+        visualization = robot->getVisualization<CoinVisualization>(SceneObject::Collision);
+        SoNode* visualisationNode = nullptr;
+
+        if (visualization)
+        {
+            visualisationNode = visualization->getCoinVisualization();
+        }
+
+        if (visualisationNode)
+        {
+            robotSep->addChild(visualisationNode);
+        }
     }
 
-    if (visualisationNode)
+    if (UI.checkBoxFullModel->checkState() == Qt::Checked
+        || UI.checkBoxStructure->checkState() == Qt::Checked
+        || UI.checkBoxRobotSensors->checkState() == Qt::Checked
+        || UI.checkBoxRobotCoordSystems->checkState() == Qt::Checked)
     {
-        robotSep->addChild(visualisationNode);
+        visualization = robot->getVisualization<CoinVisualization>(SceneObject::Full);
+        SoNode* visualisationNode = nullptr;
+
+        if (visualization)
+        {
+            visualisationNode = visualization->getCoinVisualization();
+        }
+
+        if (visualisationNode)
+        {
+            robotSep->addChild(visualisationNode);
+        }
     }
 
     selectJoint(UI.comboBoxJoint->currentIndex());
 
     UI.checkBoxStructure->setEnabled(!useColModel);
     UI.checkBoxRobotSensors->setEnabled(!useColModel);
-    UI.checkBoxFullModel->setEnabled(!useColModel);
     UI.checkBoxRobotCoordSystems->setEnabled(!useColModel);
 
 }
@@ -767,8 +788,6 @@ void showRobotWindow::loadRobot()
         }
 
         robot = importer->loadFromFile(m_sRobotFilename, RobotIO::eFull);
-
-
     }
     catch (VirtualRobotException& e)
     {
@@ -830,6 +849,16 @@ void showRobotWindow::updatRobotInfo()
 
     displayTriangles();
 
+    UI.comboBoxPrimitiveModel->clear();
+    std::set<std::string> ids;
+    robot->getPrimitiveApproximationIDs(ids);
+    UI.comboBoxPrimitiveModel->addItem(""); // TODO
+    for (const std::string& id : ids)
+    {
+        UI.comboBoxPrimitiveModel->addItem(QString::fromStdString(id));
+    }
+
+
     // build visualization
     rebuildVisualization();
     robotStructure();
@@ -877,6 +906,15 @@ void showRobotWindow::openHand()
     {
         currentEEF->openActors();
     }
+}
+
+
+void showRobotWindow::selectPrimitiveModel(int nr)
+{
+    std::cout << "Selecting primitive model nr " << nr << std::endl;
+    std::vector<std::string> ids = { UI.comboBoxPrimitiveModel->itemText(nr).toStdString() };
+    robot->setPrimitiveApproximationModel(ids, true);
+    rebuildVisualization();
 }
 
 void showRobotWindow::selectEEF(int nr)

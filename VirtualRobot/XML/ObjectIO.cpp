@@ -152,6 +152,7 @@ namespace VirtualRobot
         SceneObject::Physics physics;
         bool physicsDefined = false;
         Eigen::Matrix4f globalPose = Eigen::Matrix4f::Identity();
+        SceneObject::PrimitiveApproximation primitiveApproximation;
 
         // get name
         std::string objName = processNameAttribute(objectXMLNode);
@@ -218,6 +219,10 @@ namespace VirtualRobot
                 collisionModel = processCollisionTag(node, objName, basePath);
                 colProcessed = true;
             }
+            else if (nodeName == "primitivemodel")
+            {
+                processPrimitiveModelTag(primitiveApproximation, node);
+            }
             else if (nodeName == "physics")
             {
                 THROW_VR_EXCEPTION_IF(physicsDefined, "Two physics tags defined in Obstacle '" << objName << "'." << endl);
@@ -239,6 +244,7 @@ namespace VirtualRobot
         // build object
         ObstaclePtr object(new Obstacle(objName, visualizationNode, collisionModel, physics));
         object->setGlobalPose(globalPose);
+        object->setPrimitiveApproximation(primitiveApproximation);
         return object;
     }
 
@@ -300,6 +306,7 @@ namespace VirtualRobot
         std::vector<GraspSetPtr> graspSets;
         Eigen::Matrix4f globalPose = Eigen::Matrix4f::Identity();
         std::vector< rapidxml::xml_node<>* > sensorTags;
+        SceneObject::PrimitiveApproximation primitiveApproximation;
 
         // get name
         std::string objName = processNameAttribute(objectXMLNode);
@@ -366,6 +373,10 @@ namespace VirtualRobot
                 collisionModel = processCollisionTag(node, objName, basePath);
                 colProcessed = true;
             }
+            else if (nodeName == "primitivemodel")
+            {
+                processPrimitiveModelTag(primitiveApproximation, node);
+            }
             else if (nodeName == "physics")
             {
                 THROW_VR_EXCEPTION_IF(physicsDefined, "Two physics tags defined in ManipulationObject '" << objName << "'." << endl);
@@ -412,6 +423,7 @@ namespace VirtualRobot
         }
 
         object->setGlobalPose(globalPose);
+        object->setPrimitiveApproximation(primitiveApproximation);
 
         return object;
     }

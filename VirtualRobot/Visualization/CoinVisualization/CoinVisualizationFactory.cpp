@@ -146,14 +146,11 @@ namespace VirtualRobot
         SoSeparator* coinVisualization = new SoSeparator();
         coinVisualization->ref();
 
-        Eigen::Matrix4f currentTransform = Eigen::Matrix4f::Identity();
-
         for (auto p : primitives)
         {
-            currentTransform *= p->transform;
             SoSeparator* soSep = new SoSeparator();
             SoNode* pNode = GetNodeFromPrimitive(p, boundingBox, color);
-            soSep->addChild(getMatrixTransformScaleMM2M(currentTransform));
+            soSep->addChild(getMatrixTransformScaleMM2M(p->transform));
             soSep->addChild(pNode);
             coinVisualization->addChild(soSep);
         }
@@ -204,6 +201,37 @@ namespace VirtualRobot
             soCylinder->radius = cylinder->radius / 1000.f;
             soCylinder->height = cylinder->height / 1000.f;
             coinVisualization->addChild(soCylinder);
+        }
+        else if (primitive->type == Primitive::Capsule::TYPE)
+        {
+            // TODO find a better visualization for capsule
+            Primitive::Capsule* cylinder = std::dynamic_pointer_cast<Primitive::Capsule>(primitive).get();
+            SoCylinder* soCylinder = new SoCylinder;
+            soCylinder->radius = cylinder->radius / 1000.f;
+            soCylinder->height = cylinder->height / 1000.f;
+            coinVisualization->addChild(soCylinder);
+
+            {
+                SoSeparator* sep = new SoSeparator();
+                SoTranslation* transl = new SoTranslation;
+                sep->addChild(transl);
+                transl->translation.setValue(0, -cylinder->height / 2000.f, 0.);
+                SoSphere* soSphere = new SoSphere;
+                soSphere->radius = soCylinder->radius;
+                sep->addChild(soSphere);
+                coinVisualization->addChild(sep);
+            }
+
+            {
+                SoSeparator* sep = new SoSeparator();
+                SoTranslation* transl = new SoTranslation;
+                sep->addChild(transl);
+                transl->translation.setValue(0, cylinder->height / 2000.f, 0.);
+                SoSphere* soSphere = new SoSphere;
+                soSphere->radius = soCylinder->radius;
+                sep->addChild(soSphere);
+                coinVisualization->addChild(sep);
+            }
         }
 
         if (boundingBox && coinVisualization)
@@ -4344,7 +4372,6 @@ namespace VirtualRobot
 
         return root;
     }
-
 
     SoGroup* CoinVisualizationFactory::convertSoFileChildren(SoGroup* orig)
     {
