@@ -21,11 +21,11 @@
 
 #include "VirtualRobot/VirtualRobotException.h"
 #include <GeometricPlanning/ParametricPath.h>
+#include <GeometricPlanning/assert/assert.h>
 #include <GeometricPlanning/path_primitives/CircleSegment.h>
 #include <GeometricPlanning/path_primitives/Line.h>
 #include <GeometricPlanning/path_primitives/PathPrimitive.h>
 #include <GeometricPlanning/types.h>
-#include <GeometricPlanning/assert/assert.h>
 
 
 namespace simox::geometric_planning
@@ -41,11 +41,13 @@ namespace simox::geometric_planning
     ArticulatedObjectGeometricPlanningHelper::getPathForNode(const std::string& nodeName) const
     {
         const auto node = articulatedObject->getRobotNode(nodeName);
+        REQUIRE(node != nullptr);
 
         simox::geometric_planning::ArticulatedObjectGeometricPlanningHelper helper(
             articulatedObject);
 
         const auto parents = node->getAllParents();
+        REQUIRE(not parents.empty());
 
         // VR_INFO << parents.size() << " parents for " << nodeName;
 
@@ -78,6 +80,7 @@ namespace simox::geometric_planning
 
         const auto parentJoint = std::find_if(parents.begin(), parents.end(), isJoint);
         const auto& joint = *parentJoint;
+        REQUIRE(joint != nullptr);
 
         const auto parametricPath = helper.getPathForNode(node->getName(), joint->getName());
 
@@ -133,7 +136,7 @@ namespace simox::geometric_planning
         // ARMARX_DEBUG << "Radius: " << radius;
 
         REQUIRE_MESSAGE(joint->getJointLimitHigh() > joint->getJointLimitLow(),
-                          "Not implemented yet. Do so by flipping the z axis of the joint.");
+                        "Not implemented yet. Do so by flipping the z axis of the joint.");
 
         const ParameterRange parameterRange{
             .min = 0, .max = joint->getJointLimitHigh() - joint->getJointLimitLow()};
@@ -162,8 +165,7 @@ namespace simox::geometric_planning
                                      joint_plane__joint_plane_P_node_initial.x());
         // ARMARX_DEBUG << VAROUT(yaw);
 
-        const Pose joint_plane_T_joint_reference(
-            Eigen::AngleAxisf(yaw, Eigen::Vector3f::UnitZ()));
+        const Pose joint_plane_T_joint_reference(Eigen::AngleAxisf(yaw, Eigen::Vector3f::UnitZ()));
 
         subpart->setJointValue(joint->getName(), joint->getJointLimitLow());
 
@@ -172,7 +174,7 @@ namespace simox::geometric_planning
         const Pose root_T_joint = root_T_global * global_T_joint;
 
         const Pose root_T_joint_reference(root_T_joint * joint_T_joint_plane *
-                                                joint_plane_T_joint_reference);
+                                          joint_plane_T_joint_reference);
 
         const auto jointReferenceNode = std::make_shared<VirtualRobot::RobotNodeFixed>(
             subpart, nodeJointReference, root_T_joint_reference.matrix());
@@ -180,7 +182,8 @@ namespace simox::geometric_planning
         // TODO check if node already exists and unregister if needed
 
         subpart->registerRobotNode(jointReferenceNode);
-        CHECK(!jointReferenceNode->initialize(subpart->getRootNode()));
+        CHECK_MESSAGE(jointReferenceNode->initialize(subpart->getRootNode()),
+                      "Failed to initialize node `" << jointReferenceNode->getName() << "`!");
 
         // reset joint state
         joint->setJointValue(initialJointValue);
