@@ -1,8 +1,10 @@
 #include "assert.h"
 
 #include <sstream>
-#include <experimental/source_location>
+
 #include <VirtualRobot/VirtualRobotException.h>
+
+#include <experimental/source_location>
 
 namespace simox::geometric_planning::assert::virtual_robot::detail
 {
@@ -21,4 +23,20 @@ namespace simox::geometric_planning::assert::virtual_robot::detail
         }
     }
 
-}  // namespace simox::geometric_planning::assert::virtual_robot::detail
+    void
+    checkMessage(bool expressionResult,
+                 const std::string& expression,
+                 const std::function<std::string()>& messageFtor,
+                 const std::experimental::source_location& sourceLocation)
+    {
+        if (not expressionResult)
+        {
+            std::stringstream stream;
+            stream << "Check `" << expression << "` failed in function `"
+                   << sourceLocation.function_name() << "` line " << sourceLocation.line() << " at "
+                   << sourceLocation.file_name() << ". " << messageFtor();
+            throw VirtualRobot::VirtualRobotException(stream.str());
+        }
+    }
+
+} // namespace simox::geometric_planning::assert::virtual_robot::detail

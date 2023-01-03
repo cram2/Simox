@@ -183,7 +183,9 @@ namespace simox::geometric_planning
 
         subpart->registerRobotNode(jointReferenceNode);
         CHECK_MESSAGE(jointReferenceNode->initialize(subpart->getRootNode()),
-                      "Failed to initialize node `" << jointReferenceNode->getName() << "`!");
+                      "Failed to initialize node `",
+                      jointReferenceNode->getName(),
+                      "`!");
 
         // reset joint state
         joint->setJointValue(initialJointValue);
