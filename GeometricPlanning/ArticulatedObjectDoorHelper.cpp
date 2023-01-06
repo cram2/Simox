@@ -26,7 +26,7 @@ namespace simox::geometric_planning
         const std::string handleNodeName = nodeSetName + constants::HandleSuffix;
         const std::string surfaceProjectionNodeName = nodeSetName + constants::SurfaceSuffix;
 
-        const auto checkNodeExists = [&rns, &nodeSetName](const std::string& nodeName)
+        const auto checkNodeExists = [&rns, &nodeSetName]([[maybe_unused]] const std::string& nodeName)
         {
             REQUIRE_MESSAGE(rns->hasRobotNode(nodeName),
                             "Robot node `" << nodeName + "` does not exist within robot node set `"

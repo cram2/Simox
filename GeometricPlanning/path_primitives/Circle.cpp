@@ -29,7 +29,7 @@ namespace simox::geometric_planning
     }
 
     Eigen::Vector3f
-    Circle::getPositionDerivative(float t) const
+    Circle::getPositionDerivative([[maybe_unused]] float t) const
     {
         REQUIRE(parameterRange().isInRange(t));
 

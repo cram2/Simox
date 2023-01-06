@@ -65,7 +65,7 @@ namespace simox::geometric_planning
         };
 
         // validate assumption
-        const auto numberMovableParentJoints =
+        [[maybe_unused]] const auto numberMovableParentJoints =
             std::accumulate(parents.begin(),
                             parents.end(),
                             0,

@@ -26,7 +26,7 @@ namespace simox::geometric_planning
     }
 
     Eigen::Vector3f
-    Line::getPositionDerivative(float t) const
+    Line::getPositionDerivative([[maybe_unused]] float t) const
     {
         REQUIRE(parameterRange().isInRange(t));
 
