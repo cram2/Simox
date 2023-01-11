@@ -220,6 +220,7 @@ SET(INCLUDES
     meta/enum/EnumNames.hpp
     meta/key_type.h
 
+    random/choice.h
 
     simox/SimoxPath.h
 
