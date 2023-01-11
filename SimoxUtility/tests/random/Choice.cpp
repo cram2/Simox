@@ -52,11 +52,17 @@ BOOST_AUTO_TEST_CASE(test_choice)
 {
     std::vector<std::string> items { "a", "b", "c" };
 
-    for (int i = 0; i < 100; ++i)
+    std::set<std::string> allChosen;
+    for (int i = 0; i < 1e5; ++i)
     {
         std::string chosen = simox::random::choice(items);
         BOOST_CHECK(std::find(items.begin(), items.end(), chosen) != items.end());
+
+        allChosen.insert(chosen);
     }
+
+    // All items must be hit at least once ... very likely.
+    BOOST_CHECK_EQUAL(allChosen.size(), 3);
 }
 
 
