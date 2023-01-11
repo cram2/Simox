@@ -28,12 +28,19 @@
 
 #include <iostream>
 
+#include <set>
+#include <vector>
+
 
 namespace ChoiceTest
 {
 
 struct Fixture
 {
+
+    std::vector<std::string> vector { "a", "b", "c" };
+    std::set<std::string> set {vector.begin(), vector.end()};
+
     Fixture()
     {
     }
@@ -48,15 +55,29 @@ struct Fixture
 BOOST_FIXTURE_TEST_SUITE(ChoiceTest, ChoiceTest::Fixture)
 
 
-BOOST_AUTO_TEST_CASE(test_choice)
+BOOST_AUTO_TEST_CASE(test_choice_vector)
 {
-    std::vector<std::string> items { "a", "b", "c" };
-
     std::set<std::string> allChosen;
     for (int i = 0; i < 1e5; ++i)
     {
-        std::string chosen = simox::random::choice(items);
-        BOOST_CHECK(std::find(items.begin(), items.end(), chosen) != items.end());
+        std::string chosen = simox::random::choice(vector);
+        BOOST_CHECK(std::find(vector.begin(), vector.end(), chosen) != vector.end());
+
+        allChosen.insert(chosen);
+    }
+
+    // All items must be hit at least once ... very likely.
+    BOOST_CHECK_EQUAL(allChosen.size(), 3);
+}
+
+
+BOOST_AUTO_TEST_CASE(test_choice_set)
+{
+    std::set<std::string> allChosen;
+    for (int i = 0; i < 1e5; ++i)
+    {
+        std::string chosen = simox::random::choice(set);
+        BOOST_CHECK(std::find(set.begin(), set.end(), chosen) != set.end());
 
         allChosen.insert(chosen);
     }
@@ -68,8 +89,10 @@ BOOST_AUTO_TEST_CASE(test_choice)
 
 BOOST_AUTO_TEST_CASE(test_choice_empty)
 {
-    std::vector<std::string> items;
-    BOOST_CHECK_THROW(simox::random::choice(items), simox::error::SimoxError);
+    vector.clear();
+    set.clear();
+    BOOST_CHECK_THROW(simox::random::choice(vector), simox::error::SimoxError);
+    BOOST_CHECK_THROW(simox::random::choice(set), simox::error::SimoxError);
 }
 
 
