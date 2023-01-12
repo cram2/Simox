@@ -14,6 +14,7 @@ stages:
 
   before_script:
     # Ccache configuration and introspection.
+    - apt-get update
     - apt-get install ccache --yes
     - ccache --set-config=cache_dir="$CI_PROJECT_DIR/.ccache"
     - ccache --max-size=5G
