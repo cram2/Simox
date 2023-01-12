@@ -74,6 +74,8 @@ SET(INCLUDES
     algorithm/string/string_conversion_eigen.h
     algorithm/ordered_circular_buffer.h
 
+    backport/span/gcc_header.h
+
     caching/CacheMap.h
 
     color/cmaps/colormaps.h
@@ -105,7 +107,6 @@ SET(INCLUDES
     json/json.hpp
     json/json.h
     json/util.h
-
 
     math/mean.h
     math/sum.h
@@ -199,7 +200,6 @@ SET(INCLUDES
     math/statistics/Histogram1D.h
     math/statistics/measures.h
 
-
     meta/undefined_t/undefined_t.h
     meta/undefined_t/is_set.h
     meta/eigen/enable_if_compile_time_size.h
@@ -220,12 +220,9 @@ SET(INCLUDES
     meta/enum/EnumNames.hpp
     meta/key_type.h
 
-    simox/SimoxPath.h
+    random/choice.h
 
-    xml/rapidxml/rapidxml.hpp
-    xml/rapidxml/rapidxml_print.hpp
-    xml/rapidxml/RapidXMLWrapper.h
-    xml/rapidxml/RapidXMLForwardDecl.h
+    simox/SimoxPath.h
 
     shapes/AxisAlignedBoundingBox.h
     shapes/OrientedBoxBase.h
@@ -233,10 +230,13 @@ SET(INCLUDES
     shapes/XYConstrainedOrientedBox.h
     shapes/json_conversions.h
 
-    backport/span/gcc_header.h
-
     threads/system_thread_id.h
     threads/CountingSemaphore.h
+
+    xml/rapidxml/rapidxml.hpp
+    xml/rapidxml/rapidxml_print.hpp
+    xml/rapidxml/RapidXMLWrapper.h
+    xml/rapidxml/RapidXMLForwardDecl.h
 )
 
 
