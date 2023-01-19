@@ -97,7 +97,7 @@ build-and-test-jammy:
 downstream:
   stage: downstream
 
-  variable:
+  variables:
     TODO_ENV_VARIABLE: "This variable will be available to the CI pipeline of ArmarXCore."
 
   trigger:
