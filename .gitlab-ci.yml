@@ -94,7 +94,7 @@ build-and-test-jammy:
   image: git.h2t.iar.kit.edu:5050/sw/armarx/meta/axii:latest-jammy
 
 
-downstream:
+armarx-core:
   stage: downstream
 
   variables:
