@@ -326,6 +326,8 @@ SET(SOURCES
     Nodes/RobotNodeActuator.cpp
     Nodes/RobotNodeHemisphere.cpp
     Nodes/RobotNodeHemisphereFactory.cpp
+    Nodes/RobotNodeFourBar.cpp
+    Nodes/RobotNodeFourBarFactory.cpp
     Nodes/RobotNodeFixed.cpp
     Nodes/RobotNodeFixedFactory.cpp
     Nodes/RobotNodePrismatic.cpp
@@ -335,6 +337,8 @@ SET(SOURCES
     Nodes/Sensor.cpp
     Nodes/HemisphereJoint/Expressions.cpp
     Nodes/HemisphereJoint/Joint.cpp
+    Nodes/FourBar/Expressions.cpp
+    Nodes/FourBar/Joint.cpp
 
     TimeOptimalTrajectory/Path.cpp
     TimeOptimalTrajectory/TimeOptimalTrajectory.cpp
@@ -568,6 +572,8 @@ SET(INCLUDES
     Nodes/RobotNodeActuator.h
     Nodes/RobotNodeHemisphere.h
     Nodes/RobotNodeHemisphereFactory.h
+    Nodes/RobotNodeFourBar.h
+    Nodes/RobotNodeFourBarFactory.h
     Nodes/RobotNodeFactory.h
     Nodes/RobotNodeFixed.h
     Nodes/RobotNodeFixedFactory.h
@@ -579,6 +585,8 @@ SET(INCLUDES
     Nodes/SensorFactory.h
     Nodes/HemisphereJoint/Expressions.h
     Nodes/HemisphereJoint/Joint.h
+    Nodes/FourBar/Expressions.h
+    Nodes/FourBar/Joint.h
 
     TimeOptimalTrajectory/Path.h
     TimeOptimalTrajectory/TimeOptimalTrajectory.h

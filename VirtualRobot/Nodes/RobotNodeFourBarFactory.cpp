@@ -8,7 +8,7 @@
 
 #include "../CollisionDetection/CollisionModel.h"
 #include "RobotNode.h"
-#include "RobotNodeHemisphere.h"
+#include "RobotNodeFourBar.h"
 
 
 namespace VirtualRobot
@@ -34,8 +34,8 @@ namespace VirtualRobot
                                              const SceneObject::Physics& physics,
                                              RobotNode::RobotNodeType rntype) const
     {
-        std::cout << "CREATE NEW HEMISPHERE JOINT" << std::endl;
-        return std::make_shared<RobotNodeHemisphere>(
+        std::cout << "CREATE NEW FOUR BAR JOINT" << std::endl;
+        return std::make_shared<RobotNodeFourBar>(
             robot,
             nodeName,
             limitLow,
@@ -63,8 +63,8 @@ namespace VirtualRobot
                                                const SceneObject::Physics& physics,
                                                RobotNode::RobotNodeType rntype) const
     {
-        std::cout << "CREATE NEW HEMISPHERE JOINT DH" << std::endl;
-        return std::make_shared<RobotNodeHemisphere>(robot,
+        std::cout << "CREATE NEW FOUR BAR JOINT DH" << std::endl;
+        return std::make_shared<RobotNodeFourBar>(robot,
                                                      nodeName,
                                                      limitLow,
                                                      limitHigh,
@@ -89,7 +89,7 @@ namespace VirtualRobot
     std::string
     RobotNodeFourBarFactory::getName()
     {
-        return "hemisphere";
+        return "four_bar";
     }
 
 

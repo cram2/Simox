@@ -16,11 +16,12 @@
 #include "../Visualization/TriMeshModel.h"
 #include "../RobotConfig.h"
 #include "../RuntimeEnvironment.h"
+#include "Nodes/RobotNodeFourBar.h"
 #include "VirtualRobot.h"
 #include "rapidxml.hpp"
 #include "mujoco/RobotMjcf.h"
 #include <VirtualRobot/Import/URDF/SimoxURDFFactory.h>
-
+#include <VirtualRobot/Nodes/FourBar/Joint.h>
 #include <SimoxUtility/xml/rapidxml/rapidxml_print.hpp>
 #include <SimoxUtility/filesystem/remove_trailing_separator.h>
 #include <SimoxUtility/math/convert/deg_to_rad.h>
@@ -251,6 +252,7 @@ namespace VirtualRobot
         Eigen::Vector3f scaleVisuFactor = Eigen::Vector3f::Zero();
 
         std::optional<RobotNodeHemisphere::XmlInfo> hemisphere;
+        std::optional<RobotNodeFourBar::XmlInfo> fourBarXmlInfo;
 
         while (node)
         {
@@ -473,6 +475,40 @@ namespace VirtualRobot
                     break;
                 }
             }
+            else if (nodeName == "four_bar")
+            {
+                fourBarXmlInfo.emplace();
+
+                std::string roleString = processStringAttribute("role", node, true);
+                roleString = simox::alg::to_lower(roleString);
+                try
+                {
+                    fourBarXmlInfo->role = RobotNodeFourBar::RoleFromString(roleString);
+                }
+                catch (const std::out_of_range& e)
+                {
+                    THROW_VR_EXCEPTION("Invalid role in four_bar joint: " << e.what())
+                }
+
+                const rapidxml::xml_node<>* dimensionsNode = node->first_node("dimensions", 0, false);
+
+                if(fourBarXmlInfo->role == RobotNodeFourBar::Role::ACTIVE)
+                {
+                    if(dimensionsNode == nullptr)
+                    {
+                        THROW_VR_EXCEPTION("Missing <dimensions> node for four_bar joint.");
+                    }
+                
+                    fourBarXmlInfo->dimensions = four_bar::Joint::Dimensions
+                    {
+                        .shank = getFloatByAttributeName(dimensionsNode, "shank"),
+                        .p1 = getFloatByAttributeName(dimensionsNode, "p1"),
+                        .p2 = getFloatByAttributeName(dimensionsNode, "p2"),
+                        .p3 = getFloatByAttributeName(dimensionsNode, "p3")
+                    };
+                }
+                
+            }
             else
             {
                 THROW_VR_EXCEPTION("XML definition <" << nodeName << "> not supported in <Joint> tag of RobotNode <" << robotNodeName << ">." << endl);
@@ -585,6 +621,12 @@ namespace VirtualRobot
         {
             RobotNodeHemispherePtr node = std::dynamic_pointer_cast<RobotNodeHemisphere>(robotNode);
             node->setXmlInfo(hemisphere.value());
+        }
+
+        if(robotNode->isFourBarJoint() and fourBarXmlInfo.has_value())
+        {
+            auto node = std::dynamic_pointer_cast<RobotNodeFourBar>(robotNode);
+            node->setXmlInfo(fourBarXmlInfo.value());
         }
 
         if (scaleVisu)

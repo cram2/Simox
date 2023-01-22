@@ -21,16 +21,15 @@
 */
 #pragma once
 
-#include "../VirtualRobot.h"
-
-#include "Nodes/FourBar/Joint.h"
-#include "RobotNode.h"
+#include <optional>
+#include <string>
+#include <vector>
 
 #include <Eigen/Core>
 
-#include <string>
-#include <vector>
-#include <optional>
+#include "../VirtualRobot.h"
+#include "Nodes/FourBar/Joint.h"
+#include "RobotNode.h"
 
 
 namespace VirtualRobot
@@ -43,7 +42,6 @@ namespace VirtualRobot
     class VIRTUAL_ROBOT_IMPORT_EXPORT RobotNodeFourBar : public RobotNode
     {
     public:
-
         enum class Role
         {
             PASSIVE,
@@ -57,7 +55,9 @@ namespace VirtualRobot
 
             // Only set for first:
             double theta0 = -1;
-            double lever = -1;
+            // double lever = -1;
+
+            std::optional<four_bar::Joint::Dimensions> dimensions;
         };
 
         friend class RobotFactory;
@@ -66,109 +66,91 @@ namespace VirtualRobot
 
 
         RobotNodeFourBar(
-                RobotWeakPtr rob,                                   ///< The robot
-                const std::string& name,                            ///< The name
-                float jointLimitLo,                                 ///< lower joint limit
-                float jointLimitHi,                                 ///< upper joint limit
-                const Eigen::Matrix4f& preJointTransform,           ///< This transformation is applied before the translation of the joint is done
-                const Eigen::Vector3f& axis,                        ///< The rotation axis (in local joint coord system)
-                VisualizationNodePtr visualization = nullptr,       ///< A visualization model
-                CollisionModelPtr collisionModel = nullptr,         ///< A collision model
-                float jointValueOffset = 0.0f,                      ///< An offset that is internally added to the joint value
-                const SceneObject::Physics& p = {},                 ///< physics information
-                CollisionCheckerPtr colChecker = nullptr,           ///< A collision checker instance (if not set, the global col checker is used)
-                RobotNodeType type = Generic
-                );
+            RobotWeakPtr rob, ///< The robot
+            const std::string& name, ///< The name
+            float jointLimitLo, ///< lower joint limit
+            float jointLimitHi, ///< upper joint limit
+            const Eigen::Matrix4f&
+                preJointTransform, ///< This transformation is applied before the translation of the joint is done
+            const Eigen::Vector3f& axis, ///< The rotation axis (in local joint coord system)
+            VisualizationNodePtr visualization = nullptr, ///< A visualization model
+            CollisionModelPtr collisionModel = nullptr, ///< A collision model
+            float jointValueOffset =
+                0.0f, ///< An offset that is internally added to the joint value
+            const SceneObject::Physics& p = {}, ///< physics information
+            CollisionCheckerPtr colChecker =
+                nullptr, ///< A collision checker instance (if not set, the global col checker is used)
+            RobotNodeType type = Generic);
 
         RobotNodeFourBar(
-                RobotWeakPtr rob,                                   ///< The robot
-                const std::string& name,                            ///< The name
-                float jointLimitLo,                                 ///< lower joint limit
-                float jointLimitHi,                                 ///< upper joint limit
-                float a,                                            ///< dh paramters
-                float d,                                            ///< dh paramters
-                float alpha,                                        ///< dh paramters
-                float theta,                                        ///< dh paramters
-                VisualizationNodePtr visualization = nullptr,       ///< A visualization model
-                CollisionModelPtr collisionModel = nullptr,         ///< A collision model
-                float jointValueOffset = 0.0f,                      ///< An offset that is internally added to the joint value
-                const SceneObject::Physics& p = {},                 ///< physics information
-                CollisionCheckerPtr colChecker = {},                ///< A collision checker instance (if not set, the global col checker is used)
-                RobotNodeType type = Generic
-                );
+            RobotWeakPtr rob, ///< The robot
+            const std::string& name, ///< The name
+            float jointLimitLo, ///< lower joint limit
+            float jointLimitHi, ///< upper joint limit
+            float a, ///< dh paramters
+            float d, ///< dh paramters
+            float alpha, ///< dh paramters
+            float theta, ///< dh paramters
+            VisualizationNodePtr visualization = nullptr, ///< A visualization model
+            CollisionModelPtr collisionModel = nullptr, ///< A collision model
+            float jointValueOffset =
+                0.0f, ///< An offset that is internally added to the joint value
+            const SceneObject::Physics& p = {}, ///< physics information
+            CollisionCheckerPtr colChecker =
+                {}, ///< A collision checker instance (if not set, the global col checker is used)
+            RobotNodeType type = Generic);
 
         void setJointValueNoUpdate(float q) override;
         void setJointValue(float q) override;
 
     public:
-
         ~RobotNodeFourBar() override;
 
 
         void setXmlInfo(const XmlInfo& info);
 
-        bool
-        initialize(
-                SceneObjectPtr parent = nullptr,
-                const std::vector<SceneObjectPtr>& children = {}
-                ) override;
+        bool initialize(SceneObjectPtr parent = nullptr,
+                        const std::vector<SceneObjectPtr>& children = {}) override;
 
         /// Print status information.
-        void
-        print(
-                bool printChildren = false,
-                bool printDecoration = true
-                ) const override;
+        void print(bool printChildren = false, bool printDecoration = true) const override;
 
-        bool
-        isFourBarJoint() const override;
+        bool isFourBarJoint() const override;
 
 
     protected:
-
         RobotNodeFourBar();
 
         /// Derived classes add custom XML tags here
-        std::string
-        _toXML(
-                const std::string& modelPath
-                ) override;
+        std::string _toXML(const std::string& modelPath) override;
 
         /// Checks if nodeType constraints are fulfilled. Otherwise an exception is thrown.
         /// Called on initialization.
-        void
-        checkValidRobotNodeType() override;
+        void checkValidRobotNodeType() override;
 
-        void
-        updateTransformationMatrices(
-                const Eigen::Matrix4f& parentPose
-                ) override;
+        void updateTransformationMatrices(const Eigen::Matrix4f& parentPose) override;
 
-        RobotNodePtr
-        _clone(
-                const RobotPtr newRobot,
-                const VisualizationNodePtr visualizationModel,
-                const CollisionModelPtr collisionModel,
-                CollisionCheckerPtr colChecker,
-                float scaling
-                ) override;
+        RobotNodePtr _clone(const RobotPtr newRobot,
+                            const VisualizationNodePtr visualizationModel,
+                            const CollisionModelPtr collisionModel,
+                            CollisionCheckerPtr colChecker,
+                            float scaling) override;
 
 
     protected:
-
         struct JointMath
         {
             /// The actuator values that were used to compute the joint math.
-            Eigen::Vector2f actuators = Eigen::Vector2f::Constant(std::numeric_limits<float>::min());
+            // Eigen::Vector2f actuators = Eigen::Vector2f::Constant(std::numeric_limits<float>::min());
             /// The joint math.
             four_bar::Joint joint;
 
-            void update(const Eigen::Vector2f& actuators);
+            void update(float theta);
         };
 
         struct First
         {
-            JointMath math;
+            // JointMath math;
         };
         std::optional<First> first;
 
@@ -177,17 +159,22 @@ namespace VirtualRobot
             /// The first actuator node.
             RobotNodeFourBar* passive = nullptr;
 
-            JointMath& math()
-            {
-                return passive->first->math;
-            }
-            const JointMath& math() const
-            {
-                return passive->first->math;
-            }
+            JointMath math;
+
+            // JointMath& math()
+            // {
+            //     return passive->first->math;
+            // }
+            // const JointMath& math() const
+            // {
+            //     return passive->first->math;
+            // }
         };
         std::optional<Second> active;
 
+
+
+        std::optional<XmlInfo> xmlInfo;
     };
 
 } // namespace VirtualRobot
