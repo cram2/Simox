@@ -228,6 +228,7 @@ namespace VirtualRobot
         virtual bool isTranslationalJoint() const;
         virtual bool isRotationalJoint() const;
         virtual bool isHemisphereJoint() const;
+        virtual bool isFourBarJoint() const;
 
         /**
          * @param limitless wheter this node has joint limits or not.
