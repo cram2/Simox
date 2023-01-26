@@ -815,59 +815,67 @@ void GraspRrtWindow::testGraspPose()
 
 void GraspRrtWindow::plan()
 {
-    if (!robot || !rns || !eef || !graspQuality)
+    if (not (robot and rns and eef and graspQuality))
     {
         return;
     }
 
-    // setup collision detection
+    // Setup collision detection.
     CDManagerPtr cdm(new CDManager());
 
     if (colModelRobA)
     {
         cdm->addCollisionModel(colModelRobA);
     }
-
     if (colModelRobB)
     {
         cdm->addCollisionModel(colModelRobB);
     }
-
     if (colModelEnv)
     {
         cdm->addCollisionModel(colModelEnv);
     }
 
     cdm->addCollisionModel(targetObject);
-    cspace.reset(new Saba::CSpaceSampled(robot, cdm, rns, 500000));
-    float sampl = (float)UI.doubleSpinBoxCSpaceSampling->value();
-    float samplDCD = (float)UI.doubleSpinBoxColChecking->value();
-    cspace->setSamplingSize(sampl);
-    cspace->setSamplingSizeDCD(samplDCD);
-    float minGraspScore = (float)UI.doubleSpinBoxMinGraspScore->value();
 
-    Saba::GraspRrtPtr graspRrt(new Saba::GraspRrt(cspace, eef, targetObject, graspQuality, colModelEnv, 0.1f, minGraspScore));
+    unsigned int maxConfigs = 500000;
+    cspace = std::make_shared<Saba::CSpaceSampled>(robot, cdm, rns, maxConfigs);
+
+    float sampleSize = static_cast<float>(UI.doubleSpinBoxCSpaceSampling->value());
+    float sampleSizeDCD = static_cast<float>(UI.doubleSpinBoxColChecking->value());
+    float minGraspScore = static_cast<float>(UI.doubleSpinBoxMinGraspScore->value());
+    cspace->setSamplingSize(sampleSize);
+    cspace->setSamplingSizeDCD(sampleSizeDCD);
+
+    Saba::GraspRrtPtr graspRrt = std::make_shared<Saba::GraspRrt>(
+                cspace, eef, targetObject, graspQuality, colModelEnv, 0.1f, minGraspScore);
 
     graspRrt->setStart(startConfig);
 
-    //bool planOk = false;
     bool planOK = graspRrt->plan();
-
     if (planOK)
     {
-        VR_INFO << " Planning succeeded " << std::endl;
+        VR_INFO << "Planning succeeded " << std::endl;
         solution = graspRrt->getSolution();
-        Saba::ShortcutProcessorPtr postProcessing(new Saba::ShortcutProcessor(solution, cspace, false));
-        solutionOptimized = postProcessing->optimize(100);
+
+        Saba::ShortcutProcessorPtr postProcessing =
+                std::make_shared<Saba::ShortcutProcessor>(solution, cspace, false);
+        int steps = 100;
+        solutionOptimized = postProcessing->optimize(steps);
+
         tree = graspRrt->getTree();
-        std::vector<Saba::GraspRrt::GraspInfo, Eigen::aligned_allocator<Saba::GraspRrt::GraspInfo> > vStoreGraspInfo;
-        graspRrt->getGraspInfoResult(vStoreGraspInfo);
+
+        Saba::GraspRrt::GraspInfoVector graspInfoVector;
+        graspRrt->getGraspInfoResult(graspInfoVector);
         grasps.clear();
 
-        for (size_t i = 0; i < vStoreGraspInfo.size(); i++)
+        for (size_t i = 0; i < graspInfoVector.size(); i++)
         {
             std::cout << "processing grasp " << i << std::endl;
-            VirtualRobot::GraspPtr g(new VirtualRobot::Grasp("GraspRrt Grasp", robot->getType(), eef->getName(), vStoreGraspInfo[i].handToObjectTransform, "GraspRrt", vStoreGraspInfo[i].graspScore));
+            VirtualRobot::GraspPtr g = std::make_shared<VirtualRobot::Grasp>(
+                        "GraspRrt Grasp", robot->getType(), eef->getName(),
+                        graspInfoVector[i].handToObjectTransform, "GraspRrt",
+                        graspInfoVector[i].graspScore);
             grasps.push_back(g);
         }
     }
@@ -903,7 +911,7 @@ void GraspRrtWindow::sliderSolution(int pos)
         s = solutionOptimized;
     }
 
-    float p = (float)pos / 1000.0f;
+    float p = static_cast<float>(pos) / 1000.0f;
     Eigen::VectorXf iPos;
     s->interpolate(p, iPos);
     robot->setJointValues(rns, iPos);

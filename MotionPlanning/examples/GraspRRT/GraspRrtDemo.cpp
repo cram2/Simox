@@ -30,7 +30,7 @@ int main(int argc, char** argv)
 
     std::cout << " --- START --- " << std::endl;
 
-    std::string filenameScene("/scenes/examples/GraspRrt/planning.xml");
+    std::string filenameScene("scenes/examples/GraspRrt/planning.xml");
     VirtualRobot::RuntimeEnvironment::getDataFileAbsolute(filenameScene);
     std::string startConfig("init");
     std::string goalObject("Can");
