@@ -243,6 +243,10 @@ namespace VirtualRobot
                 // Save pointer to firstNode
                 active->passive = firstNode;
 
+                // initialize the passive node
+                const float psi = active->math.joint.psi(getJointValue());
+                active->passive->setJointValueNoUpdate(-psi);
+
                 // Set up robot node parameters.
                 {
                     // const four_bar::Joint& joint = active->math.joint;
