@@ -2,6 +2,7 @@
 stages:
   - build-and-test
   - documentation
+  - downstream
 
 
 .build-and-test:
@@ -91,3 +92,18 @@ build-and-test-jammy:
   extends: .build-and-test
 
   image: git.h2t.iar.kit.edu:5050/sw/armarx/meta/axii:latest-jammy
+
+
+armarx-core:
+  stage: downstream
+
+  variables:
+    TODO_ENV_VARIABLE: "This variable will be available to the CI pipeline of ArmarXCore."
+
+  trigger:
+    project: sw/armarx/armarx-core
+    # This is optional, but we could tell ArmarX which Simox branch to use.
+    branch: master  
+
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master"
