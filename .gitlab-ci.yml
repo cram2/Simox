@@ -102,4 +102,8 @@ armarx-core:
 
   trigger:
     project: sw/armarx/armarx-core
-    branch: master  # This is optional
+    # This is optional, but we could tell ArmarX which Simox branch to use.
+    branch: master  
+
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master"
