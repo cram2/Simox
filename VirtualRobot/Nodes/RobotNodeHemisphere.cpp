@@ -109,6 +109,8 @@ namespace VirtualRobot
 
     void RobotNodeHemisphere::setXmlInfo(const XmlInfo& info)
     {
+        this->xmlInfo = info;
+
         VR_ASSERT(second.has_value());
         switch (info.role)
         {
@@ -263,7 +265,7 @@ namespace VirtualRobot
         ReadLockPtr lock = getRobot()->getReadLock();
         Physics physics = this->physics.scale(scaling);
 
-        RobotNodePtr result;
+        RobotNodeHemispherePtr result;
         if (optionalDHParameter.isSet)
         {
             result.reset(new RobotNodeHemisphere(
@@ -286,6 +288,11 @@ namespace VirtualRobot
                              localTransform, Eigen::Vector3f::Zero(),
                              visualizationModel, collisionModel,
                              jointValueOffset, physics, colChecker, nodeType));
+        }
+
+        if(xmlInfo)
+        {
+            result->setXmlInfo(xmlInfo.value());
         }
 
         return result;

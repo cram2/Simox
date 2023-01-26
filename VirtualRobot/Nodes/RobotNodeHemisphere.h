@@ -183,7 +183,9 @@ namespace VirtualRobot
         };
         std::optional<Second> second;
 
+
+        std::optional<XmlInfo> xmlInfo;
+
     };
 
 } // namespace VirtualRobot
-
