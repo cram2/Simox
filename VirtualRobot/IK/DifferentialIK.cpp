@@ -6,6 +6,8 @@
 #include "../Nodes/RobotNodeRevolute.h"
 #include "../VirtualRobotException.h"
 #include "../CollisionDetection/CollisionChecker.h"
+#include "Nodes/RobotNodeFourBar.h"
+#include "Nodes/RobotNodeHemisphere.h"
 
 #include <Eigen/Geometry>
 
@@ -443,6 +445,17 @@ namespace VirtualRobot
 
                     // no orientation part required with prismatic joints
                 }
+                else if (dof->isHemisphereJoint())
+                {
+                    const RobotNodeHemisphere* hemisphere = dynamic_cast<RobotNodeHemisphere*>(dof.get());
+                    // FIXME implement
+                }
+                else if (dof->isFourBarJoint())
+                {
+                    const RobotNodeFourBar* fourBarJoint = dynamic_cast<RobotNodeFourBar*>(dof.get());
+                    // FIXME implement
+                }
+
             }
 
 #ifdef CHECK_PERFORMANCE
