@@ -149,7 +149,7 @@ namespace VirtualRobot
                 ) override;
 
 
-    protected:
+    public:
 
         struct JointMath
         {
