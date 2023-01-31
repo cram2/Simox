@@ -7,6 +7,8 @@
 #include "../VirtualRobotException.h"
 #include "../CollisionDetection/CollisionChecker.h"
 #include <VirtualRobot/Nodes/RobotNodeHemisphere.h>
+#include <VirtualRobot/Nodes/RobotNodeFourBar.h>
+#include <VirtualRobot/Nodes/RobotNodeHemisphere.h>
 
 #include <Eigen/Geometry>
 
@@ -506,6 +508,11 @@ namespace VirtualRobot
                     {
                         // Pass
                     }
+                }
+                else if (dof->isFourBarJoint())
+                {
+                    const RobotNodeFourBar* fourBarJoint = dynamic_cast<RobotNodeFourBar*>(dof.get());
+                    // FIXME implement
                 }
             }
 

@@ -140,13 +140,12 @@ namespace VirtualRobot
                 ) override;
 
         RobotNodePtr
-        _clone(
-                const RobotPtr newRobot,
-                const VisualizationNodePtr visualizationModel,
-                const CollisionModelPtr collisionModel,
-                CollisionCheckerPtr colChecker,
-                float scaling
-                ) override;
+        _clone(const RobotPtr newRobot,
+               const VisualizationNodePtr visualizationModel,
+               const CollisionModelPtr collisionModel,
+               CollisionCheckerPtr colChecker,
+               float scaling
+               ) override;
 
 
     public:
@@ -186,4 +185,3 @@ namespace VirtualRobot
     };
 
 } // namespace VirtualRobot
-
