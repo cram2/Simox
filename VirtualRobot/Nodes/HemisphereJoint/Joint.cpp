@@ -38,13 +38,13 @@ namespace VirtualRobot::hemisphere
     }
 
 
-    void Joint::computeFkOfPosition(const Eigen::Vector2d& p12)
+    void Joint::computeFkOfPosition(const ActuatorPosition& p12)
     {
         computeFkOfPosition(p12(0), p12(1));
     }
 
 
-    void Joint::computeFkOfAngle(const Eigen::Vector2d& alpha12)
+    void Joint::computeFkOfAngle(const ActuatorAngle& alpha12)
     {
         computeFkOfPosition(angleToPosition(alpha12));
     }
@@ -89,7 +89,8 @@ namespace VirtualRobot::hemisphere
         return jacobian;
     }
 
-    Eigen::Vector2d Joint::angleToPosition(const Eigen::Vector2d& alpha) const
+
+    Joint::ActuatorPosition Joint::angleToPosition(const Joint::ActuatorAngle& alpha) const
     {
         return lever * Eigen::sin((alpha + Eigen::Vector2d::Constant(theta0)).array());
     }
