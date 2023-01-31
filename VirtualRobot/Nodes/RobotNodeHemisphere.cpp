@@ -263,10 +263,10 @@ namespace VirtualRobot
         ReadLockPtr lock = getRobot()->getReadLock();
         Physics physics = this->physics.scale(scaling);
 
-        RobotNodePtr result;
+        RobotNodeHemispherePtr cloned;
         if (optionalDHParameter.isSet)
         {
-            result.reset(new RobotNodeHemisphere(
+            cloned.reset(new RobotNodeHemisphere(
                              newRobot, name, jointLimitLo, jointLimitHi,
                              optionalDHParameter.aMM() * scaling,
                              optionalDHParameter.dMM() * scaling,
@@ -280,7 +280,7 @@ namespace VirtualRobot
         {
             Eigen::Matrix4f localTransform = getLocalTransformation();
             simox::math::position(localTransform) *= scaling;
-            result.reset(new RobotNodeHemisphere(
+            cloned.reset(new RobotNodeHemisphere(
                              newRobot, name,
                              jointLimitLo, jointLimitHi,
                              localTransform, Eigen::Vector3f::Zero(),
@@ -288,7 +288,18 @@ namespace VirtualRobot
                              jointValueOffset, physics, colChecker, nodeType));
         }
 
-        return result;
+        if (this->first)
+        {
+            // We can just copy the math object.
+            cloned->first = first;
+        }
+        else if (this->second)
+        {
+            cloned->second.emplace(Second{});
+            // initialize() takes care of hooking up the second to the first.
+        }
+
+        return cloned;
     }
 
 
