@@ -38,7 +38,7 @@ namespace VirtualRobot
             // IK params
             size_t steps = 40;
 
-            float maxJointAngleStep = 0.2f;
+            float maxJointAngleStep = 0.01f;
             float stepSize = 0.5f;
             bool resetRnsValues = true;
             bool returnIKSteps = false;

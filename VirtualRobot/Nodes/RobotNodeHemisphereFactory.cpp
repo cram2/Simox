@@ -7,7 +7,8 @@
 #include "RobotNodeHemisphereFactory.h"
 #include "RobotNode.h"
 #include "RobotNodeHemisphere.h"
-#include "../CollisionDetection/CollisionModel.h"
+
+#include <VirtualRobot/CollisionDetection/CollisionModel.h>
 
 
 namespace VirtualRobot
@@ -21,7 +22,8 @@ namespace VirtualRobot
     = default;
 
 
-    RobotNodePtr RobotNodeHemisphereFactory::createRobotNode(
+    RobotNodePtr
+    RobotNodeHemisphereFactory::createRobotNode(
             RobotPtr robot,
             const std::string& nodeName,
             VisualizationNodePtr visualizationModel,
@@ -34,25 +36,26 @@ namespace VirtualRobot
             const Eigen::Vector3f& /*translationDirection*/,
             const SceneObject::Physics& physics,
             RobotNode::RobotNodeType rntype) const
+
     {
-        std::cout << "CREATE NEW HEMISPHERE JOINT" << std::endl;
+        (void) limitLow, (void) limitHigh;
+        (void) axis;
+
         return std::make_shared<RobotNodeHemisphere>(
                     robot,
                     nodeName,
-                    limitLow,
-                    limitHigh,
                     preJointTransform,
-                    axis,
                     visualizationModel,
                     collisionModel,
                     jointValueOffset,
                     physics,
-                    (collisionModel ? collisionModel->getCollisionChecker() : CollisionCheckerPtr()),
+                    collisionModel ? collisionModel->getCollisionChecker() : CollisionCheckerPtr(),
                     rntype);
     }
 
 
-    RobotNodePtr RobotNodeHemisphereFactory::createRobotNodeDH(
+    RobotNodePtr
+    RobotNodeHemisphereFactory::createRobotNodeDH(
             RobotPtr robot,
             const std::string& nodeName,
             VisualizationNodePtr visualizationModel,
@@ -64,12 +67,11 @@ namespace VirtualRobot
             const SceneObject::Physics& physics,
             RobotNode::RobotNodeType rntype) const
     {
-        std::cout << "CREATE NEW HEMISPHERE JOINT DH" << std::endl;
+        (void) limitLow, (void) limitHigh;
+
         return std::make_shared<RobotNodeHemisphere>(
                     robot,
                     nodeName,
-                    limitLow,
-                    limitHigh,
                     dhParameters.aMM(),
                     dhParameters.dMM(),
                     dhParameters.alphaRadian(),
@@ -78,21 +80,24 @@ namespace VirtualRobot
                     collisionModel,
                     jointValueOffset,
                     physics,
-                    CollisionCheckerPtr(),
+                    collisionModel ? collisionModel->getCollisionChecker() : CollisionCheckerPtr(),
                     rntype);
     }
 
 
-    RobotNodeFactory::SubClassRegistry RobotNodeHemisphereFactory::registry(RobotNodeHemisphereFactory::getName(), &RobotNodeHemisphereFactory::createInstance);
+    RobotNodeFactory::SubClassRegistry
+    RobotNodeHemisphereFactory::registry(RobotNodeHemisphereFactory::getName(), &RobotNodeHemisphereFactory::createInstance);
 
 
-    std::string RobotNodeHemisphereFactory::getName()
+    std::string
+    RobotNodeHemisphereFactory::getName()
     {
         return "hemisphere";
     }
 
 
-    std::shared_ptr<RobotNodeFactory> RobotNodeHemisphereFactory::createInstance(void*)
+    std::shared_ptr<RobotNodeFactory>
+    RobotNodeHemisphereFactory::createInstance(void*)
     {
         return std::make_shared<RobotNodeHemisphereFactory>();
     }

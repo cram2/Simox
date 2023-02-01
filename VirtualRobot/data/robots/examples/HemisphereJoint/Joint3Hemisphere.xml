@@ -1,26 +1,26 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
 <Robot Type="Simple3DoFRobotWithHemisphereJoint" StandardName="Simple3DoFRobotWithHemisphereJoint" RootNode="First">
-	
+
     <RobotNode name="First">
         <Visualization enable="true">
-			<CoordinateAxis enable="true" scaling="1" text="Root"/>
+            <CoordinateAxis enable="true" scaling="1" text="Root"/>
             <File type="Inventor">end.iv</File>
-		</Visualization>
+        </Visualization>
         <Child name="Joint1_Revolute"/>
-	</RobotNode>
+    </RobotNode>
 
     <RobotNode name="Joint1_Revolute">
-		<Joint type="revolute">
-			<Limits unit="degree" lo="-90" hi="90"/>
+        <Joint type="revolute">
+            <Limits unit="degree" lo="-90" hi="90"/>
             <Axis x="1" y="0" z="0"/>
         </Joint>
-		<Visualization enable="true">
+        <Visualization enable="true">
              <File type="Inventor">joint_01_base.iv</File>
-			 <UseAsCollisionModel/>
-		</Visualization>
+             <UseAsCollisionModel/>
+        </Visualization>
         <Child name="Joint2_Hemisphere_A"/>
-	</RobotNode>
+    </RobotNode>
 
     <RobotNode name="Joint2_Hemisphere_A">
         <Transform>
@@ -31,10 +31,10 @@
         </Joint>
         <Visualization enable="true">
              <File type="Inventor">joint_02_hemisphere_a.iv</File>
-			 <UseAsCollisionModel/>
+             <UseAsCollisionModel/>
         </Visualization>
         <Child name="Joint2_Hemisphere_B"/>
-	</RobotNode>
+    </RobotNode>
 
     <RobotNode name="Joint2_Hemisphere_B">
         <Joint type="hemisphere">
@@ -48,44 +48,49 @@
     </RobotNode>
 
     <RobotNode name="Joint3_Revolute">
-		<Transform>
+        <Transform>
             <Translation x="0" y="0" z="50" />
-		</Transform>
+        </Transform>
         <Joint type="revolute">
             <Axis x="1" y="0" z="0"/>
-			<Limits unit="degree" lo="-90" hi="90"/>
+            <Limits unit="degree" lo="-90" hi="90"/>
         </Joint>
-		<Visualization enable="true">
+        <Visualization enable="true">
              <File type="Inventor">joint_03_finger.iv</File>
-			 <UseAsCollisionModel/>
-		</Visualization>
+             <UseAsCollisionModel/>
+        </Visualization>
         <Child name="Last"/>
-	</RobotNode>
+    </RobotNode>
 
     <RobotNode name="Last">
-		<Transform>
+        <Transform>
             <Translation x="0" y="0" z="300" />
-		</Transform>
-		<Visualization enable="true">
+        </Transform>
+        <Visualization enable="true">
              <File type="Inventor">end.iv</File>
-			 <UseAsCollisionModel/>
-		</Visualization>
-	</RobotNode>
+             <UseAsCollisionModel/>
+        </Visualization>
+    </RobotNode>
 
     <RobotNodeSet name="AllJoints" kinematicRoot="Joint1_Revolute">
         <Node name="Joint1_Revolute"/>
         <Node name="Joint2_Hemisphere_A"/>
         <Node name="Joint2_Hemisphere_B"/>
         <Node name="Joint3_Revolute"/>
-	</RobotNodeSet>
+    </RobotNodeSet>
 
-	<RobotNodeSet name="CollisionModel">
+    <RobotNodeSet name="HemisphereJoints" kinematicRoot="Joint2_Hemisphere_A" tcp="Last">
+        <Node name="Joint2_Hemisphere_A"/>
+        <Node name="Joint2_Hemisphere_B"/>
+    </RobotNodeSet>
+
+    <RobotNodeSet name="CollisionModel">
         <Node name="First"/>
         <Node name="Joint1_Revolute"/>
         <Node name="Joint2_Hemisphere_A"/>
         <Node name="Joint2_Hemisphere_B"/>
         <Node name="Joint3_Revolute"/>
         <Node name="Last"/>
-	</RobotNodeSet>
+    </RobotNodeSet>
 
 </Robot>

@@ -6,6 +6,7 @@
 #include "../Nodes/RobotNodeRevolute.h"
 #include "../VirtualRobotException.h"
 #include "../CollisionDetection/CollisionChecker.h"
+#include <VirtualRobot/Nodes/RobotNodeHemisphere.h>
 
 #include <Eigen/Geometry>
 
@@ -380,9 +381,9 @@ namespace VirtualRobot
 
             //check if the tcp is affected by this DOF
             auto p = parents[tcpRN];
-            if (find(p.begin(), p.end(), dof) != p.end())
+            const bool isParent = std::find(p.begin(), p.end(), dof) != p.end();
+            if (isParent)
             {
-
                 // Calculus for rotational joints is different as for prismatic joints.
                 if (dof->isRotationalJoint())
                 {
@@ -442,6 +443,29 @@ namespace VirtualRobot
                     }
 
                     // no orientation part required with prismatic joints
+                }
+                else if (dof->isHemisphereJoint())
+                {
+                    RobotNodeHemispherePtr hemisphere
+                            = std::dynamic_pointer_cast<RobotNodeHemisphere>(dof);
+
+                    VR_ASSERT(hemisphere->first.has_value() xor hemisphere->second.has_value());
+
+                    if (hemisphere->isSecondHemisphereJointNode())
+                    {
+                        // Set Jacobian for both DoFs.
+                        RobotNodeHemisphere::SecondData& second = hemisphere->getSecondData();
+                        const hemisphere::Maths::Jacobian jacobian = second.getJacobian();
+
+                        tmpUpdateJacobianPosition.block<3, 2>(0, i - 1)
+                                = jacobian.block<3, 2>(0, 0).cast<float>();
+                        tmpUpdateJacobianOrientation.block<3, 2>(0, i - 1)
+                                = jacobian.block<3, 2>(3, 0).cast<float>();
+                    }
+                    else
+                    {
+                        // Nothing to do - everything is handled by second DoF.
+                    }
                 }
             }
 
