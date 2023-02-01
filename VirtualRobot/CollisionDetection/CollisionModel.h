@@ -94,6 +94,15 @@ namespace VirtualRobot
             return getBoundingBox();
         }
 
+        void setGlobalParentPose(const Eigen::Matrix4f& globalParentPose)
+        {
+            setGlobalPose(globalParentPose * localPose);
+        }
+
+        void setLocalPose(const Eigen::Matrix4f& localPose)
+        {
+            this->localPose = localPose;
+        }
 
         /*!
         The global pose defines the position of the joint in the world. This value is used for visualization.
@@ -224,6 +233,7 @@ namespace VirtualRobot
 
         Eigen::Matrix4f globalPose;     //< The transformation that is used for visualization and for updating the col model
 
+        Eigen::Matrix4f localPose = Eigen::Matrix4f::Identity();
 
 #if defined(VR_COLLISION_DETECTION_PQP)
         std::shared_ptr< CollisionModelPQP > collisionModelImplementation;
@@ -233,4 +243,3 @@ namespace VirtualRobot
     };
 
 } // namespace VirtualRobot
-

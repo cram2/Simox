@@ -20,6 +20,7 @@ namespace VirtualRobot
         this->name = name;
         this->margin = margin;
         this->colChecker = colChecker;
+        this->localPose = visu->getLocalPose();
 
         if (!this->colChecker)
         {
@@ -450,4 +451,3 @@ namespace VirtualRobot
 
 
 } // namespace VirtualRobot
-

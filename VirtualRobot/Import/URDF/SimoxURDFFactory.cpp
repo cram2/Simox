@@ -4,6 +4,8 @@
 #include <iostream>
 #include <map>
 
+#include <Eigen/Geometry>
+
 #include <urdf_model/model.h>
 #include <urdf_parser/urdf_parser.h>
 
@@ -144,7 +146,7 @@ namespace VirtualRobot
         return robo;
     }
 
-    Eigen::Matrix4f SimoxURDFFactory::convertPose(urdf::Pose& p)
+    Eigen::Matrix4f SimoxURDFFactory::convertPose(const urdf::Pose& p)
     {
         const float scale = 1000.0f; // mm
         Eigen::Matrix4f res;
@@ -272,20 +274,20 @@ namespace VirtualRobot
         return res;
     }
 
-    VisualizationNodePtr SimoxURDFFactory::convertVisuArray(std::vector<std::shared_ptr<urdf::Collision> > visu_array, const string& basePath)
+    VisualizationNodePtr SimoxURDFFactory::convertVisuArray(std::vector<std::shared_ptr<urdf::Collision> > col_array, const string& basePath)
     {
         VirtualRobot::VisualizationNodePtr res;
         std::shared_ptr<VisualizationFactory> factory = CoinVisualizationFactory::createInstance(NULL);
 
-        if (visu_array.size() == 0)
+        if (col_array.empty())
         {
             return res;
         }
 
         std::vector< VisualizationNodePtr > visus;
-        for (size_t i = 0; i < visu_array.size(); i++)
+        for (auto & visu : col_array)
         {
-            VirtualRobot::VisualizationNodePtr v = convertVisu(visu_array[i]->geometry, visu_array[i]->origin, basePath);
+            VirtualRobot::VisualizationNodePtr v = convertVisu(visu->geometry, visu->origin, basePath);
             if (v)
             {
                 visus.push_back(v);

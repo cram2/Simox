@@ -133,7 +133,7 @@ namespace VirtualRobot
 
         if (collisionModel && updateCollisionModel)
         {
-            collisionModel->setGlobalPose(globalPose);
+            collisionModel->setGlobalParentPose(globalPose);
         }
 
         if (updateChildren)
@@ -157,7 +157,7 @@ namespace VirtualRobot
         }
         if (collisionModel && updateCollisionModel)
         {
-            collisionModel->setGlobalPose(globalPose);
+            collisionModel->setGlobalParentPose(globalPose);
         }
     }
 
@@ -545,7 +545,7 @@ namespace VirtualRobot
         if (collisionModel)
         {
             collisionModel->setUpdateVisualization(updateCollisionModel);
-            collisionModel->setGlobalPose(globalPose);
+            collisionModel->setGlobalParentPose(globalPose);
         }
     }
 
