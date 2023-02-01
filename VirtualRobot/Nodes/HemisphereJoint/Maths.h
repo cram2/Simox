@@ -50,7 +50,7 @@ namespace VirtualRobot::hemisphere
     public:
 
         double lever = 0;
-        double theta0 = 0;
+        double theta0Rad = 0;
         double radius = 0;
 
         double limitLo = 0;

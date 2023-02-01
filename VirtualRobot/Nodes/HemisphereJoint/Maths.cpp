@@ -24,7 +24,7 @@ namespace VirtualRobot::hemisphere
     void Maths::setConstants(double lever, double theta0)
     {
         this->lever = lever;
-        this->theta0 = theta0;
+        this->theta0Rad = theta0;
         this->radius = 2 * std::sin(theta0) * lever;
 
         this->limitHi =   simox::math::deg_to_rad(45 - 6.0);
@@ -34,7 +34,7 @@ namespace VirtualRobot::hemisphere
 
     void Maths::computeFkOfPosition(double p1, double p2)
     {
-        expressions.compute(p1, p2, lever, theta0);
+        expressions.compute(p1, p2, lever, theta0Rad);
     }
 
 
@@ -115,7 +115,7 @@ namespace VirtualRobot::hemisphere
 
     Maths::ActuatorPosition Maths::angleToPosition(const Maths::ActuatorAngle& alpha) const
     {
-        return lever * Eigen::sin((alpha + Eigen::Vector2d::Constant(theta0)).array());
+        return lever * Eigen::sin((alpha + Eigen::Vector2d::Constant(theta0Rad)).array());
     }
 
 }

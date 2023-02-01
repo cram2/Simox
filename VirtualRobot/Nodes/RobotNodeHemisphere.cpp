@@ -10,6 +10,7 @@
 
 #include <SimoxUtility/meta/enum/EnumNames.hpp>
 #include <SimoxUtility/math/pose/pose.h>
+#include <SimoxUtility/math/convert/rad_to_deg.h>
 
 
 namespace VirtualRobot
@@ -106,7 +107,7 @@ namespace VirtualRobot
         {
         case Role::FIRST:
             firstData.emplace(FirstData{});
-            firstData->maths.maths.setConstants(info.lever, info.theta0);
+            firstData->maths.maths.setConstants(info.lever, info.theta0Rad);
             break;
 
         case Role::SECOND:
@@ -190,7 +191,7 @@ namespace VirtualRobot
                 Eigen::IOFormat iof(5, 0, " ", "\n", "    [", "]");
                 std::cout << __FUNCTION__ << "() of second actuator with "
                           << "\n  lever = " << maths.maths.lever
-                          << "\n  theta0 = " << maths.maths.theta0
+                          << "\n  theta0 = " << maths.maths.theta0Rad
                           << "\n  radius = " << maths.maths.radius
                           << "\n  joint value = " << jointValue
                           << "\n  actuator (angle) = \n" << actuators.transpose().format(iof)
@@ -327,33 +328,34 @@ namespace VirtualRobot
         VR_ASSERT_MESSAGE(firstData.has_value() xor secondData.has_value(),
                           std::stringstream() << firstData.has_value() << " / " << secondData.has_value());
 
+        std::stringstream ss;
+        ss << "\t\t<Joint type='Hemisphere'>" << std::endl;
         if (firstData)
         {
-            // TODO
-            return "";
+            // Constants are defined in first.
+
+            hemisphere::Maths& maths = firstData->maths.maths;
+            ss << "\t\t\t<hemisphere role='first'"
+               << " lever='" << maths.lever << "'"
+               << " theta0='" << simox::math::rad_to_deg(maths.theta0Rad) << "'"
+               << " />" << std::endl;
         }
         else
         {
-            hemisphere::CachedMaths& math = secondData->maths();
-
-            std::stringstream ss;
-            ss << "\t\t<Joint type='Hemisphere'>" << std::endl;
-            ss << "\t\t\t<hemisphere lever='" << math.maths.lever << "' theta0='" << math.maths.theta0 << "' />" << std::endl;
-            ss << "\t\t\t<limits lo='" << jointLimitLo << "' hi='" << jointLimitHi << "' units='radian'/>" << std::endl;
-            ss << "\t\t\t<MaxAcceleration value='" << maxAcceleration << "'/>" << std::endl;
-            ss << "\t\t\t<MaxVelocity value='" << maxVelocity << "'/>" << std::endl;
-            ss << "\t\t\t<MaxTorque value='" << maxTorque << "'/>" << std::endl;
-            std::map< std::string, float >::iterator propIt = propagatedJointValues.begin();
-
-            while (propIt != propagatedJointValues.end())
-            {
-                ss << "\t\t\t<PropagateJointValue name='" << propIt->first << "' factor='" << propIt->second << "'/>" << std::endl;
-                propIt++;
-            }
-
-            ss << "\t\t</Joint>" << std::endl;
-            return ss.str();
+            ss << "\t\t\t<hemisphere role='second' />" << std::endl;
         }
+
+        ss << "\t\t\t<MaxAcceleration value='" << maxAcceleration << "'/>" << std::endl;
+        ss << "\t\t\t<MaxVelocity value='" << maxVelocity << "'/>" << std::endl;
+        ss << "\t\t\t<MaxTorque value='" << maxTorque << "'/>" << std::endl;
+
+        for (auto propIt = propagatedJointValues.begin(); propIt != propagatedJointValues.end(); ++propIt)
+        {
+            ss << "\t\t\t<PropagateJointValue name='" << propIt->first << "' factor='" << propIt->second << "'/>" << std::endl;
+        }
+
+        ss << "\t\t</Joint>" << std::endl;
+        return ss.str();
     }
 
     hemisphere::CachedMaths& RobotNodeHemisphere::SecondData::maths()

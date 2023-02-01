@@ -69,7 +69,7 @@ namespace VirtualRobot
             Role role;
 
             // Only set for first:
-            double theta0 = -1;
+            double theta0Rad = -1;
             double lever = -1;
         };
 
