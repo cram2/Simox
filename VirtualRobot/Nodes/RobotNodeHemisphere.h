@@ -140,16 +140,15 @@ namespace VirtualRobot
                 ) override;
 
         RobotNodePtr
-        _clone(
-                const RobotPtr newRobot,
-                const VisualizationNodePtr visualizationModel,
-                const CollisionModelPtr collisionModel,
-                CollisionCheckerPtr colChecker,
-                float scaling
-                ) override;
+        _clone(const RobotPtr newRobot,
+               const VisualizationNodePtr visualizationModel,
+               const CollisionModelPtr collisionModel,
+               CollisionCheckerPtr colChecker,
+               float scaling
+               ) override;
 
 
-    protected:
+    public:
 
         struct JointMath
         {
@@ -182,9 +181,6 @@ namespace VirtualRobot
             }
         };
         std::optional<Second> second;
-
-
-        std::optional<XmlInfo> xmlInfo;
 
     };
 

@@ -91,7 +91,27 @@ CompositeDiffIK::Result CompositeDiffIK::solve(Parameters params, SolveState &s)
     s.jointRegularization = Eigen::VectorXf::Zero(s.cols);
     for (size_t i = 0; i < rns->getSize(); i++)
     {
-        s.jointRegularization(i) = rns->getNode(i)->isTranslationalJoint() ?  params.jointRegularizationTranslation : params.jointRegularizationRotation;
+        float regularization = 1;
+        if (rns->getNode(i)->isTranslationalJoint())
+        {
+            regularization = params.jointRegularizationTranslation;
+        }
+        else if (rns->getNode(i)->isRotationalJoint())
+        {
+            regularization = params.jointRegularizationRotation;
+        }
+        else if (rns->getNode(i)->isHemisphereJoint())
+        {
+            // FIXME: ToDo?
+            regularization = params.jointRegularizationRotation;
+        }
+        else if (rns->getNode(i)->isFourBarJoint())
+        {
+            // FIXME: ToDo?
+            regularization = params.jointRegularizationRotation;
+        }
+
+        s.jointRegularization(i) = regularization;
     }
 
     s.cartesianRegularization = Eigen::VectorXf::Zero(s.rows);
@@ -206,38 +226,47 @@ void CompositeDiffIK::step(CompositeDiffIK::Parameters& params, SolveState& s, i
 
     ik->updatePseudoInverseJacobianMatrix(s.invJac, s.jacobi, 0, s.cartesianRegularization);
 
-
-    Eigen::VectorXf nullspaceVel = Eigen::VectorXf::Zero(s.cols);
-
-    for (const NullspaceGradientPtr& nsGradient : nullspaceGradients)
-    {
-        Eigen::VectorXf nsgrad = nsGradient->kP * nsGradient->getGradientAdjusted(params, stepNr);
-        nullspaceVel += nsgrad;
-    }
-    //LimitInfNormTo(nullspaceVel, params.maxJointAngleStep);
-
-    Eigen::JacobiSVD<Eigen::MatrixXf> svd(s.jacobi, Eigen::ComputeFullU | Eigen::ComputeFullV);
-    Eigen::MatrixXf V = svd.matrixV();
-    Eigen::MatrixXf nullspaceSVD = V.block(0, s.rows, s.cols, s.cols - s.rows);
-
-    s.nullspace = nullspaceSVD; // CalculateNullspaceSVD(s.jacobi);
-
-    Eigen::VectorXf nsv = Eigen::VectorXf::Zero(s.cols);
-    for (int i = 0; i < s.nullspace.cols(); i++)
-    {
-        float squaredNorm = s.nullspace.col(i).squaredNorm();
-        // Prevent division by zero
-        if (squaredNorm > 1.0e-32f)
-        {
-            nsv += s.nullspace.col(i) * s.nullspace.col(i).dot(nullspaceVel) / s.nullspace.col(i).squaredNorm();
-        }
-    }
-
     Eigen::VectorXf jv = s.invJac * cartesianVel;
-    jv = jv + nsv;
+
+    if (s.cols > s.rows)
+    {
+        Eigen::VectorXf nullspaceVel = Eigen::VectorXf::Zero(s.cols);
+
+        for (const NullspaceGradientPtr& nsGradient : nullspaceGradients)
+        {
+            Eigen::VectorXf nsgrad = nsGradient->kP * nsGradient->getGradientAdjusted(params, stepNr);
+            nullspaceVel += nsgrad;
+        }
+
+        //LimitInfNormTo(nullspaceVel, params.maxJointAngleStep);
+
+        Eigen::JacobiSVD<Eigen::MatrixXf> svd(s.jacobi, Eigen::ComputeFullU | Eigen::ComputeFullV);
+        Eigen::MatrixXf V = svd.matrixV();
+
+        Eigen::MatrixXf nullspaceSVD = V.block(0, s.rows, s.cols, s.cols - s.rows);
+
+        s.nullspace = nullspaceSVD; // CalculateNullspaceSVD(s.jacobi);
+
+        Eigen::VectorXf nsv = Eigen::VectorXf::Zero(s.cols);
+        for (int i = 0; i < s.nullspace.cols(); i++)
+        {
+            float squaredNorm = s.nullspace.col(i).squaredNorm();
+            // Prevent division by zero
+            if (squaredNorm > 1.0e-32f)
+            {
+                nsv += s.nullspace.col(i) * s.nullspace.col(i).dot(nullspaceVel) / s.nullspace.col(i).squaredNorm();
+            }
+        }
+        jv = jv + nsv;
+    }
+
+    std::cout << "Before: " << jv << std::endl;
+
     jv = jv * params.stepSize;
     jv = LimitInfNormTo(jv, params.maxJointAngleStep, params.maxJointAngleStepIgnore);
     jv = jv.cwiseProduct(s.jointRegularization);
+
+    std::cout << "After: " << jv << std::endl;
 
     Eigen::VectorXf newJointValues = s.jointValues + jv;
 
