@@ -105,22 +105,8 @@ namespace VirtualRobot::hemisphere
             const Eigen::Vector3d scaledRotAxis = eefStateTrans.cross(eefVelTrans)
                     / eefStateTrans.norm() * 2;
 
-            for (int column = 0; column < 2; ++column)
-            {
-                /* This check should not be necessary since we are setting
-                 * actuatorVel = (+1, +1) above.
-                 * However, in order to avoid breaking changes in the future,
-                 * I will keep it here.
-                 */
-                if (actuatorVel(column) != 0)
-                {
-                    jacobian.block<3, 1>(0, column) = scaledRotAxis / actuatorVel(column);
-                }
-                else
-                {
-                    jacobian.block<3, 1>(0, column).setZero();
-                }
-            }
+            jacobian.block<3, 1>(3, 0) = scaledRotAxis / actuatorVel(0);
+            jacobian.block<3, 1>(3, 1) = scaledRotAxis / actuatorVel(1);
         }
 
         return jacobian;
