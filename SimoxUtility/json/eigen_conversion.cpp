@@ -7,8 +7,7 @@
 
 namespace Eigen
 {
-    template <>
-    void from_json<Eigen::Vector3f>(const ::simox::json::json& j, Eigen::MatrixBase<Eigen::Vector3f>& vector)
+    void from_json(const ::simox::json::json& j, Eigen::Vector3f& vector)
     {
         if (j.is_object())
         {
@@ -23,8 +22,7 @@ namespace Eigen
     }
 
 
-    template <>
-    void from_json<Eigen::Matrix4f>(const ::simox::json::json& j, Eigen::MatrixBase<Eigen::Matrix4f>& matrix)
+    void from_json(const ::simox::json::json& j, Eigen::Matrix4f& matrix)
     {
         if (j.is_object())
         {
