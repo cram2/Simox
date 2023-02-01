@@ -15,7 +15,7 @@
 namespace VirtualRobot
 {
 
-    static const float limit = 1.0;
+    static const float initialLimit = 1.0;
 
     extern const simox::meta::EnumNames<RobotNodeHemisphere::Role> RoleNames =
     {
@@ -35,10 +35,7 @@ namespace VirtualRobot
     RobotNodeHemisphere::RobotNodeHemisphere(
             RobotWeakPtr rob,
             const std::string& name,
-            float jointLimitLo,
-            float jointLimitHi,
             const Eigen::Matrix4f& preJointTransform,
-            const Eigen::Vector3f& axis,
             VisualizationNodePtr visualization,
             CollisionModelPtr collisionModel,
             float jointValueOffset,
@@ -46,12 +43,9 @@ namespace VirtualRobot
             CollisionCheckerPtr colChecker,
             RobotNodeType type
             ) :
-        RobotNode(rob, name, -limit, limit, visualization, collisionModel,
+        RobotNode(rob, name, -initialLimit, initialLimit, visualization, collisionModel,
                   jointValueOffset, physics, colChecker, type)
     {
-        (void) axis;
-        (void) jointLimitLo, (void) jointLimitHi;
-
         initialized = false;
         optionalDHParameter.isSet = false;
         localTransformation = preJointTransform;
@@ -62,8 +56,6 @@ namespace VirtualRobot
     RobotNodeHemisphere::RobotNodeHemisphere(
             RobotWeakPtr rob,
             const std::string& name,
-            float jointLimitLo,
-            float jointLimitHi,
             float a, float d, float alpha, float theta,
             VisualizationNodePtr visualization,
             CollisionModelPtr collisionModel,
@@ -72,7 +64,7 @@ namespace VirtualRobot
             CollisionCheckerPtr colChecker,
             RobotNodeType type
             ) :
-        RobotNode(rob, name, jointLimitLo, jointLimitHi, visualization, collisionModel,
+        RobotNode(rob, name, -initialLimit, initialLimit, visualization, collisionModel,
                   jointValueOffset, physics, colChecker, type)
     {
         initialized = false;
@@ -128,7 +120,8 @@ namespace VirtualRobot
             SceneObjectPtr parent,
             const std::vector<SceneObjectPtr>& children)
     {
-        VR_ASSERT_MESSAGE(firstData.has_value() xor secondData.has_value(), std::stringstream() << firstData.has_value() << " / " << secondData.has_value());
+        VR_ASSERT_MESSAGE(firstData.has_value() xor secondData.has_value(),
+                          std::stringstream() << firstData.has_value() << " / " << secondData.has_value());
 
         // The second node needs to store a reference to the first node.
         if (secondData)
@@ -152,13 +145,13 @@ namespace VirtualRobot
 
             // Set up robot node parameters.
             {
-                const hemisphere::Maths& joint = secondData->maths().maths;
+                const hemisphere::Maths& maths = secondData->maths().maths;
 
-                firstNode->jointLimitLo = joint.limitLo;
-                secondNode->jointLimitLo = joint.limitLo;
+                firstNode->jointLimitLo = maths.limitLo;
+                secondNode->jointLimitLo = maths.limitLo;
 
-                firstNode->jointLimitHi = joint.limitHi;
-                secondNode->jointLimitHi = joint.limitHi;
+                firstNode->jointLimitHi = maths.limitHi;
+                secondNode->jointLimitHi = maths.limitHi;
             }
         }
 
@@ -179,27 +172,29 @@ namespace VirtualRobot
         {
             VR_ASSERT_MESSAGE(secondData->first, "First node must be known to second node.");
 
-            hemisphere::CachedMaths& math = secondData->maths();
+            hemisphere::CachedMaths& maths = secondData->maths();
             Eigen::Vector2f actuators(secondData->firstNode->getJointValue(), this->getJointValue());
 
-            math.update(actuators);
+            maths.update(actuators);
 
-            Eigen::Vector3d translation = math.maths.getEndEffectorTranslation();
-            const Eigen::Matrix3d rotation = math.maths.getEndEffectorRotation();
+            Eigen::Vector3d translation = maths.maths.getEndEffectorTranslation();
+            const Eigen::Matrix3d rotation = maths.maths.getEndEffectorRotation();
             const Eigen::Matrix4d transform = simox::math::pose(translation, rotation);
 
             // Update Second
-            {
-                this->globalPose = parentPose * localTransformation * transform.cast<float>();
+            this->globalPose = parentPose * localTransformation * transform.cast<float>();
 
+            const bool verbose = false;
+            if (verbose)
+            {
                 Eigen::IOFormat iof(5, 0, " ", "\n", "    [", "]");
                 std::cout << __FUNCTION__ << "() of second actuator with "
-                          << "\n  lever = " << math.maths.lever
-                          << "\n  theta0 = " << math.maths.theta0
-                          << "\n  radius = " << math.maths.radius
+                          << "\n  lever = " << maths.maths.lever
+                          << "\n  theta0 = " << maths.maths.theta0
+                          << "\n  radius = " << maths.maths.radius
                           << "\n  joint value = " << jointValue
                           << "\n  actuator (angle) = \n" << actuators.transpose().format(iof)
-                          << "\n  actuator (pos) =  \n" << math.maths.angleToPosition(actuators.cast<double>()).transpose().format(iof)
+                          << "\n  actuator (pos) =  \n" << maths.maths.angleToPosition(actuators.cast<double>()).transpose().format(iof)
                           << "\n  local transform = \n" << localTransformation.format(iof)
                           << "\n  joint transform = \n" << transform.format(iof)
                           << std::endl;
@@ -259,7 +254,7 @@ namespace VirtualRobot
         if (optionalDHParameter.isSet)
         {
             cloned.reset(new RobotNodeHemisphere(
-                             newRobot, name, jointLimitLo, jointLimitHi,
+                             newRobot, name,
                              optionalDHParameter.aMM() * scaling,
                              optionalDHParameter.dMM() * scaling,
                              optionalDHParameter.alphaRadian(),
@@ -273,9 +268,7 @@ namespace VirtualRobot
             Eigen::Matrix4f localTransform = getLocalTransformation();
             simox::math::position(localTransform) *= scaling;
             cloned.reset(new RobotNodeHemisphere(
-                             newRobot, name,
-                             jointLimitLo, jointLimitHi,
-                             localTransform, Eigen::Vector3f::Zero(),
+                             newRobot, name, localTransform,
                              visualizationModel, collisionModel,
                              jointValueOffset, physics, colChecker, nodeType));
         }
@@ -331,7 +324,8 @@ namespace VirtualRobot
 
     std::string RobotNodeHemisphere::_toXML(const std::string& /*modelPath*/)
     {
-        VR_ASSERT_MESSAGE(firstData.has_value() xor secondData.has_value(), std::stringstream() << firstData.has_value() << " / " << secondData.has_value());
+        VR_ASSERT_MESSAGE(firstData.has_value() xor secondData.has_value(),
+                          std::stringstream() << firstData.has_value() << " / " << secondData.has_value());
 
         if (firstData)
         {

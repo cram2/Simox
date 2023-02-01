@@ -104,10 +104,7 @@ namespace VirtualRobot
         RobotNodeHemisphere(
                 RobotWeakPtr rob,                                   ///< The robot
                 const std::string& name,                            ///< The name
-                float jointLimitLo,                                 ///< lower joint limit
-                float jointLimitHi,                                 ///< upper joint limit
                 const Eigen::Matrix4f& preJointTransform,           ///< This transformation is applied before the translation of the joint is done
-                const Eigen::Vector3f& axis,                        ///< The rotation axis (in local joint coord system)
                 VisualizationNodePtr visualization = nullptr,       ///< A visualization model
                 CollisionModelPtr collisionModel = nullptr,         ///< A collision model
                 float jointValueOffset = 0.0f,                      ///< An offset that is internally added to the joint value
@@ -116,11 +113,10 @@ namespace VirtualRobot
                 RobotNodeType type = Generic
                 );
 
+        // The DH-based constructor is not tested so far for Hemisphere joints.
         RobotNodeHemisphere(
                 RobotWeakPtr rob,                                   ///< The robot
                 const std::string& name,                            ///< The name
-                float jointLimitLo,                                 ///< lower joint limit
-                float jointLimitHi,                                 ///< upper joint limit
                 float a,                                            ///< dh paramters
                 float d,                                            ///< dh paramters
                 float alpha,                                        ///< dh paramters
