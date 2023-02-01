@@ -86,6 +86,43 @@ namespace VirtualRobot::hemisphere
                     fk.jrx1, fk.jrx2,
                     fk.jry1, fk.jry2,
                     fk.jrz1, fk.jrz2;
+
+        // Current state of constructing the orientational part.
+        // ToDo: Do this with symbolic math inside `Expressions`.
+        {
+            const Eigen::Vector3d eefStateTrans = getEndEffectorTranslation();
+
+            // Assume we move with (+1, +1) - this should cancel out.
+            const Eigen::Vector2d actuatorVel = Eigen::Vector2d::Ones();
+            const Eigen::Vector3d eefVelTrans = jacobian.block<3, 2>(0, 0) * actuatorVel;
+
+            /*
+             * The rotation axis is orthogonal to the vector from origin to the
+             * EEF (eefStateTrans) and the movement direction (eefVelTrans).
+             *
+             * For the scaling, ask Cornelius. :)
+             */
+            const Eigen::Vector3d scaledRotAxis = eefStateTrans.cross(eefVelTrans)
+                    / eefStateTrans.norm() * 2;
+
+            for (int column = 0; column < 2; ++column)
+            {
+                /* This check should not be necessary since we are setting
+                 * actuatorVel = (+1, +1) above.
+                 * However, in order to avoid breaking changes in the future,
+                 * I will keep it here.
+                 */
+                if (actuatorVel(column) != 0)
+                {
+                    jacobian.block<3, 1>(0, column) = scaledRotAxis / actuatorVel(column);
+                }
+                else
+                {
+                    jacobian.block<3, 1>(0, column).setZero();
+                }
+            }
+        }
+
         return jacobian;
     }
 
