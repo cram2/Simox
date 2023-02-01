@@ -338,7 +338,6 @@ SET(SOURCES
     Nodes/HemisphereJoint/CachedMaths.cpp
     Nodes/HemisphereJoint/Expressions.cpp
     Nodes/HemisphereJoint/Maths.cpp
-    Nodes/FourBar/Expressions.cpp
     Nodes/FourBar/Joint.cpp
 
     TimeOptimalTrajectory/Path.cpp
@@ -587,7 +586,6 @@ SET(INCLUDES
     Nodes/HemisphereJoint/CachedMaths.h
     Nodes/HemisphereJoint/Expressions.h
     Nodes/HemisphereJoint/Maths.h
-    Nodes/FourBar/Expressions.h
     Nodes/FourBar/Joint.h
 
     TimeOptimalTrajectory/Path.h

@@ -5,8 +5,6 @@
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
-#include "Expressions.h"
-
 
 namespace VirtualRobot::four_bar
 {
@@ -17,7 +15,6 @@ namespace VirtualRobot::four_bar
     public:
         using Jacobian = Eigen::Matrix<double, 3, 1>;
 
-    public:
         struct Dimensions;
 
         Joint(double theta0, const Dimensions& dimensions);
@@ -63,18 +60,9 @@ namespace VirtualRobot::four_bar
         // Eigen::Vector2d angleToPosition(const Eigen::Vector2d& alpha) const;
 
 
-    public:
+    // private:
         const double theta0;
         const Dimensions dims;
-
-        double limitLo = 0;
-        double limitHi = 0;
-
-
-        Expressions fk;
-
-        // Eigen::Isometry3d transformation = Eigen::Isometry3d::Identity();
-
 
     };
 
