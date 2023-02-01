@@ -5,6 +5,7 @@
 
 #include <Eigen/Geometry>
 #include <Eigen/src/Geometry/AngleAxis.h>
+#include <Eigen/src/Geometry/Transform.h>
 
 #include <SimoxUtility/math/pose/pose.h>
 #include <SimoxUtility/meta/enum/EnumNames.hpp>
@@ -12,6 +13,7 @@
 #include "Nodes/FourBar/Joint.h"
 #include "Nodes/Sensor.h"
 #include "Robot.h"
+#include "VirtualRobot.h"
 #include "VirtualRobotException.h"
 
 
@@ -144,7 +146,7 @@ namespace VirtualRobot
     {
         // We must update the preceeding node (the passive node).
         // This usually causes issues as the order to update the kinematic chain is strict.
-        std::cout << "RobotNodeFourBar: setting joint value " << getName()  << " " << q << std::endl;
+        std::cout << "RobotNodeFourBar: setting joint value " << getName() << " " << q << std::endl;
 
         std::cout << "RobotNodeFourBar: active? " << active.has_value() << std::endl;
 
@@ -231,7 +233,7 @@ namespace VirtualRobot
                 //     THROW_VR_EXCEPTION(ss.str());
                 // }
 
-                if(firstNode == nullptr)
+                if (firstNode == nullptr)
                 {
                     currentParent = currentParent->getParent();
                     std::cout << "Parent does not match (yet).";
@@ -271,7 +273,7 @@ namespace VirtualRobot
     {
         // if (actuators != this->actuators)
         // {
-        joint.computeFkOfAngle(theta);
+        joint.computeFk(theta);
         // }
     }
 
@@ -293,14 +295,14 @@ namespace VirtualRobot
             std::cout << "active: joint value " << jV << std::endl;
 
             active->math.update(jV);
-            tmp = active->math.joint.getEndEffectorTransform().cast<float>();
+            tmp = active->math.joint.computeFk(jV).matrix().cast<float>();
         }
         else // passive
         {
             std::cout << "passive: joint value " << jV << std::endl;
 
-            tmp.linear() =
-                Eigen::AngleAxisf(jV + jointValueOffset, Eigen::Vector3f::UnitZ()).toRotationMatrix();
+            tmp.linear() = Eigen::AngleAxisf(jV + jointValueOffset, Eigen::Vector3f::UnitZ())
+                               .toRotationMatrix();
         }
 
 
@@ -366,8 +368,8 @@ namespace VirtualRobot
         else if (active)
         {
             std::cout << "* four_bar joint second node";
-            std::cout << "* Transform: \n"
-                      << active->math.joint.getEndEffectorTransform() << std::endl;
+            // std::cout << "* Transform: \n"
+            //           << active->math.joint.getEndEffectorTransform() << std::endl;
         }
 
         if (printDecoration)
@@ -431,7 +433,7 @@ namespace VirtualRobot
                                               nodeType));
         }
 
-        if(xmlInfo)
+        if (xmlInfo)
         {
             result->setXmlInfo(xmlInfo.value());
         }
@@ -444,6 +446,64 @@ namespace VirtualRobot
     RobotNodeFourBar::isFourBarJoint() const
     {
         return true;
+    }
+
+    Eigen::Vector3f
+    RobotNodeFourBar::getJointRotationAxis(const SceneObjectPtr& coordSystem) const
+    {
+        ReadLockPtr lock = getRobot()->getReadLock();
+
+        // FIXME(fabian.reister): improve this code. This is just copied from RobotNodeRevolutes
+
+        const Eigen::Vector3f jointRotationAxis = Eigen::Vector3f::UnitZ();
+
+        Eigen::Vector4f result4f = Eigen::Vector4f::Zero();
+        result4f.segment(0, 3) = jointRotationAxis;
+        result4f = globalPose * result4f;
+
+        if (coordSystem)
+        {
+            //res = coordSystem->toLocalCoordinateSystem(res);
+            result4f = Eigen::Isometry3f{coordSystem->getGlobalPose()}.inverse() * result4f;
+        }
+
+        return result4f.block(0, 0, 3, 1);
+    }
+
+    Eigen::Matrix4f
+    RobotNodeFourBar::baseFrame(const SceneObjectPtr& coordSystem) const
+    {
+        VR_ASSERT(active.has_value()); // only defined for active joint
+
+        const auto global_T_base_frame = active->passive->getParent()->getGlobalPose();
+
+        if (coordSystem)
+        {
+            const Eigen::Isometry3f global_T_ref(coordSystem->getGlobalPose());
+            const auto ref_T_global = global_T_ref.inverse();
+
+            return ref_T_global * global_T_base_frame;
+        }
+
+        return global_T_base_frame;
+    }
+
+    four_bar::Joint::Jacobian
+    RobotNodeFourBar::getJacobian(const Eigen::Vector3f& global_P_eef) const
+    {
+        const auto throwIfFalse = [](const bool exprResult){
+            if(not exprResult){throw VirtualRobotException("boom");}
+        };
+
+        throwIfFalse(active.has_value());
+        throwIfFalse(active->passive != nullptr);
+        throwIfFalse(active->passive->getParent() != nullptr);
+
+        const Eigen::Isometry3f global_T_base(active->passive->getParent()->getGlobalPose());
+        const auto base_P_eef = global_T_base.inverse() * global_P_eef;
+
+        const Eigen::Vector3d base_P_eef_d = base_P_eef.cast<double>();
+        return active->math.joint.getJacobian(getJointValue(), base_P_eef_d);
     }
 
 

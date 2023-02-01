@@ -117,6 +117,13 @@ namespace VirtualRobot
 
         bool isFourBarJoint() const override;
 
+        Eigen::Vector3f getJointRotationAxis(const SceneObjectPtr& coordSystem) const;
+
+        // the root of the 
+        Eigen::Matrix4f baseFrame(const SceneObjectPtr& coordSystem) const;
+
+        four_bar::Joint::Jacobian getJacobian(const Eigen::Vector3f& global_P_eef) const;
+
 
     protected:
         RobotNodeFourBar();

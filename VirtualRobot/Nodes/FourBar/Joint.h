@@ -15,7 +15,7 @@ namespace VirtualRobot::four_bar
     class Joint
     {
     public:
-        using Jacobian = Eigen::Matrix<double, 6, 1>;
+        using Jacobian = Eigen::Matrix<double, 3, 1>;
 
     public:
         struct Dimensions;
@@ -47,46 +47,25 @@ namespace VirtualRobot::four_bar
             double
             k3() const
             {
-                constexpr auto squared = [](const double t){ return t * t; };
+                constexpr auto squared = [](const double t) { return t * t; };
 
                 return (squared(shank) + squared(p1) + squared(p3) - squared(p2)) / (2 * p1 * p3);
             }
         };
 
-        double
-        psi(const double theta)
-        {
-            const double k1 = dims.k1();
-            const double k2 = dims.k2();
-            const double k3 = dims.k3();
-
-            const double cosTheta = std::cos(theta);
-            const double sinTheta = std::sin(theta);
-
-            const double A = k1 * cosTheta + k2 + k3 + cosTheta; // C.34
-            const double B = -2 * sinTheta; // C.35
-            const double C = k1 * cosTheta - k2 + k3 - cosTheta; // C.36
-
-            const double psi = 2 * std::atan((-B + std::sqrt(B * B - 4 * A * C)) / (2 * A)); // C.39
-
-            return psi;
-        }
+        double psi(double theta) const;
 
         // compute pose of actuated joint in passive joint frame
-        void computeFkOfAngle(double theta);
+        Eigen::Isometry3d computeFk(double theta) const;
 
-
-        Eigen::Vector3d getEndEffectorTranslation() const;
-        Eigen::Matrix3d getEndEffectorRotation() const;
-        Eigen::Matrix4d getEndEffectorTransform() const;
-        Jacobian getJacobian() const;
+        Jacobian getJacobian(double theta, const Eigen::Vector3d& base_P_eef) const;
 
         // Eigen::Vector2d angleToPosition(const Eigen::Vector2d& alpha) const;
 
 
     public:
         const double theta0;
-        const Dimensions dims; 
+        const Dimensions dims;
 
         double limitLo = 0;
         double limitHi = 0;
@@ -94,7 +73,9 @@ namespace VirtualRobot::four_bar
 
         Expressions fk;
 
-        Eigen::Isometry3d transformation = Eigen::Isometry3d::Identity();
+        // Eigen::Isometry3d transformation = Eigen::Isometry3d::Identity();
+
+
     };
 
 } // namespace VirtualRobot::four_bar
