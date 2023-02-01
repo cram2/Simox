@@ -92,21 +92,22 @@ namespace VirtualRobot::hemisphere
         {
             const Eigen::Vector3d eefStateTrans = getEndEffectorTranslation();
 
-            // Assume we move with (+1, +1) - this should cancel out.
-            const Eigen::Vector2d actuatorVel = Eigen::Vector2d::Ones();
-            const Eigen::Vector3d eefVelTrans = jacobian.block<3, 2>(0, 0) * actuatorVel;
+            for (int column = 0; column < 2; ++column)
+            {
+                // Imagine we apply (+1, 0) / (0, +1) actuator velocities.
+                const Eigen::Vector3d eefVelTrans = jacobian.block<3, 1>(0, column);  // * 1.0
 
-            /*
-             * The rotation axis is orthogonal to the vector from origin to the
-             * EEF (eefStateTrans) and the movement direction (eefVelTrans).
-             *
-             * For the scaling, ask Cornelius. :)
-             */
-            const Eigen::Vector3d scaledRotAxis = eefStateTrans.cross(eefVelTrans)
-                    / eefStateTrans.norm() * 2;
+                /*
+                 * The rotation axis is orthogonal to the vector from origin to the
+                 * EEF (eefStateTrans) and the movement direction (eefVelTrans).
+                 *
+                 * For the scaling, ask Cornelius. :)
+                 */
+                const Eigen::Vector3d scaledRotAxis = eefStateTrans.cross(eefVelTrans)
+                        / eefStateTrans.norm() * 2;
 
-            jacobian.block<3, 1>(3, 0) = scaledRotAxis / actuatorVel(0);
-            jacobian.block<3, 1>(3, 1) = scaledRotAxis / actuatorVel(1);
+                jacobian.block<3, 1>(3, column) = scaledRotAxis;  // / 1.0;
+            }
         }
 
         return jacobian;
