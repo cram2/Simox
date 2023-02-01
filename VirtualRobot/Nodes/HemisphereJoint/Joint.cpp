@@ -34,7 +34,7 @@ namespace VirtualRobot::hemisphere
 
     void Joint::computeFkOfPosition(double p1, double p2)
     {
-        fk.compute(p1, p2, lever, theta0);
+        expressions.compute(p1, p2, lever, theta0);
     }
 
 
@@ -53,9 +53,9 @@ namespace VirtualRobot::hemisphere
     Eigen::Vector3d Joint::getEndEffectorTranslation() const
     {
         return Eigen::Vector3d {
-            fk.ex,
-            fk.ey,
-            fk.ez
+            expressions.ex,
+            expressions.ey,
+            expressions.ez
         };
     }
 
@@ -64,9 +64,9 @@ namespace VirtualRobot::hemisphere
     {
         // r_wrist_to_base = np.array([[exx, eyx, ezx], [exy, eyy, ezy], [exz, eyz, ezz]])
         Eigen::Matrix3d ori;
-        ori << fk.exx, fk.eyx, fk.ezx,
-               fk.exy, fk.eyy, fk.ezy,
-               fk.exz, fk.eyz, fk.ezz;
+        ori << expressions.exx, expressions.eyx, expressions.ezx,
+               expressions.exy, expressions.eyy, expressions.ezy,
+               expressions.exz, expressions.eyz, expressions.ezz;
         return ori;
     }
 
@@ -80,12 +80,12 @@ namespace VirtualRobot::hemisphere
     Joint::Jacobian Joint::getJacobian() const
     {
         Joint::Jacobian jacobian;
-        jacobian << fk.jx1, fk.jx2,
-                    fk.jy1, fk.jy2,
-                    fk.jz1, fk.jz2,
-                    fk.jrx1, fk.jrx2,
-                    fk.jry1, fk.jry2,
-                    fk.jrz1, fk.jrz2;
+        jacobian << expressions.jx1, expressions.jx2,
+                    expressions.jy1, expressions.jy2,
+                    expressions.jz1, expressions.jz2,
+                    expressions.jrx1, expressions.jrx2,
+                    expressions.jry1, expressions.jry2,
+                    expressions.jrz1, expressions.jrz2;
 
         // Current state of constructing the orientational part.
         // ToDo: Do this with symbolic math inside `Expressions`.

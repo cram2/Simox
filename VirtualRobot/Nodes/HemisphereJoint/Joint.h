@@ -57,7 +57,7 @@ namespace VirtualRobot::hemisphere
         double limitHi = 0;
 
 
-        Expressions fk;
+        Expressions expressions;
 
     };
 
