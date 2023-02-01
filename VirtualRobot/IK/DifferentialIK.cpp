@@ -384,9 +384,6 @@ namespace VirtualRobot
             const bool isParent = std::find(p.begin(), p.end(), dof) != p.end();
             if (isParent)
             {
-                bool isHemisphere = dof->isHemisphereJoint();
-                std::cout << "isHemisphere: " << isHemisphere << std::endl;
-
                 // Calculus for rotational joints is different as for prismatic joints.
                 if (dof->isRotationalJoint())
                 {
@@ -454,19 +451,20 @@ namespace VirtualRobot
 
                     VR_ASSERT(hemisphere->first.has_value() xor hemisphere->second.has_value());
 
-                    if (hemisphere->isFirstHemisphereJointNode())
+                    if (hemisphere->isSecondHemisphereJointNode())
                     {
-                        // Nothing to do - everything is handled by second DoF.
+                        // Set Jacobian for both DoFs.
+                        RobotNodeHemisphere::SecondData& second = hemisphere->getSecondData();
+                        const hemisphere::Maths::Jacobian jacobian = second.getJacobian();
+
+                        tmpUpdateJacobianPosition.block<3, 2>(0, i - 1)
+                                = jacobian.block<3, 2>(0, 0).cast<float>();
+                        tmpUpdateJacobianOrientation.block<3, 2>(0, i - 1)
+                                = jacobian.block<3, 2>(3, 0).cast<float>();
                     }
                     else
                     {
-                        VR_ASSERT(hemisphere->isSecondHemisphereJointNode());
-
-                        // Set Jacobian for both DoFs.
-                        const RobotNodeHemisphere::SecondData& second = hemisphere->getSecondData();
-                        const hemisphere::Maths::Jacobian jacobian = second.getJacobian();
-
-                        tmpUpdateJacobianPosition.block<6, 2>(0, i - 1) = jacobian.cast<float>();
+                        // Nothing to do - everything is handled by second DoF.
                     }
                 }
             }

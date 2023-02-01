@@ -366,12 +366,12 @@ namespace VirtualRobot
         return firstNode->firstData->maths;
     }
 
-    hemisphere::Maths::Jacobian RobotNodeHemisphere::SecondData::getJacobian() const
+    hemisphere::Maths::Jacobian RobotNodeHemisphere::SecondData::getJacobian()
     {
         VR_ASSERT(firstNode);
         VR_ASSERT(secondNode);
 
-        hemisphere::CachedMaths& maths = firstNode->firstData->maths;
+        hemisphere::CachedMaths& maths = this->maths();
 
         Eigen::Vector2f actuators(firstNode->getJointValue(), secondNode->getJointValue());
         maths.update(actuators);

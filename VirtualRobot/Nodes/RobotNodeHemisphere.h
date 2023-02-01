@@ -90,7 +90,7 @@ namespace VirtualRobot
             hemisphere::CachedMaths& maths();
             const hemisphere::CachedMaths& maths() const;
 
-            hemisphere::Maths::Jacobian getJacobian() const;
+            hemisphere::Maths::Jacobian getJacobian();
         };
 
         friend class RobotFactory;
