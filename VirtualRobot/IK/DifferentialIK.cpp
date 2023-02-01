@@ -454,27 +454,19 @@ namespace VirtualRobot
 
                     VR_ASSERT(hemisphere->first.has_value() xor hemisphere->second.has_value());
 
-                    if (hemisphere->first)
+                    if (hemisphere->isFirstHemisphereJointNode())
                     {
                         // Nothing to do - everything is handled by second DoF.
                     }
                     else
                     {
-                        VR_ASSERT(hemisphere->second);
+                        VR_ASSERT(hemisphere->isSecondHemisphereJointNode());
 
                         // Set Jacobian for both DoFs.
+                        const RobotNodeHemisphere::SecondData& second = hemisphere->getSecondData();
+                        const hemisphere::Maths::Jacobian jacobian = second.getJacobian();
 
-                        RobotNodeHemispherePtr second = hemisphere;
-                        RobotNodeHemisphere* first = hemisphere->second->first;
-
-                        RobotNodeHemisphere::JointMath& math = first->first->math;
-
-                        Eigen::Vector2f actuators(first->getJointValue(), second->getJointValue());
-                        math.update(actuators);
-
-                        hemisphere::Joint::Jacobian jacobian = math.joint.getJacobian();
-
-                        tmpUpdateJacobianPosition.block<6, 2>(0, i-1) = jacobian.cast<float>();
+                        tmpUpdateJacobianPosition.block<6, 2>(0, i - 1) = jacobian.cast<float>();
                     }
                 }
             }

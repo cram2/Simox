@@ -21,10 +21,11 @@
 */
 #pragma once
 
-#include "../VirtualRobot.h"
+#include <VirtualRobot/VirtualRobot.h>
 
-#include "RobotNode.h"
-#include "HemisphereJoint/Joint.h"
+#include <VirtualRobot/Nodes/RobotNode.h>
+#include <VirtualRobot/Nodes/HemisphereJoint/CachedMaths.h>
+#include <VirtualRobot/Nodes/HemisphereJoint/Maths.h>
 
 #include <Eigen/Core>
 
@@ -38,17 +39,31 @@ namespace VirtualRobot
 
     using RobotNodeHemispherePtr = std::shared_ptr<class RobotNodeHemisphere>;
 
+    /**
+     * @brief A model of the 2 DoF wrist joint mechanism published in:
+     *
+     * C. Klas and T. Asfour, "A Compact, Lightweight and Singularity-Free
+     * Wrist Joint Mechanism for Humanoid Robots," 2022 IEEE/RSJ International
+     * Conference on Intelligent Robots and Systems (IROS), Kyoto, Japan, 2022,
+     * pp. 457-464, doi: 10.1109/IROS47612.2022.9981787.
+     *
+     * This joint mechanism represents 2 Degrees of Freedom (DoF). Therefore,
+     * it must be represented by two robot nodes in VirtualRobot.
+     */
     class VIRTUAL_ROBOT_IMPORT_EXPORT RobotNodeHemisphere : public RobotNode
     {
     public:
 
         enum class Role
         {
+            /// The first DoF in the kinematic chain.
             FIRST,
+            /// The second DoF in the kinematic chain.
             SECOND,
         };
         static Role RoleFromString(const std::string& string);
 
+        /// Information specified in the robot XML.
         struct XmlInfo
         {
             Role role;
@@ -58,7 +73,30 @@ namespace VirtualRobot
             double lever = -1;
         };
 
+
+        /// Data held by the first joint.
+        struct FirstData
+        {
+            hemisphere::CachedMaths maths;
+        };
+
+        /// Data held by the second joint.
+        struct SecondData
+        {
+            /// The first actuator node.
+            RobotNodeHemisphere* firstNode = nullptr;
+            RobotNodeHemisphere* secondNode = nullptr;
+
+            hemisphere::CachedMaths& maths();
+            const hemisphere::CachedMaths& maths() const;
+
+            hemisphere::Maths::Jacobian getJacobian() const;
+        };
+
         friend class RobotFactory;
+
+
+    public:
 
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
@@ -118,6 +156,15 @@ namespace VirtualRobot
         bool
         isHemisphereJoint() const override;
 
+        bool isFirstHemisphereJointNode() const;
+        bool isSecondHemisphereJointNode() const;
+
+        /**
+         * @brief Get the data held by the second node.
+         * May only be called if `isFirstHemisphereJointNode()`;
+         */
+        SecondData& getSecondData();
+        const SecondData& getSecondData() const;
 
     protected:
 
@@ -140,48 +187,18 @@ namespace VirtualRobot
                 ) override;
 
         RobotNodePtr
-        _clone(
-                const RobotPtr newRobot,
-                const VisualizationNodePtr visualizationModel,
-                const CollisionModelPtr collisionModel,
-                CollisionCheckerPtr colChecker,
-                float scaling
-                ) override;
+        _clone(const RobotPtr newRobot,
+               const VisualizationNodePtr visualizationModel,
+               const CollisionModelPtr collisionModel,
+               CollisionCheckerPtr colChecker,
+               float scaling
+               ) override;
 
 
-    public:
+    private:
 
-        struct JointMath
-        {
-            /// The actuator values that were used to compute the joint math.
-            Eigen::Vector2f actuators = Eigen::Vector2f::Constant(std::numeric_limits<float>::min());
-            /// The joint math.
-            hemisphere::Joint joint;
-
-            void update(const Eigen::Vector2f& actuators);
-        };
-
-        struct First
-        {
-            JointMath math;
-        };
-        std::optional<First> first;
-
-        struct Second
-        {
-            /// The first actuator node.
-            RobotNodeHemisphere* first = nullptr;
-
-            JointMath& math()
-            {
-                return first->first->math;
-            }
-            const JointMath& math() const
-            {
-                return first->first->math;
-            }
-        };
-        std::optional<Second> second;
+        std::optional<FirstData> firstData;
+        std::optional<SecondData> secondData;
 
     };
 

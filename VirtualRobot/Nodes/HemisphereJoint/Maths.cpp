@@ -1,4 +1,4 @@
-#include "Joint.h"
+#include "Maths.h"
 
 #include <cmath>
 
@@ -9,19 +9,19 @@
 namespace VirtualRobot::hemisphere
 {
 
-    Joint::Joint() :
-        Joint(1, simox::math::deg_to_rad(25.))
+    Maths::Maths() :
+        Maths(1, simox::math::deg_to_rad(25.))
     {
     }
 
 
-    Joint::Joint(double lever, double theta0)
+    Maths::Maths(double lever, double theta0)
     {
         this->setConstants(lever, theta0);
     }
 
 
-    void Joint::setConstants(double lever, double theta0)
+    void Maths::setConstants(double lever, double theta0)
     {
         this->lever = lever;
         this->theta0 = theta0;
@@ -32,25 +32,25 @@ namespace VirtualRobot::hemisphere
     }
 
 
-    void Joint::computeFkOfPosition(double p1, double p2)
+    void Maths::computeFkOfPosition(double p1, double p2)
     {
         expressions.compute(p1, p2, lever, theta0);
     }
 
 
-    void Joint::computeFkOfPosition(const ActuatorPosition& p12)
+    void Maths::computeFkOfPosition(const ActuatorPosition& p12)
     {
         computeFkOfPosition(p12(0), p12(1));
     }
 
 
-    void Joint::computeFkOfAngle(const ActuatorAngle& alpha12)
+    void Maths::computeFkOfAngle(const ActuatorAngle& alpha12)
     {
         computeFkOfPosition(angleToPosition(alpha12));
     }
 
 
-    Eigen::Vector3d Joint::getEndEffectorTranslation() const
+    Eigen::Vector3d Maths::getEndEffectorTranslation() const
     {
         return Eigen::Vector3d {
             expressions.ex,
@@ -60,7 +60,7 @@ namespace VirtualRobot::hemisphere
     }
 
 
-    Eigen::Matrix3d Joint::getEndEffectorRotation() const
+    Eigen::Matrix3d Maths::getEndEffectorRotation() const
     {
         // r_wrist_to_base = np.array([[exx, eyx, ezx], [exy, eyy, ezy], [exz, eyz, ezz]])
         Eigen::Matrix3d ori;
@@ -71,15 +71,15 @@ namespace VirtualRobot::hemisphere
     }
 
 
-    Eigen::Matrix4d Joint::getEndEffectorTransform() const
+    Eigen::Matrix4d Maths::getEndEffectorTransform() const
     {
         return simox::math::pose(getEndEffectorTranslation(), getEndEffectorRotation());
     }
 
 
-    Joint::Jacobian Joint::getJacobian() const
+    Maths::Jacobian Maths::getJacobian() const
     {
-        Joint::Jacobian jacobian;
+        Maths::Jacobian jacobian;
         jacobian << expressions.jx1, expressions.jx2,
                     expressions.jy1, expressions.jy2,
                     expressions.jz1, expressions.jz2,
@@ -127,7 +127,7 @@ namespace VirtualRobot::hemisphere
     }
 
 
-    Joint::ActuatorPosition Joint::angleToPosition(const Joint::ActuatorAngle& alpha) const
+    Maths::ActuatorPosition Maths::angleToPosition(const Maths::ActuatorAngle& alpha) const
     {
         return lever * Eigen::sin((alpha + Eigen::Vector2d::Constant(theta0)).array());
     }
