@@ -615,8 +615,6 @@ void showRobotWindow::jointValueChanged(int pos)
             + static_cast<float>(pos) / 1000.0f
             * (currentRobotNodes[nr]->getJointLimitHi()
                - currentRobotNodes[nr]->getJointLimitLo());
-
-    std::cout << "Setting joint value " << fPos << " for joint " << currentRobotNodes[nr]->getName() << std::endl;
     robot->setJointValue(currentRobotNodes[nr], fPos);
     UI.lcdNumberJointValue->display(static_cast<double>(fPos));
 
@@ -818,8 +816,8 @@ void showRobotWindow::updatRobotInfo()
     UI.checkBoxFullModel->setChecked(true);
     UI.checkBoxPhysicsCoM->setChecked(false);
     UI.checkBoxPhysicsInertia->setChecked(false);
-    UI.checkBoxRobotCoordSystems->setChecked(true);
-    UI.checkBoxShowCoordSystem->setChecked(true);
+    UI.checkBoxRobotCoordSystems->setChecked(false);
+    UI.checkBoxShowCoordSystem->setChecked(false);
     UI.checkBoxStructure->setChecked(false);
 
     // get nodes
@@ -876,8 +874,6 @@ void showRobotWindow::robotStructure()
     }
 
     structureEnabled = UI.checkBoxStructure->checkState() == Qt::Checked;
-    structureEnabled = true;
-
     robot->showStructure(structureEnabled);
     // rebuild visualization
     rebuildVisualization();
@@ -891,7 +887,6 @@ void showRobotWindow::robotCoordSystems()
     }
 
     bool robotAllCoordsEnabled = UI.checkBoxRobotCoordSystems->checkState() == Qt::Checked;
-    robotAllCoordsEnabled = true;
     robot->showCoordinateSystems(robotAllCoordsEnabled);
     // rebuild visualization
     rebuildVisualization();
