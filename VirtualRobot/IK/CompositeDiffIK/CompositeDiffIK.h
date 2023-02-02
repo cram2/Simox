@@ -44,6 +44,8 @@ namespace VirtualRobot
             bool returnIKSteps = false;
             float jointRegularizationTranslation = 1000; // in mm
             float jointRegularizationRotation = 1;
+            float jointRegularizationHemisphere = 10;
+            float jointRegularizationFourBar = 1;
 
             std::set<std::string> maxJointAngleStepIgnore = {};
         };
@@ -206,7 +208,6 @@ namespace VirtualRobot
             Eigen::MatrixXf jacobi;
             Eigen::MatrixXf invJac;
             Eigen::MatrixXf nullspace;
-
         };
 
         static Eigen::VectorXf LimitInfNormTo(Eigen::VectorXf vec, float maxValue);

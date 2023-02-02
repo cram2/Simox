@@ -95,7 +95,7 @@ namespace VirtualRobot
             The internal matrices and visualizations are updated accordingly.
             If you intend to update multiple joints, use \ref setJointValueNoUpdate(float) for faster access.
         */
-        void setJointValue(float q);
+        virtual void setJointValue(float q);
 
         /*!
             All children and their children (and so on) are collected.
@@ -228,6 +228,7 @@ namespace VirtualRobot
         virtual bool isTranslationalJoint() const;
         virtual bool isRotationalJoint() const;
         virtual bool isHemisphereJoint() const;
+        virtual bool isFourBarJoint() const;
 
         /**
          * @param limitless wheter this node has joint limits or not.
