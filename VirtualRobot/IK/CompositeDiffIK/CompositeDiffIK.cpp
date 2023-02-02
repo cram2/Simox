@@ -260,13 +260,9 @@ void CompositeDiffIK::step(CompositeDiffIK::Parameters& params, SolveState& s, i
         jv = jv + nsv;
     }
 
-    std::cout << "Before: " << jv << std::endl;
-
     jv = jv * params.stepSize;
     jv = LimitInfNormTo(jv, params.maxJointAngleStep, params.maxJointAngleStepIgnore);
     jv = jv.cwiseProduct(s.jointRegularization);
-
-    std::cout << "After: " << jv << std::endl;
 
     Eigen::VectorXf newJointValues = s.jointValues + jv;
 

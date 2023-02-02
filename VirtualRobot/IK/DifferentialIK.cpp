@@ -387,9 +387,6 @@ namespace VirtualRobot
             const bool isParent = std::find(p.begin(), p.end(), dof) != p.end();
             if (isParent)
             {
-                bool isHemisphere = dof->isHemisphereJoint();
-                std::cout << "isHemisphere: " << isHemisphere << std::endl;
-
                 // Calculus for rotational joints is different as for prismatic joints.
                 if (dof->isRotationalJoint())
                 {
@@ -455,59 +452,22 @@ namespace VirtualRobot
                     RobotNodeHemispherePtr hemisphere
                             = std::dynamic_pointer_cast<RobotNodeHemisphere>(dof);
 
-                    if (not (hemisphere->first.has_value() xor hemisphere->second.has_value()))
+                    VR_ASSERT(hemisphere->first.has_value() xor hemisphere->second.has_value());
+
+                    if (hemisphere->isSecondHemisphereJointNode())
                     {
-                        throw "!!!!";
-                    }
+                        // Set Jacobian for both DoFs.
+                        RobotNodeHemisphere::SecondData& second = hemisphere->getSecondData();
+                        const hemisphere::Maths::Jacobian jacobian = second.getJacobian();
 
-                    if (hemisphere->first)
-                    {
-                        std::cout << "First Hemisphere" << std::endl;
-                    }
-                    else if (hemisphere->second)
-                    {
-                        std::cout << "Second Hemisphere" << std::endl;
-
-                        RobotNodeHemispherePtr second = hemisphere;
-                        RobotNodeHemisphere* first = hemisphere->second->first;
-
-                        RobotNodeHemisphere::JointMath& math = first->first->math;
-
-                        Eigen::Vector2f actuators(first->getJointValue(), second->getJointValue());
-                        math.update(actuators);
-
-                        hemisphere::Joint::Jacobian jacobian = math.joint.getJacobian();
-
-                        tmpUpdateJacobianPosition.block<3, 2>(0, i-1) =
-                                jacobian.block<3, 2>(0, 0).cast<float>();
-
-                        {
-                            // Assume we move with (+1, +1)
-                            Eigen::Vector3d eefStateTrans = math.joint.getEndEffectorTranslation();
-
-                            Eigen::Vector2d actuatorVel = Eigen::Vector2d::Ones();
-                            Eigen::Vector3d eefVelTrans = jacobian.block<3, 2>(0, 0) * actuatorVel;
-
-                            Eigen::Vector3d rotAxis = eefStateTrans.cross(eefVelTrans) / eefStateTrans.norm() * 2;
-
-                            // Left column.
-                            for (int column = 0; column < 2; ++column)
-                            {
-                                if (actuatorVel(column) != 0)
-                                {
-                                    tmpUpdateJacobianOrientation.block<3, 1>(0, (i-1) + column) =
-                                            (rotAxis / actuatorVel(column)).cast<float>();
-                                }
-                                else
-                                {
-                                    tmpUpdateJacobianOrientation.block<3, 1>(0, (i-1) + column).setZero();
-                                }
-                            }
-                        }
+                        tmpUpdateJacobianPosition.block<3, 2>(0, i - 1)
+                                = jacobian.block<3, 2>(0, 0).cast<float>();
+                        tmpUpdateJacobianOrientation.block<3, 2>(0, i - 1)
+                                = jacobian.block<3, 2>(3, 0).cast<float>();
                     }
                     else
                     {
-                        // Pass
+                        // Nothing to do - everything is handled by second DoF.
                     }
                 }
                 else if (dof->isFourBarJoint())

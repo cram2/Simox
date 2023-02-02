@@ -15,7 +15,7 @@ namespace VirtualRobot::hemisphere
      * math code that was generated from Python sympy expressions
      * using `python/hemisphere-joint-demo/hemisphere_joint_demo/sympy_to_code.py`.
      */
-    class Joint
+    class Maths
     {
     public:
 
@@ -25,8 +25,8 @@ namespace VirtualRobot::hemisphere
 
     public:
 
-        Joint();
-        Joint(double lever, double theta0);
+        Maths();
+        Maths(double lever, double theta0);
 
 
         void setConstants(double lever, double theta0);
@@ -50,14 +50,14 @@ namespace VirtualRobot::hemisphere
     public:
 
         double lever = 0;
-        double theta0 = 0;
+        double theta0Rad = 0;
         double radius = 0;
 
         double limitLo = 0;
         double limitHi = 0;
 
 
-        Expressions fk;
+        Expressions expressions;
 
     };
 

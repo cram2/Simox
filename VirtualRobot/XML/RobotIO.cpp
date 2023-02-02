@@ -469,7 +469,7 @@ namespace VirtualRobot
                 {
                 case RobotNodeHemisphere::Role::FIRST:
                     hemisphere->lever = getFloatByAttributeName(node, "lever");
-                    hemisphere->theta0 = simox::math::deg_to_rad(getFloatByAttributeName(node, "theta0"));
+                    hemisphere->theta0Rad = simox::math::deg_to_rad(getFloatByAttributeName(node, "theta0"));
                     break;
                 case RobotNodeHemisphere::Role::SECOND:
                     break;

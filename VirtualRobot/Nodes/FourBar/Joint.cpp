@@ -5,8 +5,6 @@
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
-#include <Eigen/src/Core/Matrix.h>
-#include <Eigen/src/Geometry/Transform.h>
 
 #include <SimoxUtility/math/convert/deg_to_rad.h>
 #include <SimoxUtility/math/pose/pose.h>
@@ -20,24 +18,9 @@ namespace VirtualRobot::four_bar
     }
 
 
-    // void Joint::computeFkOfPosition(double p1, double p2)
-    // {
-    //     fk.compute(p1, p2, lever, theta0);
-    // }
-
-
-    // void Joint::computeFkOfPosition(const Eigen::Vector2d& p12)
-    // {
-    //     computeFkOfPosition(p12(0), p12(1));
-    // }
-
-
     Eigen::Isometry3d
     Joint::computeFk(const double theta) const
     {
-        // computeFkOfPosition(angleToPosition(alpha12));
-        // transformation.setIdentity();
-
         // move from passive to active joint
         const Eigen::Translation3d passive_T_active_base(Eigen::Vector3d::UnitX() * dims.shank);
 
@@ -112,11 +95,6 @@ namespace VirtualRobot::four_bar
 
         return jacobian;
     }
-
-    // Eigen::Vector2d Joint::angleToPosition(const Eigen::Vector2d& alpha) const
-    // {
-    //     return lever * Eigen::sin((alpha + Eigen::Vector2d::Constant(theta0)).array());
-    // }
 
     double
     Joint::psi(const double theta) const

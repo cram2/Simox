@@ -6,20 +6,17 @@
 #include <SimoxUtility/math/statistics/measures.h>
 
 #include <VirtualRobot/RuntimeEnvironment.h>
-#include <VirtualRobot/Nodes/HemisphereJoint/Joint.h>
+#include <VirtualRobot/Nodes/HemisphereJoint/Maths.h>
 
 
 using VirtualRobot::RuntimeEnvironment;
 
 
-/**
- *
- */
 int main(int argc, char* argv[])
 {
     const Eigen::IOFormat iof(5, 0, " ", "\n", "    [", "]", "", "");
 
-    RuntimeEnvironment::setCaption("Convert .iv to .wrl files");
+    RuntimeEnvironment::setCaption("Compute hemisphere joint mathematics");
 
     RuntimeEnvironment::considerFlag(
                 "verbose", "Enable verbose output.");
@@ -67,7 +64,7 @@ int main(int argc, char* argv[])
             {
                 const time_point start = std::chrono::system_clock::now();
 
-                VirtualRobot::hemisphere::Joint joint;
+                VirtualRobot::hemisphere::Maths joint;
                 joint.computeFkOfPosition(a1, a2);
 
                 const Eigen::Vector3d pos = joint.getEndEffectorTranslation();
@@ -109,7 +106,7 @@ int main(int argc, char* argv[])
         a1 += offset;
         a2 += offset;
 
-        VirtualRobot::hemisphere::Joint joint;
+        VirtualRobot::hemisphere::Maths joint;
         joint.computeFkOfPosition(a1, a2);
 
         const Eigen::Vector3d pos = joint.getEndEffectorTranslation();
