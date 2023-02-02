@@ -91,27 +91,31 @@ CompositeDiffIK::Result CompositeDiffIK::solve(Parameters params, SolveState &s)
     s.jointRegularization = Eigen::VectorXf::Zero(s.cols);
     for (size_t i = 0; i < rns->getSize(); i++)
     {
-        float regularization = 1;
-        if (rns->getNode(i)->isTranslationalJoint())
+        RobotNodePtr node = rns->getNode(i);
+        if (node->isJoint())
         {
-            regularization = params.jointRegularizationTranslation;
-        }
-        else if (rns->getNode(i)->isRotationalJoint())
-        {
-            regularization = params.jointRegularizationRotation;
-        }
-        else if (rns->getNode(i)->isHemisphereJoint())
-        {
-            // FIXME: ToDo?
-            regularization = params.jointRegularizationRotation;
-        }
-        else if (rns->getNode(i)->isFourBarJoint())
-        {
-            // FIXME: ToDo?
-            regularization = params.jointRegularizationRotation;
-        }
+            float regularization = 1;
 
-        s.jointRegularization(i) = regularization;
+            if (node->isTranslationalJoint())
+            {
+                regularization = params.jointRegularizationTranslation;
+            }
+            else if (node->isRotationalJoint())
+            {
+                regularization = params.jointRegularizationRotation;
+            }
+            else if (node->isHemisphereJoint())
+            {
+                regularization = params.jointRegularizationHemisphere;
+            }
+            else if (node->isFourBarJoint())
+            {
+                // FIXME: ToDo @reister ?
+                regularization = params.jointRegularizationFourBar;
+            }
+
+            s.jointRegularization(i) = regularization;
+        }
     }
 
     s.cartesianRegularization = Eigen::VectorXf::Zero(s.rows);
