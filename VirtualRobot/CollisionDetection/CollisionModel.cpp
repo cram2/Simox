@@ -170,6 +170,7 @@ namespace VirtualRobot
             }
 
         }
+        p->setLocalPose(localPose);
         p->setGlobalPose(getGlobalPose());
         p->setUpdateVisualization(getUpdateVisualizationStatus());
         return p;
