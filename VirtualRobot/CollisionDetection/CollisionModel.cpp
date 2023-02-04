@@ -239,11 +239,13 @@ namespace VirtualRobot
         Eigen::Matrix4f t;
         t.setIdentity();
 
+        result.reserve(model->vertices.size());
+
         for (auto& vertice : model->vertices)
         {
             t.block(0, 3, 3, 1) = vertice;
             t = globalPose * t;
-            result.push_back(t.block(0, 3, 3, 1));
+            result.emplace_back(t.block(0, 3, 3, 1));
         }
 
         return result;
@@ -383,9 +385,9 @@ namespace VirtualRobot
             VR_ASSERT(colModel->getCollisionChecker() == colChecker);
         }
 
-        if (visus.size() == 0)
+        if (visus.empty())
         {
-            return CollisionModelPtr();
+            return {};
         }
 
         VisualizationNodePtr vc = VisualizationNode::CreateUnitedVisualization(visus);
