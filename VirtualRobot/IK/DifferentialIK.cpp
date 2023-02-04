@@ -7,8 +7,11 @@
 #include "../VirtualRobotException.h"
 #include "../CollisionDetection/CollisionChecker.h"
 #include <VirtualRobot/Nodes/RobotNodeHemisphere.h>
+#include <VirtualRobot/Nodes/RobotNodeFourBar.h>
+#include <VirtualRobot/Nodes/RobotNodeHemisphere.h>
 
 #include <Eigen/Geometry>
+#include <Eigen/src/Core/Matrix.h>
 
 #include <algorithm>
 #include <cfloat>
@@ -466,6 +469,65 @@ namespace VirtualRobot
                     {
                         // Nothing to do - everything is handled by second DoF.
                     }
+                }
+                else if (dof->isFourBarJoint())
+                {
+                    VR_ASSERT( coordSystem == nullptr); // NOT implemented yet ...
+
+                    const RobotNodeFourBar* fourBarJoint = dynamic_cast<RobotNodeFourBar*>(dof.get());
+
+                    const Eigen::Vector3f global_P_tcp = tcp->getGlobalPosition().cast<float>();
+                    
+                    const auto jacobianInBase = fourBarJoint->getJacobian(global_P_tcp).cast<float>(); 
+                    axis = fourBarJoint->getJointRotationAxis(coordSystem);
+
+                    // if necessary calculate the position part of the Jacobian
+                    if (mode & IKSolver::Position)
+                    {
+
+                        const Eigen::Matrix3f global_R_base = fourBarJoint->baseFrame(nullptr).block<3,3>(0,0);
+
+                        Eigen::Matrix3f ref_R_base;
+
+                        if (coordSystem)
+                        {
+                            const Eigen::Matrix3f global_R_ref = coordSystem->getGlobalOrientation();
+
+                            ref_R_base = global_R_ref.transpose() * global_R_base;
+
+                            toTCP = coordSystem->toLocalCoordinateSystem(tcp->getGlobalPose()).block(0, 3, 3, 1)
+                                    - coordSystem->toLocalCoordinateSystem(dof->getGlobalPose()).block(0, 3, 3, 1);
+                        }
+                        else
+                        {
+                            ref_R_base = global_R_base;
+
+                            toTCP = tcp->getGlobalPose().block(0, 3, 3, 1)
+                                    - dof->getGlobalPose().block(0, 3, 3, 1);
+                        }
+
+                        if (convertMMtoM)
+                        {
+                            toTCP /= 1000.0f;
+                        }
+
+                        const Eigen::Vector3f jacobianPosInBaseFrame{jacobianInBase(0) / 1000, jacobianInBase(1) / 1000, 0};
+                        const Eigen::Vector3f jacobianPosInRefFrame = ref_R_base * jacobianPosInBaseFrame;
+                        
+
+                        //cout << "toTCP: " << tcp->getName() << std::endl;
+                        //cout << toTCP << std::endl;
+                        // tmpUpdateJacobianPosition.block(0, i, 3, 1) = axis.cross(toTCP);
+                        tmpUpdateJacobianPosition.block(0, i, 3, 1) = jacobianPosInRefFrame;
+                    }
+
+                    // and the orientation part
+                    if (mode & IKSolver::Orientation)
+                    {
+                        tmpUpdateJacobianOrientation.block(0, i, 3, 1) = axis * jacobianInBase(2);
+                    }
+
+
                 }
             }
 

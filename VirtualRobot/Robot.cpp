@@ -960,7 +960,7 @@ namespace VirtualRobot
 
         for (const auto& rn : this->getRobotNodes())
         {
-            if (rn->isTranslationalJoint() || rn->isRotationalJoint())
+            if (rn->isJoint())
             {
                 r->setConfig(rn, rn->getJointValue());
             }
@@ -1119,6 +1119,7 @@ namespace VirtualRobot
 
         for (size_t i = 0; i < rn.size(); i++)
         {
+            VR_INFO << rn[i]->getName() << ": " <<  jointValues[i];
             rn[i]->setJointValueNoUpdate(jointValues[i]);
         }
 

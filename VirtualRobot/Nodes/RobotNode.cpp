@@ -662,6 +662,11 @@ namespace VirtualRobot
     {
         return false;
     }
+    
+    bool RobotNode::isFourBarJoint() const
+    {
+        return false;
+    }
 
     void RobotNode::setLimitless(bool limitless)
     {
@@ -888,7 +893,7 @@ namespace VirtualRobot
 
     bool RobotNode::isJoint() const
     {
-        return isRotationalJoint() or isTranslationalJoint() or isHemisphereJoint();
+        return isRotationalJoint() or isTranslationalJoint() or isHemisphereJoint() or isFourBarJoint();
     }
 
     void RobotNode::setMaxTorque(float maxTo)

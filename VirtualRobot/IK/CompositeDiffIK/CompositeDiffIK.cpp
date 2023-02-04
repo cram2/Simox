@@ -91,7 +91,31 @@ CompositeDiffIK::Result CompositeDiffIK::solve(Parameters params, SolveState &s)
     s.jointRegularization = Eigen::VectorXf::Zero(s.cols);
     for (size_t i = 0; i < rns->getSize(); i++)
     {
-        s.jointRegularization(i) = rns->getNode(i)->isTranslationalJoint() ?  params.jointRegularizationTranslation : params.jointRegularizationRotation;
+        RobotNodePtr node = rns->getNode(i);
+        if (node->isJoint())
+        {
+            float regularization = 1;
+
+            if (node->isTranslationalJoint())
+            {
+                regularization = params.jointRegularizationTranslation;
+            }
+            else if (node->isRotationalJoint())
+            {
+                regularization = params.jointRegularizationRotation;
+            }
+            else if (node->isHemisphereJoint())
+            {
+                regularization = params.jointRegularizationHemisphere;
+            }
+            else if (node->isFourBarJoint())
+            {
+                // FIXME: ToDo @reister ?
+                regularization = params.jointRegularizationFourBar;
+            }
+
+            s.jointRegularization(i) = regularization;
+        }
     }
 
     s.cartesianRegularization = Eigen::VectorXf::Zero(s.rows);
