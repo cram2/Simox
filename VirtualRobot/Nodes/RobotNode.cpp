@@ -319,7 +319,7 @@ namespace VirtualRobot
         }
         if (collisionModel && updateCollisionModel)
         {
-            collisionModel->setGlobalPose(globalPose);
+            collisionModel->setGlobalParentPose(globalPose);
         }
     }
 

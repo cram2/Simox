@@ -26,9 +26,11 @@
 #include "../../Workspace/WorkspaceGrid.h"
 #include "../../XML/BaseIO.h"
 #include "../../Import/MeshImport/AssimpReader.h"
+#include "SimoxUtility/math/convert/mat3f_to_quat.h"
 #include <Inventor/SoDB.h>
 #include <Inventor/nodes/SoFile.h>
 #include <Inventor/nodes/SoNode.h>
+#include <Inventor/nodes/SoTransformation.h>
 #include <Inventor/nodes/SoUnits.h>
 #include <Inventor/nodes/SoSeparator.h>
 #include <Inventor/nodes/SoCube.h>
@@ -4087,7 +4089,24 @@ namespace VirtualRobot
 
                 if (n)
                 {
-                    s->addChild(n->copy(FALSE));
+                    SoSeparator* ss = new SoSeparator();
+
+                    SoUnits* u = new SoUnits();
+                    u->units = SoUnits::MILLIMETERS;
+
+                    const Eigen::Isometry3f localPose(visualizations[i]->getLocalPose());
+                    const Eigen::Vector3f& translation = localPose.translation();
+
+                    SoTransform* t = new SoTransform;
+                    t->translation.setValue(translation.x(), translation.y(), translation.z());
+                    const Eigen::Quaternionf q = simox::math::mat3f_to_quat(localPose.linear());
+                    t->rotation.setValue(q.x(), q.y(), q.z(), q.w());
+
+                    ss->addChild(u);
+                    ss->addChild(t);
+                    ss->addChild(n->copy(FALSE));
+
+                    s->addChild(ss);
                 }
             }
             else
