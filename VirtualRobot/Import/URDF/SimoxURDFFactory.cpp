@@ -22,6 +22,7 @@
 #include <VirtualRobot/Nodes/RobotNodeRevoluteFactory.h>
 #include <VirtualRobot/RuntimeEnvironment.h>
 
+#include <SimoxUtility/color.h>
 
 using namespace std;
 
@@ -301,7 +302,7 @@ namespace VirtualRobot
 
     }
 
-    VirtualRobot::VisualizationNodePtr SimoxURDFFactory::convertVisu(std::shared_ptr<urdf::Geometry> g, urdf::Pose& pose, const std::string& basePath)
+    VirtualRobot::VisualizationNodePtr SimoxURDFFactory::convertVisu(const std::shared_ptr<urdf::Geometry>& g, const urdf::Pose& pose, const std::string& basePath)
     {
 
         const float scale = 1000.0f; // mm
@@ -313,19 +314,25 @@ namespace VirtualRobot
             return res;
         }
 
+        const auto kit_green = ::simox::Color::kit_green(128);
+        constexpr float alpha = 0.5;
+        const VisualizationFactory::Color color(kit_green.r / 255., kit_green.g / 255., kit_green.b / 255, alpha);
+
+        
+
         switch (g->type)
         {
             case urdf::Geometry::BOX:
             {
                 std::shared_ptr<urdf::Box> b = std::dynamic_pointer_cast<urdf::Box>(g);
-                res = factory->createBox(b->dim.x * scale, b->dim.y * scale, b->dim.z * scale);
+                res = factory->createBox(b->dim.x * scale, b->dim.y * scale, b->dim.z * scale, color);
             }
             break;
 
             case urdf::Geometry::SPHERE:
             {
                 std::shared_ptr<urdf::Sphere> s = std::dynamic_pointer_cast<urdf::Sphere>(g);
-                res = factory->createSphere(s->radius * scale);
+                res = factory->createSphere(s->radius * scale, color);
             }
             break;
 
@@ -333,7 +340,7 @@ namespace VirtualRobot
             case urdf::Geometry::CYLINDER:
             {
                 std::shared_ptr<urdf::Cylinder> c = std::dynamic_pointer_cast<urdf::Cylinder>(g);
-                res = factory->createCylinder(c->radius * scale, c->length * scale);
+                res = factory->createCylinder(c->radius * scale, c->length * scale, color);
 
             }
             break;
@@ -342,7 +349,7 @@ namespace VirtualRobot
             {
                 std::shared_ptr<urdf::Mesh> m = std::dynamic_pointer_cast<urdf::Mesh>(g);
                 std::string filename = getFilename(m->filename, basePath);
-                res = factory->getVisualizationFromFile(filename, false, m->scale.x, m->scale.y, m->scale.z);
+                res = factory->getVisualizationFromFile(filename, false, m->scale.x * scale, m->scale.y * scale, m->scale.z * scale);
             }
             break;
 
@@ -358,7 +365,8 @@ namespace VirtualRobot
                 // inventor and urdf differ in the conventions for cylinders
                 p = p * MathTools::axisangle2eigen4f(Eigen::Vector3f::UnitX(), M_PI_2);
             }
-            factory->applyDisplacement(res, p);
+            // factory->applyDisplacement(res, p);
+            res->setLocalPose(p);
         }
 
         return res;

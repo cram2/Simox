@@ -12,6 +12,7 @@
 #include <VirtualRobot/XML/BaseIO.h>
 
 #include <Eigen/Core>
+#include <Eigen/src/Geometry/Transform.h>
 
 #include <filesystem>
 #include <algorithm>
@@ -821,17 +822,18 @@ namespace VirtualRobot
             }
 
             // create visu
-            Eigen::Matrix4f i = Eigen::Matrix4f::Identity();
-
             if (!localTransformation.isIdentity())
             {
                 VisualizationNodePtr visualizationNode1;
+
 
                 if (parRN && parRN->getVisualization())
                 {
                     // add to parent node (pre joint trafo moves with parent!)
                     //visualizationNode1 = visualizationFactory->createLine(parRN->postJointTransformation, parRN->postJointTransformation*localTransformation);
-                    visualizationNode1 = visualizationFactory->createLine(Eigen::Matrix4f::Identity(), localTransformation);
+                    const Eigen::Vector3f localTrafoPos = Eigen::Isometry3f{localTransformation}.translation();
+                    
+                    visualizationNode1 = visualizationFactory->createLine(Eigen::Vector3f::Zero(), localTrafoPos);
 
                     if (visualizationNode1)
                     {
@@ -840,7 +842,9 @@ namespace VirtualRobot
                 }
                 else
                 {
-                    visualizationNode1 = visualizationFactory->createLine(localTransformation.inverse(), i);
+                    const Eigen::Vector3f localTrafoInvPos = Eigen::Isometry3f{localTransformation}.inverse().translation();
+
+                    visualizationNode1 = visualizationFactory->createLine(localTrafoInvPos, Eigen::Vector3f::Zero());
 
                     if (visualizationNode1)
                     {

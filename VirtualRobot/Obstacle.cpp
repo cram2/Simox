@@ -86,7 +86,7 @@ namespace VirtualRobot
 
         VisualizationNodePtr visu = visualizationFactory->getVisualizationFromPrimitives(primitives,false,color);
         */
-        VisualizationNodePtr visu = visualizationFactory->createBox(width, height, depth, color.r, color.g, color.b);
+        VisualizationNodePtr visu = visualizationFactory->createBox(width, height, depth, color);
 
         if (!visu)
         {
@@ -132,7 +132,7 @@ namespace VirtualRobot
             return result;
         }
 
-        VisualizationNodePtr visu = visualizationFactory->createSphere(radius, color.r, color.g, color.b);
+        VisualizationNodePtr visu = visualizationFactory->createSphere(radius, color);
 
         /*std::vector<Primitive::PrimitivePtr> primitives;
         Primitive::PrimitivePtr p(new Primitive::Sphere(radius));
@@ -184,7 +184,7 @@ namespace VirtualRobot
             return result;
         }
 
-        VisualizationNodePtr visu = visualizationFactory->createCylinder(radius, height, color.r, color.g, color.b);
+        VisualizationNodePtr visu = visualizationFactory->createCylinder(radius, height, color);
 
         /*std::vector<Primitive::PrimitivePtr> primitives;
         Primitive::PrimitivePtr p(new Primitive::Cylinder(radius, height));
@@ -343,5 +343,3 @@ namespace VirtualRobot
     }
 
 } //  namespace
-
-

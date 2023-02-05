@@ -320,8 +320,8 @@ namespace VirtualRobot
             // create visu
             if (!comModel)
             {
-                VisualizationNodePtr comModel1 = visualizationFactory->createSphere(7.05f, 1.0f, 0.2f, 0.2f);
-                VisualizationNodePtr comModel2 = visualizationFactory->createBox(10.0f, 10.0f, 10.0f, 0.2f, 0.2f, 1.0f);
+                VisualizationNodePtr comModel1 = visualizationFactory->createSphere(7.05f, VisualizationFactory::Color(1.0f, 0.2f, 0.2f));
+                VisualizationNodePtr comModel2 = visualizationFactory->createBox(10.0f, 10.0f, 10.0f, VisualizationFactory::Color(0.2f, 0.2f, 1.0f));
                 std::vector<VisualizationNodePtr> v;
                 v.push_back(comModel1);
                 v.push_back(comModel2);
@@ -1535,8 +1535,10 @@ namespace VirtualRobot
         }
         else
         {
+            const auto color = simox::color::Color::kit_blue(128);
+
             VisualizationFactoryPtr visualizationFactory = VisualizationFactory::first(NULL);
-            setCollisionModel(std::make_shared<CollisionModel>(visualizationFactory->getVisualizationFromPrimitives(primitives),
+            setCollisionModel(std::make_shared<CollisionModel>(visualizationFactory->getVisualizationFromPrimitives(primitives, false, color),
                                                                getName() + "_PrimitiveModel", CollisionCheckerPtr()));
         }
 

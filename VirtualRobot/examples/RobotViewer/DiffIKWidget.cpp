@@ -297,6 +297,8 @@ void DiffIKWidget::updateEndeffectorPoseVis(VirtualRobot::RobotNodeSetPtr robotN
             mat->transparency.setValue(0.5);
             sep->addChild(mat);
 
+            using Color = VirtualRobot::CoinVisualizationFactory::Color;
+
             if (ui->checkBoxOriIK->isChecked()) {
                 auto visNode = tcp->getVisualization(VirtualRobot::SceneObject::Full);
                 auto coinVisNode = std::dynamic_pointer_cast<VirtualRobot::CoinVisualizationNode>(visNode);
@@ -305,11 +307,11 @@ void DiffIKWidget::updateEndeffectorPoseVis(VirtualRobot::RobotNodeSetPtr robotN
                     sep->addChild(coinVis);
                 }
                 else {
-                    sep->addChild(VirtualRobot::CoinVisualizationFactory::CreateSphere(50, 1, 0, 0));
+                    sep->addChild(VirtualRobot::CoinVisualizationFactory::CreateSphere(50, Color::Red()));
                 }
             }
             else {
-                sep->addChild(VirtualRobot::CoinVisualizationFactory::CreateSphere(50, 1, 0, 0));
+                sep->addChild(VirtualRobot::CoinVisualizationFactory::CreateSphere(50, Color::Red()));
             }
             endeffectorSep->addChild(sep);
         }

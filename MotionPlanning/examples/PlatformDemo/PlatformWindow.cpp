@@ -321,19 +321,12 @@ void PlatformWindow::selectColModelEnv(const std::string &name)
     this->colModelEnv = scene->getSceneObjectSet(name);
 }
 
-void PlatformWindow::updateDistVisu(const Eigen::Vector3f &a, const Eigen::Vector3f &b)
+void PlatformWindow::updateDistVisu(const Eigen::Vector3f &from, const Eigen::Vector3f &to)
 {
     distSep->removeAllChildren();
     if (UI.checkBoxShowDistance->isChecked())
     {
-        Eigen::Matrix4f from;
-        Eigen::Matrix4f to;
-        from.setIdentity();
-        to.setIdentity();
-        from.block(0,3,3,1) = a;
-        to.block(0,3,3,1) = b;
-
-        SoNode * c = CoinVisualizationFactory::createCoinLine(from, to, 5.0f, 1.0f, 0.2f, 0.2f);
+        SoNode * c = CoinVisualizationFactory::createCoinLine(from, to, 5.0f, VirtualRobot::CoinVisualizationFactory::Color(1.0f, 0.2f, 0.2f));
         distSep->addChild(c);
     }
 }
@@ -612,6 +605,3 @@ void PlatformWindow::redraw()
     this->update();
     viewer->scheduleRedraw();
 }
-
-
-

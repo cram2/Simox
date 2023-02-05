@@ -27,6 +27,7 @@
 #include "../MathTools.h"
 #include "../BoundingBox.h"
 #include "../Primitive.h"
+#include "SimoxUtility/color/Color.h"
 
 #include <Eigen/Core>
 #include <string>
@@ -73,6 +74,8 @@ namespace VirtualRobot
             {
                 return Color(0.0f, 0.0f, 0.0f, 1.0f);
             }
+
+            Color(const simox::Color& sc): Color(sc.r / 255., sc.g / 255., sc.b / 255., sc.a / 255.){}
         };
 
         struct PhongMaterial
@@ -97,7 +100,7 @@ namespace VirtualRobot
         {
         }
 
-        virtual VisualizationNodePtr getVisualizationFromPrimitives(const std::vector<Primitive::PrimitivePtr>& /*primitives*/, bool /*boundingBox*/ = false, Color /*color*/ = Color::Gray())
+        virtual VisualizationNodePtr getVisualizationFromPrimitives(const std::vector<Primitive::PrimitivePtr>& /*primitives*/, bool /*boundingBox*/ = false, const Color& /*color*/ = Color::Gray())
         {
             return nullptr;
         }
@@ -109,86 +112,96 @@ namespace VirtualRobot
         {
             return nullptr;
         }
-        /*!
-            A box, dimensions are given in mm.
-        */
-        virtual VisualizationNodePtr createBox(float /*width*/, float /*height*/, float /*depth*/, float /*colorR*/ = 0.5f, float /*colorG*/ = 0.5f, float /*colorB*/ = 0.5f)
-        {
-            return nullptr;
-        }
-        virtual VisualizationNodePtr createLine(const Eigen::Vector3f& /*from*/, const Eigen::Vector3f& /*to*/, float /*width*/ = 1.0f, float /*colorR*/ = 0.5f, float /*colorG*/ = 0.5f, float /*colorB*/ = 0.5f)
-        {
-            return nullptr;
-        }
-        virtual VisualizationNodePtr createLine(const Eigen::Matrix4f& /*from*/, const Eigen::Matrix4f& /*to*/, float /*width*/ = 1.0f, float /*colorR*/ = 0.5f, float /*colorG*/ = 0.5f, float /*colorB*/ = 0.5f)
-        {
-            return nullptr;
-        }
-        virtual VisualizationNodePtr createSphere(float /*radius*/, float /*colorR*/ = 0.5f, float /*colorG*/ = 0.5f, float /*colorB*/ = 0.5f)
-        {
-            return nullptr;
-        }
-        virtual VisualizationNodePtr createCircle(float /*radius*/, float /*circleCompletion*/, float /*width*/, float /*colorR*/ = 1.0f, float /*colorG*/ = 0.5f, float /*colorB*/ = 0.5f, size_t /*numberOfCircleParts*/ = 30)
-        {
-            return nullptr;
-        }
+        
+        // virtual VisualizationNodePtr createPlane(const MathTools::Plane& plane, float extend, float transparency,  float colorR = 0.5f, float colorG = 0.5f, float colorB = 0.5f)
+        // {
+        //     return createPlane(plane.p, plane.n, extend, transparency, colorR, colorG, colorB);
+        // }
+        
 
-        virtual VisualizationNodePtr createTorus(float /*radius*/, float /*tubeRadius*/, float /*completion*/ = 1.0f, float /*colorR*/ = 0.5f, float /*colorG*/ = 0.5f, float /*colorB*/ = 0.5f, float /*transparency*/ = 0.0f, int /*sides*/ = 8, int /*rings*/ = 30)
-        {
-            return nullptr;
-        }
 
-        virtual VisualizationNodePtr createCircleArrow(float /*radius*/, float /*tubeRadius*/, float /*completion*/ = 1, float /*colorR*/ = 0.5f, float /*colorG*/ = 0.5f, float /*colorB*/ = 0.5f, float /*transparency*/ = 0.0f, int /*sides*/ = 8, int /*rings*/ = 30)
-        {
-            return nullptr;
-        }
+        virtual VisualizationNodePtr
+        createBox(float width, float height, float depth, const Color& color = Color::Gray());
 
-        virtual VisualizationNodePtr createCylinder(float /*radius*/, float /*height*/, float /*colorR*/ = 0.5f, float /*colorG*/ = 0.5f, float /*colorB*/ = 0.5f)
-        {
-            return nullptr;
-        }
-        virtual VisualizationNodePtr createCoordSystem(float /*scaling*/ = 1.0f, std::string* /*text*/ = NULL, float /*axisLength*/ = 100.0f, float /*axisSize*/ = 3.0f, int /*nrOfBlocks*/ = 10)
-        {
-            return nullptr;
-        }
-        virtual VisualizationNodePtr createBoundingBox(const BoundingBox& /*bbox*/, bool /*wireFrame*/ = false)
-        {
-            return nullptr;
-        }
-        virtual VisualizationNodePtr createVertexVisualization(const Eigen::Vector3f& /*position*/, float /*radius*/, float /*transparency*/,  float /*colorR*/ = 0.5f, float /*colorG*/ = 0.5f, float /*colorB*/ = 0.5f)
-        {
-            return nullptr;
-        }
+        virtual VisualizationNodePtr createLine(const Eigen::Vector3f& from,
+                                                const Eigen::Vector3f& to,
+                                                float width = 1.0f,
+                                                const Color& color = Color::Gray());
 
-        virtual VisualizationNodePtr createTriMeshModelVisualization(const TriMeshModelPtr& /*model*/, const Eigen::Matrix4f& /*pose*/, float /*scaleX*/ = 1.0f, float /*scaleY*/ = 1.0f, float /*scaleZ*/ = 1.0f)
-        {
-            return nullptr;
-        }
+        virtual VisualizationNodePtr createSphere(float radius, const Color& color = Color::Gray());
 
-        virtual VisualizationNodePtr createTriMeshModelVisualization(const TriMeshModelPtr& /*model*/, bool /*showNormals*/, const Eigen::Matrix4f& /*pose*/, bool /*showLines*/ = true)
-        {
-            return nullptr;
-        }
-        virtual VisualizationNodePtr createPlane(const Eigen::Vector3f& /*position*/, const Eigen::Vector3f& /*normal*/, float /*extend*/, float /*transparency*/,  float /*colorR*/ = 0.5f, float /*colorG*/ = 0.5f, float /*colorB*/ = 0.5f)
-        {
-            return nullptr;
-        }
-        virtual VisualizationNodePtr createPlane(const MathTools::Plane& plane, float extend, float transparency,  float colorR = 0.5f, float colorG = 0.5f, float colorB = 0.5f)
-        {
-            return createPlane(plane.p, plane.n, extend, transparency, colorR, colorG, colorB);
-        }
-        virtual VisualizationNodePtr createArrow(const Eigen::Vector3f& /*n*/, float /*length*/ = 50.0f, float /*width*/ = 2.0f, const Color& /*color*/ = Color::Gray())
-        {
-            return nullptr;
-        }
-        virtual VisualizationNodePtr createTrajectory(TrajectoryPtr /*t*/, Color /*colorNode*/ = Color::Blue(), Color /*colorLine*/ = Color::Gray(), float /*nodeSize*/ = 15.0f, float /*lineSize*/ = 4.0f)
-        {
-            return nullptr;
-        }
-        virtual VisualizationNodePtr createText(const std::string& /*text*/, bool /*billboard*/ = false, float /*scaling*/ = 1.0f, Color /*c*/ = Color::Black(), float /*offsetX*/ = 20.0f, float /*offsetY*/ = 20.0f, float /*offsetZ*/ = 0.0f)
-        {
-            return nullptr;
-        }
+        virtual VisualizationNodePtr
+        createCylinder(float radius, float height, const Color& color = Color::Gray());
+
+        virtual VisualizationNodePtr createCircle(float radius,
+                                                  float circleCompletion,
+                                                  float width,
+                                                  const Color& color = Color::Gray(),
+                                                  size_t numberOfCircleParts = 30);
+
+        virtual VisualizationNodePtr createCoordSystem(float /*scaling*/ = 1.0f,
+                                                       std::string* text = nullptr,
+                                                       float axisLength = 100.0f,
+                                                       float axisSize = 3.0f,
+                                                       int nrOfBlocks = 10);
+
+        virtual VisualizationNodePtr createBoundingBox(const BoundingBox& bbox,
+                                                       bool wireFrame = false);
+
+        virtual VisualizationNodePtr createVertexVisualization(const Eigen::Vector3f& position,
+                                                               float radius,
+                                                               const Color& color = Color::Gray());
+
+        virtual VisualizationNodePtr
+        createTriMeshModelVisualization(const TriMeshModelPtr& model,
+                                        const Eigen::Matrix4f& pose = Eigen::Matrix4f::Identity(),
+                                        float scaleX = 1.0f,
+                                        float scaleY = 1.0f,
+                                        float scaleZ = 1.0f);
+
+        virtual VisualizationNodePtr createTriMeshModelVisualization(const TriMeshModelPtr& model,
+                                                                     bool showNormals,
+                                                                     const Eigen::Matrix4f& pose,
+                                                                     bool /*showLines*/ = true);
+
+        virtual VisualizationNodePtr createPlane(const Eigen::Vector3f& position,
+                                                 const Eigen::Vector3f& normal,
+                                                 float extend,
+                                                 const Color& color = Color::Gray());
+
+        virtual VisualizationNodePtr createArrow(const Eigen::Vector3f& n,
+                                                 float length = 50.0f,
+                                                 float width = 2.0f,
+                                                 const Color& color = Color::Gray());
+
+        virtual VisualizationNodePtr createCircleArrow(float radius,
+                                                       float tubeRadius,
+                                                       float completion = 1,
+                                                       const Color& color = Color::Gray(),
+                                                       int sides = 8,
+                                                       int rings = 30);
+
+        virtual VisualizationNodePtr createTrajectory(TrajectoryPtr t,
+                                                      const Color& colorNode = Color::Blue(),
+                                                      const Color& colorLine = Color::Gray(),
+                                                      float nodeSize = 15.0f,
+                                                      float lineSize = 4.0f);
+
+        virtual VisualizationNodePtr createText(const std::string& text,
+                                                bool billboard = false,
+                                                float scaling = 1.0f,
+                                                const Color& c = Color::Black(),
+                                                float offsetX = 20.0f,
+                                                float offsetY = 20.0f,
+                                                float offsetZ = 0.0f);
+
+        virtual VisualizationNodePtr createTorus(float radius,
+                                                 float tubeRadius,
+                                                 float completion = 1,
+                                                 const Color& color = Color::Gray(),
+                                                 int sides = 8,
+                                                 int rings = 30);
+
         /*!
             Creates an coordinate axis aligned ellipse
             \param x The extend in x direction must be >= 1e-6
@@ -234,4 +247,3 @@ namespace VirtualRobot
     typedef std::shared_ptr<VisualizationFactory::Color> ColorPtr;
 
 } // namespace VirtualRobot
-
