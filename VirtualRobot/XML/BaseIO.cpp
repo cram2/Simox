@@ -21,6 +21,7 @@
 #include <SimoxUtility/filesystem/make_relative.h>
 #include <SimoxUtility/algorithm/string/string_conversion.h>
 #include "SimoxUtility/algorithm/string/string_tools.h"
+#include "SimoxUtility/color/Color.h"
 #include "VirtualRobot.h"
 #include "rapidxml.hpp"
 
@@ -1093,10 +1094,14 @@ namespace VirtualRobot
                 visualizationNode = visualizationFactory->createUnitedVisualization(visualizationNodes);
             }
 
-            else if (primitives.size() != 0)
+            else if (not primitives.empty())
             {
                 VisualizationFactoryPtr visualizationFactory = VisualizationFactory::first(NULL);
-                visualizationNode = visualizationFactory->getVisualizationFromPrimitives(primitives);
+
+                const auto color = simox::Color::kit_green(128);
+                constexpr float alpha = 0.5;
+
+                visualizationNode = visualizationFactory->getVisualizationFromPrimitives(primitives, false, VisualizationFactory::Color(color.r / 255., color.g / 255., color.b / 255, alpha));
             }
 
 

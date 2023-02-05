@@ -234,6 +234,9 @@ namespace VirtualRobot
                 sep->addChild(soSphere);
                 coinVisualization->addChild(sep);
             }
+        }else
+        {
+            VR_WARNING << "Unknown primitive type!";
         }
 
         if (boundingBox && coinVisualization)

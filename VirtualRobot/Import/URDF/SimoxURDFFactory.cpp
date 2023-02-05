@@ -6,7 +6,10 @@
 
 #include <Eigen/Geometry>
 
+#include "Primitive.h"
+#include <urdf_model/link.h>
 #include <urdf_model/model.h>
+#include <urdf_model/pose.h>
 #include <urdf_parser/urdf_parser.h>
 
 #include <VirtualRobot/Visualization/CoinVisualization/CoinVisualizationFactory.h>
@@ -146,7 +149,7 @@ namespace VirtualRobot
         return robo;
     }
 
-    Eigen::Matrix4f SimoxURDFFactory::convertPose(const urdf::Pose& p)
+    Eigen::Matrix4f SimoxURDFFactory::convertPose(const urdf::Pose& p) const
     {
         const float scale = 1000.0f; // mm
         Eigen::Matrix4f res;
@@ -209,6 +212,93 @@ namespace VirtualRobot
             result = (p_base / p_result).string();
         }
         return result;
+    }
+
+    Primitive::PrimitivePtr SimoxURDFFactory::convertPrimitive(const urdf::Collision& col) const
+    {
+        const urdf::Geometry& g = *col.geometry;
+        const urdf::Pose& p = col.origin;
+
+        return convertPrimitive(g, p);
+    }
+
+
+    Primitive::PrimitivePtr SimoxURDFFactory::convertPrimitive(const urdf::Visual& col) const
+    {
+        const urdf::Geometry& g = *col.geometry;
+        const urdf::Pose& p = col.origin;
+
+        return convertPrimitive(g, p);
+    }
+
+    Primitive::PrimitivePtr SimoxURDFFactory::convertPrimitive(const urdf::Geometry& g, const urdf::Pose& p) const
+    {
+        auto origin = convertPose(p);
+        if (g.type == urdf::Geometry::CYLINDER)
+        {
+            // inventor and urdf differ in the conventions for cylinders
+            origin = origin * MathTools::axisangle2eigen4f(Eigen::Vector3f::UnitX(), M_PI_2);
+        }
+
+        constexpr float scaleMtoMM = 1000;
+
+        switch (g.type)
+        {
+            case urdf::Geometry::BOX:
+            {
+                const urdf::Box* b = dynamic_cast<const urdf::Box*>(&g);
+
+                auto box = std::make_shared<Primitive::Box>();
+                box->width = b->dim.x * scaleMtoMM;
+                box->height = b->dim.y * scaleMtoMM;
+                box->depth = b->dim.z * scaleMtoMM ;
+
+                box->transform = origin;
+
+                return box;
+            }
+            break;
+
+            case urdf::Geometry::SPHERE:
+            {
+                const urdf::Sphere* s = dynamic_cast<const urdf::Sphere*>(&g);
+
+                auto sphere = std::make_shared<Primitive::Sphere>();
+                sphere->radius = s->radius * scaleMtoMM;
+
+                sphere->transform = origin;
+                return sphere;
+            }
+            break;
+
+
+            case urdf::Geometry::CYLINDER:
+            {
+                const urdf::Cylinder* c = dynamic_cast<const urdf::Cylinder*>(&g);
+
+                auto cylinder = std::make_shared<Primitive::Cylinder>();
+                cylinder->height = c->length * scaleMtoMM;
+                cylinder->radius = c->radius * scaleMtoMM;
+
+                cylinder->transform = origin;
+                return cylinder;
+
+            }
+            break;
+
+            case urdf::Geometry::MESH:
+            {
+                // not a primitive
+                return nullptr;
+            }
+            break;
+
+            default:
+                VR_WARNING << "urdf::Geometry type nyi..." << std::endl;
+        }
+
+        return nullptr;
+
     }
 
     VirtualRobot::VisualizationNodePtr SimoxURDFFactory::convertVisu(std::shared_ptr<urdf::Geometry> g, urdf::Pose& pose, const std::string& basePath)
@@ -274,6 +364,37 @@ namespace VirtualRobot
         return res;
     }
 
+    std::vector<Primitive::PrimitivePtr> SimoxURDFFactory::convertToPrimitives(const std::vector<std::shared_ptr<urdf::Collision>>& col_array) const
+    {
+        std::vector<Primitive::PrimitivePtr> primitives;
+
+        for (const auto & visu : col_array)
+        {
+            if(auto primitive = convertPrimitive(*visu))
+            {
+                primitives.push_back(primitive);
+            }
+        }
+
+        return primitives;
+    }
+
+     std::vector<Primitive::PrimitivePtr> SimoxURDFFactory::convertToPrimitives(const std::vector<std::shared_ptr<urdf::Visual>>& col_array) const
+    {
+        std::vector<Primitive::PrimitivePtr> primitives;
+
+        for (const auto & visu : col_array)
+        {
+            if(auto primitive = convertPrimitive(*visu))
+            {
+                primitives.push_back(primitive);
+            }
+        }
+
+        return primitives;
+    }
+
+
     VisualizationNodePtr SimoxURDFFactory::convertVisuArray(std::vector<std::shared_ptr<urdf::Collision> > col_array, const string& basePath)
     {
         VirtualRobot::VisualizationNodePtr res;
@@ -322,11 +443,9 @@ namespace VirtualRobot
 
     RobotNodePtr SimoxURDFFactory::createBodyNode(const std::string& name, RobotPtr robo, std::shared_ptr<urdf::Link> urdfBody, const std::string& basePath, bool useColModelsIfNoVisuModel)
     {
-        RobotNodePtr result;
-
         if (!urdfBody)
         {
-            return result;
+            return {};
         }
 
         VirtualRobot::RobotNodeFactoryPtr fixedNodeFactory = VirtualRobot::RobotNodeFactory::fromName(VirtualRobot::RobotNodeFixedFactory::getName(), NULL);
@@ -336,16 +455,21 @@ namespace VirtualRobot
         VirtualRobot::VisualizationNodePtr rnVisu;
         VirtualRobot::CollisionModelPtr rnCol;
 
+        std::vector<Primitive::PrimitivePtr> visuPrimitives;
+        std::vector<Primitive::PrimitivePtr> colPrimitives;
+
         if (urdfBody->visual && urdfBody->visual)
         {
             if (urdfBody->visual_array.size() > 1)
             {
                 // visual points to first entry in array
                 rnVisu = convertVisuArray(urdfBody->visual_array, basePath);
+                visuPrimitives = convertToPrimitives(urdfBody->visual_array);
             }
             else
             {
                 rnVisu = convertVisu(urdfBody->visual->geometry, urdfBody->visual->origin, basePath);
+                visuPrimitives = convertToPrimitives({urdfBody->visual});
             }
         }
 
@@ -355,10 +479,12 @@ namespace VirtualRobot
             if (urdfBody->collision_array.size() > 1)
             {
                 v = convertVisuArray(urdfBody->collision_array, basePath);
+                colPrimitives = convertToPrimitives(urdfBody->collision_array);
             }
             else
             {
                 v = convertVisu(urdfBody->collision->geometry, urdfBody->collision->origin, basePath);
+                colPrimitives = convertToPrimitives({urdfBody->collision});
             }
 
             if (v)
@@ -397,11 +523,22 @@ namespace VirtualRobot
         }
 
         Eigen::Vector3f idVec3 = Eigen::Vector3f::Zero();
-        result = fixedNodeFactory->createRobotNode(robo, name, rnVisu, rnCol, 0, 0, 0, preJointTransform, idVec3, idVec3, physics);
+        RobotNodePtr node = fixedNodeFactory->createRobotNode(robo, name, rnVisu, rnCol, 0, 0, 0, preJointTransform, idVec3, idVec3, physics);
 
-        robo->registerRobotNode(result);
+        robo->registerRobotNode(node);
 
-        return result;
+        if(not visuPrimitives.empty())
+        {
+            node->getPrimitiveApproximation().addModel(visuPrimitives, "urdf_visu");
+        }
+
+        if(not colPrimitives.empty())
+        {
+            node->getPrimitiveApproximation().addModel(colPrimitives, "urdf_col");
+        }
+
+
+        return node;
     }
 
     RobotNodePtr SimoxURDFFactory::createJointNode(RobotPtr robo, std::shared_ptr<urdf::Joint> urdfJoint)
