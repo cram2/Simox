@@ -445,10 +445,11 @@ void showRobotWindow::updatePointDistanceVisu()
         const Eigen::Vector3f dir = (pt1 - pt2).normalized();
         const float spherSize = 10;
         using Factory = VirtualRobot::CoinVisualizationFactory;
+        using Color = VirtualRobot::CoinVisualizationFactory::Color;
         ptDistance.sep->addChild(Factory::CreateArrow(pt2, dir, distance));
-        ptDistance.sep->addChild(Factory::CreateSphere(pt, spherSize, 0, 1, 0));
-        ptDistance.sep->addChild(Factory::CreateSphere(pt1, spherSize, 0, 0, 1));
-        ptDistance.sep->addChild(Factory::CreateSphere(pt2, spherSize, 0, 1, 1));
+        ptDistance.sep->addChild(Factory::CreateSphere(pt, spherSize, Color::Green()));
+        ptDistance.sep->addChild(Factory::CreateSphere(pt1, spherSize, Color::Blue()));
+        ptDistance.sep->addChild(Factory::CreateSphere(pt2, spherSize, Color(0,1,1)));
     }
 
     UI.labelDistancePtDist->setText(QString::number(distance));

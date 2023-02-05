@@ -1099,9 +1099,8 @@ namespace VirtualRobot
                 VisualizationFactoryPtr visualizationFactory = VisualizationFactory::first(NULL);
 
                 const auto color = simox::Color::kit_green(128);
-                constexpr float alpha = 0.5;
 
-                visualizationNode = visualizationFactory->getVisualizationFromPrimitives(primitives, false, VisualizationFactory::Color(color.r / 255., color.g / 255., color.b / 255, alpha));
+                visualizationNode = visualizationFactory->getVisualizationFromPrimitives(primitives, false, color);
             }
 
 

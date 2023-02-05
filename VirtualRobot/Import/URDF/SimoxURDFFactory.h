@@ -79,7 +79,7 @@ namespace VirtualRobot
         RobotNodePtr createBodyNode(const std::string& name, RobotPtr robot, std::shared_ptr<urdf::Link> urdfBody, const std::string& basePath, bool useColModelsIfNoVisuModel = true);
         RobotNodePtr createJointNode(RobotPtr robot, std::shared_ptr<urdf::Joint> urdfJoint);
         Eigen::Matrix4f convertPose(const urdf::Pose& p) const;
-        VirtualRobot::VisualizationNodePtr convertVisu(std::shared_ptr<urdf::Geometry> g, urdf::Pose& pose, const std::string& basePath);
+        VirtualRobot::VisualizationNodePtr convertVisu(const std::shared_ptr<urdf::Geometry>& g, const urdf::Pose& pose, const std::string& basePath);
         VirtualRobot::VisualizationNodePtr convertVisuArray(std::vector<std::shared_ptr<urdf::Visual> > visu_array, const std::string& basePath);
         VirtualRobot::VisualizationNodePtr convertVisuArray(std::vector<std::shared_ptr<urdf::Collision> > visu_array, const std::string& basePath);
         std::string getFilename(const std::string& f, const std::string& basePath);

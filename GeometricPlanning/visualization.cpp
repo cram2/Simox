@@ -25,27 +25,20 @@ namespace simox::geometric_planning
     constexpr std::size_t numberOfCircleParts = 20;
     inline const simox::Color DefaultColor = simox::Color::blue();
 
-    constexpr float
-    scaleColor(const auto colorVal)
-    {
-        return colorVal / 255.f;
-    }
-
+    
     namespace detail
     {
         SoNode*
         visualizePathLine(const geometric_planning::ParametricPath& path)
         {
-            const auto startPos = path.getPose(path.parameterRange().min);
-            const auto endPos = path.getPose(path.parameterRange().max);
+            const auto startPos = path.getPosition(path.parameterRange().min);
+            const auto endPos = path.getPosition(path.parameterRange().max);
 
             return VirtualRobot::CoinVisualizationFactory::createCoinLine(
-                startPos.matrix(),
-                endPos.matrix(),
+                startPos,
+                endPos,
                 defaultWidth,
-                scaleColor(DefaultColor.r),
-                scaleColor(DefaultColor.g),
-                scaleColor(DefaultColor.b));
+                DefaultColor);
         }
 
 
@@ -65,9 +58,7 @@ namespace simox::geometric_planning
                 circleSegment->getRadius(),
                 circleCompletion,
                 defaultWidth,
-                scaleColor(DefaultColor.r),
-                scaleColor(DefaultColor.g),
-                scaleColor(DefaultColor.b),
+                DefaultColor,
                 numberOfCircleParts);
 
 
