@@ -114,7 +114,7 @@ namespace simox::color
         // KIT colors (source: https://www.sek.kit.edu/downloads/2_Gestaltungsgrundlagen_Farben.pdf)
 
         static inline Color kit_green(int a = 255)      { return Color(  0, 150, 130, a); }
-        static inline Color kit_blue(int a = 255)       { return Color(140, 182,  60, a); }
+        static inline Color kit_blue(int a = 255)       { return Color( 70, 100, 170, a); }
         static inline Color kit_maygreen(int a = 255)   { return Color(140, 182,  60, a); }
         static inline Color kit_yellow(int a = 255)     { return Color(252, 229,   0, a); }
         static inline Color kit_orange(int a = 255)     { return Color(223, 155,  27, a); }
