@@ -452,8 +452,6 @@ namespace VirtualRobot
                     RobotNodeHemispherePtr hemisphere
                             = std::dynamic_pointer_cast<RobotNodeHemisphere>(dof);
 
-                    VR_ASSERT(hemisphere->first.has_value() xor hemisphere->second.has_value());
-
                     if (hemisphere->isSecondHemisphereJointNode())
                     {
                         // Set Jacobian for both DoFs.
