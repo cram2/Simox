@@ -390,11 +390,12 @@ namespace VirtualRobot
                 // Calculus for rotational joints is different as for prismatic joints.
                 if (dof->isRotationalJoint())
                 {
-                    // get axis
+                    // todo: find a better way of handling different joint types
                     std::shared_ptr<RobotNodeRevolute> revolute
                         = std::dynamic_pointer_cast<RobotNodeRevolute>(dof);
                     THROW_VR_EXCEPTION_IF(!revolute, "Internal error: expecting revolute joint");
-                    // todo: find a better way of handling different joint types
+
+                    // get axis
                     axis = revolute->getJointRotationAxis(coordSystem);
 
                     // if necessary calculate the position part of the Jacobian
@@ -458,10 +459,25 @@ namespace VirtualRobot
                         RobotNodeHemisphere::SecondData& second = hemisphere->getSecondData();
                         const hemisphere::Maths::Jacobian jacobian = second.getJacobian();
 
-                        tmpUpdateJacobianPosition.block<3, 2>(0, i - 1)
-                                = jacobian.block<3, 2>(0, 0).cast<float>();
-                        tmpUpdateJacobianOrientation.block<3, 2>(0, i - 1)
-                                = jacobian.block<3, 2>(3, 0).cast<float>();
+                        using Matrix3x2f = Eigen::Matrix<float, 3, 2>;
+
+                        const Matrix3x2f velocities = jacobian.block<3, 2>(0, 0).cast<float>();
+                        const Matrix3x2f rotAxes = jacobian.block<3, 2>(3, 0).cast<float>();
+
+                        const Eigen::Matrix3f globalOri = second.firstNode->getGlobalOrientation();
+
+                        Matrix3x2f velocitiesCoord = globalOri * velocities;
+                        Matrix3x2f rotAxesCoord = globalOri * rotAxes;
+                        if (coordSystem)
+                        {
+                            auto coordSystemInverseGlobalRot = coordSystem->getGlobalOrientation().transpose();
+
+                            velocitiesCoord = coordSystemInverseGlobalRot * velocitiesCoord;
+                            rotAxesCoord = coordSystemInverseGlobalRot * rotAxesCoord;
+                        }
+
+                        tmpUpdateJacobianPosition.block<3, 2>(0, i - 1) = velocitiesCoord;
+                        tmpUpdateJacobianOrientation.block<3, 2>(0, i - 1) = rotAxesCoord;
                     }
                     else
                     {
