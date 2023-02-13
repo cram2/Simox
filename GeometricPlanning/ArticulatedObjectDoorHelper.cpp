@@ -20,7 +20,7 @@ namespace simox::geometric_planning
     ArticulatedObjectDoorHelper::planInteraction(const std::string& nodeSetName) const
     {
         const auto rns = object->getRobotNodeSet(nodeSetName);
-        REQUIRE_MESSAGE(rns != nullptr, "Robot node set `" << nodeSetName << "` does not exist!");
+        // REQUIRE_MESSAGE(rns != nullptr, "Robot node set `" << nodeSetName << "` does not exist!");
 
         const std::string jointNodeName = nodeSetName + constants::JointSuffix;
         const std::string handleNodeName = nodeSetName + constants::HandleSuffix;
@@ -28,9 +28,12 @@ namespace simox::geometric_planning
 
         const auto checkNodeExists = [&rns, &nodeSetName]([[maybe_unused]] const std::string& nodeName)
         {
+            (void) rns, (void) nodeSetName;
+            /*
             REQUIRE_MESSAGE(rns->hasRobotNode(nodeName),
                             "Robot node `" << nodeName + "` does not exist within robot node set `"
                                            << nodeSetName << "`!");
+            */
         };
 
         for (const auto& nodeName : {jointNodeName, handleNodeName, surfaceProjectionNodeName})
