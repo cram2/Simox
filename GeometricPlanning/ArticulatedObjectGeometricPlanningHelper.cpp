@@ -143,8 +143,8 @@ namespace simox::geometric_planning
 
         // ARMARX_DEBUG << "radius is " << radius;
 
-        Pose postTransform; //(joint_R_node);
-        postTransform.setIdentity(); // FIXME ???
+        // Pose postTransform; //(joint_R_node);
+        // postTransform.setIdentity(); // FIXME ???
 
         //
         auto subpart = articulatedObject;
@@ -193,7 +193,7 @@ namespace simox::geometric_planning
 
         return {jointReferenceNode,
                 std::make_unique<CircleSegment>(radius, parameterRange),
-                postTransform};
+                Pose::Identity()};
     }
 
     ParametricPath
@@ -263,7 +263,6 @@ namespace simox::geometric_planning
 
         return ParametricPath(jointReferenceNode,
                               std::make_unique<Line>(parameterRange),
-                              //   Pose(articulatedObject->getGlobalPose()),
                               Pose::Identity());
     }
 
