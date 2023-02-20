@@ -176,7 +176,7 @@ namespace VirtualRobot
     {
         this->xmlInfo = info;
 
-        VR_ASSERT(second.has_value());
+        VR_ASSERT(active.has_value());
         switch (info.role)
         {
             case Role::PASSIVE:
@@ -199,16 +199,16 @@ namespace VirtualRobot
     bool
     RobotNodeFourBar::initialize(SceneObjectPtr parent, const std::vector<SceneObjectPtr>& children)
     {
-        VR_ASSERT_MESSAGE(first.has_value() xor second.has_value(),
-                          std::stringstream() << first.has_value() << " / " << second.has_value());
+        VR_ASSERT_MESSAGE(first.has_value() xor active.has_value(),
+                          std::stringstream() << first.has_value() << " / " << active.has_value());
 
-        // The second node needs to store a reference to the first node.
+        // The active node needs to store a reference to the first node.
         // Whenever the joint value has changed, the passive joint will be updated.
         if (active)
         {
             std::cout << "Initializing active four bar joint" << std::endl;
 
-            VR_ASSERT_MESSAGE(not second->first, "Second must not be initialized yet.");
+            VR_ASSERT_MESSAGE(not active->passive, "Second must not be initialized yet.");
 
             VirtualRobot::SceneObjectPtr currentParent = parent;
 
@@ -281,8 +281,8 @@ namespace VirtualRobot
     void
     RobotNodeFourBar::updateTransformationMatrices(const Eigen::Matrix4f& parentPose)
     {
-        VR_ASSERT_MESSAGE(first.has_value() xor second.has_value(),
-                          std::stringstream() << first.has_value() << " / " << second.has_value());
+        VR_ASSERT_MESSAGE(first.has_value() xor active.has_value(),
+                          std::stringstream() << first.has_value() << " / " << active.has_value());
 
         std::cout << "Updating RobotNodeFourBar::updateTransformationMatrices" << std::endl;
 
@@ -316,7 +316,7 @@ namespace VirtualRobot
         // }
         // else if (active)
         // {
-        //     VR_ASSERT_MESSAGE(second->first, "First node must be known to second node.");
+        //     VR_ASSERT_MESSAGE(active->first, "First node must be known to active node.");
 
         //     JointMath& math = active->math();
         //     Eigen::Vector2f actuators(active->passive->getJointValue(), this->getJointValue());
@@ -333,7 +333,7 @@ namespace VirtualRobot
 
         //         Eigen::IOFormat iof(5, 0, " ", "\n", "    [", "]");
         //         std::cout
-        //             << __FUNCTION__ << "() of second actuator with "
+        //             << __FUNCTION__ << "() of active actuator with "
         //             << "\n  lever = " << math.joint.lever << "\n  theta0 = " << math.joint.theta0
         //             << "\n  radius = " << math.joint.radius << "\n  joint value = " << jointValue
         //             << "\n  actuator (angle) = \n"
@@ -351,8 +351,8 @@ namespace VirtualRobot
     RobotNodeFourBar::print(bool printChildren, bool printDecoration) const
     {
         ReadLockPtr lock = getRobot()->getReadLock();
-        VR_ASSERT_MESSAGE(first.has_value() xor second.has_value(),
-                          std::stringstream() << first.has_value() << " / " << second.has_value());
+        VR_ASSERT_MESSAGE(first.has_value() xor active.has_value(),
+                          std::stringstream() << first.has_value() << " / " << active.has_value());
 
         if (printDecoration)
         {
@@ -367,7 +367,7 @@ namespace VirtualRobot
         }
         else if (active)
         {
-            std::cout << "* four_bar joint second node";
+            std::cout << "* four_bar joint active node";
             // std::cout << "* Transform: \n"
             //           << active->math.joint.getEndEffectorTransform() << std::endl;
         }
@@ -519,8 +519,8 @@ namespace VirtualRobot
     std::string
     RobotNodeFourBar::_toXML(const std::string& /*modelPath*/)
     {
-        VR_ASSERT_MESSAGE(first.has_value() xor second.has_value(),
-                          std::stringstream() << first.has_value() << " / " << second.has_value());
+        VR_ASSERT_MESSAGE(first.has_value() xor active.has_value(),
+                          std::stringstream() << first.has_value() << " / " << active.has_value());
 
         if (first)
         {
