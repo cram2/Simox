@@ -37,7 +37,7 @@ namespace simox::geometric_planning
 
         // the position derivative is always pointing into x direction as orientation changes as well
         // FIXME update this according to getPosition!
-        return radius * -Eigen::Vector3f::UnitX();
+        return radius * Eigen::Vector3f::UnitY();
     }
 
     Eigen::Quaternionf
