@@ -14,13 +14,14 @@ namespace simox::geometric_planning
                                                              const Params& params) :
         object(object), params(params)
     {
+        CHECK_MESSAGE(object != nullptr, "Object must not be null");
     }
 
     ArticulatedObjectDoorHelper::DoorInteractionContext
     ArticulatedObjectDoorHelper::planInteraction(const std::string& nodeSetName) const
     {
         const auto rns = object->getRobotNodeSet(nodeSetName);
-        REQUIRE_MESSAGE(rns != nullptr, "Robot node set `" << nodeSetName << "` does not exist!");
+        CHECK_MESSAGE(rns != nullptr, std::string("Robot node set `" + nodeSetName + "` does not exist!"));
 
         const std::string jointNodeName = nodeSetName + constants::JointSuffix;
         const std::string handleNodeName = nodeSetName + constants::HandleSuffix;
@@ -28,9 +29,9 @@ namespace simox::geometric_planning
 
         const auto checkNodeExists = [&rns, &nodeSetName]([[maybe_unused]] const std::string& nodeName)
         {
-            REQUIRE_MESSAGE(rns->hasRobotNode(nodeName),
-                            "Robot node `" << nodeName + "` does not exist within robot node set `"
-                                           << nodeSetName << "`!");
+            CHECK_MESSAGE(rns->hasRobotNode(nodeName),
+                            std::string("Robot node `" + nodeName + "` does not exist within robot node set `"
+                                           + nodeSetName + "`!"));
         };
 
         for (const auto& nodeName : {jointNodeName, handleNodeName, surfaceProjectionNodeName})
@@ -38,7 +39,7 @@ namespace simox::geometric_planning
             checkNodeExists(nodeName);
         }
 
-        REQUIRE_MESSAGE(params.doorContactHandleDistance > 0.,
+        CHECK_MESSAGE(params.doorContactHandleDistance > 0.,
                         "Grasping from the other side not implemented yet!");
 
         return DoorInteractionContext{
