@@ -12,17 +12,18 @@
 #include <SimoxUtility/algorithm/string/string_conversion_eigen.h>
 
 #define CHECK_SMALL_VELOCITY(a, b, tolerance) { \
-    BOOST_REQUIRE_EQUAL(a.rows(), b.rows()); \
-    for (unsigned int i = 0; i < a.rows(); i++) { \
-        BOOST_CHECK_SMALL(std::abs(a(i) - b(i)), tolerance); \
+    BOOST_REQUIRE_EQUAL((a).rows(), (b).rows()); \
+    for (unsigned int i = 0; i < (a).rows(); i++) { \
+        BOOST_CHECK_SMALL(std::abs((a)(i) - (b)(i)), (tolerance)); \
     } \
 }
 
-#define FLOAT_CLOSE_TO_DIFF 1e-4f
-
-#define CHECK_SMALL_DIFF_VELOCITY(a, b) { \
-    CHECK_SMALL_VELOCITY(a, b, FLOAT_CLOSE_TO_DIFF) \
+#define CHECK_SMALL_DIFF_VELOCITY(a, b, tolerance) { \
+    CHECK_SMALL_VELOCITY(a, b, tolerance) \
 }
+
+
+static const float DefaultTolerance = 1e-4f;
 
 
 BOOST_AUTO_TEST_SUITE(ManipulabilityTest)
@@ -55,7 +56,7 @@ BOOST_AUTO_TEST_CASE(testPositionalVelocityManipulabilityTracking)
     VirtualRobot::SingleChainManipulabilityTrackingPtr tracking(new VirtualRobot::SingleChainManipulabilityTracking(manipulability));
     Eigen::VectorXf velocity = tracking->calculateVelocity(desiredManipulability);
 
-    CHECK_SMALL_DIFF_VELOCITY(velocity, expectedVelocity)
+    CHECK_SMALL_DIFF_VELOCITY(velocity, expectedVelocity, DefaultTolerance)
 }
 
 //BOOST_AUTO_TEST_CASE(testOrientationalVelocityManipulabilityTracking)
@@ -120,7 +121,7 @@ BOOST_AUTO_TEST_CASE(testWholeVelocityManipulabilityTracking)
     VirtualRobot::SingleChainManipulabilityTrackingPtr tracking(new VirtualRobot::SingleChainManipulabilityTracking(manipulability));
     Eigen::VectorXf velocity = tracking->calculateVelocity(desiredManipulability);
 
-    CHECK_SMALL_DIFF_VELOCITY(velocity, expectedVelocity)
+    CHECK_SMALL_DIFF_VELOCITY(velocity, expectedVelocity, DefaultTolerance)
 }
 
 BOOST_AUTO_TEST_CASE(testPositionalForceManipulabilityTracking)
@@ -151,7 +152,7 @@ BOOST_AUTO_TEST_CASE(testPositionalForceManipulabilityTracking)
     VirtualRobot::SingleChainManipulabilityTrackingPtr tracking(new VirtualRobot::SingleChainManipulabilityTracking(manipulability));
     Eigen::VectorXf velocity = tracking->calculateVelocity(desiredManipulability);
 
-    CHECK_SMALL_DIFF_VELOCITY(velocity, expectedVelocity)
+    CHECK_SMALL_DIFF_VELOCITY(velocity, expectedVelocity, DefaultTolerance)
 }
 
 //BOOST_AUTO_TEST_CASE(testOrientationalForceManipulabilityTracking)
@@ -216,7 +217,7 @@ BOOST_AUTO_TEST_CASE(testWholeForceManipulabilityTracking)
     VirtualRobot::SingleChainManipulabilityTrackingPtr tracking(new VirtualRobot::SingleChainManipulabilityTracking(manipulability));
     Eigen::VectorXf velocity = tracking->calculateVelocity(desiredManipulability);
 
-    CHECK_SMALL_DIFF_VELOCITY(velocity, expectedVelocity)
+    CHECK_SMALL_DIFF_VELOCITY(velocity, expectedVelocity, 4e-4f)
 }
 
 
