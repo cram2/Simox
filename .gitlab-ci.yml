@@ -64,7 +64,7 @@ stages:
     - cd "$PROJECT_PATH_IN_WORKSPACE/build"
     - ctest . || true
     - ctest --rerun-failed --output-on-failure . || true
-    - cat Temporary/LastTest.log || true
+    - cat Testing/Temporary/LastTest.log || true
     # Once again to make the job fail if an error occurs.
     - ctest .
 
