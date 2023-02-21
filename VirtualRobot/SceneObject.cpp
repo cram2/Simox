@@ -1662,4 +1662,20 @@ namespace VirtualRobot
         return defaultPrimitives.empty() && primitives.empty();
     }
 
+    void SceneObject::PrimitiveApproximation::scaleLinear(float scalingFactor)
+    {
+        for (auto& primitive : this->defaultPrimitives)
+        {
+            primitive->scaleLinear(scalingFactor);
+        }
+
+        for (auto& [id, primitives] : this->primitives)
+        {
+            for (auto& primitive : primitives)
+            {
+                primitive->scaleLinear(scalingFactor);
+            }
+        }
+    }
+
 } // namespace

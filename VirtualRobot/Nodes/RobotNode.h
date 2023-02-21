@@ -32,6 +32,7 @@
 
 #include <Eigen/Core>
 
+#include <optional>
 #include <string>
 #include <vector>
 #include <map>
@@ -271,7 +272,7 @@ namespace VirtualRobot
                                    bool cloneChildren = true,
                                    RobotNodePtr initializeWithParent = RobotNodePtr(),
                                    CollisionCheckerPtr colChecker = CollisionCheckerPtr(),
-                                   float scaling = 1.0f,
+                                   std::optional<float> scaling = std::nullopt,
                                    bool preventCloningMeshesIfScalingIs1 = false);
 
         inline float getJointValueOffset() const
