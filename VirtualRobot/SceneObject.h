@@ -105,6 +105,8 @@ namespace VirtualRobot
 
             bool empty() const;
 
+            void scaleLinear(float scalingFactor);
+
         private:
             std::vector<Primitive::PrimitivePtr> defaultPrimitives;
             std::map<std::string, std::vector<Primitive::PrimitivePtr>> primitives;

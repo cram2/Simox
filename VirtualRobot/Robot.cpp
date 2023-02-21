@@ -766,7 +766,7 @@ namespace VirtualRobot
             bool cloneRNS,
             bool cloneEEFs,
             CollisionCheckerPtr collisionChecker,
-            float scaling,
+            std::optional<float> scaling,
             bool preventCloningMeshesIfScalingIs1)
     {
         THROW_VR_EXCEPTION_IF(!startJoint, " StartJoint is nullptr");
@@ -787,7 +787,7 @@ namespace VirtualRobot
         RobotNodePtr rootNew = startJoint->clone(result, true, RobotNodePtr(), colChecker, scaling, preventCloningMeshesIfScalingIs1);
         THROW_VR_EXCEPTION_IF(!rootNew, "Clone failed...");
         result->setRootNode(rootNew);
-        result->setScaling(scaling > 0 ? scaling : this->scaling);
+        result->setScaling(scaling.value_or(this->scaling));
 
         std::vector<RobotNodePtr> rn = result->getRobotNodes();
 
@@ -849,7 +849,7 @@ namespace VirtualRobot
     }
 
     RobotPtr Robot::cloneScaling() {
-        return clone(getName(), CollisionCheckerPtr(), -1.0f);
+        return clone();
     }
 
     Eigen::Matrix4f Robot::getGlobalPoseForRobotNode(
@@ -905,7 +905,7 @@ namespace VirtualRobot
 
     VirtualRobot::RobotPtr Robot::clone(const std::string& name,
                                         CollisionCheckerPtr collisionChecker,
-                                        float scaling,
+                                        std::optional<float> scaling,
                                         bool preventCloningMeshesIfScalingIs1)
     {
         VirtualRobot::RobotPtr result = extractSubPart(this->getRootNode(),
@@ -929,7 +929,7 @@ namespace VirtualRobot
     }
 
     RobotPtr Robot::clone(CollisionCheckerPtr collisionChecker,
-                          float scaling,
+                          std::optional<float> scaling,
                           bool preventCloningMeshesIfScalingIs1)
     {
         return clone(getName(), collisionChecker, scaling, preventCloningMeshesIfScalingIs1);

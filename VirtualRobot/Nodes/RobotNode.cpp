@@ -538,11 +538,11 @@ namespace VirtualRobot
     RobotNodePtr RobotNode::clone(RobotPtr newRobot, bool cloneChildren,
                                   RobotNodePtr initializeWithParent,
                                   CollisionCheckerPtr colChecker,
-                                  float scaling,
+                                  std::optional<float> scaling,
                                   bool preventCloningMeshesIfScalingIs1)
     {
-        // If scaling is <= 0 this->scaling is used instead. This enables different scalings while still able to clone the robot
-        auto actualScaling = scaling > 0 ? scaling : this->scaling;
+        const float actualScaling = scaling.value_or(this->scaling);
+        const float scalingFactor = scaling.has_value() ? scaling.value() / this->scaling : 1.0f;
 
         ReadLockPtr lock = getRobot()->getReadLock();
 
@@ -556,20 +556,20 @@ namespace VirtualRobot
 
         VisualizationNodePtr clonedVisualizationNode;
 
-        const bool deepMeshClone = !preventCloningMeshesIfScalingIs1 || std::abs(scaling - 1) <= 0;
+        const bool deepMeshClone = !preventCloningMeshesIfScalingIs1 || std::abs(scalingFactor - 1) <= 1e-12;
         if (visualizationModel)
         {
-            clonedVisualizationNode = visualizationModel->clone(deepMeshClone, actualScaling);
+            clonedVisualizationNode = visualizationModel->clone(deepMeshClone, scalingFactor);
         }
 
         CollisionModelPtr clonedCollisionModel;
 
         if (collisionModel)
         {
-            clonedCollisionModel = collisionModel->clone(colChecker, actualScaling, deepMeshClone);
+            clonedCollisionModel = collisionModel->clone(colChecker, scalingFactor, deepMeshClone);
         }
 
-        RobotNodePtr result = _clone(newRobot, clonedVisualizationNode, clonedCollisionModel, colChecker, scaling > 0 ? scaling : 1.0f);
+        RobotNodePtr result = _clone(newRobot, clonedVisualizationNode, clonedCollisionModel, colChecker, scalingFactor);
 
         if (!result)
         {
