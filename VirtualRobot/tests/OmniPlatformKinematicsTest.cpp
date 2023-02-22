@@ -19,6 +19,7 @@
  *             GNU General Public License
  */
 
+#include <cmath>
 #include <boost/test/tools/old/interface.hpp>
 #define BOOST_TEST_MODULE VirtualRobot_OmniPlatformKinematics
 
@@ -40,7 +41,9 @@ const inline VirtualRobot::OmniWheelPlatformKinematics::Params ARMAR7_OMNI_PLATF
     .L = 326,                                      // [mm]
     .R = 125 / 2,                                  // [mm]
     .delta = VirtualRobot::MathTools::deg2rad(30), // [rad]
-    .n = 1};
+    .n = 1,
+    .relativeAngle = M_PI / 3,
+    .wheelFactor = Eigen::Vector3f{-1, 1, 1}};
 
 BOOST_AUTO_TEST_CASE(testExample)
 {

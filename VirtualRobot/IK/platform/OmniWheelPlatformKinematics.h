@@ -49,6 +49,13 @@ namespace VirtualRobot
         //! gear ratio
         float n;
 
+        //! rotation to reference
+        // Rotation around platform center to define which direction is front
+        // For ARMAR-7, this is 60 degrees (between the two "front" wheels).
+        float relativeAngle;
+
+        Eigen::Vector3f wheelFactor;
+
         // see Liu et al., formula 2.2.2
         Eigen::Matrix3f B() const;
 
