@@ -303,7 +303,7 @@ namespace VirtualRobot
                                         bool cloneRNS = true,
                                         bool cloneEEFs = true,
                                         CollisionCheckerPtr collisionChecker = CollisionCheckerPtr(),
-                                        float scaling = 1.0f,
+                                        std::optional<float> scaling = std::nullopt,
                                         bool preventCloningMeshesIfScalingIs1 = false);
 
         /*!
@@ -315,13 +315,14 @@ namespace VirtualRobot
         */
         virtual RobotPtr clone(const std::string& name,
                                CollisionCheckerPtr collisionChecker = CollisionCheckerPtr(),
-                               float scaling = 1.0f,
+                               std::optional<float> scaling = std::nullopt,
                                bool preventCloningMeshesIfScalingIs1 = false);
         virtual RobotPtr clone(CollisionCheckerPtr collisionChecker = CollisionCheckerPtr(),
-                               float scaling = 1.0f,
+                               std::optional<float> scaling = std::nullopt,
                                bool preventCloningMeshesIfScalingIs1 = false);
 
-        /*! @brief Clones this robot and keeps the current scaling for the robot and each robot node */
+        /*! @brief Clones this robot and keeps the current scaling for the robot and each robot node. */
+        [[deprecated("Use clone() instead. Which now contains scaling as an optional.")]]
         virtual RobotPtr cloneScaling();
 
         //! Just storing the filename.

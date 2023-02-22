@@ -22,6 +22,8 @@ namespace VirtualRobot
 
             virtual std::unique_ptr<Primitive> clone() const = 0;
 
+            virtual void scaleLinear(float scalingFactor) = 0;
+
         protected:
             Primitive(int type) : type(type), transform(Eigen::Matrix4f::Identity()) {}
             std::string getTransformString(int tabs = 0);
@@ -47,6 +49,14 @@ namespace VirtualRobot
                 clone->transform = transform;
                 return clone;
             }
+
+            void scaleLinear(float scalingFactor) final
+            {
+                transform.block(0, 3, 3, 1) *= scalingFactor;
+                width *= scalingFactor;
+                height *= scalingFactor;
+                depth *= scalingFactor;
+            }
         };
 
         class VIRTUAL_ROBOT_IMPORT_EXPORT Sphere : public Primitive
@@ -63,6 +73,12 @@ namespace VirtualRobot
                 auto clone = std::make_unique<Sphere>(radius);
                 clone->transform = transform;
                 return clone;
+            }
+
+            void scaleLinear(float scalingFactor) final
+            {
+                transform.block(0, 3, 3, 1) *= scalingFactor;
+                radius *= scalingFactor;
             }
         };
 
@@ -81,6 +97,13 @@ namespace VirtualRobot
                 auto clone = std::make_unique<Cylinder>(radius, height);
                 clone->transform = transform;
                 return clone;
+            }
+
+            void scaleLinear(float scalingFactor) final
+            {
+                transform.block(0, 3, 3, 1) *= scalingFactor;
+                height *= scalingFactor;
+                radius *= scalingFactor;
             }
         };
 
@@ -102,6 +125,13 @@ namespace VirtualRobot
                 auto clone = std::make_unique<Capsule>(radius, height);
                 clone->transform = transform;
                 return clone;
+            }
+
+            void scaleLinear(float scalingFactor) final
+            {
+                transform.block(0, 3, 3, 1) *= scalingFactor;
+                height *= scalingFactor;
+                radius *= scalingFactor;
             }
         };
 

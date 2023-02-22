@@ -147,6 +147,21 @@ namespace VirtualRobot
 
         static bool detach(RobotPtr robot, RobotNodePtr rn);
 
+        static void scaleLinear(RobotNode& node, float sizeScaling, float weightScaling = 1.);
+
+        /**
+         * Method to linearly scale the size (in all axes) and the weight of the robot, e.g. for the MMM reference model.
+         * This includes scaling all kinematic and dynamic properties as well as the visualization, collision and primitive approximation models.
+         * @param robot
+         * @param sizeScaling linear scaling factor in x,y,z-direction
+         * @param weightScaling linear weight factor
+         * @param customSegmentLengths (Optional) RobotNode name -> custom translation length. Takes priority over sizeScaling
+         * @param customSizeScaling (Optional) RobotNode name -> custom size scaling. Takes priority over customSegmentLengths.
+         */
+        static void scaleLinear(Robot& robot, float sizeScaling, float weightScaling = 1.,
+                                const std::map<std::string, float>& customSegmentLengths = std::map<std::string, float>(),
+                                const std::map<std::string, float>& customSegmentSizeScaling = std::map<std::string, float>());
+
     protected:
 
         // some internal stuff
