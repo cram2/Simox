@@ -125,7 +125,7 @@ namespace VirtualRobot
     void
     RobotNodeFourBar::setJointValueNoUpdate(float q)
     {
-        std::cout << "RobotNodeFourBar: setting joint value no update " << q << std::endl;
+        // std::cout << "RobotNodeFourBar: setting joint value no update " << q << std::endl;
 
         if (active)
         {
@@ -146,9 +146,9 @@ namespace VirtualRobot
     {
         // We must update the preceeding node (the passive node).
         // This usually causes issues as the order to update the kinematic chain is strict.
-        std::cout << "RobotNodeFourBar: setting joint value " << getName() << " " << q << std::endl;
+        // std::cout << "RobotNodeFourBar: setting joint value " << getName() << " " << q << std::endl;
 
-        std::cout << "RobotNodeFourBar: active? " << active.has_value() << std::endl;
+        // std::cout << "RobotNodeFourBar: active? " << active.has_value() << std::endl;
 
         // update this node (without the global / internal pose!)
         {
@@ -160,7 +160,7 @@ namespace VirtualRobot
 
         if (active)
         {
-            std::cout << "RobotNodeFourBar: triggering update of passive joint " << std::endl;
+            // std::cout << "RobotNodeFourBar: triggering update of passive joint " << std::endl;
 
             // update all nodes including this one
             active->passive->updatePose(true);
@@ -206,7 +206,7 @@ namespace VirtualRobot
         // Whenever the joint value has changed, the passive joint will be updated.
         if (active)
         {
-            std::cout << "Initializing active four bar joint" << std::endl;
+            // std::cout << "Initializing active four bar joint" << std::endl;
 
             VR_ASSERT_MESSAGE(not active->passive, "Second must not be initialized yet.");
 
@@ -284,7 +284,7 @@ namespace VirtualRobot
         VR_ASSERT_MESSAGE(first.has_value() xor active.has_value(),
                           std::stringstream() << first.has_value() << " / " << active.has_value());
 
-        std::cout << "Updating RobotNodeFourBar::updateTransformationMatrices" << std::endl;
+        // std::cout << "Updating RobotNodeFourBar::updateTransformationMatrices" << std::endl;
 
         Eigen::Isometry3f tmp = Eigen::Isometry3f::Identity();
 
@@ -292,21 +292,21 @@ namespace VirtualRobot
 
         if (active)
         {
-            std::cout << "active: joint value " << jV << std::endl;
+            // std::cout << "active: joint value " << jV << std::endl;
 
             active->math.update(jV);
             tmp = active->math.joint.computeFk(jV).matrix().cast<float>();
         }
         else // passive
         {
-            std::cout << "passive: joint value " << jV << std::endl;
+            // std::cout << "passive: joint value " << jV << std::endl;
 
             tmp.linear() = Eigen::AngleAxisf(jV + jointValueOffset, Eigen::Vector3f::UnitZ())
                                .toRotationMatrix();
         }
 
 
-        std::cout << "local transformation: " << getName() << tmp.matrix() << std::endl;
+        // std::cout << "local transformation: " << getName() << tmp.matrix() << std::endl;
         globalPose = parentPose * localTransformation * tmp.matrix();
 
 
