@@ -117,22 +117,23 @@ namespace simox::geometric_planning
                 .toRotationMatrix());
         // ARMARX_DEBUG << VAROUT(joint_T_joint_ref.linear());
 
-        const Pose global_T_joint =
-            global_T_joint_orig *
-            joint_T_joint_ref; // * Pose(Eigen::Quaternionf::FromTwoVectors(Eigen::Vector3f::UnitZ(), revoluteJoint->getJointRotationAxis()).toRotationMatrix());
+        const Pose global_T_joint_ref = global_T_joint_orig * joint_T_joint_ref;
+        // * Pose(Eigen::Quaternionf::FromTwoVectors(Eigen::Vector3f::UnitZ(), revoluteJoint->getJointRotationAxis()).toRotationMatrix());
 
         const Pose global_T_node(node->getGlobalPose());
 
         // this is the node within the joint frame
-        const Pose joint_T_node = global_T_joint.inverse() * global_T_node;
+        // joint_ref_T_node = joint_ref_T_global * global_T_node
+        const Pose joint_ref_T_node = global_T_joint_ref.inverse() * global_T_node;
+
         // ARMARX_DEBUG << "relative position: " << joint_T_node.translation();
 
-        // the plane in which the node moves is given by the following
+        // the plane in which the node moves is given by the following (x, y coordinates = 0 for movement plane)
         const Pose global_T_joint_plane =
-            global_T_joint * Eigen::Translation3f{0, 0, joint_T_node.translation().z()};
+            global_T_joint_ref * Eigen::Translation3f{0, 0, joint_ref_T_node.translation().z()};
 
         // and the radius of the movement is given by the xy coordinate
-        const float radius = joint_T_node.translation().head<2>().norm();
+        const float radius = joint_ref_T_node.translation().head<2>().norm();
         // ARMARX_DEBUG << "Radius: " << radius;
 
         REQUIRE_MESSAGE(joint->getJointLimitHigh() > joint->getJointLimitLow(),
@@ -151,7 +152,8 @@ namespace simox::geometric_planning
 
         const std::string nodeJointReference = node->getName() + "_joint_reference";
 
-        const Pose joint_T_joint_plane = global_T_joint.inverse() * global_T_joint_plane;
+        // joint_T_joint_plane = joint_ref_T_global * global_t_joint_plane
+        const Pose joint_ref_T_joint_plane = global_T_joint_ref.inverse() * global_T_joint_plane;
 
         // now we make sure that the joint coordinate system is oriented such that the x axis points towards the initial node position
         const Eigen::Vector3f global__joint_plane_P_node_initial =
@@ -171,9 +173,9 @@ namespace simox::geometric_planning
 
         const Pose global_T_root(subpart->getGlobalPose());
         const Pose root_T_global = global_T_root.inverse();
-        const Pose root_T_joint = root_T_global * global_T_joint;
+        const Pose root_T_joint_ref = root_T_global * global_T_joint_ref;
 
-        const Pose root_T_joint_reference(root_T_joint * joint_T_joint_plane *
+        const Pose root_T_joint_reference(root_T_joint_ref * joint_ref_T_joint_plane *
                                           joint_plane_T_joint_reference);
 
         const auto jointReferenceNode = std::make_shared<VirtualRobot::RobotNodeFixed>(
@@ -190,10 +192,18 @@ namespace simox::geometric_planning
         // reset joint state
         joint->setJointValue(initialJointValue);
 
+        // we need the transformation from root_T_joint_reference to node, so that the orientations match up.
+        // without the orientation adaption, this will output a coordinate system with x pointing in the
+        // direction from global_T_plane to node, and z pointing upward.
+        // therefore:
+        // global_T_root * root_T_joint_reference = global_T_joint_reference
+        // we just need the linear transformation though (i think), because the translation was already covered before
+        Pose joint_reference_T_node(
+            ((global_T_root * root_T_joint_reference).inverse() * global_T_node).linear());
 
         return {jointReferenceNode,
                 std::make_unique<CircleSegment>(radius, parameterRange),
-                Pose::Identity()};
+                joint_reference_T_node};
     }
 
     ParametricPath
@@ -261,9 +271,8 @@ namespace simox::geometric_planning
 
         // ARMARX_DEBUG << "registered robot node `" << jointReferenceNode->getName() << "`";
 
-        return ParametricPath(jointReferenceNode,
-                              std::make_unique<Line>(parameterRange),
-                              Pose::Identity());
+        return ParametricPath(
+            jointReferenceNode, std::make_unique<Line>(parameterRange), Pose::Identity());
     }
 
     ParametricPath

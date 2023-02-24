@@ -114,8 +114,9 @@ endif()
 
 if(BUILD_TESTING)
     # include unit tests
-    # ADD_SUBDIRECTORY(tests/)
+    ADD_SUBDIRECTORY(tests)
 endif()
+
 
 #######################################################################################
 ############################ Setup for installation ###################################
