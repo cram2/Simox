@@ -1184,32 +1184,47 @@ namespace VirtualRobot
             const Eigen::Matrix4f globalPoseInv = simox::math::inverted_pose(n.node_cloned->getGlobalPose());
             if (!visus.empty())
             {
-                if (const auto visu = n.node->getVisualization())
+                if (visus.size() == 1)
                 {
-                    visus.insert(visus.begin(), visu->clone());
+                    n.node_cloned->setVisualization(visus.front()->clone());
                 }
-                auto v = vf->createUnitedVisualization(visus);
-                if (n.parentNode_cloned)
+                else
                 {
-                    vf->applyDisplacement(v, globalPoseInv);
+                    if (const auto visu = n.node->getVisualization())
+                    {
+                        visus.insert(visus.begin(), visu->clone());
+                    }
+                    auto v = vf->createUnitedVisualization(visus);
+                    if (n.parentNode_cloned)
+                    {
+                        v->setLocalPose(globalPoseInv);
+                    }
+                    n.node_cloned->setVisualization(v);
                 }
-                n.node_cloned->setVisualization(v);
             }
             if (!colVisus.empty())
             {
-                if (const auto colModel = n.node->getCollisionModel())
+                if (colVisus.size() == 1)
                 {
-                    if (const auto vis = colModel->getVisualization())
+                    n.node_cloned->setCollisionModel(std::make_shared<CollisionModel>(colVisus.front(), n.node->getName()));
+                }
+                else
+                {
+                    if (const auto colModel = n.node->getCollisionModel())
                     {
-                        colVisus.insert(colVisus.begin(), vis->clone());
+                        if (const auto vis = colModel->getVisualization())
+                        {
+                            colVisus.insert(colVisus.begin(), vis->clone());
+                        }
                     }
+                    auto colVisu = vf->createUnitedVisualization(colVisus);
+                    if (n.parentNode_cloned)
+                    {
+                        colVisu->setLocalPose(globalPoseInv);
+                    }
+                    n.node_cloned->setCollisionModel(std::make_shared<CollisionModel>(colVisu, n.node->getName()));
                 }
-                auto colVisu = vf->createUnitedVisualization(colVisus);
-                if (n.parentNode_cloned)
-                {
-                    vf->applyDisplacement(colVisu, globalPoseInv);
-                }
-                n.node_cloned->setCollisionModel(std::make_shared<CollisionModel>(colVisu, n.node->getName()));
+
             }
 
             for (const auto& childNode : n.childNodes)
