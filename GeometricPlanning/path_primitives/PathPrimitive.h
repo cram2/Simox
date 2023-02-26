@@ -51,6 +51,8 @@ namespace simox::geometric_planning
 
         Pose getPose(float t) const;
 
+        float clampParameter(float t) const;
+
         ~PathPrimitive() override = default;
     };
 

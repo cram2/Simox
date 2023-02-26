@@ -21,11 +21,19 @@ namespace simox::geometric_planning
         return (param - range.min) / (range.max - range.min);
     }
 
+
+    float PathPrimitive::clampParameter(float t) const
+    {
+        const auto range = parameterRange();
+        return std::clamp(t, range.min, range.max);
+    }
+
     Pose
     PathPrimitive::getPose(const float t) const
     {
         return Pose(::math::Helpers::CreatePose(getPosition(t), getOrientation(t)));
     }
+    
 
     Eigen::Vector3f
     PathPrimitive::GetPosition(float t)
