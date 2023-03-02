@@ -16,9 +16,16 @@ namespace simox::geometric_planning
     PathPrimitive::progress(const Pose& pose) const
     {
         const float param = parameter(pose);
+        return progress(param);
+    }
+    
+    float PathPrimitive::progress(const float param) const
+    {
         const auto range = parameterRange();
 
-        return (param - range.min) / (range.max - range.min);
+        const float paramSanitized = clampParameter(param);
+
+        return (paramSanitized - range.min) / (range.max - range.min);
     }
 
 
