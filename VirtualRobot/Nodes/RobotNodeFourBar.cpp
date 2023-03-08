@@ -129,9 +129,11 @@ namespace VirtualRobot
 
         if (active)
         {
+            const float theta = jointValueOffset + q;
+
             // update the passive joint
-            const float psi = active->math.joint.psi(q);
-            active->passive->setJointValueNoUpdate(-psi); // FIXME make joint axis consistent
+            const float psi = active->math.joint.psi(theta);
+            active->passive->setJointValueNoUpdate(psi);
             RobotNode::setJointValueNoUpdate(q);
         }
         else
@@ -180,17 +182,16 @@ namespace VirtualRobot
         switch (info.role)
         {
             case Role::PASSIVE:
-                std::cout << "Role: passive" << std::endl;
+                // std::cout << "Role: passive" << std::endl;
                 first.emplace(First{});
                 // first->math.joint.setConstants(0, info.theta0);
                 break;
 
             case Role::ACTIVE:
-                std::cout << "Role: active" << std::endl;
+                // std::cout << "Role: active" << std::endl;
                 active.emplace(
                     Second{.passive = nullptr,
-                           .math = JointMath{.joint = four_bar::Joint{jointValueOffset,
-                                                                      info.dimensions.value()}}});
+                           .math = JointMath{.joint = four_bar::Joint{info.dimensions.value()}}});
                 break;
         }
     }
@@ -236,18 +237,22 @@ namespace VirtualRobot
                 if (firstNode == nullptr)
                 {
                     currentParent = currentParent->getParent();
-                    std::cout << "Parent does not match (yet).";
+                    // std::cout << "Parent does not match (yet).";
                     continue;
                 }
 
-                std::cout << "Parent matches.";
+                // std::cout << "Parent matches.";
 
                 // Save pointer to firstNode
                 active->passive = firstNode;
 
+                const float theta = jointValueOffset + getJointValue();
+
                 // initialize the passive node
-                const float psi = active->math.joint.psi(getJointValue());
-                active->passive->setJointValueNoUpdate(-psi);
+                const float psi = active->math.joint.psi(theta);
+
+                // VR_INFO << "psi " << psi;
+                active->passive->setJointValueNoUpdate(psi);
 
                 // Set up robot node parameters.
                 {
@@ -269,11 +274,11 @@ namespace VirtualRobot
 
 
     void
-    RobotNodeFourBar::JointMath::update(const float theta)
+    RobotNodeFourBar::JointMath::update(const float /*theta*/)
     {
         // if (actuators != this->actuators)
         // {
-        joint.computeFk(theta);
+        // joint.computeFk(theta);
         // }
     }
 
@@ -288,20 +293,21 @@ namespace VirtualRobot
 
         Eigen::Isometry3f tmp = Eigen::Isometry3f::Identity();
 
-        const auto jV = this->getJointValue();
 
         if (active)
         {
             // std::cout << "active: joint value " << jV << std::endl;
+            const float theta = this->getJointValue() + jointValueOffset;
 
-            active->math.update(jV);
-            tmp = active->math.joint.computeFk(jV).matrix().cast<float>();
+            active->math.update(theta);
+            tmp = active->math.joint.computeFk(theta).matrix().cast<float>();
         }
         else // passive
         {
             // std::cout << "passive: joint value " << jV << std::endl;
+            const float psi = this->getJointValue();
 
-            tmp.linear() = Eigen::AngleAxisf(jV + jointValueOffset, Eigen::Vector3f::UnitZ())
+            tmp.linear() = Eigen::AngleAxisf(psi, -Eigen::Vector3f::UnitZ())
                                .toRotationMatrix();
         }
 
@@ -503,7 +509,14 @@ namespace VirtualRobot
         const auto base_P_eef = global_T_base.inverse() * global_P_eef;
 
         const Eigen::Vector3d base_P_eef_d = base_P_eef.cast<double>();
-        return active->math.joint.getJacobian(getJointValue(), base_P_eef_d);
+
+        const float theta = this->getJointValue() + jointValueOffset;
+
+        const four_bar::Joint::Jacobian J = active->math.joint.getJacobian(theta, base_P_eef_d);
+
+        // position part 
+        // J.head<2>() *= 1000; // [mm] to [m]
+        return J;
     }
 
 
@@ -529,13 +542,13 @@ namespace VirtualRobot
         }
         else
         {
-            JointMath& math = active->math;
+            // JointMath& math = active->math;
 
             // FIXME implement
 
             std::stringstream ss;
             ss << "\t\t<Joint type='four_bar'>" << std::endl;
-            ss << "\t\t\t<four_bar theta0='" << math.joint.theta0 << "' />" << std::endl;
+            // ss << "\t\t\t<four_bar theta0='" << math.joint.theta0 << "' />" << std::endl;
             ss << "\t\t\t<limits lo='" << jointLimitLo << "' hi='" << jointLimitHi
                << "' units='radian'/>" << std::endl;
             ss << "\t\t\t<MaxAcceleration value='" << maxAcceleration << "'/>" << std::endl;
