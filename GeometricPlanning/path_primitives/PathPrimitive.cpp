@@ -16,9 +16,23 @@ namespace simox::geometric_planning
     PathPrimitive::progress(const Pose& pose) const
     {
         const float param = parameter(pose);
+        return progress(param);
+    }
+    
+    float PathPrimitive::progress(const float param) const
+    {
         const auto range = parameterRange();
 
-        return (param - range.min) / (range.max - range.min);
+        const float paramSanitized = clampParameter(param);
+
+        return (paramSanitized - range.min) / (range.max - range.min);
+    }
+
+
+    float PathPrimitive::clampParameter(float t) const
+    {
+        const auto range = parameterRange();
+        return std::clamp(t, range.min, range.max);
     }
 
     Pose
@@ -26,6 +40,7 @@ namespace simox::geometric_planning
     {
         return Pose(::math::Helpers::CreatePose(getPosition(t), getOrientation(t)));
     }
+    
 
     Eigen::Vector3f
     PathPrimitive::GetPosition(float t)

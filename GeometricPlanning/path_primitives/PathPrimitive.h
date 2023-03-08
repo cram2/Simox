@@ -36,6 +36,7 @@ namespace simox::geometric_planning
          * @return the progress in range [0,1]
          */
         float progress(const Pose& pose) const;
+        float progress(float param) const;
 
         // math::AbstractFunctionR1R6 interface
         Eigen::Vector3f GetPosition(float t) override;
@@ -50,6 +51,8 @@ namespace simox::geometric_planning
         virtual Eigen::Vector3f getOrientationDerivative(float t) const = 0;
 
         Pose getPose(float t) const;
+
+        float clampParameter(float t) const;
 
         ~PathPrimitive() override = default;
     };

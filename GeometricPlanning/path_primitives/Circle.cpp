@@ -23,7 +23,9 @@ namespace simox::geometric_planning
     Eigen::Vector3f
     Circle::getPosition(float t) const
     {
-        REQUIRE(parameterRange().isInRange(t));
+        // REQUIRE(parameterRange().isInRange(t));
+
+        t = clampParameter(t);
 
         return radius * Eigen::Vector3f(std::cos(t), std::sin(t), 0.0F);
     }
@@ -31,7 +33,8 @@ namespace simox::geometric_planning
     Eigen::Vector3f
     Circle::getPositionDerivative([[maybe_unused]] float t) const
     {
-        REQUIRE(parameterRange().isInRange(t));
+        // REQUIRE(parameterRange().isInRange(t));
+        
 
         // return radius * Eigen::Vector3f(-std::sin(t + M_PI_2f32), std::cos(t + M_PI_2f32), 0.0F);
 
@@ -80,7 +83,7 @@ namespace simox::geometric_planning
         const float param = phi;
         // ARMARX_DEBUG << "Param is " << param;
 
-        return std::clamp(param, parameterRange().min, parameterRange().max);
+        return clampParameter(param);
     }
 
 } // namespace simox::geometric_planning
