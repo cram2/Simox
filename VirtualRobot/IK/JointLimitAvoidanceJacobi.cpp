@@ -36,7 +36,7 @@ namespace VirtualRobot
 
         for (size_t i = 0; i < nDoF; i++)
         {
-            if (nodes[i]->isRotationalJoint())
+            if (nodes[i]->isJoint() and not nodes[i]->isLimitless())
             {
                 float l = nodes[i]->getJointLimitHi() - nodes[i]->getJointLimitLo();
                 float target = nodes[i]->getJointLimitLo() + l * 0.5f;
