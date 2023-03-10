@@ -344,6 +344,80 @@ namespace VirtualRobot
         return true;
     }
 
+    void RobotFactory::scaleLinear(RobotNode &node, float sizeScaling, float weightScaling)
+    {
+        Eigen::Matrix4f localTransformation = node.getLocalTransformation();
+        localTransformation.block(0, 3, 3, 1) *= sizeScaling;
+        node.setLocalTransformation(localTransformation);
+
+        if (node.optionalDHParameter.isSet)
+        {
+            node.optionalDHParameter.setAInMM(node.optionalDHParameter.aMM() * sizeScaling);
+            node.optionalDHParameter.setDInMM(node.optionalDHParameter.dMM() * sizeScaling);
+        }
+
+        node.setMass(node.getMass() * weightScaling);
+        node.setCoMLocal(node.getCoMLocal() * sizeScaling);
+        node.setInertiaMatrix(node.getInertiaMatrix() * pow(sizeScaling, 2) * weightScaling);
+        node.setScaling(node.getScaling() * sizeScaling);
+    }
+
+    void RobotFactory::scaleLinear(Robot &robot, float sizeScaling, float weightScaling,
+                                   const std::map<std::string, float> &customSegmentLengths,
+                                   const std::map<std::string, float>& customSizeScaling)
+    {
+        for (auto node : robot.getRobotNodes())
+        {
+            float model_height_scaling = sizeScaling;
+
+            const auto segLengthIt = customSegmentLengths.find(node->getName());
+            const auto sizeScaleIt = customSizeScaling.find(node->getName());
+
+            if (sizeScaleIt != customSizeScaling.end())
+            {
+                model_height_scaling = sizeScaleIt->second;
+            }
+
+            if (segLengthIt != customSegmentLengths.end())
+            {
+                if (sizeScaleIt != customSizeScaling.end())
+                {
+                    VR_WARNING << "Custom segment length ignored for node " << node->getName()
+                               << " because custom height scaling was already specified ";
+                }
+                else
+                {
+                    const float l = node->getLocalTransformation().block(0, 3, 3, 1).norm();
+                    if (l != 0.0f)
+                        model_height_scaling = 1.0f / l * segLengthIt->second;
+                }
+            }
+
+            for (auto sensor : node->getSensors())
+            {
+                Eigen::Matrix4f lt = sensor->getParentNodeToSensorTransformation();
+                lt.block(0, 3, 3, 1) *= model_height_scaling;
+                sensor->setRobotNodeToSensorTransformation(lt);
+            }
+
+            scaleLinear(*node.get(), model_height_scaling, weightScaling);
+
+            if (auto vis = node->visualizationModel)
+            {
+                node->setVisualization(node->visualizationModel->clone(true, model_height_scaling));
+            }
+
+            if (auto col = node->getCollisionModel())
+            {
+                node->setCollisionModel(col->clone(node->getCollisionChecker(), model_height_scaling, true));
+            }
+
+            node->getPrimitiveApproximation().scaleLinear(model_height_scaling);
+        }
+        robot.setScaling(robot.getScaling() * sizeScaling);
+        robot.setMass(robot.getMass() * weightScaling);
+    }
+
     RobotPtr RobotFactory::cloneChangeStructure(RobotPtr robot, robotStructureDef& newStructure)
     {
         VR_ASSERT(robot);
@@ -1110,32 +1184,47 @@ namespace VirtualRobot
             const Eigen::Matrix4f globalPoseInv = simox::math::inverted_pose(n.node_cloned->getGlobalPose());
             if (!visus.empty())
             {
-                if (const auto visu = n.node->getVisualization())
+                if (visus.size() == 1)
                 {
-                    visus.insert(visus.begin(), visu->clone());
+                    n.node_cloned->setVisualization(visus.front()->clone());
                 }
-                auto v = vf->createUnitedVisualization(visus);
-                if (n.parentNode_cloned)
+                else
                 {
-                    vf->applyDisplacement(v, globalPoseInv);
+                    if (const auto visu = n.node->getVisualization())
+                    {
+                        visus.insert(visus.begin(), visu->clone());
+                    }
+                    auto v = vf->createUnitedVisualization(visus);
+                    if (n.parentNode_cloned)
+                    {
+                        v->setLocalPose(globalPoseInv);
+                    }
+                    n.node_cloned->setVisualization(v);
                 }
-                n.node_cloned->setVisualization(v);
             }
             if (!colVisus.empty())
             {
-                if (const auto colModel = n.node->getCollisionModel())
+                if (colVisus.size() == 1)
                 {
-                    if (const auto vis = colModel->getVisualization())
+                    n.node_cloned->setCollisionModel(std::make_shared<CollisionModel>(colVisus.front(), n.node->getName()));
+                }
+                else
+                {
+                    if (const auto colModel = n.node->getCollisionModel())
                     {
-                        colVisus.insert(colVisus.begin(), vis->clone());
+                        if (const auto vis = colModel->getVisualization())
+                        {
+                            colVisus.insert(colVisus.begin(), vis->clone());
+                        }
                     }
+                    auto colVisu = vf->createUnitedVisualization(colVisus);
+                    if (n.parentNode_cloned)
+                    {
+                        colVisu->setLocalPose(globalPoseInv);
+                    }
+                    n.node_cloned->setCollisionModel(std::make_shared<CollisionModel>(colVisu, n.node->getName()));
                 }
-                auto colVisu = vf->createUnitedVisualization(colVisus);
-                if (n.parentNode_cloned)
-                {
-                    vf->applyDisplacement(colVisu, globalPoseInv);
-                }
-                n.node_cloned->setCollisionModel(std::make_shared<CollisionModel>(colVisu, n.node->getName()));
+
             }
 
             for (const auto& childNode : n.childNodes)

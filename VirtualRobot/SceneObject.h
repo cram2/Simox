@@ -105,6 +105,8 @@ namespace VirtualRobot
 
             bool empty() const;
 
+            void scaleLinear(float scalingFactor);
+
         private:
             std::vector<Primitive::PrimitivePtr> defaultPrimitives;
             std::map<std::string, std::vector<Primitive::PrimitivePtr>> primitives;
@@ -418,7 +420,7 @@ namespace VirtualRobot
         void setScaling(float scaling);
         float getScaling();
 
-        bool reloadVisualizationFromXML(bool useVisAsColModelIfMissing = true);
+        bool reloadVisualizationFromXML(bool useVisAsColModelIfMissing = true, bool loadColOnly = false);
 
         const std::string& getVisualizationModelXML() const;
 

@@ -19,6 +19,11 @@ namespace simox::geometric_planning
     {
         return path->progress(toLocalPathFrame(global_T_pose));
     }
+    
+    float ParametricPath::progress(const float param) const
+    {
+        return path->progress(param);
+    }
 
     Pose
     ParametricPath::toLocalPathFrame(const Pose& global_T_pose) const

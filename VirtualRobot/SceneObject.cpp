@@ -1464,7 +1464,7 @@ namespace VirtualRobot
         return scaling;
     }
 
-    bool SceneObject::reloadVisualizationFromXML(bool useVisAsColModelIfMissing) {
+    bool SceneObject::reloadVisualizationFromXML(bool useVisAsColModelIfMissing, bool loadColOnly) {
         bool reloaded = false;
         if (!collisionModelXML.empty())
         {
@@ -1484,7 +1484,8 @@ namespace VirtualRobot
             }
             reloaded = true;
         }
-        if (!visualizationModelXML.empty())
+        if ((!loadColOnly || (!collisionModel && useVisAsColModelIfMissing))
+             && !visualizationModelXML.empty())
         {
             rapidxml::xml_document<> doc;
             std::vector<char> cstr(visualizationModelXML.size() + 1);  // Create char buffer to store string copy
@@ -1492,13 +1493,16 @@ namespace VirtualRobot
             doc.parse<0>(cstr.data());
             bool useAsColModel;
             auto visualizationModel = BaseIO::processVisualizationTag(doc.first_node(), name, basePath, useAsColModel);
-            if (visualizationModel && scaling != 1.0f)
+            if (!loadColOnly)
             {
-                setVisualization(visualizationModel->clone(true, scaling));
-            }
-            else
-            {
-                setVisualization(visualizationModel);
+                if (visualizationModel && scaling != 1.0f)
+                {
+                    setVisualization(visualizationModel->clone(true, scaling));
+                }
+                else
+                {
+                    setVisualization(visualizationModel);
+                }
             }
             if (visualizationModel && collisionModel == nullptr && (useVisAsColModelIfMissing || useAsColModel))
             {
@@ -1507,7 +1511,7 @@ namespace VirtualRobot
             reloaded = true;
         }
         for (auto child : this->getChildren()) {
-            reloaded |= child->reloadVisualizationFromXML(useVisAsColModelIfMissing);
+            reloaded |= child->reloadVisualizationFromXML(useVisAsColModelIfMissing, loadColOnly);
         }
         return reloaded;
     }
@@ -1660,6 +1664,22 @@ namespace VirtualRobot
     bool SceneObject::PrimitiveApproximation::empty() const
     {
         return defaultPrimitives.empty() && primitives.empty();
+    }
+
+    void SceneObject::PrimitiveApproximation::scaleLinear(float scalingFactor)
+    {
+        for (auto& primitive : this->defaultPrimitives)
+        {
+            primitive->scaleLinear(scalingFactor);
+        }
+
+        for (auto& [id, primitives] : this->primitives)
+        {
+            for (auto& primitive : primitives)
+            {
+                primitive->scaleLinear(scalingFactor);
+            }
+        }
     }
 
 } // namespace

@@ -127,7 +127,7 @@ namespace VirtualRobot
         // The second node needs to store a reference to the first node.
         if (secondData)
         {
-            VR_ASSERT_MESSAGE(not secondData->first, "Second must not be initialized yet.");
+            VR_ASSERT_MESSAGE(not secondData->firstNode, "Second must not be initialized yet.");
 
             RobotNodeHemisphere* firstNode = dynamic_cast<RobotNodeHemisphere*>(parent.get());
             RobotNodeHemisphere* secondNode = this;
@@ -171,7 +171,7 @@ namespace VirtualRobot
         }
         else if (secondData)
         {
-            VR_ASSERT_MESSAGE(secondData->first, "First node must be known to second node.");
+            VR_ASSERT_MESSAGE(secondData->firstNode, "First node must be known to second node.");
 
             hemisphere::CachedMaths& maths = secondData->maths();
             Eigen::Vector2f actuators(secondData->firstNode->getJointValue(), this->getJointValue());
