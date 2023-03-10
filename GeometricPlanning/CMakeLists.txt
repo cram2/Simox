@@ -32,6 +32,7 @@ SET(SOURCES
     path_primitives/CircleSegment.cpp
     path_primitives/Line.cpp
     visualization.cpp
+    util.cpp
 )
 
 SET(HEADERS
@@ -45,6 +46,7 @@ SET(HEADERS
     path_primitives/Line.h
     assert/assert.h
     visualization.h
+    util.h
 )
 
 ADD_LIBRARY(GeometricPlanning SHARED) # sources will be added later
