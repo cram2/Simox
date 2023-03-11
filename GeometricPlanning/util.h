@@ -23,6 +23,7 @@
 
 
 #include <map>
+#include <optional>
 
 #include <VirtualRobot/VirtualRobot.h>
 
