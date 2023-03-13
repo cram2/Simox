@@ -32,6 +32,7 @@ namespace simox::geometric_planning
 
         // helper functions to obtain the PathPrimitive's parameter and progress directly from a global pose
         float progress(const Pose& global_T_pose) const;
+        float progress(float param) const;
 
         Pose toLocalPathFrame(const Pose& global_T_pose) const;
 

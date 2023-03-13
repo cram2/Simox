@@ -43,6 +43,9 @@ namespace simox::geometric_planning
         const auto node = articulatedObject->getRobotNode(nodeName);
         REQUIRE(node != nullptr);
 
+        const auto global_T_object_root = articulatedObject->getGlobalPose();
+        articulatedObject->setGlobalPose(Eigen::Matrix4f::Identity());
+
         simox::geometric_planning::ArticulatedObjectGeometricPlanningHelper helper(
             articulatedObject);
 
@@ -83,6 +86,10 @@ namespace simox::geometric_planning
         REQUIRE(joint != nullptr);
 
         const auto parametricPath = helper.getPathForNode(node->getName(), joint->getName());
+
+        // reset global pose
+        articulatedObject->setGlobalPose(global_T_object_root);
+
 
         return parametricPath;
     }
