@@ -31,7 +31,8 @@ namespace VirtualRobot
 {
 
     
-    class VIRTUAL_ROBOT_IMPORT_EXPORT NaturalPosture : public WorkspaceRepresentation, public std::enable_shared_from_this<NaturalPosture>
+    class VIRTUAL_ROBOT_IMPORT_EXPORT NaturalPosture :
+            public WorkspaceRepresentation, public std::enable_shared_from_this<NaturalPosture>
     {
     public:
         friend class CoinVisualizationFactory;

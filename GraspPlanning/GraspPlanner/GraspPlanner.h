@@ -56,6 +56,7 @@ namespace GraspStudio
             Creates new grasps.
             \param nrGrasps The number of grasps to be planned.
             \param timeOutMS The time out in milliseconds. Planning is stopped when this time is exceeded. Disabled when zero.
+            \param obstacles
             \return Number of planned grasps.
         */
         virtual int plan(int nrGrasps, int timeOutMS = 0, VirtualRobot::SceneObjectSetPtr obstacles = {}) = 0;
