@@ -35,9 +35,8 @@ IF(DOXYGEN_FOUND)
         "${CMAKE_CURRENT_SOURCE_DIR}/../SimoxQtUtility"
     )
 
-    simox_subdirs(SIMOX_SUBDIRS "${CMAKE_CURRENT_SOURCE_DIR}/../SimoxUtility")
-    SET (CMAKE_DOXYGEN_INPUT_LIST  ${CMAKE_DOXYGEN_INPUT_LIST}
-        ${SIMOX_SUBDIRS})
+    simox_subdirs_recursive(SIMOX_UTILITY_SUBDIRS "${CMAKE_CURRENT_SOURCE_DIR}/../SimoxUtility")
+    LIST (APPEND CMAKE_DOXYGEN_INPUT_LIST ${SIMOX_UTILITY_SUBDIRS})
 
     # consider visualization setup
     IF (Simox_USE_COIN_VISUALIZATION)
