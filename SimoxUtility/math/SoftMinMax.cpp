@@ -13,29 +13,29 @@ namespace simox::math
         reset(0, 1);
     }
 
-    SoftMinMax::SoftMinMax(float percentile, std::size_t numValues)
+    SoftMinMax::SoftMinMax(float quantile, std::size_t numValues)
     {
-        reset(percentile, numValues);
+        reset(quantile, numValues);
     }
 
-    void SoftMinMax::reset(float percentile, std::size_t numValues)
+    void SoftMinMax::reset(float quantile, std::size_t numValues)
     {
         minQueue = MinQueue();
         maxQueue = MaxQueue();
 
-        if (percentile < 0 || percentile > 0.5f)
+        if (quantile < 0 || quantile > 0.5f)
         {
             std::stringstream msg;
-            msg << "percentile must be in [0, 0.5], but was " << percentile << ".";
+            msg << "The quantile must be in [0, 0.5], but was " << quantile << ".";
             throw std::invalid_argument(msg.str());
         }
         if (numValues == 0)
         {
             std::stringstream msg;
-            msg << "numValues must be > 0, but was " << numValues;
+            msg << "The numValues must be > 0, but was " << numValues;
             throw std::invalid_argument(msg.str());
         }
-        this->percentile = percentile;
+        this->quantile = quantile;
         this->num_elements = numValues;
 
         allowed_heap_size_cache = allowedHeapSize();
@@ -99,7 +99,7 @@ namespace simox::math
 
     std::size_t SoftMinMax::numOutsideSoftMinMax() const
     {
-        return size_t(std::ceil(percentile * num_elements));
+        return size_t(std::ceil(quantile * num_elements));
     }
 
     std::size_t SoftMinMax::allowedHeapSize() const

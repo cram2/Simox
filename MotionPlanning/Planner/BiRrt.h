@@ -46,6 +46,7 @@ namespace Saba
             \param cspace An initialized cspace object.
             \param modeA Specify the RRT method that should be used to build the first tree
             \param modeB Specify the RRT method that should be used to build the second tree
+            \param samplingSize
         */
         BiRrt(CSpacePtr cspace, RrtMethod modeA = eConnect, RrtMethod modeB = eConnect, float samplingSize = -1);
         ~BiRrt() override;

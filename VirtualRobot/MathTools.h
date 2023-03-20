@@ -650,8 +650,8 @@ namespace VirtualRobot
         double VIRTUAL_ROBOT_IMPORT_EXPORT getDamping(const Eigen::MatrixXf &matrix);
 
         /*! @brief Calculates the damped least square inverse by J^T * (JJ^T + k^2 I)^{-1}
-         * @jacobian Jacobian J
-         * @squaredDampingFactor Damping factor k^2
+         * @param jacobian Jacobian J
+         * @param squaredDampingFactor Damping factor k^2
          */
         template <typename T>
         Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> VIRTUAL_ROBOT_IMPORT_EXPORT getDampedLeastSquareInverse(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> &jacobian, double squaredDampingFactor = 0.01f) {
