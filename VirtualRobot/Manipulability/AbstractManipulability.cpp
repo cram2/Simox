@@ -109,70 +109,49 @@ VisualizationNodePtr AbstractManipulability::getManipulabilityVis(const Eigen::M
 }
 
 void AbstractManipulability::getEllipsoidOrientationAndScale(const Eigen::MatrixXd& manipulability, Eigen::Quaternionf& orientation, Eigen::Vector3d& scale) {
-    Eigen::Matrix3d reduced_manipulability =
-      (mode != Mode::Orientation || manipulability.rows() == 3)
-        ? manipulability.block(0, 0, 3, 3)
-        : manipulability.block(3, 3, 3, 3);
-    Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> eigenSolver(reduced_manipulability);
-    const Eigen::Matrix3d& eigenVectors = eigenSolver.eigenvectors();
-    const Eigen::Vector3d& eigenValues = eigenSolver.eigenvalues();
+    
+    constexpr std::size_t POSITION_DIMS = 3;
+    constexpr std::size_t ORIENTATION_DIMS = 3;
+    constexpr std::size_t POSE_DIMS = POSITION_DIMS + ORIENTATION_DIMS;
+    
+    const Eigen::MatrixXd reduced_manipulability =
+        (mode != Mode::Orientation || manipulability.rows() == 3)
+            ? manipulability.block(0, 0, POSITION_DIMS, POSITION_DIMS)
+            : manipulability.block(
+                    POSITION_DIMS, POSITION_DIMS, ORIENTATION_DIMS, ORIENTATION_DIMS);
+    const Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> eigenSolver(reduced_manipulability);
 
     // Eigenvectors are the columns of the matrix 'eigenVectors'
     // they are already normalized to have length 1
-    // we sort them by the eigenvalues
-    struct VecVal
-    {
-        Eigen::Vector3d vec;
-        double val;
-    };
-    std::array<VecVal, 3> decomp = {
-        VecVal{.vec = eigenVectors.col(0), .val = eigenValues(0)},
-        VecVal{.vec = eigenVectors.col(1), .val = eigenValues(1)},
-        VecVal{.vec = eigenVectors.col(2), .val = eigenValues(2)},
-    };
-    std::sort(decomp.begin(),
-              decomp.end(),
-              [](const auto& a, const auto& b) { return a.val > b.val; });
+    const Eigen::MatrixXd& eigenVectors = eigenSolver.eigenvectors();
 
-    Eigen::Matrix3d transform;
-    transform.col(0) = decomp[0].vec;
-    transform.col(1) = decomp[1].vec;
-    transform.col(2) = decomp[2].vec;
+    // Eigen values are sorted in increasing order
+    const Eigen::Vector3d& eigenValues = eigenSolver.eigenvalues();
 
-    // Rectify the transformation matrix representing the orientation of the ellipse
-    // We need to make sure that is *special* orthogonal, not just orthogonal
-    // Flip the signs of eigenvectors that point opposite the first quadrant
-    // Sum of the elements is the same as a dot product with (1, 1, 1)
-    // We want this so that the directions of the eigenvectors is consistent,
-    // and because this makes transform have determinant 1
-    for (int col = 0; col < transform.cols(); ++col)
+    // We create a ortho-normal basis of the eigen vectors.
+    // Here, we use the eigen vectors with the eigen values in decreasing order.
+    // To ensure a right-handed coordinate system, the third basis vector is computed
+    // by using the cross product.
+    Eigen::Matrix3d rotationMatrix;
+    rotationMatrix.col(0) = eigenVectors.col(2);
+    rotationMatrix.col(1) = eigenVectors.col(1);
+    rotationMatrix.col(2) = rotationMatrix.col(0).cross(rotationMatrix.col(1));
+
+    orientation = rotationMatrix;
+
+    scale = eigenValues.reverse();
+
+    // normalize singular values for scaling
+    scale /= scale.sum();
+    for (int i = 0; i < eigenValues.rows(); i++)
     {
-        if (transform.col(col).sum() < 0.0)
+        constexpr double minEigenVal = 0.005; // [mm]
+
+        if (scale(i) < minEigenVal)
         {
-            transform.col(col) *= -1.0;
+            scale(i) = minEigenVal;
         }
     }
-
-    // if the matrix still has determinant smaller than one, just flip one of the vectors back. This may be the case if all of the columns point opposite (1, 1, 1)
-    if (transform.determinant() < 0)
-    {
-        transform.col(2) *= -1;
-    }
-    orientation = transform.cast<float>();
-
-    // Normalize eigenvalues for scaling
-    Eigen::Vector3d s =
-        Eigen::Vector3d(decomp[0].val, decomp[1].val, decomp[2].val).array().sqrt();
-    s /= s.sum();
-    for (int i = 0; i < s.rows(); i++)
-    {
-        if (s(i) < 0.005) // 5mm
-            s(i) = 0.005;
-    }
-
-    scale(0) = s(0);
-    scale(1) = s(1);
-    scale(2) = s(2);
 }
 
 void AbstractManipulability::getEllipsoidOrientationAndScale(Eigen::Quaternionf &orientation, Eigen::Vector3d &scale) {
