@@ -278,10 +278,10 @@ namespace simox::geometric_planning
 
 
         // ARMARX_DEBUG << "registered robot node `" << jointReferenceNode->getName() << "`";
-        Eigen::Isometry3f global_T_node(node->getGlobalPose());
-        Eigen::Isometry3f global_T_jointReference(jointReferenceNode->getGlobalPose());
+        const Eigen::Isometry3f global_T_node(node->getGlobalPose());
+        const Eigen::Isometry3f global_T_jointReference(jointReferenceNode->getGlobalPose());
 
-        Eigen::Isometry3f jointReference_T_node = global_T_jointReference.inverse() * global_T_node;
+        const Eigen::Isometry3f jointReference_T_node = global_T_jointReference.inverse() * global_T_node;
         // jointRef_T_node = jointRef_T_global * global_T_node
 
         return ParametricPath(
