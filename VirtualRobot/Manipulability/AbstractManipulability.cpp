@@ -112,7 +112,6 @@ void AbstractManipulability::getEllipsoidOrientationAndScale(const Eigen::Matrix
     
     constexpr std::size_t POSITION_DIMS = 3;
     constexpr std::size_t ORIENTATION_DIMS = 3;
-    constexpr std::size_t POSE_DIMS = POSITION_DIMS + ORIENTATION_DIMS;
     
     const Eigen::MatrixXd reduced_manipulability =
         (mode != Mode::Orientation || manipulability.rows() == 3)
@@ -137,7 +136,7 @@ void AbstractManipulability::getEllipsoidOrientationAndScale(const Eigen::Matrix
     rotationMatrix.col(1) = eigenVectors.col(1);
     rotationMatrix.col(2) = rotationMatrix.col(0).cross(rotationMatrix.col(1));
 
-    orientation = rotationMatrix;
+    orientation = rotationMatrix.cast<float>();
 
     scale = eigenValues.reverse();
 
