@@ -108,26 +108,50 @@ VisualizationNodePtr AbstractManipulability::getManipulabilityVis(const Eigen::M
     return vis;
 }
 
-void AbstractManipulability::getEllipsoidOrientationAndScale(const Eigen::MatrixXd &manipulability, Eigen::Quaternionf &orientation, Eigen::Vector3d &scale) {
-    Eigen::MatrixXd reduced_manipulability = (mode != Mode::Orientation || manipulability.rows() == 3) ?  manipulability.block(0, 0, 3, 3) : manipulability.block(3, 3, 3, 3);
-    Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> eigenSolver(reduced_manipulability);
-    Eigen::MatrixXd eigenVectors = eigenSolver.eigenvectors();
-    Eigen::VectorXd eigenValues = eigenSolver.eigenvalues();
-    Eigen::VectorXd v1 = eigenVectors.col(eigenVectors.cols() - 1);
-    Eigen::VectorXd v2 = eigenVectors.col(eigenVectors.cols() - 2);
+void AbstractManipulability::getEllipsoidOrientationAndScale(const Eigen::MatrixXd& manipulability, Eigen::Quaternionf& orientation, Eigen::Vector3d& scale) {
+    
+    constexpr std::size_t POSITION_DIMS = 3;
+    constexpr std::size_t ORIENTATION_DIMS = 3;
+    constexpr std::size_t POSE_DIMS = POSITION_DIMS + ORIENTATION_DIMS;
+    
+    const Eigen::MatrixXd reduced_manipulability =
+        (mode != Mode::Orientation || manipulability.rows() == 3)
+            ? manipulability.block(0, 0, POSITION_DIMS, POSITION_DIMS)
+            : manipulability.block(
+                    POSITION_DIMS, POSITION_DIMS, ORIENTATION_DIMS, ORIENTATION_DIMS);
+    const Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> eigenSolver(reduced_manipulability);
 
-    orientation = Eigen::Quaterniond::FromTwoVectors(v1, v2).cast<float>();
+    // Eigenvectors are the columns of the matrix 'eigenVectors'
+    // they are already normalized to have length 1
+    const Eigen::MatrixXd& eigenVectors = eigenSolver.eigenvectors();
+
+    // Eigen values are sorted in increasing order
+    const Eigen::Vector3d& eigenValues = eigenSolver.eigenvalues();
+
+    // We create a ortho-normal basis of the eigen vectors.
+    // Here, we use the eigen vectors with the eigen values in decreasing order.
+    // To ensure a right-handed coordinate system, the third basis vector is computed
+    // by using the cross product.
+    Eigen::Matrix3d rotationMatrix;
+    rotationMatrix.col(0) = eigenVectors.col(2);
+    rotationMatrix.col(1) = eigenVectors.col(1);
+    rotationMatrix.col(2) = rotationMatrix.col(0).cross(rotationMatrix.col(1));
+
+    orientation = rotationMatrix;
+
+    scale = eigenValues.reverse();
 
     // normalize singular values for scaling
-    eigenValues /= eigenValues.sum();
-    for (int i = 0; i < eigenValues.rows(); i++) {
-        if (eigenValues(i) < 0.005) // 5mm
-            eigenValues(i) = 0.005;
-    }
+    scale /= scale.sum();
+    for (int i = 0; i < eigenValues.rows(); i++)
+    {
+        constexpr double minEigenVal = 0.005; // [mm]
 
-    scale(0) = eigenValues(eigenValues.rows() - 1);
-    scale(1) = eigenValues(eigenValues.rows() - 2);
-    scale(2) = eigenValues(eigenValues.rows() - 3);
+        if (scale(i) < minEigenVal)
+        {
+            scale(i) = minEigenVal;
+        }
+    }
 }
 
 void AbstractManipulability::getEllipsoidOrientationAndScale(Eigen::Quaternionf &orientation, Eigen::Vector3d &scale) {
