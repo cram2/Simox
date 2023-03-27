@@ -273,7 +273,7 @@ namespace VirtualRobot
 
         /*!
             Estimate a parameter setup for the given RNS by randomly set configurations and check for achieved workspace extends. The results are slightly scaled.
-            \param ndoeSet
+            \param nodeSet
             \param steps How many loops should be performed to estimate the result. Chose a value >= 1000.
             \param storeMinBounds Workspace extend from min
             \param storeMaxBounds Workspace extend to max
@@ -321,6 +321,7 @@ namespace VirtualRobot
         * \brief createCut Create a cut at a specific height (assuming z is upwards).
         * \param heightPercent Value in [0,1]
         * \param cellSize The discretization step size of the result
+        * \param sumAngles¸
         * \return
         */
         WorkspaceCut2DPtr createCut(float heightPercent, float cellSize, bool sumAngles) const;

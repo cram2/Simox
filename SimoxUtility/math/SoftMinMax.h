@@ -11,7 +11,7 @@ namespace simox::math
      *
      * Soft means that some values are allowed to be >= soft min / <= soft max
      * (including the soft min/max), respectively.
-     * A percentile argument in [0..0.5] specifies the percentage of values
+     * A quantile parameter in [0..0.5] specifies the proportion of values
      * which are allowed to excess the soft min/max.
      */
     class SoftMinMax
@@ -22,16 +22,16 @@ namespace simox::math
         SoftMinMax();
 
         /**
-         * @brief Constructs a SoftMinMax for given percentile and number of values.
+         * @brief Constructs a SoftMinMax for given quantile and number of values.
          *
-         * @param percentile
-         *  The percentage of values that may excess the soft min/max. Must be in [0..0.5].
+         * @param quantile
+         *  The proportion of values that may excess the soft min/max. Must be in [0..0.5].
          * @param numValues the total number of values that will be added. Must be > 0.
          *
          * @throws `std::invalid_argument`
          *  If one of the parameters value does not meet the requirements
          */
-        SoftMinMax(float percentile, std::size_t numValues);
+        SoftMinMax(float quantile, std::size_t numValues);
 
         /**
          * Reinitializes the SoftMinMax with the given arguments.
@@ -39,7 +39,7 @@ namespace simox::math
          * @throws `std::invalid_argument`
          *  If one of the parameters value does not meet the requirements.
          */
-        void reset(float percentile, std::size_t numValues);
+        void reset(float quantile, std::size_t numValues);
 
         /// Add a value to the considered collection.
         /// @note Only values excessing the current soft min/max are stored.
@@ -62,8 +62,8 @@ namespace simox::math
         std::size_t allowedHeapSize() const;
 
 
-        /// The percentile in [0, 0.5].
-        float percentile = 0;
+        /// The quantile in [0, 0.5].
+        float quantile = 0;
         /// The number of elements to be added.
         std::size_t num_elements = 0;
 
