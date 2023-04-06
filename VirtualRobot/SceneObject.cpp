@@ -317,45 +317,30 @@ namespace VirtualRobot
 
         if (enableCoM && visualizationFactory)
         {
+            Eigen::Isometry3f localPose = Eigen::Isometry3f::Identity();
+            localPose.translation() = getCoMLocal() / 1000;
+
             // create visu
             if (!comModel)
             {
                 VisualizationNodePtr comModel1 = visualizationFactory->createSphere(7.05f, VisualizationFactory::Color(1.0f, 0.2f, 0.2f));
+                comModel1->setLocalPose(localPose.matrix());
+                
                 VisualizationNodePtr comModel2 = visualizationFactory->createBox(10.0f, 10.0f, 10.0f, VisualizationFactory::Color(0.2f, 0.2f, 1.0f));
-                std::vector<VisualizationNodePtr> v;
-                v.push_back(comModel1);
-                v.push_back(comModel2);
+                comModel2->setLocalPose(localPose.matrix());
+                
+                const std::string t = "COM: " + getName();
+                VisualizationNodePtr vText = visualizationFactory->createText(t, true, 1.0f, VisualizationFactory::Color::Blue(), 0, 10.0f, 0);
+                vText->setLocalPose(localPose.matrix());
+                
+                const std::vector<VisualizationNodePtr> v{comModel1, comModel2, vText};
+
                 comModel = visualizationFactory->createUnitedVisualization(v);
             }
 
-            if (comModel)
-            {
-                std::stringstream ss;
-                ss << "COM:" << getName();
-                std::string t = ss.str();
-                VisualizationNodePtr vText = visualizationFactory->createText(t, true, 1.0f, VisualizationFactory::Color::Blue(), 0, 10.0f, 0);
-                std::vector<VisualizationNodePtr> v;
-                v.push_back(comModel);
-                v.push_back(vText);
-                comModel = visualizationFactory->createUnitedVisualization(v);
-            }
+            VR_ASSERT(comModel != nullptr);
 
             VisualizationNodePtr comModelClone = comModel->clone();
-            Eigen::Vector3f l = getCoMLocal();
-            //cout << "COM:" << l << std::endl;
-            Eigen::Matrix4f m = Eigen::Matrix4f::Identity();
-            m.block(0, 3, 3, 1) = l;
-
-            // now we have transformation in RobotNode (end) coordsystem
-            // we need to transform to RobotNode's visualization system
-            // -> not needed here, since we don't use postr joint transformations any more
-            //m = getGlobalPoseVisualization().inverse() * getGlobalPose() * m;
-
-            // convert mm to m
-            //m.block(0, 3, 3, 1) *= 0.001f;
-
-            visualizationFactory->applyDisplacement(comModelClone, m);
-
             visualizationModel->attachVisualization("__CoMLocation", comModelClone);
         }
 
@@ -456,23 +441,18 @@ namespace VirtualRobot
 
                 VisualizationNodePtr inertiaVisu = visualizationFactory->createEllipse(xl, yl, zl, true, axesSize, axesSize * 2.0f);
 
-                Eigen::Vector3f l = getCoMLocal();
-                //cout << "COM:" << l << std::endl;
-                Eigen::Matrix4f m = Eigen::Matrix4f::Identity();
-                m.block(0, 3, 3, 1) = l;
-                m.block(0, 0, 3, 3) = eigensolver.eigenvectors().block(0, 0, 3, 3); // rotate according to EV
+                Eigen::Isometry3f localPose = Eigen::Isometry3f::Identity();
+                localPose.linear().col(0) = eigensolver.eigenvectors().col(0);
+                localPose.linear().col(1) = eigensolver.eigenvectors().col(1);
+                localPose.linear().col(2) = eigensolver.eigenvectors().col(0).cross(eigensolver.eigenvectors().col(1));
+                localPose.translation() = getCoMLocal() / 1000;
 
-                // now we have transformation in RobotNode (end) coordsystem
-                // we need to transform to RobotNode's visualization system
-                // not needed, we don't have post joint transformations any more
-                //m = getGlobalPoseVisualization().inverse() * getGlobalPose() * m;
+                inertiaVisu->setLocalPose(localPose.matrix());
 
-                // convert mm to m
-                //m.block(0, 3, 3, 1) *= 0.001f;
+                // using intermediate visu model to make local transformation (last line) work
+                const auto visu = visualizationFactory->createUnitedVisualization({inertiaVisu});
 
-                visualizationFactory->applyDisplacement(inertiaVisu, m);
-
-                visualizationModel->attachVisualization("__InertiaMatrix", inertiaVisu);
+                visualizationModel->attachVisualization("__InertiaMatrix", visu);
 
             }
             else
