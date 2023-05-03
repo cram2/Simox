@@ -722,8 +722,6 @@ namespace VirtualRobot
 
             while (armNode != nullptr)
             {
-                VR_INFO << "arm node";
-
                 const auto side = getSide(armNode);
 
                 const rapidxml::xml_node<char> *segmentsNode =
