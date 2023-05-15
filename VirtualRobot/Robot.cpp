@@ -919,6 +919,8 @@ namespace VirtualRobot
         result->type = type;
         //result->radianToMMfactor = radianToMMfactor;
 
+        result->nodeMapping = getNodeMapping();
+
         if(getHumanMapping().has_value())
         {
             result->registerHumanMapping(getHumanMapping().value());
