@@ -42,12 +42,15 @@ namespace simox::geometric_planning
         CHECK_MESSAGE(params.doorContactHandleDistance > 0.,
                         "Grasping from the other side not implemented yet!");
 
+        constexpr float doorContactHandleLateralShift = 25;
+        constexpr float doorContactHandleDistance = -120;
+
         return DoorInteractionContext{
             .rns = {.joint = rns->getNode(jointNodeName),
                     .handle = rns->getNode(handleNodeName),
                     .handleSurfaceProjection = rns->getNode(surfaceProjectionNodeName)},
             .handleSurfaceProjection_T_door_initial_contact =
-                Pose(Eigen::Translation3f{0.F, -params.doorContactHandleDistance, 0.F}),
+                Pose(Eigen::Translation3f{doorContactHandleLateralShift, doorContactHandleDistance, 0.F}),
             .door_initial_contact_T_pre_contact =
                 Pose(Eigen::Translation3f{0.F, 0, params.preContactDistance})};
     }
