@@ -43,7 +43,7 @@ namespace simox::geometric_planning
                         "Grasping from the other side not implemented yet!");
 
         constexpr float doorContactHandleLateralShift = 25;
-        constexpr float doorContactHandleDistance = -120;
+        constexpr float doorContactHandleDistance = -140;
 
         return DoorInteractionContext{
             .rns = {.joint = rns->getNode(jointNodeName),
