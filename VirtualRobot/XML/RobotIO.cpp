@@ -507,6 +507,14 @@ namespace VirtualRobot
                         hemisphere->lever = getFloatByAttributeName(node, "lever");
                         hemisphere->theta0Rad =
                             simox::math::deg_to_rad(getFloatByAttributeName(node, "theta0"));
+                        if (node->first_attribute("limitLo"))
+                        {
+                            hemisphere->limitLo = getFloatByAttributeName(node, "limitLo");
+                        }
+                        if (node->first_attribute("limitHi"))
+                        {
+                            hemisphere->limitHi = getFloatByAttributeName(node, "limitHi");
+                        }
                         break;
                     case RobotNodeHemisphere::Role::SECOND:
                         break;

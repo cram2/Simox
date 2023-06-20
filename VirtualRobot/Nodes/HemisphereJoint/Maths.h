@@ -1,5 +1,7 @@
 #pragma once
 
+#include <optional>
+
 #include <Eigen/Core>
 
 #include "Expressions.h"
@@ -26,8 +28,10 @@ namespace VirtualRobot::hemisphere
         Maths(double lever, double theta0);
 
 
-        void setConstants(double lever, double theta0);
-
+        void setConstants(double lever,
+                          double theta0,
+                          std::optional<double> limitLo,
+                          std::optional<double> limitHi);
 
         void computeFkOfAngle(const ActuatorAngle& alpha12);
 
@@ -47,7 +51,7 @@ namespace VirtualRobot::hemisphere
     public:
         double lever = 0;
         double theta0Rad = 0;
-        double radius = 0;
+        double radiusOfRollingSpheres = 0;
 
         double limitLo = 0;
         double limitHi = 0;

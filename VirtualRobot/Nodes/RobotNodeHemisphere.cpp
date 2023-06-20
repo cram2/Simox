@@ -119,7 +119,8 @@ namespace VirtualRobot
         {
             case Role::FIRST:
                 firstData.emplace(FirstData{});
-                firstData->maths.maths.setConstants(info.lever, info.theta0Rad);
+                firstData->maths.maths.setConstants(
+                    info.lever, info.theta0Rad, info.limitLo, info.limitHi);
                 break;
 
             case Role::SECOND:
@@ -209,7 +210,13 @@ namespace VirtualRobot
                     << __FUNCTION__ << "() of second actuator with "
                     << "\n  lever = " << maths.maths.lever
                     << "\n  theta0 = " << maths.maths.theta0Rad
-                    << "\n  radius = " << maths.maths.radius << "\n  joint value = " << jointValue
+                    << "\n  theta0 = " << maths.maths.theta0Rad << " rad ("
+                    << simox::math::rad_to_deg(maths.maths.theta0Rad) << " deg)"
+                    << "\n  radius of rolling spheres = " << maths.maths.radiusOfRollingSpheres
+                    << "\n  joint limit lo = " << getJointLimitLo() << " rad ("
+                    << simox::math::rad_to_deg(getJointLimitLo()) << " deg)"
+                    << "\n  joint limit hi = " << getJointLimitHi() << " rad ("
+                    << simox::math::rad_to_deg(getJointLimitHi()) << " deg)"
                     << "\n  actuator (angle) = \n"
                     << actuators.transpose().format(iof) << "\n  actuator (pos) =  \n"
                     << maths.maths.angleToPosition(actuators.cast<double>()).transpose().format(iof)
