@@ -21,18 +21,16 @@
 */
 #pragma once
 
-#include <VirtualRobot/VirtualRobot.h>
-
-#include <VirtualRobot/Nodes/RobotNode.h>
-#include <VirtualRobot/Nodes/HemisphereJoint/CachedMaths.h>
-#include <VirtualRobot/Nodes/HemisphereJoint/Maths.h>
+#include <optional>
+#include <string>
+#include <vector>
 
 #include <Eigen/Core>
 
-#include <string>
-#include <vector>
-#include <optional>
-
+#include <VirtualRobot/Nodes/HemisphereJoint/CachedMaths.h>
+#include <VirtualRobot/Nodes/HemisphereJoint/Maths.h>
+#include <VirtualRobot/Nodes/RobotNode.h>
+#include <VirtualRobot/VirtualRobot.h>
 
 namespace VirtualRobot
 {
@@ -53,7 +51,6 @@ namespace VirtualRobot
     class VIRTUAL_ROBOT_IMPORT_EXPORT RobotNodeHemisphere : public RobotNode
     {
     public:
-
         enum class Role
         {
             /// The first DoF in the kinematic chain.
@@ -72,7 +69,6 @@ namespace VirtualRobot
             double theta0Rad = -1;
             double lever = -1;
         };
-
 
         /// Data held by the first joint.
         struct FirstData
@@ -97,60 +93,53 @@ namespace VirtualRobot
 
 
     public:
-
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
 
         RobotNodeHemisphere(
-                RobotWeakPtr rob,                                   ///< The robot
-                const std::string& name,                            ///< The name
-                const Eigen::Matrix4f& preJointTransform,           ///< This transformation is applied before the translation of the joint is done
-                VisualizationNodePtr visualization = nullptr,       ///< A visualization model
-                CollisionModelPtr collisionModel = nullptr,         ///< A collision model
-                float jointValueOffset = 0.0f,                      ///< An offset that is internally added to the joint value
-                const SceneObject::Physics& p = {},                 ///< physics information
-                CollisionCheckerPtr colChecker = nullptr,           ///< A collision checker instance (if not set, the global col checker is used)
-                RobotNodeType type = Generic
-                );
+            RobotWeakPtr rob, ///< The robot
+            const std::string& name, ///< The name
+            const Eigen::Matrix4f&
+                preJointTransform, ///< This transformation is applied before the translation of the joint is done
+            VisualizationNodePtr visualization = nullptr, ///< A visualization model
+            CollisionModelPtr collisionModel = nullptr, ///< A collision model
+            float jointValueOffset =
+                0.0f, ///< An offset that is internally added to the joint value
+            const SceneObject::Physics& p = {}, ///< physics information
+            CollisionCheckerPtr colChecker =
+                nullptr, ///< A collision checker instance (if not set, the global col checker is used)
+            RobotNodeType type = Generic);
 
         // The DH-based constructor is not tested so far for Hemisphere joints.
         RobotNodeHemisphere(
-                RobotWeakPtr rob,                                   ///< The robot
-                const std::string& name,                            ///< The name
-                float a,                                            ///< dh paramters
-                float d,                                            ///< dh paramters
-                float alpha,                                        ///< dh paramters
-                float theta,                                        ///< dh paramters
-                VisualizationNodePtr visualization = nullptr,       ///< A visualization model
-                CollisionModelPtr collisionModel = nullptr,         ///< A collision model
-                float jointValueOffset = 0.0f,                      ///< An offset that is internally added to the joint value
-                const SceneObject::Physics& p = {},                 ///< physics information
-                CollisionCheckerPtr colChecker = {},                ///< A collision checker instance (if not set, the global col checker is used)
-                RobotNodeType type = Generic
-                );
+            RobotWeakPtr rob, ///< The robot
+            const std::string& name, ///< The name
+            float a, ///< dh paramters
+            float d, ///< dh paramters
+            float alpha, ///< dh paramters
+            float theta, ///< dh paramters
+            VisualizationNodePtr visualization = nullptr, ///< A visualization model
+            CollisionModelPtr collisionModel = nullptr, ///< A collision model
+            float jointValueOffset =
+                0.0f, ///< An offset that is internally added to the joint value
+            const SceneObject::Physics& p = {}, ///< physics information
+            CollisionCheckerPtr colChecker =
+                {}, ///< A collision checker instance (if not set, the global col checker is used)
+            RobotNodeType type = Generic);
 
     public:
-
         ~RobotNodeHemisphere() override;
 
 
         void setXmlInfo(const XmlInfo& info);
 
-        bool
-        initialize(
-                SceneObjectPtr parent = nullptr,
-                const std::vector<SceneObjectPtr>& children = {}
-                ) override;
+        bool initialize(SceneObjectPtr parent = nullptr,
+                        const std::vector<SceneObjectPtr>& children = {}) override;
 
         /// Print status information.
-        void
-        print(
-                bool printChildren = false,
-                bool printDecoration = true
-                ) const override;
+        void print(bool printChildren = false, bool printDecoration = true) const override;
 
-        bool
-        isHemisphereJoint() const override;
+        bool isHemisphereJoint() const override;
 
         bool isFirstHemisphereJointNode() const;
         bool isSecondHemisphereJointNode() const;
@@ -163,39 +152,27 @@ namespace VirtualRobot
         const SecondData& getSecondData() const;
 
     protected:
-
         RobotNodeHemisphere();
 
         /// Derived classes add custom XML tags here
-        std::string
-        _toXML(
-                const std::string& modelPath
-                ) override;
+        std::string _toXML(const std::string& modelPath) override;
 
         /// Checks if nodeType constraints are fulfilled. Otherwise an exception is thrown.
         /// Called on initialization.
-        void
-        checkValidRobotNodeType() override;
+        void checkValidRobotNodeType() override;
 
-        void
-        updateTransformationMatrices(
-                const Eigen::Matrix4f& parentPose
-                ) override;
+        void updateTransformationMatrices(const Eigen::Matrix4f& parentPose) override;
 
-        RobotNodePtr
-        _clone(const RobotPtr newRobot,
-               const VisualizationNodePtr visualizationModel,
-               const CollisionModelPtr collisionModel,
-               CollisionCheckerPtr colChecker,
-               float scaling
-               ) override;
+        RobotNodePtr _clone(const RobotPtr newRobot,
+                            const VisualizationNodePtr visualizationModel,
+                            const CollisionModelPtr collisionModel,
+                            CollisionCheckerPtr colChecker,
+                            float scaling) override;
 
 
     private:
-
         std::optional<FirstData> firstData;
         std::optional<SecondData> secondData;
-
     };
 
 } // namespace VirtualRobot
