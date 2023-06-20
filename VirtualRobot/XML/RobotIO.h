@@ -22,22 +22,20 @@
 */
 #pragma once
 
-#include "../VirtualRobot.h"
-#include "../Robot.h"
-#include "../Nodes/RobotNode.h"
-#include "../EndEffector/EndEffectorActor.h"
-#include "BaseIO.h"
-
+#include <map>
 #include <string>
 #include <vector>
-#include <map>
 
-
+#include "../EndEffector/EndEffectorActor.h"
+#include "../Nodes/RobotNode.h"
+#include "../Robot.h"
+#include "../VirtualRobot.h"
+#include "BaseIO.h"
 
 // using forward declarations here, so that the rapidXML header does not have to be parsed when this file is included
 namespace rapidxml
 {
-    template<class Ch>
+    template <class Ch>
     class xml_node;
 }
 
@@ -47,7 +45,6 @@ namespace VirtualRobot
     class VIRTUAL_ROBOT_IMPORT_EXPORT RobotIO : public BaseIO
     {
     public:
-
         /*!
             Loads robot from file.
             @param xmlFile The file
@@ -62,7 +59,9 @@ namespace VirtualRobot
             @param basePath If any \<childFromRobot\> tags are given, the path for searching the robot files can be specified.
             @param loadMode Standard: eFull, When eStructure is used no visualization and collision models are loaded for faster access.
         */
-        static RobotPtr createRobotFromString(const std::string& xmlString, const std::string& basePath = "", RobotDescription loadMode = eFull);
+        static RobotPtr createRobotFromString(const std::string& xmlString,
+                                              const std::string& basePath = "",
+                                              RobotDescription loadMode = eFull);
 
 
         /*!
@@ -72,7 +71,14 @@ namespace VirtualRobot
             @param basePath The directory to store the robot to
             @param modelDir The local directory where all visualization files should be stored to.
         */
-        static bool saveXML(RobotPtr robot, const std::string& filename, const std::string& basePath, const std::string& modelDir = "models", bool storeEEF = true, bool storeRNS = true, bool storeSensors = true, bool storeModelFiles = true);
+        static bool saveXML(RobotPtr robot,
+                            const std::string& filename,
+                            const std::string& basePath,
+                            const std::string& modelDir = "models",
+                            bool storeEEF = true,
+                            bool storeRNS = true,
+                            bool storeSensors = true,
+                            bool storeModelFiles = true);
 
 
         /*!
@@ -83,12 +89,12 @@ namespace VirtualRobot
             @param meshDir  The local directory where all mesh files should be stored to.
          */
         static void saveMJCF(RobotPtr robot,
-                             const std::string& filename, const std::string& basePath,
+                             const std::string& filename,
+                             const std::string& basePath,
                              const std::string& meshDir = "mesh");
 
 
     protected:
-
         struct ChildFromRobotDef
         {
             std::string filename;
@@ -99,42 +105,67 @@ namespace VirtualRobot
         RobotIO();
         ~RobotIO() override;
 
-        static RobotPtr processRobot(rapidxml::xml_node<char>* robotXMLNode, const std::string& basePath, RobotDescription loadMode = eFull);
-        static RobotPtr processRobotAttributes(rapidxml::xml_node<char>* robotXMLNode, std::string& robotRoot);
-        static void processRobotChildNodes(rapidxml::xml_node<char>* robotXMLNode,
-                                           RobotPtr robo,
-                                           const std::string& robotRoot,
-                                           const std::string& basePath,
-                                           std::map < RobotNodePtr,
-                                           std::vector<ChildFromRobotDef> > & childrenFromRobotFilesMap,
-                                           std::vector<rapidxml::xml_node<char>* >& robotNodeSetNodes,
-                                           std::vector<rapidxml::xml_node<char>* >& endeffectorNodes,
-                                           NodeMapping& nodeMapping,
-                                           std::optional<HumanMapping>& humanMapping,
-                                           std::map<std::string, std::vector<std::string>>& attachments,
-                                           RobotDescription loadMode = eFull);
+        static RobotPtr processRobot(rapidxml::xml_node<char>* robotXMLNode,
+                                     const std::string& basePath,
+                                     RobotDescription loadMode = eFull);
+        static RobotPtr processRobotAttributes(rapidxml::xml_node<char>* robotXMLNode,
+                                               std::string& robotRoot);
+        static void processRobotChildNodes(
+            rapidxml::xml_node<char>* robotXMLNode,
+            RobotPtr robo,
+            const std::string& robotRoot,
+            const std::string& basePath,
+            std::map<RobotNodePtr, std::vector<ChildFromRobotDef>>& childrenFromRobotFilesMap,
+            std::vector<rapidxml::xml_node<char>*>& robotNodeSetNodes,
+            std::vector<rapidxml::xml_node<char>*>& endeffectorNodes,
+            NodeMapping& nodeMapping,
+            std::optional<HumanMapping>& humanMapping,
+            std::map<std::string, std::vector<std::string>>& attachments,
+            RobotDescription loadMode = eFull);
         static RobotNodePtr processRobotNode(rapidxml::xml_node<char>* robotNodeXMLNode,
                                              RobotPtr robo,
                                              const std::string& basePath,
                                              int& robotNodeCounter,
-                                             std::vector< std::string >& childrenNames,
-                                             std::vector< ChildFromRobotDef >& childrenFromRobot,
+                                             std::vector<std::string>& childrenNames,
+                                             std::vector<ChildFromRobotDef>& childrenFromRobot,
                                              RobotDescription loadMode = eFull,
                                              RobotNode::RobotNodeType rntype = RobotNode::Generic);
-        static EndEffectorPtr processEndeffectorNode(rapidxml::xml_node<char>* endeffectorXMLNode, RobotPtr robo);
-        static EndEffectorActorPtr processEndeffectorActorNode(rapidxml::xml_node<char>* endeffectorActorXMLNode, RobotPtr robo);
-        static void processEndeffectorStaticNode(rapidxml::xml_node<char>* endeffectorStaticXMLNode, RobotPtr robo, std::vector<RobotNodePtr>& staticNodesList);
-        static EndEffectorActor::CollisionMode processEEFColAttributes(rapidxml::xml_node<char>* node, bool allowOtherAttributes = false);
-        static void processActorNodeList(rapidxml::xml_node<char>* parentNode, RobotPtr robot, std::vector<EndEffectorActor::ActorDefinition>& actorList, bool clearList = true);
+        static EndEffectorPtr processEndeffectorNode(rapidxml::xml_node<char>* endeffectorXMLNode,
+                                                     RobotPtr robo);
+        static EndEffectorActorPtr
+        processEndeffectorActorNode(rapidxml::xml_node<char>* endeffectorActorXMLNode,
+                                    RobotPtr robo);
+        static void processEndeffectorStaticNode(rapidxml::xml_node<char>* endeffectorStaticXMLNode,
+                                                 RobotPtr robo,
+                                                 std::vector<RobotNodePtr>& staticNodesList);
+        static EndEffectorActor::CollisionMode
+        processEEFColAttributes(rapidxml::xml_node<char>* node, bool allowOtherAttributes = false);
+        static void processActorNodeList(rapidxml::xml_node<char>* parentNode,
+                                         RobotPtr robot,
+                                         std::vector<EndEffectorActor::ActorDefinition>& actorList,
+                                         bool clearList = true);
         //static RobotNodeSetPtr processRobotNodeSet(rapidxml::xml_node<char> *setXMLNode, RobotPtr robo, const std::string &rootName, int &robotNodeSetCounter);
-        static void processChildNode(rapidxml::xml_node<char>* childXMLNode, std::vector<std::string>& childrenNames);
-        static RobotNodePtr processJointNode(rapidxml::xml_node<char>* jointXMLNode, const std::string& robotNodeName,
-                                             RobotPtr robot, VisualizationNodePtr visualizationNode, CollisionModelPtr collisionModel,
-                                             SceneObject::Physics& physics, RobotNode::RobotNodeType rntype, Eigen::Matrix4f& transformationMatrix);
-        static void processChildFromRobotNode(rapidxml::xml_node<char>* childXMLNode, const std::string& nodeName, std::vector< ChildFromRobotDef >& childrenFromRobot);
-        static void processLimitsNode(rapidxml::xml_node<char>* limitsXMLNode, float& jointLimitLo, float& jointLimitHi, bool& limitless);
+        static void processChildNode(rapidxml::xml_node<char>* childXMLNode,
+                                     std::vector<std::string>& childrenNames);
+        static RobotNodePtr processJointNode(rapidxml::xml_node<char>* jointXMLNode,
+                                             const std::string& robotNodeName,
+                                             RobotPtr robot,
+                                             VisualizationNodePtr visualizationNode,
+                                             CollisionModelPtr collisionModel,
+                                             SceneObject::Physics& physics,
+                                             RobotNode::RobotNodeType rntype,
+                                             Eigen::Matrix4f& transformationMatrix);
+        static void processChildFromRobotNode(rapidxml::xml_node<char>* childXMLNode,
+                                              const std::string& nodeName,
+                                              std::vector<ChildFromRobotDef>& childrenFromRobot);
+        static void processLimitsNode(rapidxml::xml_node<char>* limitsXMLNode,
+                                      float& jointLimitLo,
+                                      float& jointLimitHi,
+                                      bool& limitless);
         static std::map<std::string, int> robot_name_counter;
-        static VisualizationNodePtr checkUseAsColModel(rapidxml::xml_node<char>* visuXMLNode, const std::string& robotNodeName, const std::string& basePath);
+        static VisualizationNodePtr checkUseAsColModel(rapidxml::xml_node<char>* visuXMLNode,
+                                                       const std::string& robotNodeName,
+                                                       const std::string& basePath);
     };
 
-}
+} // namespace VirtualRobot
