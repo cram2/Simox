@@ -754,7 +754,7 @@ namespace VirtualRobot
                     return nullptr;
                 };
 
-                const auto processSegmentNode = [&segmentsNode, &findSegmentNode](const std::string& type)
+                const auto processSegmentNode = [&findSegmentNode](const std::string& type)
                 {
                     // find the segment node with the correct type
                     const auto* node = findSegmentNode(type);
@@ -766,7 +766,7 @@ namespace VirtualRobot
                     const std::string name = processStringAttribute("name", node, true);
 
                     Eigen::Matrix4f transform;
-                    processTransformNode(segmentsNode->first_node("transform", 0, false), "transform", transform);
+                    processTransformNode(node->first_node("transform", 0, false), "transform", transform);
 
                     return HumanMapping::ArmDescription::Segment
                     {
