@@ -826,7 +826,6 @@ namespace VirtualRobot
             {
                 VisualizationNodePtr visualizationNode1;
 
-
                 if (parRN && parRN->getVisualization())
                 {
                     // add to parent node (pre joint trafo moves with parent!)
@@ -837,7 +836,7 @@ namespace VirtualRobot
 
                     if (visualizationNode1)
                     {
-                        parRN->getVisualization()->attachVisualization(attachName1, visualizationNode1);
+                        //parRN->getVisualization()->attachVisualization(attachName1, visualizationNode1);
                     }
                 }
                 else
@@ -848,9 +847,28 @@ namespace VirtualRobot
 
                     if (visualizationNode1)
                     {
-                        visualizationModel->attachVisualization(attachName1, visualizationNode1);
+                        //visualizationModel->attachVisualization(attachName1, visualizationNode1);
                     }
                 }
+            }
+            else if (Eigen::Vector3f parPos = parRN
+                                            ? parRN->getPositionInFrame(getRobot()->getRobotNode(this->getName()))
+                                            : Eigen::Vector3f::Zero()
+                                            ; parPos.norm() > 0.01)
+            {
+                // Some nodes (e.g. the Revolute and FourBar) offset their position by values that are not reflected in the local transformation.
+                // Check RobotNodeFourBar::updateTransformationMatrices and RobotNodeRevolute::updateTransformationMatrices.
+                // There the global pose is set to parent * local * tmp, where tmp is important but not part of
+                // This code catches these cases by checking the actual distance between the current node and its parent.
+
+                VisualizationNodePtr visualizationNode1 = visualizationFactory->createLine(Eigen::Vector3f::Zero(), parPos);
+
+                if (visualizationNode1)
+                {
+                    visualizationModel->attachVisualization(attachName1, visualizationNode1);
+                }
+
+                std::cout << "VERY IMPORTANT MARKER FROM " << getName() << std::endl;
             }
 
             VisualizationNodePtr visualizationNode2 = visualizationFactory->createSphere(5.0f);
