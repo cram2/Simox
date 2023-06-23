@@ -867,8 +867,6 @@ namespace VirtualRobot
                 {
                     visualizationModel->attachVisualization(attachName1, visualizationNode1);
                 }
-
-                std::cout << "VERY IMPORTANT MARKER FROM " << getName() << std::endl;
             }
 
             VisualizationNodePtr visualizationNode2 = visualizationFactory->createSphere(5.0f);
