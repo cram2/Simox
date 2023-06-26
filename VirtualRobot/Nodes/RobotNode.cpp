@@ -836,7 +836,7 @@ namespace VirtualRobot
 
                     if (visualizationNode1)
                     {
-                        //parRN->getVisualization()->attachVisualization(attachName1, visualizationNode1);
+                        parRN->getVisualization()->attachVisualization(attachName1, visualizationNode1);
                     }
                 }
                 else
@@ -847,7 +847,7 @@ namespace VirtualRobot
 
                     if (visualizationNode1)
                     {
-                        //visualizationModel->attachVisualization(attachName1, visualizationNode1);
+                        visualizationModel->attachVisualization(attachName1, visualizationNode1);
                     }
                 }
             }
