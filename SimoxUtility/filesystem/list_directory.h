@@ -3,7 +3,6 @@
 #include <filesystem>
 #include <vector>
 
-
 namespace simox::fs
 {
     using namespace std::filesystem;
@@ -18,5 +17,11 @@ namespace simox::fs
      * @return The entries in `directory`.
      */
     std::vector<path> list_directory(const path& directory, bool local = false, bool sort = true);
-}
 
+    /**
+     * @brief Same as list_directory(), but recurses into subdirectories.
+     */
+    std::vector<path>
+    list_directory_recursive(const path& directory, bool local = false, bool sort = true);
+
+} // namespace simox::fs
