@@ -252,8 +252,10 @@ namespace VirtualRobot
     {
         // copy string content to char array
         std::vector<char> y(xmlString.size() + 1);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-truncation"
         strncpy(y.data(), xmlString.c_str(), xmlString.size() + 1);
-
+#pragma GCC diagnostic pop
         VirtualRobot::ManipulationObjectPtr obj;
 
         try
