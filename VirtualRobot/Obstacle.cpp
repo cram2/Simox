@@ -4,7 +4,7 @@
 #include "CollisionDetection/CollisionChecker.h"
 #include "Nodes/RobotNode.h"
 #include "Visualization/VisualizationFactory.h"
-#include "Visualization/CoinVisualization/CoinVisualizationNode.h"
+#include "Visualization/VisualizationNode.h"
 #include <vector>
 
 namespace VirtualRobot
@@ -42,7 +42,7 @@ namespace VirtualRobot
     }
 
     Obstacle::Obstacle(const std::string& name, const TriMeshModelPtr& trimesh, const std::string& filename)
-        : Obstacle(TagTrimeshCtor{}, name, std::make_shared<CoinVisualizationNode>(trimesh))
+        : Obstacle(TagTrimeshCtor{}, name, std::make_shared<VisualizationNode>(trimesh))
     {
         getVisualization()->setFilename(filename, false);
         getCollisionModel()->getVisualization()->setFilename(filename, false);
@@ -337,9 +337,9 @@ namespace VirtualRobot
         return filename;
     }
 
-    void Obstacle::setFilename(const std::string& filename)
+    void Obstacle::setFilename(const std::string& fname)
     {
-        this->filename = filename;
+        this->filename = fname;
     }
 
 } //  namespace
