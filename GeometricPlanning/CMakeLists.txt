@@ -31,7 +31,6 @@ SET(SOURCES
     path_primitives/Circle.cpp
     path_primitives/CircleSegment.cpp
     path_primitives/Line.cpp
-    visualization.cpp
     util.cpp
 )
 
@@ -45,7 +44,6 @@ SET(HEADERS
     path_primitives/CircleSegment.h
     path_primitives/Line.h
     assert/assert.h
-    visualization.h
     util.h
 )
 
@@ -79,16 +77,15 @@ else()
 endif()
 
 
-if (Simox_USE_COIN_VISUALIZATION)
-	# SET(SOURCES
-	# ${SOURCES}
-	# Visualization/CoinVisualization/CoinRrtWorkspaceVisualization.cpp
-	# )
+if (Simox_USE_COIN_VISUALIZATION AND COIN_FOUND)
+    message(STATUS "Using COIN visualization")
+    list(APPEND SOURCES
+        visualization.cpp
+    )
 
-	# SET(HEADERS
-	# ${HEADERS}
-	# Visualization/CoinVisualization/CoinRrtWorkspaceVisualization.h
-	# )
+    list(APPEND HEADERS
+        visualization.h
+    )
 endif ()
 
 # target_sources(GeometricPlanning
