@@ -37,7 +37,10 @@ endif ()
 #### VISUALIZATION Coin3D+Qt+SoQt / OSG+Qt
 
 find_package(assimp REQUIRED)
-target_link_libraries(VirtualRobot PUBLIC assimp)
+MESSAGE (STATUS "Found assimp: " ${ASSIMP_INCLUDE_DIRS})
+target_link_libraries(VirtualRobot PUBLIC ${ASSIMP_LIBRARIES})
+target_link_directories(VirtualRobot PUBLIC ${ASSIMP_LIBRARY_DIRS})
+target_include_directories(VirtualRobot PUBLIC ${ASSIMP_INCLUDE_DIRS})
 
 if (Simox_USE_COIN_VISUALIZATION)
     MESSAGE(STATUS "Searching Coin3D, Qt and SoQt...")
