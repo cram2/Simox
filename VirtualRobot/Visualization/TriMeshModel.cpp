@@ -5,22 +5,23 @@
 */
 
 #include "TriMeshModel.h"
-
-#include <algorithm>
-#include <filesystem>
-#include <fstream>
-#include <iomanip>
-#include <iostream>
-#include <set>
-
-#include <Eigen/Geometry>
-
-#include "../DataStructures/KdTreePointCloud.h"
-#include "../DataStructures/nanoflann.hpp"
-#include "../Import/MeshImport/AssimpReader.h"
 #include "../VirtualRobot.h"
+#include "../DataStructures/nanoflann.hpp"
+#include "../DataStructures/KdTreePointCloud.h"
+
+#include "../Import/MeshImport/AssimpReader.h"
 #include "VisualizationFactory.h"
 #include "VisualizationNode.h"
+
+#include<Eigen/Geometry>
+
+#include <algorithm>
+#include <iostream>
+#include <fstream>
+#include <iomanip>
+#include <set>
+#include <filesystem>
+
 
 namespace VirtualRobot
 {
@@ -29,8 +30,7 @@ namespace VirtualRobot
 
     TriMeshModel::TriMeshModel() = default;
 
-    TriMeshModelPtr
-    TriMeshModel::FromFile(const std::string& str)
+    TriMeshModelPtr TriMeshModel::FromFile(const std::string &str)
     {
         const auto tolower = [](std::string s)
         {
@@ -49,7 +49,7 @@ namespace VirtualRobot
         {
             VisualizationFactoryPtr visualizationFactory;
             visualizationFactory = VisualizationFactory::fromName("inventor", nullptr);
-            std::array<char*, 1> argv = {nullptr};
+            std::array<char*,1> argv = {nullptr};
             int argc = 0;
             visualizationFactory->init(argc, argv.data(), "");
             const auto vnode = visualizationFactory->getVisualizationFromFile(str);
@@ -57,9 +57,8 @@ namespace VirtualRobot
         }
         return nullptr;
     }
-
-    TriMeshModel
-    TriMeshModel::MakeBox(float a, float b, float c)
+    
+    TriMeshModel TriMeshModel::MakeBox(float a, float b, float c)
     {
         TriMeshModel m;
         m.addVertex(0, 0, 0);
@@ -85,23 +84,17 @@ namespace VirtualRobot
         addF(4, 5, 1, 0);
         return m;
     }
-
-    TriMeshModel
-    TriMeshModel::MakePoint(float x, float y, float z)
+    TriMeshModel    TriMeshModel::MakePoint(float x, float y, float z)
     {
         std::vector<triangle> tr;
         tr.emplace_back(x, y, z);
         return {tr};
     }
-
-    TriMeshModelPtr
-    TriMeshModel::MakePointPtr(float x, float y, float z)
+    TriMeshModelPtr TriMeshModel::MakePointPtr(float x, float y, float z)
     {
         return std::make_shared<VirtualRobot::TriMeshModel>(MakePoint(x, y, z));
     }
-
-    TriMeshModelPtr
-    TriMeshModel::MakePointPtr(const Eigen::Vector3f& p)
+    TriMeshModelPtr TriMeshModel::MakePointPtr(const Eigen::Vector3f& p)
     {
         return MakePointPtr(p.x(), p.y(), p.z());
     }
@@ -127,6 +120,8 @@ namespace VirtualRobot
         }
     }
 
+
+
     /**
      * This method adds the vertices \p vertex1,
      * \p vertex2 and \p vertex3 to TriMeshModel::vertices and creates a new
@@ -136,23 +131,15 @@ namespace VirtualRobot
      * \param vertex2 second vertex to use in the calculation
      * \param vertex3 third vertex to use in the calculation
      */
-    void
-    TriMeshModel::addTriangleWithFace(const Eigen::Vector3f& vertex1,
-                                      const Eigen::Vector3f& vertex2,
-                                      const Eigen::Vector3f& vertex3)
+    void TriMeshModel::addTriangleWithFace(const Eigen::Vector3f& vertex1, const Eigen::Vector3f& vertex2, const Eigen::Vector3f& vertex3)
     {
         Eigen::Vector3f normal = TriMeshModel::CreateNormal(vertex1, vertex2, vertex3);
         addTriangleWithFace(vertex1, vertex2, vertex3, normal);
     }
 
-    void
-    TriMeshModel::addTriangleWithFace(const Eigen::Vector3f& vertex1,
-                                      const Eigen::Vector3f& vertex2,
-                                      const Eigen::Vector3f& vertex3,
-                                      Eigen::Vector3f normal,
-                                      const VisualizationFactory::Color& color1,
-                                      const VisualizationFactory::Color& color2,
-                                      const VisualizationFactory::Color& color3)
+    void TriMeshModel::addTriangleWithFace(
+        const Eigen::Vector3f& vertex1, const Eigen::Vector3f& vertex2, const Eigen::Vector3f& vertex3, Eigen::Vector3f normal,
+        const VisualizationFactory::Color& color1, const VisualizationFactory::Color& color2, const VisualizationFactory::Color& color3)
     {
         //        VR_INFO << vertex1 << "\n\n" << vertex2 << "\n\n" << vertex3 << "\n\n" << std::endl;
         this->addVertex(vertex1);
@@ -191,39 +178,25 @@ namespace VirtualRobot
         this->addFace(face);
     }
 
-    void
-    TriMeshModel::addTriangleWithFace(const Eigen::Vector3f& vertex1,
-                                      const Eigen::Vector3f& vertex2,
-                                      const Eigen::Vector3f& vertex3,
-                                      const Eigen::Vector4f& vertexColor1,
-                                      const Eigen::Vector4f& vertexColor2,
-                                      const Eigen::Vector4f& vertexColor3)
+    void TriMeshModel::addTriangleWithFace(const Eigen::Vector3f& vertex1, const Eigen::Vector3f& vertex2, const Eigen::Vector3f& vertex3, const Eigen::Vector4f& vertexColor1, const Eigen::Vector4f& vertexColor2, const Eigen::Vector4f& vertexColor3)
     {
         Eigen::Vector3f normal = TriMeshModel::CreateNormal(vertex1, vertex2, vertex3);
-        VisualizationFactory::Color color1(
-            vertexColor1(0), vertexColor1(1), vertexColor1(2), vertexColor1(4));
-        VisualizationFactory::Color color2(
-            vertexColor2(0), vertexColor2(1), vertexColor2(2), vertexColor2(4));
-        VisualizationFactory::Color color3(
-            vertexColor3(0), vertexColor3(1), vertexColor3(2), vertexColor3(4));
+        VisualizationFactory::Color color1(vertexColor1(0), vertexColor1(1), vertexColor1(2), vertexColor1(4));
+        VisualizationFactory::Color color2(vertexColor2(0), vertexColor2(1), vertexColor2(2), vertexColor2(4));
+        VisualizationFactory::Color color3(vertexColor3(0), vertexColor3(1), vertexColor3(2), vertexColor3(4));
         addTriangleWithFace(vertex1, vertex2, vertex3, normal, color1, color2, color3);
     }
 
-    void
-    TriMeshModel::addMesh(const TriMeshModel& mesh)
+    void TriMeshModel::addMesh(const TriMeshModel& mesh)
     {
         for (const auto& face : mesh.faces)
         {
-            addTriangleWithFace(mesh.vertices.at(face.id1),
-                                mesh.vertices.at(face.id2),
-                                mesh.vertices.at(face.id3),
-                                face.normal,
-                                mesh.colors.at(face.idColor1),
-                                mesh.colors.at(face.idColor2),
-                                mesh.colors.at(face.idColor3));
+            addTriangleWithFace(mesh.vertices.at(face.id1), mesh.vertices.at(face.id2), mesh.vertices.at(face.id3),
+                                face.normal, mesh.colors.at(face.idColor1), mesh.colors.at(face.idColor2), mesh.colors.at(face.idColor3));
         }
         //        VR_INFO << " size after : " << vertices.size() << std::endl;
     }
+
 
     /**
      * This method creates the normal belonging to the vertices \p vertex1,
@@ -235,10 +208,7 @@ namespace VirtualRobot
      *
      * \return normal vector
      */
-    Eigen::Vector3f
-    TriMeshModel::CreateNormal(const Eigen::Vector3f& vertex1,
-                               const Eigen::Vector3f& vertex2,
-                               const Eigen::Vector3f& vertex3)
+    Eigen::Vector3f TriMeshModel::CreateNormal(const Eigen::Vector3f& vertex1, const Eigen::Vector3f& vertex2, const Eigen::Vector3f& vertex3)
     {
         static bool warningPrinted = false;
         // calculate normal
@@ -252,8 +222,7 @@ namespace VirtualRobot
         {
             if (!warningPrinted)
             {
-                VR_INFO << ": Warning: tiny normal found in TriMeshModel. This error is printed "
-                           "only once!\n";
+                VR_INFO << ": Warning: tiny normal found in TriMeshModel. This error is printed only once!\n";
                 warningPrinted = true;
             }
         }
@@ -265,17 +234,16 @@ namespace VirtualRobot
         return normal;
     }
 
+
     /**
      * This method adds a face to the internal data structure TriMeshModel::faces.
      */
-    void
-    TriMeshModel::addFace(const MathTools::TriangleFace& face)
+    void TriMeshModel::addFace(const MathTools::TriangleFace& face)
     {
         faces.push_back(face);
     }
 
-    void
-    TriMeshModel::addFace(unsigned int id0, unsigned int id1, unsigned int id2)
+    void TriMeshModel::addFace(unsigned int id0, unsigned int id1, unsigned int id2)
     {
         MathTools::TriangleFace f;
         f.id1 = id0;
@@ -284,11 +252,11 @@ namespace VirtualRobot
         addFace(f);
     }
 
+
     /**
     * This method adds a vertex to the internal data structure TriMeshModel::vertices.
     */
-    int
-    TriMeshModel::addVertex(const Eigen::Vector3f& vertex)
+    int TriMeshModel::addVertex(const Eigen::Vector3f& vertex)
     {
         if (std::isnan(vertex[0]) || std::isnan(vertex[1]) || std::isnan(vertex[2]))
         {
@@ -303,28 +271,27 @@ namespace VirtualRobot
     /**
     * This method adds a normal to the internal data structure TriMeshModel::normals.
     */
-    unsigned int
-    TriMeshModel::addNormal(const Eigen::Vector3f& normal)
+    unsigned int TriMeshModel::addNormal(const Eigen::Vector3f& normal)
     {
         normals.push_back(normal);
         return static_cast<unsigned int>(normals.size() - 1);
+
     }
 
     /**
      * This method adds a color to the internal data structure TriMeshModel::colors
      */
-    unsigned int
-    TriMeshModel::addColor(const VisualizationFactory::Color& color)
+    unsigned int TriMeshModel::addColor(const VisualizationFactory::Color& color)
     {
         colors.push_back(color);
         return static_cast<unsigned int>(colors.size() - 1);
+
     }
 
     /**
      * This method converts and adds a color to the internal data structure TriMeshModel::colors
      */
-    unsigned int
-    TriMeshModel::addColor(const Eigen::Vector4f& color)
+    unsigned int TriMeshModel::addColor(const Eigen::Vector4f& color)
     {
         return addColor(VisualizationFactory::Color(color(0), color(1), color(2), color(3)));
     }
@@ -332,19 +299,18 @@ namespace VirtualRobot
     /**
      * This method converts and adds a color to the internal data structure TriMeshModel::materials
      */
-    unsigned int
-    TriMeshModel::addMaterial(const VisualizationFactory::PhongMaterial& material)
+    unsigned int TriMeshModel::addMaterial(const VisualizationFactory::PhongMaterial& material)
     {
         materials.push_back(material);
         return static_cast<unsigned int>(materials.size() - 1);
     }
 
+
     /**
      * This method clears the internal data structures TriMeshModel::faces and
      * TriMeshModel::vertices.
      */
-    void
-    TriMeshModel::clear()
+    void TriMeshModel::clear()
     {
         vertices.clear();
         colors.clear();
@@ -353,23 +319,19 @@ namespace VirtualRobot
         boundingBox.clear();
     }
 
-    unsigned int
-    TriMeshModel::addMissingNormals()
+    unsigned int TriMeshModel::addMissingNormals()
     {
         int counter = 0;
         for (auto& face : faces)
         {
-            if (face.idNormal1 != UINT_MAX && face.idNormal2 != UINT_MAX &&
-                face.idNormal3 != UINT_MAX)
+            if (face.idNormal1 != UINT_MAX && face.idNormal2 != UINT_MAX && face.idNormal3 != UINT_MAX)
             {
                 continue;
             }
 
-            if (face.normal.norm() < 1e-10f || std::isnan(face.normal[0]) ||
-                std::isnan(face.normal[1]) || std::isnan(face.normal[2]))
+            if (face.normal.norm() < 1e-10f || std::isnan(face.normal[0]) || std::isnan(face.normal[1]) || std::isnan(face.normal[2]))
             {
-                face.normal = CreateNormal(
-                    vertices.at(face.id1), vertices.at(face.id2), vertices.at(face.id3));
+                face.normal = CreateNormal(vertices.at(face.id1), vertices.at(face.id2), vertices.at(face.id3));
             }
             auto normalId = UINT_MAX;
             if (face.idNormal1 == UINT_MAX)
@@ -405,8 +367,7 @@ namespace VirtualRobot
         return static_cast<unsigned int>(counter);
     }
 
-    unsigned int
-    TriMeshModel::addMissingColors(const VisualizationFactory::Color& color)
+    unsigned int TriMeshModel::addMissingColors(const VisualizationFactory::Color& color)
     {
         mergeVertices();
         int counter = 0;
@@ -455,32 +416,32 @@ namespace VirtualRobot
                 face.idColor3 = getAndAddColorId(face.id3);
                 counter++;
             }
+
         }
         return static_cast<unsigned int>(counter);
     }
 
-    void
-    TriMeshModel::smoothNormalSurface()
+    void TriMeshModel::smoothNormalSurface()
     {
         mergeVertices();
         addMissingNormals();
         fattenShrink(0.0f, true);
     }
 
+
     /**
      * This method calls TriangleFace::flipOrientation() on each entry in
      * TriMeshModel::faces.
      */
-    void
-    TriMeshModel::flipVertexOrientations()
+    void TriMeshModel::flipVertexOrientations()
     {
-        std::for_each(faces.begin(),
-                      faces.end(),
-                      std::mem_fun_ref(&MathTools::TriangleFace::flipOrientation));
+        std::for_each(faces.begin(), faces.end(), std::mem_fun_ref(&MathTools::TriangleFace::flipOrientation));
     }
 
-    void
-    TriMeshModel::mergeVertices(float mergeThreshold, bool removeVertices)
+
+
+
+    void TriMeshModel::mergeVertices(float mergeThreshold, bool removeVertices)
     {
         unsigned int size = static_cast<unsigned int>(vertices.size());
         unsigned int faceCount = static_cast<unsigned int>(faces.size());
@@ -497,25 +458,25 @@ namespace VirtualRobot
         cloud.pts.reserve(size);
         for (unsigned int i = 0; i < size; ++i)
         {
-            cloud.pts.emplace_back(
-                PointCloud<float>::Point{vertices.at(i)[0], vertices.at(i)[1], vertices.at(i)[2]});
+            cloud.pts.emplace_back(PointCloud<float>::Point{vertices.at(i)[0],
+                                   vertices.at(i)[1],
+                                   vertices.at(i)[2]});
         }
         using num_t = float;
         // construct a kd-tree index:
-        typedef nanoflann::KDTreeSingleIndexAdaptor<
-            nanoflann::L2_Simple_Adaptor<num_t, PointCloud<num_t>>,
-            PointCloud<num_t>,
-            3 /* dim */
-            >
-            my_kd_tree_t;
+        typedef nanoflann::KDTreeSingleIndexAdaptor <
+        nanoflann::L2_Simple_Adaptor<num_t, PointCloud<num_t> >,
+                  PointCloud<num_t>,
+                  3 /* dim */
+                  > my_kd_tree_t;
 
-        my_kd_tree_t index(
-            3 /*dim*/, cloud, nanoflann::KDTreeSingleIndexAdaptorParams(10 /* max leaf */));
+        my_kd_tree_t   index(3 /*dim*/, cloud, nanoflann::KDTreeSingleIndexAdaptorParams(10 /* max leaf */));
         index.buildIndex();
 
 
+
         const num_t search_radius = static_cast<num_t>(mergeThreshold);
-        std::vector<std::pair<size_t, num_t>> ret_matches;
+        std::vector<std::pair<size_t, num_t> >   ret_matches;
 
         nanoflann::SearchParams params;
         num_t query_pt[3];
@@ -526,8 +487,7 @@ namespace VirtualRobot
             query_pt[0] = p1[0];
             query_pt[1] = p1[1];
             query_pt[2] = p1[2];
-            const size_t nMatches =
-                index.radiusSearch(&query_pt[0], search_radius, ret_matches, params);
+            const size_t nMatches = index.radiusSearch(&query_pt[0], search_radius, ret_matches, params);
             for (size_t k = 0; k < nMatches; ++k)
             {
                 unsigned int foundIndex = static_cast<unsigned int>(ret_matches.at(k).first);
@@ -607,8 +567,7 @@ namespace VirtualRobot
         }
     }
 
-    size_t
-    TriMeshModel::removeUnusedVertices()
+    size_t TriMeshModel::removeUnusedVertices()
     {
         auto size = vertices.size();
         auto faceCount = faces.size();
@@ -650,33 +609,29 @@ namespace VirtualRobot
         return removed;
     }
 
-    std::vector<float>
-    TriMeshModel::getFaceAreas() const
+    std::vector<float> TriMeshModel::getFaceAreas() const
     {
         std::vector<float> areas;
         for (const auto& face : faces)
         {
             float area = MathTools::getTriangleArea(
-                vertices.at(face.id1), vertices.at(face.id2), vertices.at(face.id3));
+                             vertices.at(face.id1), vertices.at(face.id2), vertices.at(face.id3));
             areas.push_back(area);
         }
         return areas;
     }
 
-    float
-    TriMeshModel::getVolume() const
+    float TriMeshModel::getVolume() const
     {
         float volume = 0.0f;
         for (const auto& face : faces)
         {
-            volume += std::abs(
-                vertices.at(face.id1).dot(vertices.at(face.id2).cross(vertices.at(face.id3))));
+            volume += std::abs(vertices.at(face.id1).dot(vertices.at(face.id2).cross(vertices.at(face.id3))));
         }
         return volume;
     }
 
-    void
-    TriMeshModel::rotate(const Eigen::Matrix3f& mx)
+    void TriMeshModel::rotate(const Eigen::Matrix3f& mx)
     {
         for (auto& vec3f : normals)
         {
@@ -690,8 +645,7 @@ namespace VirtualRobot
         }
     }
 
-    void
-    TriMeshModel::fattenShrink(float offset, bool updateNormals)
+    void TriMeshModel::fattenShrink(float offset, bool updateNormals)
     {
         size_t i;
         size_t size = this->faces.size();
@@ -702,14 +656,10 @@ namespace VirtualRobot
             auto& p1 = vertices.at(face.id1);
             auto& p2 = vertices.at(face.id2);
             auto& p3 = vertices.at(face.id3);
-            auto normal1 =
-                face.idNormal1 < normals.size() ? normals.at(face.idNormal1) : face.normal;
-            auto normal2 =
-                face.idNormal2 < normals.size() ? normals.at(face.idNormal2) : face.normal;
-            auto normal3 =
-                face.idNormal3 < normals.size() ? normals.at(face.idNormal3) : face.normal;
-            if (std::isnan(face.normal[0]) || std::isnan(face.normal[1]) ||
-                std::isnan(face.normal[2]))
+            auto normal1 = face.idNormal1 < normals.size() ? normals.at(face.idNormal1) : face.normal;
+            auto normal2 = face.idNormal2 < normals.size() ? normals.at(face.idNormal2) : face.normal;
+            auto normal3 = face.idNormal3 < normals.size() ? normals.at(face.idNormal3) : face.normal;
+            if (std::isnan(face.normal[0]) || std::isnan(face.normal[1]) || std::isnan(face.normal[2]))
             {
                 std::cout << "NAN in face " << i << " : " << face.normal << std::endl;
             }
@@ -765,7 +715,7 @@ namespace VirtualRobot
             {
                 if (std::isnan(normal[0]) || std::isnan(normal[1]) || std::isnan(normal[2]))
                 {
-                    std::cout << "NAN in " << i << " : " << normal << std::endl;
+                    std::cout << "NAN in " << i << " : " << normal  << std::endl;
                 }
                 p += normal * offset;
             }
@@ -783,10 +733,11 @@ namespace VirtualRobot
                 face.idNormal3 = addNormal(averageNormals.at(face.id3));
             }
         }
+
+
     }
 
-    void
-    TriMeshModel::setColor(VisualizationFactory::Color color)
+    void TriMeshModel::setColor(VisualizationFactory::Color color)
     {
         colors.clear();
         for (size_t i = 0; i < vertices.size(); i++)
@@ -795,12 +746,12 @@ namespace VirtualRobot
         }
     }
 
+
     /**
      * This method calculates the center of mass by accumulating all vertices and
      * dividing the sum by the number of vertices.
      */
-    Eigen::Vector3f
-    TriMeshModel::getCOM()
+    Eigen::Vector3f TriMeshModel::getCOM()
     {
         Eigen::Vector3f centerOfMass = Eigen::Vector3f::Zero();
 
@@ -819,8 +770,7 @@ namespace VirtualRobot
         return centerOfMass;
     }
 
-    bool
-    TriMeshModel::getSize(Eigen::Vector3f& storeMinSize, Eigen::Vector3f& storeMaxSize)
+    bool TriMeshModel::getSize(Eigen::Vector3f& storeMinSize, Eigen::Vector3f& storeMaxSize)
     {
         if (vertices.size() == 0)
         {
@@ -859,10 +809,7 @@ namespace VirtualRobot
      *
      * \return true if both faces share the same edge and false if not
      */
-    bool
-    TriMeshModel::checkFacesHaveSameEdge(const MathTools::TriangleFace& face1,
-                                         const MathTools::TriangleFace& face2,
-                                         std::vector<std::pair<int, int>>& commonVertexIds) const
+    bool TriMeshModel::checkFacesHaveSameEdge(const MathTools::TriangleFace& face1, const MathTools::TriangleFace& face2, std::vector<std::pair<int, int> >& commonVertexIds) const
     {
         commonVertexIds.clear();
         Eigen::Vector2i vertexIds;
@@ -929,16 +876,16 @@ namespace VirtualRobot
         return (2 == commonVertexIds.size());
     }
 
+
     /**
      * This method checks if all normals of the model point inwards or outwards and
      * flippes the faces which have a wrong orientation.
      * \param inverted inverts the check if set to true
      * \return the number of flipped faces
      */
-    unsigned int
-    TriMeshModel::checkAndCorrectNormals(bool inverted)
+    unsigned int TriMeshModel::checkAndCorrectNormals(bool inverted)
     {
-        MathTools::TriangleFace *f1, *f2;
+        MathTools::TriangleFace* f1, *f2;
         int a1, a2, b1, b2;
         int flippedFacesCount = 0;
 
@@ -956,7 +903,7 @@ namespace VirtualRobot
                 }
 
                 f2 = &(faces[j]);
-                std::vector<std::pair<int, int>> commonVertexIds;
+                std::vector<std::pair<int, int> > commonVertexIds;
 
                 if (checkFacesHaveSameEdge(*f1, *f2, commonVertexIds))
                 {
@@ -964,10 +911,8 @@ namespace VirtualRobot
                     a2 = commonVertexIds[1].first; // second common vertex id face1
                     b1 = commonVertexIds[0].second; // first common vertex id face
                     b2 = commonVertexIds[1].second; // second common vertex id face2
-                    bool bAok =
-                        ((a1 == 1 && a2 == 2) || (a1 == 2 && a2 == 3) || (a1 == 3 && a2 == 1));
-                    bool bBok =
-                        ((b1 == 1 && b2 == 3) || (b1 == 3 && b2 == 2) || (b1 == 2 && b2 == 1));
+                    bool bAok = ((a1 == 1 && a2 == 2) || (a1 == 2 && a2 == 3) || (a1 == 3 && a2 == 1));
+                    bool bBok = ((b1 == 1 && b2 == 3) || (b1 == 3 && b2 == 2) || (b1 == 2 && b2 == 1));
 
                     if (inverted)
                     {
@@ -980,7 +925,7 @@ namespace VirtualRobot
                         flippedFacesCount++;
                         f2->flipOrientation();
                     }
-                    else if (!bAok && bBok)
+                    else if (!bAok &&  bBok)
                     {
                         flippedFacesCount++;
                         f2->flipOrientation();
@@ -992,42 +937,36 @@ namespace VirtualRobot
         return static_cast<unsigned int>(flippedFacesCount);
     }
 
-    Eigen::Vector3f
-    TriMeshModel::getNormalOfFace(std::size_t faceId) const
+    Eigen::Vector3f TriMeshModel::getNormalOfFace(std::size_t faceId) const
     {
         const auto& face = faces.at(faceId);
-        if (face.idNormal1 == UINT_MAX || face.idNormal2 == UINT_MAX || face.idNormal3 == UINT_MAX)
+        if (face.idNormal1 == UINT_MAX || face.idNormal2 == UINT_MAX  || face.idNormal3 == UINT_MAX)
         {
-            return (normals.at(face.idNormal1) + normals.at(face.idNormal2) +
-                    normals.at(face.idNormal3))
-                .normalized();
+            return (normals.at(face.idNormal1) + normals.at(face.idNormal2) + normals.at(face.idNormal3)).normalized();
         }
         return face.normal;
     }
 
-    void
-    TriMeshModel::print()
+
+    void TriMeshModel::print()
     {
-        std::cout << "TriMeshModel\nNr of Faces:" << faces.size()
-                  << "\nNr of vertices:" << vertices.size() << std::endl;
+        std::cout << "TriMeshModel\nNr of Faces:" << faces.size() << "\nNr of vertices:" << vertices.size() << std::endl;
         boundingBox.print();
     }
 
-    void
-    TriMeshModel::printNormals()
+
+    void TriMeshModel::printNormals()
     {
         std::cout << "TriMeshModel Normals:" << std::endl;
         std::streamsize pr = cout.precision(2);
         for (auto& face : faces)
         {
-            std::cout << "<" << face.normal(0) << "," << face.normal(1) << "," << face.normal(2)
-                      << ">,";
+            std::cout << "<" << face.normal(0) << "," << face.normal(1) << "," << face.normal(2) << ">,";
         }
         cout.precision(pr);
     }
 
-    void
-    TriMeshModel::printVertices()
+    void TriMeshModel::printVertices()
     {
         std::cout << "TriMeshModel Vertices:" << std::endl;
         std::streamsize pr = cout.precision(2);
@@ -1038,8 +977,7 @@ namespace VirtualRobot
         cout.precision(pr);
     }
 
-    void
-    TriMeshModel::printFaces()
+    void TriMeshModel::printFaces()
     {
         std::cout << "TriMeshModel Faces (vertex indices):" << std::endl;
         std::streamsize pr = cout.precision(2);
@@ -1050,8 +988,8 @@ namespace VirtualRobot
         cout.precision(pr);
     }
 
-    void
-    TriMeshModel::scale(const Eigen::Vector3f& scaleFactor)
+
+    void TriMeshModel::scale(const Eigen::Vector3f& scaleFactor)
     {
         if (scaleFactor(0) == 1.0f && scaleFactor(1) == 1.0f && scaleFactor(2) == 1.0f)
         {
@@ -1069,22 +1007,19 @@ namespace VirtualRobot
         boundingBox.scale(scaleFactor);
     }
 
-    void
-    TriMeshModel::scale(float scaleFactor)
+    void TriMeshModel::scale(float scaleFactor)
     {
         scale(Eigen::Vector3f{scaleFactor, scaleFactor, scaleFactor});
     }
 
-    TriMeshModelPtr
-    TriMeshModel::clone() const
+    TriMeshModelPtr TriMeshModel::clone() const
     {
         Eigen::Vector3f scaleFactor;
         scaleFactor << 1.0f, 1.0f, 1.0f;
         return clone(scaleFactor);
     }
 
-    TriMeshModelPtr
-    TriMeshModel::clone(const Eigen::Vector3f& scaleFactor) const
+    TriMeshModelPtr TriMeshModel::clone(const Eigen::Vector3f& scaleFactor) const
     {
         TriMeshModelPtr r(new TriMeshModel());
         r->vertices = vertices;
@@ -1096,9 +1031,7 @@ namespace VirtualRobot
         r->scale(scaleFactor);
         return r;
     }
-
-    TriMeshModelPtr
-    TriMeshModel::clone(float x, float y, float z) const
+    TriMeshModelPtr TriMeshModel::clone(float x, float y, float z) const
     {
         return clone(Eigen::Vector3f{x, y, z});
     }

@@ -1,11 +1,11 @@
 
 #include "Obstacle.h"
-
-#include "CollisionDetection/CollisionChecker.h"
 #include "CollisionDetection/CollisionModel.h"
+#include "CollisionDetection/CollisionChecker.h"
 #include "Nodes/RobotNode.h"
 #include "Visualization/VisualizationFactory.h"
 #include "Visualization/VisualizationNode.h"
+#include <vector>
 
 namespace VirtualRobot
 {
@@ -15,12 +15,8 @@ namespace VirtualRobot
     // obstacle models start with 20000
     int Obstacle::idCounter = 20000;
 
-    Obstacle::Obstacle(const std::string& name,
-                       VisualizationNodePtr visualization,
-                       CollisionModelPtr collisionModel,
-                       const SceneObject::Physics& p,
-                       CollisionCheckerPtr colChecker) :
-        GraspableSensorizedObject(name, visualization, collisionModel, p, colChecker)
+    Obstacle::Obstacle(const std::string& name, VisualizationNodePtr visualization, CollisionModelPtr collisionModel, const SceneObject::Physics& p, CollisionCheckerPtr colChecker)
+        : GraspableSensorizedObject(name, visualization, collisionModel, p, colChecker)
     {
         if (name == "")
         {
@@ -45,35 +41,25 @@ namespace VirtualRobot
         }
     }
 
-    Obstacle::Obstacle(const std::string& name,
-                       const TriMeshModelPtr& trimesh,
-                       const std::string& filename) :
-        Obstacle(TagTrimeshCtor{}, name, std::make_shared<VisualizationNode>(trimesh))
+    Obstacle::Obstacle(const std::string& name, const TriMeshModelPtr& trimesh, const std::string& filename)
+        : Obstacle(TagTrimeshCtor{}, name, std::make_shared<VisualizationNode>(trimesh))
     {
         getVisualization()->setFilename(filename, false);
         getCollisionModel()->getVisualization()->setFilename(filename, false);
     }
 
-    Obstacle::Obstacle(TagTrimeshCtor, const std::string& name, const VisualizationNodePtr& vis) :
-        Obstacle(name, vis, std::make_shared<CollisionModel>(vis))
-    {
-    }
+    Obstacle::Obstacle(TagTrimeshCtor, const std::string& name, const VisualizationNodePtr& vis)
+        : Obstacle(name, vis, std::make_shared<CollisionModel>(vis))
+    {}
 
     Obstacle::~Obstacle() = default;
 
-    int
-    Obstacle::getID()
+    int Obstacle::getID()
     {
         return id;
     }
 
-    VirtualRobot::ObstaclePtr
-    Obstacle::createBox(float width,
-                        float height,
-                        float depth,
-                        VisualizationFactory::Color color,
-                        std::string visualizationType,
-                        CollisionCheckerPtr colChecker)
+    VirtualRobot::ObstaclePtr Obstacle::createBox(float width, float height, float depth, VisualizationFactory::Color color, std::string visualizationType, CollisionCheckerPtr colChecker)
     {
         ObstaclePtr result;
         VisualizationFactoryPtr visualizationFactory;
@@ -104,8 +90,7 @@ namespace VirtualRobot
 
         if (!visu)
         {
-            VR_ERROR << "Could not create box visualization with visu type " << visualizationType
-                     << std::endl;
+            VR_ERROR << "Could not create box visualization with visu type " << visualizationType << std::endl;
             return result;
         }
 
@@ -126,11 +111,8 @@ namespace VirtualRobot
         return result;
     }
 
-    VirtualRobot::ObstaclePtr
-    Obstacle::createSphere(float radius,
-                           VisualizationFactory::Color color,
-                           std::string visualizationType,
-                           CollisionCheckerPtr colChecker)
+
+    VirtualRobot::ObstaclePtr Obstacle::createSphere(float radius, VisualizationFactory::Color color, std::string visualizationType, CollisionCheckerPtr colChecker)
     {
         ObstaclePtr result;
         VisualizationFactoryPtr visualizationFactory;
@@ -159,8 +141,7 @@ namespace VirtualRobot
         */
         if (!visu)
         {
-            VR_ERROR << "Could not create sphere visualization with visu type " << visualizationType
-                     << std::endl;
+            VR_ERROR << "Could not create sphere visualization with visu type " << visualizationType << std::endl;
             return result;
         }
 
@@ -182,12 +163,8 @@ namespace VirtualRobot
         return result;
     }
 
-    VirtualRobot::ObstaclePtr
-    Obstacle::createCylinder(float radius,
-                             float height,
-                             VisualizationFactory::Color color,
-                             std::string visualizationType,
-                             CollisionCheckerPtr colChecker)
+
+    VirtualRobot::ObstaclePtr Obstacle::createCylinder(float radius, float height, VisualizationFactory::Color color, std::string visualizationType, CollisionCheckerPtr colChecker)
     {
         ObstaclePtr result;
         VisualizationFactoryPtr visualizationFactory;
@@ -216,8 +193,7 @@ namespace VirtualRobot
         */
         if (!visu)
         {
-            VR_ERROR << "Could not create cylinder visualization with visu type "
-                     << visualizationType << std::endl;
+            VR_ERROR << "Could not create cylinder visualization with visu type " << visualizationType << std::endl;
             return result;
         }
 
@@ -239,10 +215,8 @@ namespace VirtualRobot
         return result;
     }
 
-    VirtualRobot::ObstaclePtr
-    Obstacle::createFromMesh(TriMeshModelPtr mesh,
-                             std::string visualizationType,
-                             CollisionCheckerPtr colChecker)
+
+    VirtualRobot::ObstaclePtr Obstacle::createFromMesh(TriMeshModelPtr mesh, std::string visualizationType, CollisionCheckerPtr colChecker)
     {
         THROW_VR_EXCEPTION_IF(!mesh, "Null data");
 
@@ -270,8 +244,7 @@ namespace VirtualRobot
 
         if (!visu)
         {
-            VR_ERROR << "Could not create sphere visualization with visu type " << visualizationType
-                     << std::endl;
+            VR_ERROR << "Could not create sphere visualization with visu type " << visualizationType << std::endl;
             return result;
         }
 
@@ -291,8 +264,7 @@ namespace VirtualRobot
         return result;
     }
 
-    void
-    Obstacle::print(bool printDecoration /*= true*/)
+    void Obstacle::print(bool printDecoration /*= true*/)
     {
         if (printDecoration)
         {
@@ -310,8 +282,7 @@ namespace VirtualRobot
         }
     }
 
-    ObstaclePtr
-    Obstacle::clone(const std::string& name, CollisionCheckerPtr colChecker, float scaling) const
+    ObstaclePtr Obstacle::clone(const std::string& name, CollisionCheckerPtr colChecker, float scaling) const
     {
         VisualizationNodePtr clonedVisualizationNode;
 
@@ -327,8 +298,7 @@ namespace VirtualRobot
             clonedCollisionModel = collisionModel->clone(colChecker, scaling);
         }
 
-        ObstaclePtr result(
-            new Obstacle(name, clonedVisualizationNode, clonedCollisionModel, physics, colChecker));
+        ObstaclePtr result(new Obstacle(name, clonedVisualizationNode, clonedCollisionModel, physics, colChecker));
 
         result->setGlobalPose(getGlobalPose());
         result->primitiveApproximation = primitiveApproximation;
@@ -339,11 +309,7 @@ namespace VirtualRobot
         return result;
     }
 
-    std::string
-    Obstacle::toXML(const std::string& basePath,
-                    int tabs,
-                    const std::string& modelPathRelative,
-                    bool storeSensors)
+    std::string Obstacle::toXML(const std::string& basePath, int tabs, const std::string& modelPathRelative, bool storeSensors)
     {
         std::stringstream ss;
         std::string t = "\t";
@@ -365,16 +331,15 @@ namespace VirtualRobot
         return ss.str();
     }
 
-    std::string
-    Obstacle::getFilename() const
+
+    std::string Obstacle::getFilename() const
     {
         return filename;
     }
 
-    void
-    Obstacle::setFilename(const std::string& fname)
+    void Obstacle::setFilename(const std::string& fname)
     {
         this->filename = fname;
     }
 
-} // namespace VirtualRobot
+} //  namespace
