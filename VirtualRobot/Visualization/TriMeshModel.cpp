@@ -10,7 +10,7 @@
 #include "../DataStructures/KdTreePointCloud.h"
 
 #include "../Import/MeshImport/AssimpReader.h"
-#include "CoinVisualization/CoinVisualizationFactory.h"
+#include "VisualizationFactory.h"
 #include "VisualizationNode.h"
 
 #include<Eigen/Geometry>
@@ -47,11 +47,12 @@ namespace VirtualRobot
         }
         if (ext == ".wrl" || ext == ".iv")
         {
-            VirtualRobot::CoinVisualizationFactory fact;
+            VisualizationFactoryPtr visualizationFactory;
+            visualizationFactory = VisualizationFactory::fromName("inventor", nullptr);
             std::array<char*,1> argv = {nullptr};
             int argc = 0;
-            fact.init(argc, argv.data(), "");
-            const auto vnode = fact.getVisualizationFromFile(str);
+            visualizationFactory->init(argc, argv.data(), "");
+            const auto vnode = visualizationFactory->getVisualizationFromFile(str);
             return vnode ? vnode->getTriMeshModel() : nullptr;
         }
         return nullptr;
