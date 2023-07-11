@@ -216,7 +216,6 @@ namespace VirtualRobot
             return true;
         }
 
-
         VisualizationFactoryPtr visualizationFactory;
 
         if (visualizationType == "")
