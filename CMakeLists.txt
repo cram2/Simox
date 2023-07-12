@@ -230,7 +230,7 @@ list (APPEND Simox_LIBRARIES          SimoxQtUtility)
 #######################################################################################
 if (Simox_BUILD_VirtualRobot)
     add_subdirectory(VirtualRobot)
-    list(APPEND SIMOX_EXPORT_TARGET_LIST VirtualRobot)
+    list(APPEND SIMOX_EXPORT_TARGET_LIST VirtualRobot assimp_interface)
     list(APPEND Simox_LIBRARIES VirtualRobot)
 endif()
 

@@ -9,7 +9,7 @@
 #include <SimoxUtility/filesystem/remove_trailing_separator.h>
 #include <SimoxUtility/math/convert/deg_to_rad.h>
 #include <SimoxUtility/xml/rapidxml/rapidxml_print.hpp>
-#include <VirtualRobot/Import/URDF/SimoxURDFFactory.h>
+#include <VirtualRobot/Import/RobotImporterFactory.h>
 #include <VirtualRobot/Nodes/FourBar/Joint.h>
 
 #include "../CollisionDetection/CollisionModel.h"
@@ -1843,8 +1843,12 @@ namespace VirtualRobot
         else if (fileType == "urdf")
         {
 
-            SimoxURDFFactory f;
-
+            std::shared_ptr<RobotImporterFactory> factory = RobotImporterFactory::fromName("SimoxURDF", nullptr);
+            if (!factory)
+            {
+                VR_ERROR << "Could not create RobotImporterFactory for SimoxURDF" << std::endl;
+                return RobotPtr();
+            }
             // to ensure that 3d model files can be loaded during converting we need to add the correct data path
             //#Question: Do we need this here as well? Is going up two directories still correct in the new context?
             std::filesystem::path tmppath = modelFile;
@@ -1854,7 +1858,7 @@ namespace VirtualRobot
             RuntimeEnvironment::addDataPath(modelsBasePath);
 
             //create VirtualRobot Object
-            VirtualRobot::RobotPtr r = f.loadFromFile(modelFile);
+            VirtualRobot::RobotPtr r = factory->loadFromFile(modelFile);
 
             return r;
         }
