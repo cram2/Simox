@@ -39,11 +39,10 @@ endif ()
 find_package(assimp REQUIRED)
 add_library(assimp_interface INTERFACE)
 set_target_properties(assimp_interface PROPERTIES
-        INTERFACE_LINK_LIBRARIES "${ASSIMP_LIBRARIES}"
+        INTERFACE_LINK_LIBRARIES assimp
         INTERFACE_INCLUDE_DIRECTORIES "${ASSIMP_INCLUDE_DIRS}"
         INTERFACE_LINK_DIRECTORIES "${ASSIMP_LIBRARY_DIRS}")
-add_library(assimp::assimp ALIAS assimp_interface)
-target_link_libraries(VirtualRobot PUBLIC assimp::assimp)
+target_link_libraries(VirtualRobot PUBLIC assimp_interface)
 
 
 if (Simox_USE_COIN_VISUALIZATION)
