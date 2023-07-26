@@ -789,6 +789,7 @@ void showRobotWindow::loadRobot()
         }
 
         robot = importer->loadFromFile(m_sRobotFilename, RobotIO::eFull);
+        robot = RobotFactory::createFlattenedModel(*robot);
     }
     catch (VirtualRobotException& e)
     {
