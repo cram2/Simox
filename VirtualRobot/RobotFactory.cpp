@@ -1254,145 +1254,168 @@ namespace VirtualRobot
     }
 
     VirtualRobot::RobotPtr
-    RobotFactory::createFlattenedModel(Robot &robot)
+    RobotFactory::createFlattenedModel(Robot& robot)
     {
         const Eigen::Matrix4f globalPose = robot.getGlobalPose();
         robot.setGlobalPose(Eigen::Matrix4f::Identity());
 
-        RobotPtr flattenedModel = std::make_shared<LocalRobot>("Flattened_" + robot.getName(), robot.getType());
+        RobotPtr flattenedRobot =
+            std::make_shared<LocalRobot>("Flattened_" + robot.getName(), robot.getType());
 
         struct NodeToClone
         {
-            RobotNodePtr original;
-            RobotNodePtr parent;
+            RobotNodePtr nodeInOriginalRobot;
+            RobotNodePtr parentInFlattenedRobot;
+        };
+
+        auto isBody = [](RobotNodePtr const& node) -> bool
+        { return node->getVisualization() != nullptr and node->getChildren<RobotNode>().empty(); };
+
+        auto isLink = [](RobotNodePtr const& node) -> bool {
+            return node->getVisualization() == nullptr and
+                   not node->getChildren<RobotNode>().empty();
+        };
+
+        auto pushAllChildren = [](RobotNodePtr const& original,
+                                  RobotNodePtr const& cloned,
+                                  std::queue<NodeToClone>& nodes)
+        {
+            for (const auto& child : original->getChildren())
+            {
+                auto const& childNode = std::dynamic_pointer_cast<RobotNode>(child);
+                if (childNode == nullptr)
+                {
+                    continue;
+                }
+
+                nodes.push({childNode, cloned});
+            }
+        };
+
+        struct BodyAndLink
+        {
+            RobotNodePtr body;
+            RobotNodePtr link;
+            std::vector<RobotNodePtr> others;
+        };
+
+        auto findBodyAndLink = [isBody,
+                                isLink](RobotNodePtr const& jointNode) -> std::optional<BodyAndLink>
+        {
+            std::optional<RobotNodePtr> body;
+            std::optional<RobotNodePtr> link;
+            std::vector<RobotNodePtr> others;
+
+            for (const auto& child : jointNode->getChildren())
+            {
+                auto const& childNode = std::dynamic_pointer_cast<RobotNode>(child);
+                if (childNode == nullptr)
+                {
+                    continue;
+                }
+
+                if (isBody(childNode))
+                {
+                    if (body.has_value())
+                    {
+                        return std::nullopt;
+                    }
+
+                    body = childNode;
+                }
+                else if (isLink(childNode))
+                {
+                    if (link.has_value())
+                    {
+                        return std::nullopt;
+                    }
+
+                    link = childNode;
+                }
+                else
+                {
+                    others.emplace_back(childNode);
+                }
+            }
+
+            if (body.has_value() and link.has_value())
+            {
+                return BodyAndLink{.body = body.value(), .link = link.value(), .others = others};
+            }
+
+            return std::nullopt;
+        };
+
+        auto performFlattenedAttach =
+            [&flattenedRobot, pushAllChildren](RobotNodePtr const& clonedJoint,
+                                               RobotNodePtr const& originalBody,
+                                               RobotNodePtr const& originalLink,
+                                               std::queue<NodeToClone>& nodesToClone)
+        {
+            const bool cloneChildren = false;
+            RobotNodePtr clonedBody =
+                originalBody->clone(flattenedRobot, cloneChildren, clonedJoint);
+            RobotNodePtr clonedLink =
+                originalLink->clone(flattenedRobot, cloneChildren, clonedBody);
+
+            Eigen::Matrix4f global_T_body = clonedBody->getGlobalPose();
+            Eigen::Matrix4f global_T_link = clonedLink->getGlobalPose();
+
+            Eigen::Matrix4f body_T_link = simox::math::inverted_pose(global_T_body) * global_T_link;
+
+            clonedLink->setLocalTransformation(body_T_link);
+            clonedLink->updateTransformationMatrices();
+
+            pushAllChildren(originalLink, clonedLink, nodesToClone);
         };
 
         std::queue<NodeToClone> nodes({{robot.getRootNode(), nullptr}});
-
-        while (!nodes.empty())
+        while (not nodes.empty())
         {
             NodeToClone current = nodes.front();
             nodes.pop();
 
-            RobotNodePtr cloned = current.original->clone(flattenedModel, false, current.parent);
+            const bool cloneChildren = false;
+            RobotNodePtr cloned = current.nodeInOriginalRobot->clone(
+                flattenedRobot, cloneChildren, current.parentInFlattenedRobot);
 
-            if (current.parent == nullptr)
+            if (current.parentInFlattenedRobot == nullptr)
             {
-                flattenedModel->setRootNode(cloned);
+                flattenedRobot->setRootNode(cloned);
             }
 
-            auto isBody = [](RobotNodePtr const& node) -> bool
+            if (current.nodeInOriginalRobot->isJoint())
             {
-                return node->getVisualization() != nullptr and node->getChildren<RobotNode>().empty();
-            };
-
-            auto isLink = [](RobotNodePtr const& node) -> bool
-            {
-                return node->getVisualization() == nullptr and not node->getChildren().empty();
-            };
-
-            auto pushAllChildren = [&nodes](RobotNodePtr const& original, RobotNodePtr const& cloned)
-            {
-                for (auto const& child : original->getChildren())
+                std::optional<BodyAndLink> bodyAndLink =
+                    findBodyAndLink(current.nodeInOriginalRobot);
+                if (bodyAndLink.has_value())
                 {
-                    auto const& childNode = std::dynamic_pointer_cast<RobotNode>(child);
-                    if (childNode == nullptr)
-                    {
-                        continue;
-                    }
+                    auto [body, link, others] = bodyAndLink.value();
 
-                    nodes.push({childNode, cloned});
-                }
-            };
+                    performFlattenedAttach(cloned, body, link, nodes);
 
-            auto findSpecialChildren = [isBody, isLink](RobotNodePtr const& node) -> std::optional<std::tuple<RobotNodePtr, RobotNodePtr, std::vector<RobotNodePtr>>>
-            {
-                std::optional<RobotNodePtr> body;
-                std::optional<RobotNodePtr> link;
-                std::vector<RobotNodePtr> others;
-
-                for (auto const& child : node->getChildren())
-                {
-                    auto const& childNode = std::dynamic_pointer_cast<RobotNode>(child);
-                    if (childNode == nullptr)
-                    {
-                        continue;
-                    }
-
-                    if (isBody(childNode))
-                    {
-                        if (body.has_value())
-                        {
-                            return std::nullopt;
-                        }
-
-                        body = childNode;
-                    }
-                    else if (isLink(childNode))
-                    {
-                        if (link.has_value())
-                        {
-                            return std::nullopt;
-                        }
-
-                        link = childNode;
-                    }
-                    else
-                    {
-                        others.emplace_back(childNode);
-                    }
-                }
-
-                if (body.has_value() and link.has_value())
-                {
-                    return std::make_tuple(body.value(), link.value(), others);
-                }
-
-                return std::nullopt;
-            };
-
-            auto performFlattenedAttach = [&flattenedModel, pushAllChildren](RobotNodePtr const& clonedJoint, RobotNodePtr const& originalBody, RobotNodePtr const& originalLink)
-            {
-                RobotNodePtr clonedBody = originalBody->clone(flattenedModel, false, clonedJoint);
-                RobotNodePtr clonedLink = originalLink->clone(flattenedModel, false, clonedBody);
-
-                Eigen::Matrix4f localLinkTransform = simox::math::inverted_pose(clonedBody->getGlobalPose()) * clonedLink->getGlobalPose();
-                clonedLink->setLocalTransformation(localLinkTransform);
-                clonedLink->updateTransformationMatrices();
-
-                pushAllChildren(originalLink, clonedLink);
-            };
-
-            if (current.original->isJoint())
-            {
-                auto specials = findSpecialChildren(current.original);
-                if (specials.has_value())
-                {
-                    auto [body, link, others] = specials.value();
-
-                    performFlattenedAttach(cloned, body, link);
-
-                    for (auto const& other : others)
+                    for (const auto& other : others)
                     {
                         nodes.push({other, cloned});
                     }
                 }
                 else
                 {
-                    pushAllChildren(current.original, cloned);
+                    pushAllChildren(current.nodeInOriginalRobot, cloned, nodes);
                 }
             }
             else
             {
-                pushAllChildren(current.original, cloned);
+                pushAllChildren(current.nodeInOriginalRobot, cloned, nodes);
             }
         }
 
         robot.setGlobalPose(globalPose);
-        flattenedModel->setGlobalPose(globalPose);
+        flattenedRobot->setGlobalPose(globalPose);
 
-        return flattenedModel;
+        return flattenedRobot;
     }
+
 
     void RobotFactory::cloneRecursiveUnite(RobotPtr robot, RobotNodePtr currentNode, RobotNodePtr currentNodeClone, std::vector<std::string> uniteWithAllChildren)
     {
