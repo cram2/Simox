@@ -1358,8 +1358,8 @@ namespace VirtualRobot
             RobotNodePtr clonedLink =
                 originalLink->clone(flattenedRobot, cloneChildren, clonedBody);
 
-            Eigen::Matrix4f global_T_body = clonedBody->getGlobalPose();
-            Eigen::Matrix4f global_T_link = clonedLink->getGlobalPose();
+            Eigen::Matrix4f global_T_body = originalBody->getGlobalPose();
+            Eigen::Matrix4f global_T_link = originalLink->getGlobalPose();
 
             Eigen::Matrix4f body_T_link = simox::math::inverted_pose(global_T_body) * global_T_link;
 
