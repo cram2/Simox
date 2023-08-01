@@ -70,7 +70,7 @@ namespace VirtualRobot
         for (const auto& [node, childNames] : childrenMap)
         {
             THROW_VR_EXCEPTION_IF(!node, "Key in childrenMap is null! check childrenMap");
-            for (auto childName : childNames)
+            for (const auto& childName : childNames)
             {
                 if (!robot->hasRobotNode(childName))
                 {
@@ -366,7 +366,7 @@ namespace VirtualRobot
                                    const std::map<std::string, float> &customSegmentLengths,
                                    const std::map<std::string, float>& customSizeScaling)
     {
-        for (auto node : robot.getRobotNodes())
+        for (const auto& node : robot.getRobotNodes())
         {
             float model_height_scaling = sizeScaling;
 
@@ -393,7 +393,7 @@ namespace VirtualRobot
                 }
             }
 
-            for (auto sensor : node->getSensors())
+            for (const auto& sensor : node->getSensors())
             {
                 Eigen::Matrix4f lt = sensor->getParentNodeToSensorTransformation();
                 lt.block(0, 3, 3, 1) *= model_height_scaling;
@@ -549,7 +549,7 @@ namespace VirtualRobot
                     // exchange sensors
                     std::vector<SceneObjectPtr> childChildren = robot->getRobotNode(nodeName)->getChildren();
 
-                    for (auto cc : childChildren)
+                    for (const auto& cc : childChildren)
                     {
                         SensorPtr cs = std::dynamic_pointer_cast<Sensor>(cc);
 
@@ -581,7 +581,7 @@ namespace VirtualRobot
                     // clone sensors
                     std::vector<SceneObjectPtr> childChildren = robot->getRobotNode(nodeName)->getChildren();
 
-                    for (auto cc : childChildren)
+                    for (const auto& cc : childChildren)
                     {
                         SensorPtr cs = std::dynamic_pointer_cast<Sensor>(cc);
 
@@ -661,7 +661,7 @@ namespace VirtualRobot
             {
                 auto sensors = sensorMap[node];
 
-                for (auto s : sensors)
+                for (const auto& s : sensors)
                 {
                     node->registerSensor(s);
                 }
@@ -694,7 +694,7 @@ namespace VirtualRobot
         std::vector < SceneObjectPtr > children = nodeA->getChildren();
         std::vector<RobotNodePtr> childNodes;
 
-        for (auto c : children)
+        for (const auto& c : children)
         {
             RobotNodePtr cRN = std::dynamic_pointer_cast<RobotNode>(c);
 
@@ -712,7 +712,7 @@ namespace VirtualRobot
         std::vector < SceneObjectPtr > children = nodeA->getChildren();
         std::vector<RobotNodePtr> childNodes;
 
-        for (auto c : children)
+        for (const auto& c : children)
         {
             SensorPtr cS = std::dynamic_pointer_cast<Sensor>(c);
             RobotNodePtr cRN = std::dynamic_pointer_cast<RobotNode>(c);
@@ -936,7 +936,7 @@ namespace VirtualRobot
         std::vector< RobotNodePtr > initialNodes = startNode->getAllParents();
         // check for static nodes which are not parent of startNode
         std::vector< RobotNodePtr > allNodes = robot->getRobotNodes();
-        for (auto rn : allNodes)
+        for (const auto& rn : allNodes)
         {
             bool isFixed = true;
             for (const auto& node : nodes)
@@ -968,7 +968,7 @@ namespace VirtualRobot
 
         // collect sensor nodes
         std::vector<SensorPtr> childSensorNodes;
-        for (auto rn : initialNodes)
+        for (const auto& rn : initialNodes)
         {
             std::vector<SceneObjectPtr> c = rn->getChildren();
             for (const auto& j : c)
