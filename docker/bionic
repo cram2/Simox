@@ -7,5 +7,20 @@ ENV LANG C.UTF-8
 ENV DEBIAN_FRONTEND noninteractive
 ENV TZ Europe/Berlin
 
+# Setup workspace in Docker.
+RUN axii workspace create /workspace workspace
+RUN axii workspace activate workspace
+
+# Simulate activating the workspace.
+ENV ARMARX_WORKSPACE=/workspace
+
 # Setup repo in Docker.
-RUN axii workspace create ~/workspace workspace
+WORKDIR $ARMARX_WORKSPACE/simox
+COPY . .
+
+# Use workspace config.
+COPY docker/armarx-workspace.json $ARMARX_WORKSPACE/armarx-workspace.json
+
+# Run the upgrade.
+RUN axii workspace system --accept-apt-install
+RUN axii workspace upgrade
