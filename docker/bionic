@@ -1,0 +1,11 @@
+FROM git.h2t.iar.kit.edu:5050/sw/armarx/meta/axii:latest-bionic
+
+# Setup environment.
+SHELL ["/bin/bash", "-c"]
+ENV LC_ALL C.UTF-8
+ENV LANG C.UTF-8
+ENV DEBIAN_FRONTEND noninteractive
+ENV TZ Europe/Berlin
+
+# Setup repo in Docker.
+RUN axii workspace create ~/workspace workspace
