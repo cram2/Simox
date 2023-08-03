@@ -132,21 +132,21 @@ armarx-core:
 .test-docker-image-common:
 
   before_script:
-    - source ~/.bashrc
-    - source /axii/scripts/install_axii.sh
+    # - source ~/.bashrc
+    # - source /axii/scripts/install_axii.sh
     - _axii_auto_env_refresh
 
   script:
     - echo "ArmarX Workspace = '$ARMARX_WORKSPACE'"
     - printenv
 
-    - axii workspace activate workspace  # No effect
-    - echo "ArmarX Workspace = '$ARMARX_WORKSPACE'"
-    - printenv
+    # - axii workspace activate workspace  # No effect
+    # - echo "ArmarX Workspace = '$ARMARX_WORKSPACE'"
+    # - printenv
 
-    - export ARMARX_WORKSPACE="/workspace"
-    - echo "ArmarX Workspace = '$ARMARX_WORKSPACE'"
-    - printenv
+    # - export ARMARX_WORKSPACE="/workspace"
+    # - echo "ArmarX Workspace = '$ARMARX_WORKSPACE'"
+    # - printenv
 
     - axii workspace list-modules
     - axii workspace list-modules --deps
