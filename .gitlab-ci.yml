@@ -161,7 +161,7 @@ armarx-core:
 
 test-docker-image-ci:
   stage: post-deploy-test
-  needs: ["docker-bionic-ci-dev"]
+  needs: ["docker-bionic"]
   extends: .test-docker-image-common
 
   image: git.h2t.iar.kit.edu:5050/sw/simox/simox:latest-bionic
