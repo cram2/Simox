@@ -23,4 +23,6 @@ COPY docker/armarx-workspace.json $ARMARX_WORKSPACE/armarx-workspace.json
 
 # Run the upgrade.
 RUN axii workspace system --accept-apt-install
+# ToDo: Prevent this from updating Simox itself.
+RUN axii workspace update --prefer-https
 RUN axii workspace upgrade

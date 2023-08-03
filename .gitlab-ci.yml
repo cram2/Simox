@@ -1,7 +1,7 @@
 
 stages:
   - build-and-test
-  - documentation
+  - deploy
   - downstream
 
 
@@ -92,6 +92,22 @@ build-and-test-jammy:
   extends: .build-and-test
 
   image: git.h2t.iar.kit.edu:5050/sw/armarx/meta/axii:latest-jammy
+
+
+
+docker-bionic:
+  stage: deploy
+  # needs: ["build-and-test-bionic"]
+  image:
+    name: gcr.io/kaniko-project/executor:v1.9.0-debug
+    entrypoint: [""]
+  script:
+    - /kaniko/executor
+      --context "${CI_PROJECT_DIR}"
+      --dockerfile "${CI_PROJECT_DIR}/docker/bionic"
+      --destination "${CI_REGISTRY_IMAGE}:latest"
+  # rules:
+    # - if: $CI_COMMIT_BRANCH == "master"
 
 
 armarx-core:
