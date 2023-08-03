@@ -144,7 +144,7 @@ docker-jammy:
     - which RobotViewer
 
 
-test-docker-image-ci:
+test-docker-image-bionic:
   stage: post-deploy-test
   needs: ["docker-bionic"]
   extends: .test-docker-image-common
@@ -152,7 +152,18 @@ test-docker-image-ci:
   image: git.h2t.iar.kit.edu:5050/sw/simox/simox:latest-bionic
 
   rules:
-    - if: $CI_COMMIT_BRANCH == "ci"
+    - if: $CI_COMMIT_BRANCH == "master"
+
+
+test-docker-image-jammy:
+  stage: post-deploy-test
+  needs: ["docker-jammy"]
+  extends: .test-docker-image-common
+
+  image: git.h2t.iar.kit.edu:5050/sw/simox/simox:latest-jammy
+
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master"
 
 
 armarx-core:
