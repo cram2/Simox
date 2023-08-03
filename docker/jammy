@@ -7,6 +7,9 @@ ENV LANG C.UTF-8
 ENV DEBIAN_FRONTEND noninteractive
 ENV TZ Europe/Berlin
 
+# Setup apt environment.
+RUN apt-get -qq update
+
 # Temporary fix until Axii is updated
 # Simulate install_axii.sh.
 ENV _AXII_INSTALL_DIR /axii
