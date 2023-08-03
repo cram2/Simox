@@ -106,6 +106,9 @@ docker-bionic:
       --dockerfile "${CI_PROJECT_DIR}/docker/bionic"
       --destination "${CI_REGISTRY_IMAGE}:latest-bionic"
 
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master"
+
 
 docker-jammy:
   stage: deploy
@@ -118,6 +121,9 @@ docker-jammy:
       --context "${CI_PROJECT_DIR}"
       --dockerfile "${CI_PROJECT_DIR}/docker/jammy"
       --destination "${CI_REGISTRY_IMAGE}:latest-jammy"
+
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master"
 
 
 .test-docker-image-common:
