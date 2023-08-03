@@ -133,7 +133,7 @@ armarx-core:
 
   before_script:
     # - source ~/.bashrc
-    # - source /axii/scripts/install_axii.sh
+    - source /axii/scripts/install_axii.sh
     - _axii_auto_env_refresh
 
   script:
