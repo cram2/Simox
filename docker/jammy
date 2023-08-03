@@ -7,6 +7,13 @@ ENV LANG C.UTF-8
 ENV DEBIAN_FRONTEND noninteractive
 ENV TZ Europe/Berlin
 
+# Temporary fix until Axii is updated
+# Simulate install_axii.sh.
+ENV _AXII_INSTALL_DIR /axii
+ENV PATH /axii/bin:$PATH
+ENV _axii_installed true
+# Temporary fix - end.
+
 # Setup workspace in Docker.
 RUN axii workspace create /workspace workspace
 RUN axii workspace activate workspace
