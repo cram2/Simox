@@ -1,0 +1,15 @@
+{
+  "modules": {
+    "deps/doxygen": {},
+    "simox": {}
+  },
+  "global": {
+    "prepare": {
+      "cmake": {
+        "definitions": {
+          "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+        }
+      }
+    }
+  }
+}
