@@ -86,8 +86,6 @@ build-and-test-bionic:
     paths:
       - build/doc/html/
 
-  rules:
-    - if: $CI_COMMIT_BRANCH != "ci"
 
 build-and-test-jammy:
   stage: build-and-test
@@ -95,13 +93,10 @@ build-and-test-jammy:
 
   image: git.h2t.iar.kit.edu:5050/sw/armarx/meta/axii:latest-jammy
 
-  rules:
-    - if: $CI_COMMIT_BRANCH != "ci"
-
 
 docker-bionic:
   stage: deploy
-  # needs: ["build-and-test-bionic"]
+  needs: ["build-and-test-bionic"]
   image:
     name: gcr.io/kaniko-project/executor:v1.9.0-debug
     entrypoint: [""]
@@ -110,8 +105,48 @@ docker-bionic:
       --context "${CI_PROJECT_DIR}"
       --dockerfile "${CI_PROJECT_DIR}/docker/bionic"
       --destination "${CI_REGISTRY_IMAGE}:latest-bionic"
+
+
+docker-jammy:
+  stage: deploy
+  needs: ["build-and-test-jammy"]
+  image:
+    name: gcr.io/kaniko-project/executor:v1.9.0-debug
+    entrypoint: [""]
+  script:
+    - /kaniko/executor
+      --context "${CI_PROJECT_DIR}"
+      --dockerfile "${CI_PROJECT_DIR}/docker/jammy"
+      --destination "${CI_REGISTRY_IMAGE}:latest-jammy"
+
+
+.test-docker-image-common:
+
+  before_script:
+    - source /axii/scripts/install_axii.sh
+    - _axii_auto_env_refresh
+
+  script:
+    - echo "ArmarX Workspace = '$ARMARX_WORKSPACE'"
+    - printenv
+
+    - axii workspace list-modules
+    - axii workspace list-modules --deps
+    - axii workspace info
+
+    - echo "Simox directory = '$Simox_DIR'"
+    - which RobotViewer
+
+
+test-docker-image-ci:
+  stage: post-deploy-test
+  needs: ["docker-bionic"]
+  extends: .test-docker-image-common
+
+  image: git.h2t.iar.kit.edu:5050/sw/simox/simox:latest-bionic
+
   rules:
-    - if: $CI_COMMIT_BRANCH != "ci"
+    - if: $CI_COMMIT_BRANCH == "ci"
 
 
 armarx-core:
@@ -123,44 +158,7 @@ armarx-core:
   trigger:
     project: sw/armarx/armarx-core
     # This is optional, but we could tell ArmarX which Simox branch to use.
-    branch: master  
+    branch: master
 
   rules:
     - if: $CI_COMMIT_BRANCH == "master"
-
-
-.test-docker-image-common:
-
-  before_script:
-    # - source ~/.bashrc
-    - source /axii/scripts/install_axii.sh
-    - _axii_auto_env_refresh
-
-  script:
-    - echo "ArmarX Workspace = '$ARMARX_WORKSPACE'"
-    - printenv
-
-    # - axii workspace activate workspace  # No effect
-    # - echo "ArmarX Workspace = '$ARMARX_WORKSPACE'"
-    # - printenv
-
-    # - export ARMARX_WORKSPACE="/workspace"
-    # - echo "ArmarX Workspace = '$ARMARX_WORKSPACE'"
-    # - printenv
-
-    - axii workspace list-modules
-    - axii workspace list-modules --deps
-    - axii workspace info
-
-    - which RobotViewer
-
-
-test-docker-image-ci:
-  stage: post-deploy-test
-  # needs: ["docker-bionic"]
-  extends: .test-docker-image-common
-
-  image: git.h2t.iar.kit.edu:5050/sw/simox/simox:latest-bionic
-
-  rules:
-    - if: $CI_COMMIT_BRANCH == "ci"
