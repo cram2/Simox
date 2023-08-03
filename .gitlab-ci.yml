@@ -107,7 +107,7 @@ docker-bionic:
       --destination "${CI_REGISTRY_IMAGE}:latest-bionic"
 
   rules:
-    - if: $CI_COMMIT_BRANCH == "master"
+    - if: $CI_COMMIT_BRANCH == "ci"
 
 
 docker-jammy:
@@ -123,7 +123,7 @@ docker-jammy:
       --destination "${CI_REGISTRY_IMAGE}:latest-jammy"
 
   rules:
-    - if: $CI_COMMIT_BRANCH == "master"
+    - if: $CI_COMMIT_BRANCH == "ci"
 
 
 .test-docker-image-common:
@@ -152,7 +152,7 @@ test-docker-image-bionic:
   image: git.h2t.iar.kit.edu:5050/sw/simox/simox:latest-bionic
 
   rules:
-    - if: $CI_COMMIT_BRANCH == "master"
+    - if: $CI_COMMIT_BRANCH == "ci"
 
 
 test-docker-image-jammy:
@@ -163,7 +163,7 @@ test-docker-image-jammy:
   image: git.h2t.iar.kit.edu:5050/sw/simox/simox:latest-jammy
 
   rules:
-    - if: $CI_COMMIT_BRANCH == "master"
+    - if: $CI_COMMIT_BRANCH == "ci"
 
 
 armarx-core:
