@@ -16,7 +16,7 @@ ENV ARMARX_WORKSPACE=/workspace
 
 # Setup repo in Docker.
 WORKDIR $ARMARX_WORKSPACE/simox
-COPY . .
+COPY --chmod=755 . .
 
 # Use workspace config.
 COPY docker/armarx-workspace.json $ARMARX_WORKSPACE/armarx-workspace.json

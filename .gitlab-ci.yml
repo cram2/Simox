@@ -1,6 +1,7 @@
 stages:
   - build-and-test
   - deploy
+  - post-deploy-test
   - downstream
 
 
@@ -108,7 +109,7 @@ docker-bionic:
     - /kaniko/executor
       --context "${CI_PROJECT_DIR}"
       --dockerfile "${CI_PROJECT_DIR}/docker/bionic"
-      --destination "${CI_REGISTRY_IMAGE}:latest"
+      --destination "${CI_REGISTRY_IMAGE}:latest-bionic"
   # rules:
     # - if: $CI_COMMIT_BRANCH == "master"
 
@@ -126,3 +127,44 @@ armarx-core:
 
   rules:
     - if: $CI_COMMIT_BRANCH == "master"
+
+
+.test-docker-image-common:
+
+  before_script:
+    - source ~/.bashrc
+    - source /axii/scripts/install_axii.sh
+
+  script:
+    - echo "ArmarX Workspace = '$ARMARX_WORKSPACE'"
+    - printenv
+
+    - axii workspace activate workspace  # No effect
+    - echo "ArmarX Workspace = '$ARMARX_WORKSPACE'"
+    - printenv
+
+    - export ARMARX_WORKSPACE="/workspace"
+    - echo "ArmarX Workspace = '$ARMARX_WORKSPACE'"
+    - printenv
+
+    - axii workspace create "$HOME/docker-test" docker-test
+    - axii workspace activate docker-test  # No effect
+    - echo "ArmarX Workspace = '$ARMARX_WORKSPACE'"
+    - printenv
+
+    - axii workspace list-modules
+    - axii workspace list-modules --deps
+    - axii workspace info
+
+    - which RobotViewer
+
+
+test-docker-image-ci:
+  stage: post-deploy-test
+  needs: ["docker-bionic-ci-dev"]
+  extends: .test-docker-image-common
+
+  image: git.h2t.iar.kit.edu:5050/sw/simox/simox:latest-bionic
+
+  rules:
+    - if: $CI_COMMIT_BRANCH == "ci"
