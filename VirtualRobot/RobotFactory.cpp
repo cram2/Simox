@@ -1295,7 +1295,7 @@ namespace VirtualRobot
         struct BodyAndLink
         {
             RobotNodePtr body;
-            RobotNodePtr link;
+            RobotNodePtr linkOrJoint;
             std::vector<RobotNodePtr> others;
         };
 
@@ -1303,7 +1303,7 @@ namespace VirtualRobot
                                 isLink](RobotNodePtr const& jointNode) -> std::optional<BodyAndLink>
         {
             std::optional<RobotNodePtr> body;
-            std::optional<RobotNodePtr> link;
+            std::optional<RobotNodePtr> linkOrJoint;
             std::vector<RobotNodePtr> others;
 
             for (const auto& child : jointNode->getChildren())
@@ -1323,14 +1323,14 @@ namespace VirtualRobot
 
                     body = childNode;
                 }
-                else if (isLink(childNode))
+                else if (isLink(childNode) or childNode->isJoint())
                 {
-                    if (link.has_value())
+                    if (linkOrJoint.has_value())
                     {
                         return std::nullopt;
                     }
 
-                    link = childNode;
+                    linkOrJoint = childNode;
                 }
                 else
                 {
@@ -1338,80 +1338,85 @@ namespace VirtualRobot
                 }
             }
 
-            if (body.has_value() and link.has_value())
+            if (body.has_value() and linkOrJoint.has_value())
             {
-                return BodyAndLink{.body = body.value(), .link = link.value(), .others = others};
+                return BodyAndLink{.body = body.value(), .linkOrJoint = linkOrJoint.value(), .others = others};
             }
 
             return std::nullopt;
         };
 
         auto performFlattenedAttach =
-            [&flattenedRobot, pushAllChildren](RobotNodePtr const& clonedJoint,
+            [&flattenedRobot](RobotNodePtr const& clonedParentJoint,
                                                RobotNodePtr const& originalBody,
-                                               RobotNodePtr const& originalLink,
-                                               std::queue<NodeToClone>& nodesToClone)
+                                               RobotNodePtr const& originalLinkOrJoint) -> RobotNodePtr
         {
             const bool cloneChildren = false;
             RobotNodePtr clonedBody =
-                originalBody->clone(flattenedRobot, cloneChildren, clonedJoint);
-            RobotNodePtr clonedLink =
-                originalLink->clone(flattenedRobot, cloneChildren, clonedBody);
+                originalBody->clone(flattenedRobot, cloneChildren, clonedParentJoint);
+            RobotNodePtr clonedLinkOrJoint =
+                originalLinkOrJoint->clone(flattenedRobot, cloneChildren, clonedBody);
 
             Eigen::Matrix4f global_T_body = originalBody->getGlobalPose();
-            Eigen::Matrix4f global_T_link = originalLink->getGlobalPose();
+            Eigen::Matrix4f global_T_link = originalLinkOrJoint->getGlobalPose();
 
             Eigen::Matrix4f body_T_link = simox::math::inverted_pose(global_T_body) * global_T_link;
 
-            clonedLink->setLocalTransformation(body_T_link);
-            clonedLink->updateTransformationMatrices();
+            clonedLinkOrJoint->setLocalTransformation(body_T_link);
+            clonedLinkOrJoint->updateTransformationMatrices();
 
-            pushAllChildren(originalLink, clonedLink, nodesToClone);
+            return clonedLinkOrJoint;
         };
 
         std::queue<NodeToClone> nodes({{robot.getRootNode(), nullptr}});
         while (not nodes.empty())
         {
-            NodeToClone current = nodes.front();
+            auto [currentOriginal, currentClonedParent] = nodes.front();
             nodes.pop();
 
             const bool cloneChildren = false;
-            RobotNodePtr cloned = current.nodeInOriginalRobot->clone(
-                flattenedRobot, cloneChildren, current.parentInFlattenedRobot);
+            RobotNodePtr currentClone = currentOriginal->clone(
+                flattenedRobot, cloneChildren, currentClonedParent);
 
-            if (current.parentInFlattenedRobot == nullptr)
+            if (currentClonedParent == nullptr)
             {
-                flattenedRobot->setRootNode(cloned);
+                flattenedRobot->setRootNode(currentClone);
             }
 
-            if (current.nodeInOriginalRobot->isJoint())
+            while (currentOriginal->isJoint())
             {
+                std::cout << "Checking joint: " << currentOriginal->getName();
+
                 std::optional<BodyAndLink> bodyAndLink =
-                    findBodyAndLink(current.nodeInOriginalRobot);
-                if (bodyAndLink.has_value())
-                {
-                    auto [body, link, others] = bodyAndLink.value();
+                    findBodyAndLink(currentOriginal);
 
-                    performFlattenedAttach(cloned, body, link, nodes);
-
-                    for (const auto& other : others)
-                    {
-                        nodes.push({other, cloned});
-                    }
-                }
-                else
+                if (not bodyAndLink.has_value())
                 {
-                    pushAllChildren(current.nodeInOriginalRobot, cloned, nodes);
+                    std::cout << " but no specials found!" << std::endl;
+                    break;
                 }
+
+                auto [body, linkOrJoint, others] = bodyAndLink.value();
+                std::cout << " and found body " << body->getName() << " and link/joint " << linkOrJoint->getName() << std::endl;
+
+                RobotNodePtr nextClone = performFlattenedAttach(currentClone, body, linkOrJoint);
+
+                for (const auto& other : others)
+                {
+                    nodes.push({other, currentClone});
+                }
+
+                currentOriginal = linkOrJoint;
+                currentClone = nextClone;
             }
-            else
-            {
-                pushAllChildren(current.nodeInOriginalRobot, cloned, nodes);
-            }
+
+            pushAllChildren(currentOriginal, currentClone, nodes);
         }
 
         robot.setGlobalPose(globalPose);
         flattenedRobot->setGlobalPose(globalPose);
+
+        std::cout << flattenedRobot->toXML() << std::endl;
 
         return flattenedRobot;
     }
