@@ -107,7 +107,8 @@ namespace VirtualRobot
     RobotIO::processLimitsNode(rapidxml::xml_node<char>* limitsXMLNode,
                                float& jointLimitLo,
                                float& jointLimitHi,
-                               bool& limitless)
+                               bool& limitless,
+                               bool& allowJointLimitAvoidance)
     {
         THROW_VR_EXCEPTION_IF(!limitsXMLNode, "NULL data for limitsXMLNode in processLimitsNode()");
 
@@ -130,7 +131,7 @@ namespace VirtualRobot
             {
                 VR_WARNING << "No 'lo' attribute in <Limits> tag. Assuming -180 [deg]."
                            << std::endl;
-                jointLimitLo = float(-M_PI);
+                jointLimitLo = -M_PIf32;
                 unit = Units("rad");
             }
         }
@@ -150,7 +151,7 @@ namespace VirtualRobot
             else
             {
                 VR_WARNING << "No 'hi' attribute in <Limits> tag. Assuming 180 [deg]." << std::endl;
-                jointLimitHi = float(M_PI);
+                jointLimitHi = M_PIf32;
                 unit = Units("rad");
             }
         }
@@ -182,9 +183,16 @@ namespace VirtualRobot
                               "should equal 2*pi [rad] or 360 [deg]."
                            << endl
                            << "Setting 'lo' to -pi and 'hi' to pi [rad]..." << std::endl;
-                jointLimitLo = float(-M_PI);
-                jointLimitHi = float(M_PI);
+                jointLimitLo = -M_PIf32;
+                jointLimitHi = M_PIf32;
             }
+        }
+
+        rapidxml::xml_attribute<>* llAllowAvoidance =
+            limitsXMLNode->first_attribute("allowAvoidance");
+        if (llAllowAvoidance != nullptr)
+        {
+            allowJointLimitAvoidance = isTrue(llAllowAvoidance->value());
         }
     }
 
@@ -198,9 +206,10 @@ namespace VirtualRobot
                               RobotNode::RobotNodeType rntype,
                               Eigen::Matrix4f& transformationMatrix)
     {
-        float jointLimitLow = float(-M_PI);
-        float jointLimitHigh = float(M_PI);
+        float jointLimitLow = -M_PIf32;
+        float jointLimitHigh = M_PIf32;
         bool limitless = false;
+        bool allowJointLimitAvoidance = true;
 
         Eigen::Matrix4f preJointTransform = transformationMatrix; //Eigen::Matrix4f::Identity();
         Eigen::Vector3f axis = Eigen::Vector3f::Zero();
@@ -296,7 +305,8 @@ namespace VirtualRobot
                                       "Multiple limits definitions in <Joint> tag of robot node <"
                                           << robotNodeName << ">." << endl);
                 limitsNode = node;
-                processLimitsNode(limitsNode, jointLimitLow, jointLimitHigh, limitless);
+                processLimitsNode(
+                    limitsNode, jointLimitLow, jointLimitHigh, limitless, allowJointLimitAvoidance);
             }
             else if (nodeName == "prejointtransform")
             {
@@ -657,6 +667,7 @@ namespace VirtualRobot
         robotNode->setMaxAcceleration(maxAcceleration);
         robotNode->setMaxTorque(maxTorque);
         robotNode->setLimitless(limitless);
+        robotNode->setAllowJointLimitAvoidance(allowJointLimitAvoidance);
 
         robotNode->jointValue = initialvalue;
 
@@ -1843,7 +1854,8 @@ namespace VirtualRobot
         else if (fileType == "urdf")
         {
 
-            std::shared_ptr<RobotImporterFactory> factory = RobotImporterFactory::fromName("SimoxURDF", nullptr);
+            std::shared_ptr<RobotImporterFactory> factory =
+                RobotImporterFactory::fromName("SimoxURDF", nullptr);
             if (!factory)
             {
                 VR_ERROR << "Could not create RobotImporterFactory for SimoxURDF" << std::endl;
