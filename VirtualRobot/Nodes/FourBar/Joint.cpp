@@ -13,7 +13,7 @@
 namespace VirtualRobot::four_bar
 {
 
-    Joint::Joint(double theta0, const Dimensions& dimensions) : theta0(theta0), dims(dimensions)
+    Joint::Joint(const Dimensions& dimensions) : dims(dimensions)
     {
     }
 
@@ -25,9 +25,24 @@ namespace VirtualRobot::four_bar
         const Eigen::Translation3d passive_T_active_base(Eigen::Vector3d::UnitX() * dims.shank);
 
         // apply rotation of this active joint
-        const Eigen::AngleAxisd active_base_T_eef{theta0 + theta, Eigen::Vector3d::UnitZ()};
+        const Eigen::AngleAxisd active_base_T_eef{theta, Eigen::Vector3d::UnitZ()};
 
         return passive_T_active_base * active_base_T_eef;
+    }
+
+    Eigen::Isometry3d
+    Joint::computeFkCombined(const double theta) const
+    {
+        // apply rotation of passive joint
+        const Eigen::AngleAxisd passive_base_T_passive{psi(theta), -Eigen::Vector3d::UnitZ()};
+
+        // move from passive to active joint
+        const Eigen::Translation3d passive_T_active_base(Eigen::Vector3d::UnitX() * dims.shank);
+
+        // apply rotation of this active joint
+        const Eigen::AngleAxisd active_base_T_eef{theta, Eigen::Vector3d::UnitZ()};
+
+        return passive_base_T_passive * passive_T_active_base * active_base_T_eef;
     }
 
 
@@ -53,8 +68,7 @@ namespace VirtualRobot::four_bar
         const double cosPsi = std::cos(psi);
         const double sinPsi = std::sin(psi);
 
-        //
-        const Eigen::Isometry3d base_T_active = computeFk(theta);
+        const Eigen::Isometry3d base_T_active = computeFkCombined(theta);
 
         const Eigen::Vector3d active_P_eef = base_T_active.inverse() * base_P_eef;
 

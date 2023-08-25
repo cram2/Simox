@@ -457,7 +457,7 @@ namespace VirtualRobot
 
         for (auto& i : rn)
         {
-            if (i->isRotationalJoint() || i->isTranslationalJoint())
+            if (i->isJoint())
             {
                 result->setConfig(i->getName(), i->getJointValue());
             }

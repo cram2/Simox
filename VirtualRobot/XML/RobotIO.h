@@ -161,7 +161,7 @@ namespace VirtualRobot
         static void processLimitsNode(rapidxml::xml_node<char>* limitsXMLNode,
                                       float& jointLimitLo,
                                       float& jointLimitHi,
-                                      bool& limitless);
+                                      bool& limitless, bool &allowJointLimitAvoidance);
         static std::map<std::string, int> robot_name_counter;
         static VisualizationNodePtr checkUseAsColModel(rapidxml::xml_node<char>* visuXMLNode,
                                                        const std::string& robotNodeName,

@@ -1,18 +1,20 @@
 #include "JointLimitAvoidanceJacobi.h"
-#include <VirtualRobot/VirtualRobotException.h>
+
 #include <VirtualRobot/Robot.h>
 #include <VirtualRobot/RobotNodeSet.h>
+#include <VirtualRobot/VirtualRobotException.h>
 
 using namespace VirtualRobot;
 using namespace std;
-
 
 namespace VirtualRobot
 {
 
 
-    JointLimitAvoidanceJacobi::JointLimitAvoidanceJacobi(RobotNodeSetPtr rns, JacobiProvider::InverseJacobiMethod invJacMethod)
-        : JacobiProvider(rns, invJacMethod)
+    JointLimitAvoidanceJacobi::JointLimitAvoidanceJacobi(
+        RobotNodeSetPtr rns,
+        JacobiProvider::InverseJacobiMethod invJacMethod) :
+        JacobiProvider(rns, invJacMethod)
     {
         nodes = rns->getAllRobotNodes();
         initialized = true; // no need of spiecial initialization
@@ -20,8 +22,8 @@ namespace VirtualRobot
         VR_ASSERT(nodes.size() > 0);
     }
 
-
-    Eigen::MatrixXf JointLimitAvoidanceJacobi::getJacobianMatrix()
+    Eigen::MatrixXf
+    JointLimitAvoidanceJacobi::getJacobianMatrix()
     {
         size_t nDoF = nodes.size();
         Eigen::MatrixXf Jacobian(nDoF, nDoF);
@@ -29,17 +31,19 @@ namespace VirtualRobot
         return Jacobian;
     }
 
-    Eigen::VectorXf JointLimitAvoidanceJacobi::getError(float stepSize)
+    Eigen::VectorXf
+    JointLimitAvoidanceJacobi::getError(float stepSize)
     {
         size_t nDoF = nodes.size();
         Eigen::VectorXf error(nDoF);
 
         for (size_t i = 0; i < nDoF; i++)
         {
-            if (nodes[i]->isRotationalJoint())
+            if (nodes[i]->isJoint() and not nodes[i]->isLimitless() and
+                nodes[i]->getAllowJointLimitAvoidance())
             {
-                float l = nodes[i]->getJointLimitHi() - nodes[i]->getJointLimitLo();
-                float target = nodes[i]->getJointLimitLo() + l * 0.5f;
+                float range = nodes[i]->getJointLimitHi() - nodes[i]->getJointLimitLo();
+                float target = nodes[i]->getJointLimitLo() + range * 0.5f;
                 error(i) = (target - nodes[i]->getJointValue()) * stepSize;
             }
             else
@@ -51,12 +55,14 @@ namespace VirtualRobot
         return error;
     }
 
-    bool JointLimitAvoidanceJacobi::checkTolerances()
+    bool
+    JointLimitAvoidanceJacobi::checkTolerances()
     {
         return false;
     }
 
-    Eigen::MatrixXf JointLimitAvoidanceJacobi::getJacobianMatrix(SceneObjectPtr /*tcp*/)
+    Eigen::MatrixXf
+    JointLimitAvoidanceJacobi::getJacobianMatrix(SceneObjectPtr /*tcp*/)
     {
         return getJacobianMatrix();
     }

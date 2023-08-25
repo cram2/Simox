@@ -22,25 +22,25 @@
 */
 #pragma once
 
-#include <SimoxUtility/math/scale_value.h>
-
-#include "../VirtualRobot.h"
-#include "../VirtualRobotException.h"
-#include "../GraspableSensorizedObject.h"
-#include "../Transformation/DHParameter.h"
-#include "Sensor.h"
-
-#include <Eigen/Core>
-
+#include <map>
 #include <optional>
 #include <string>
 #include <vector>
-#include <map>
 
+#include <Eigen/Core>
+
+#include <SimoxUtility/math/scale_value.h>
+
+#include "../GraspableSensorizedObject.h"
+#include "../Transformation/DHParameter.h"
+#include "../VirtualRobot.h"
+#include "../VirtualRobotException.h"
+#include "Sensor.h"
 
 namespace VirtualRobot
 {
     class RobotNodeActuator;
+
     /*!
         Each RobotNode may consider two transformations:
         * localTransformation: This transformation is fixed.
@@ -66,10 +66,10 @@ namespace VirtualRobot
         //! Experimental: Additional information about the node
         enum RobotNodeType
         {
-            Generic,        //! No constraints
-            Joint,          //! Only pre-joint transformations allowed (e.g. DH-theta for revolute joints). No visualization/collision models.
-            Body,           //! No transformations allowed. Only visualization and/or collision models together with physic information.
-            Transform       //! Only transformations allowed. No joint or model tags.
+            Generic, //! No constraints
+            Joint, //! Only pre-joint transformations allowed (e.g. DH-theta for revolute joints). No visualization/collision models.
+            Body, //! No transformations allowed. Only visualization and/or collision models together with physic information.
+            Transform //! Only transformations allowed. No joint or model tags.
         };
 
         /*!
@@ -102,7 +102,7 @@ namespace VirtualRobot
             All children and their children (and so on) are collected.
             The current instance is also added.
         */
-        void collectAllRobotNodes(std::vector< RobotNodePtr >& storeNodes);
+        void collectAllRobotNodes(std::vector<RobotNodePtr>& storeNodes);
 
         virtual float getJointValue() const;
 
@@ -116,18 +116,20 @@ namespace VirtualRobot
         */
         bool checkJointLimits(float jointValue, bool verbose = false) const;
 
-
         /*!
             The preJoint/preVisualization transformation. This transformation is applied before the joint and the visualization.
         */
-        virtual Eigen::Matrix4f getLocalTransformation()
+        virtual Eigen::Matrix4f
+        getLocalTransformation()
         {
             return localTransformation;
         }
 
         using SceneObject::getChildren;
-        template<class T>
-        auto getChildren()
+
+        template <class T>
+        auto
+        getChildren()
         {
             std::vector<std::shared_ptr<T>> result;
             for (const auto& c : getChildren())
@@ -146,7 +148,9 @@ namespace VirtualRobot
             Be sure all children are created and registered to robot before calling initialize.
             Usually RobotFactory manages the initialization.
         */
-        bool initialize(SceneObjectPtr parent = SceneObjectPtr(), const std::vector<SceneObjectPtr>& children = std::vector<SceneObjectPtr>()) override;
+        bool initialize(
+            SceneObjectPtr parent = SceneObjectPtr(),
+            const std::vector<SceneObjectPtr>& children = std::vector<SceneObjectPtr>()) override;
 
         /*!
             Calling this method will cause an exception, since RobotNodes are controlled via joint values.
@@ -183,7 +187,8 @@ namespace VirtualRobot
         virtual Eigen::Matrix4f getPoseInRootFrame(const Eigen::Matrix4f& localPose) const;
         virtual Eigen::Vector3f getPositionInRootFrame(const Eigen::Vector3f& localPosition) const;
         virtual Eigen::Vector3f getDirectionInRootFrame(const Eigen::Vector3f& localPosition) const;
-        virtual Eigen::Matrix3f getOrientationInRootFrame(const Eigen::Matrix3f& localOrientation) const;
+        virtual Eigen::Matrix3f
+        getOrientationInRootFrame(const Eigen::Matrix3f& localOrientation) const;
 
         /*!
             Display the coordinate system of this RobotNode. This is the global pose of it's visualization.
@@ -194,7 +199,10 @@ namespace VirtualRobot
                                     Then a visualziationNode has to be built and the \p visualizationType specifies which type of visualization should be used.
                                     If not given, the first registered visaulizationfactory is used.
         */
-        void showCoordinateSystem(bool enable, float scaling = 1.0f, std::string* text = NULL, const std::string& visualizationType = "") override;
+        void showCoordinateSystem(bool enable,
+                                  float scaling = 1.0f,
+                                  std::string* text = NULL,
+                                  const std::string& visualizationType = "") override;
 
 
         /*!
@@ -211,13 +219,10 @@ namespace VirtualRobot
             float high;
         };
 
-        JointLimits getJointLimits()
+        JointLimits
+        getJointLimits()
         {
-            return JointLimits
-            {
-                .low = getJointLimitLo(),
-                .high = getJointLimitHi()
-            };
+            return JointLimits{.low = getJointLimitLo(), .high = getJointLimitHi()};
         }
 
         /*!
@@ -275,36 +280,50 @@ namespace VirtualRobot
                                    std::optional<float> scaling = std::nullopt,
                                    bool preventCloningMeshesIfScalingIs1 = false);
 
-        inline float getJointValueOffset() const
+        inline float
+        getJointValueOffset() const
         {
             return jointValueOffset;
         }
-        inline float getJointLimitHigh() const
+
+        inline float
+        getJointLimitHigh() const
         {
             return jointLimitHi;
         }
-        inline float getJointLimitLow() const
+
+        inline float
+        getJointLimitLow() const
         {
             return jointLimitLo;
         }
 
-        inline float scaleJointValue(float val, float min = -1, float max = 1)
+        inline float
+        scaleJointValue(float val, float min = -1, float max = 1)
         {
             return simox::math::scale_value_from_to(val, jointLimitLo, jointLimitHi, min, max);
         }
-        inline float unscaleJointValue(float val, float min = -1, float max = 1)
+
+        inline float
+        unscaleJointValue(float val, float min = -1, float max = 1)
         {
             return simox::math::scale_value_from_to(val, min, max, jointLimitLo, jointLimitHi);
         }
-        inline float getScaledJointValue(float min = -1, float max = 1)
+
+        inline float
+        getScaledJointValue(float min = -1, float max = 1)
         {
             return scaleJointValue(getJointValue(), min, max);
         }
-        inline void setScaledJointValue(float val, float min = -1, float max = 1)
+
+        inline void
+        setScaledJointValue(float val, float min = -1, float max = 1)
         {
             setJointValue(unscaleJointValue(val, min, max));
         }
-        inline void setScaledJointValueNoUpdate(float val, float min = -1, float max = 1)
+
+        inline void
+        setScaledJointValueNoUpdate(float val, float min = -1, float max = 1)
         {
             setJointValueNoUpdate(unscaleJointValue(val, min, max));
         }
@@ -348,7 +367,10 @@ namespace VirtualRobot
         RobotNodeType getType();
 
         //! Forbid cloning method from SceneObject. We need to know the new robot for cloning
-        SceneObjectPtr clone(const std::string& /*name*/, CollisionCheckerPtr /*colChecker*/ = CollisionCheckerPtr(), float /*scaling*/ = 1.0f) const
+        SceneObjectPtr
+        clone(const std::string& /*name*/,
+              CollisionCheckerPtr /*colChecker*/ = CollisionCheckerPtr(),
+              float /*scaling*/ = 1.0f) const
         {
             THROW_VR_EXCEPTION("Cloning not allowed this way...");
         }
@@ -356,11 +378,11 @@ namespace VirtualRobot
         /*!
             When joint was created via DH parameters, they can be accessed here.
         */
-        const DHParameter& getOptionalDHParameters()
+        const DHParameter&
+        getOptionalDHParameters()
         {
             return optionalDHParameter;
         }
-
 
         /*!
             Compute/Update the transformations of this joint and all child joints. Therefore the parent is queried for its pose.
@@ -384,7 +406,10 @@ namespace VirtualRobot
             Creates an XML string that defines the robotnode. Filenames of all visualization models are set to modelPath/RobotNodeName_visu and/or modelPath/RobotNodeName_colmodel.
             @see RobotIO::saveXML.
         */
-        virtual std::string toXML(const std::string& basePath, const std::string& modelPathRelative = "models", bool storeSensors = true, bool storeModelFiles = true);
+        virtual std::string toXML(const std::string& basePath,
+                                  const std::string& modelPathRelative = "models",
+                                  bool storeSensors = true,
+                                  bool storeModelFiles = true);
 
         /*!
             Set the local transformation matrix that is used in this node.
@@ -402,6 +427,9 @@ namespace VirtualRobot
 
         bool getEnforceJointLimits() const;
         void setEnforceJointLimits(bool value);
+
+        bool getAllowJointLimitAvoidance() const;
+        void setAllowJointLimitAvoidance(bool value);
 
         /*! Removes all sensors (for faster forward kinematics) */
         void removeAllSensors(bool recursive = true);
@@ -426,26 +454,33 @@ namespace VirtualRobot
             \param globalPose The new global pose. The joint value is *not* determined from this pose. The RobotNodeActuator is responsible for setting the corresponding joint value
             \param updateChildren Usually it is assumed that all RobotNodes are updated this way (updateChildren=false). If not, the children poses can be updated according to this node.
         */
-        virtual void updateVisualizationPose(const Eigen::Matrix4f& globalPose, bool updateChildren = false);
-        virtual void updateVisualizationPose(const Eigen::Matrix4f& globalPose, float jointValue, bool updateChildren = false);
+        virtual void updateVisualizationPose(const Eigen::Matrix4f& globalPose,
+                                             bool updateChildren = false);
+        virtual void updateVisualizationPose(const Eigen::Matrix4f& globalPose,
+                                             float jointValue,
+                                             bool updateChildren = false);
 
         //! Checks if nodeType constraints are fulfilled. Otherwise an exception is thrown. Called on initialization.
         virtual void checkValidRobotNodeType();
 
         ///////////////////////// SETUP ////////////////////////////////////
-        RobotNode() {};
+        RobotNode(){};
 
         float jointValueOffset;
         float jointLimitLo, jointLimitHi;
         bool enforceJointLimits = true;
-        bool limitless; // whether this joint has limits or not (ignored if nodeType != Joint).
-        DHParameter optionalDHParameter;            // When the joint is defined via DH parameters they are stored here
-        float maxVelocity;          //! given in m/s
-        float maxAcceleration;      //! given in m/s^2
-        float maxTorque;            //! given in Nm
+        bool allowJointLimitAvoidance = true;
+
+        // whether this joint has limits or not (ignored if nodeType != Joint).
+        bool limitless;
+        // When the joint is defined via DH parameters they are stored here
+        DHParameter optionalDHParameter;
+        float maxVelocity; //! given in m/s
+        float maxAcceleration; //! given in m/s^2
+        float maxTorque; //! given in Nm
         Eigen::Matrix4f localTransformation;
 
-        std::map< std::string, float > propagatedJointValues;
+        std::map<std::string, float> propagatedJointValues;
         ///////////////////////// SETUP ////////////////////////////////////
 
         virtual void updateTransformationMatrices(const Eigen::Matrix4f& parentPose);
@@ -453,15 +488,22 @@ namespace VirtualRobot
 
         RobotNodeType nodeType;
 
-        float jointValue;                           //< The joint value
+        float jointValue; //< The joint value
 
         /*!
             Derived classes must implement their clone method here.
             Passed models are already scaled. Scaling factor should be only used for kinematic computations.
         */
-        virtual RobotNodePtr _clone(const RobotPtr newRobot, const VisualizationNodePtr visualizationModel, const CollisionModelPtr collisionModel, CollisionCheckerPtr colChecker, float scaling) = 0;
+        virtual RobotNodePtr _clone(const RobotPtr newRobot,
+                                    const VisualizationNodePtr visualizationModel,
+                                    const CollisionModelPtr collisionModel,
+                                    CollisionCheckerPtr colChecker,
+                                    float scaling) = 0;
 
-        SceneObject* _clone(const std::string& /*name*/, CollisionCheckerPtr /*colChecker*/ = CollisionCheckerPtr(), float /*scaling*/ = 1.0f) const override
+        SceneObject*
+        _clone(const std::string& /*name*/,
+               CollisionCheckerPtr /*colChecker*/ = CollisionCheckerPtr(),
+               float /*scaling*/ = 1.0f) const override
         {
             THROW_VR_EXCEPTION("Cloning not allowed this way...");
         }

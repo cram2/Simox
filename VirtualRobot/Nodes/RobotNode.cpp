@@ -1,39 +1,36 @@
 #include "RobotNode.h"
 
-#include <VirtualRobot/VirtualRobotException.h>
-#include <VirtualRobot/Robot.h>
-#include <VirtualRobot/RobotNodeSet.h>
-#include <VirtualRobot/CollisionDetection/CollisionModel.h>
-#include <VirtualRobot/Visualization/VisualizationFactory.h>
-#include <VirtualRobot/Visualization/VisualizationNode.h>
-#include <VirtualRobot/Visualization/Visualization.h>
-#include <VirtualRobot/Visualization/TriMeshModel.h>
-#include <VirtualRobot/math/Helpers.h>
-#include <VirtualRobot/XML/BaseIO.h>
+#include <algorithm>
+#include <cmath>
+#include <filesystem>
+#include <iomanip>
 
 #include <Eigen/Core>
-#include <Eigen/src/Geometry/Transform.h>
 
-#include <filesystem>
-#include <algorithm>
-#include <iomanip>
-#include <cmath>
-
+#include <VirtualRobot/CollisionDetection/CollisionModel.h>
+#include <VirtualRobot/Robot.h>
+#include <VirtualRobot/RobotNodeSet.h>
+#include <VirtualRobot/VirtualRobotException.h>
+#include <VirtualRobot/Visualization/TriMeshModel.h>
+#include <VirtualRobot/Visualization/Visualization.h>
+#include <VirtualRobot/Visualization/VisualizationFactory.h>
+#include <VirtualRobot/Visualization/VisualizationNode.h>
+#include <VirtualRobot/XML/BaseIO.h>
+#include <VirtualRobot/math/Helpers.h>
 
 namespace VirtualRobot
 {
 
-    RobotNode::RobotNode(
-            RobotWeakPtr rob,
-            const std::string& name,
-            float jointLimitLo,
-            float jointLimitHi,
-            VisualizationNodePtr visualization,
-            CollisionModelPtr collisionModel,
-            float jointValueOffset,
-            const SceneObject::Physics& physics,
-            CollisionCheckerPtr colChecker,
-            RobotNodeType type) :
+    RobotNode::RobotNode(RobotWeakPtr rob,
+                         const std::string& name,
+                         float jointLimitLo,
+                         float jointLimitHi,
+                         VisualizationNodePtr visualization,
+                         CollisionModelPtr collisionModel,
+                         float jointValueOffset,
+                         const SceneObject::Physics& physics,
+                         CollisionCheckerPtr colChecker,
+                         RobotNodeType type) :
         GraspableSensorizedObject(name, visualization, collisionModel, physics, colChecker)
     {
         nodeType = type;
@@ -50,8 +47,8 @@ namespace VirtualRobot
         //globalPosePostJoint = Eigen::Matrix4f::Identity();
         jointValue = 0.0f;
         limitless = false;
+        allowJointLimitAvoidance = true;
     }
-
 
     RobotNode::~RobotNode()
     {
@@ -62,8 +59,8 @@ namespace VirtualRobot
         //  rob->deregisterRobotNode(static_pointer_cast<RobotNodePtr>(shared_from_this()));
     }
 
-
-    bool RobotNode::initialize(SceneObjectPtr parent, const std::vector<SceneObjectPtr>& children)
+    bool
+    RobotNode::initialize(SceneObjectPtr parent, const std::vector<SceneObjectPtr>& children)
     {
         RobotPtr rob = robot.lock();
         THROW_VR_EXCEPTION_IF(!rob, "Could not init RobotNode without robot");
@@ -77,7 +74,8 @@ namespace VirtualRobot
         // update visualization of coordinate systems
         if (visualizationModel && visualizationModel->hasAttachedVisualization("CoordinateSystem"))
         {
-            VisualizationNodePtr v = visualizationModel->getAttachedVisualization("CoordinateSystem");
+            VisualizationNodePtr v =
+                visualizationModel->getAttachedVisualization("CoordinateSystem");
             // not needed any more!
             // this is a little hack: The globalPose is used to set the "local" position of the attached Visualization:
             // Since the attached visualizations are already positioned at the global pose of the visualizationModel,
@@ -90,7 +88,8 @@ namespace VirtualRobot
         return GraspableSensorizedObject::initialize(parent, children);
     }
 
-    void RobotNode::checkValidRobotNodeType()
+    void
+    RobotNode::checkValidRobotNodeType()
     {
         switch (nodeType)
         {
@@ -99,20 +98,24 @@ namespace VirtualRobot
                 break;
 
             case Joint:
-                THROW_VR_EXCEPTION_IF(visualizationModel, "No visualization models allowed in JointNodes");
+                THROW_VR_EXCEPTION_IF(visualizationModel,
+                                      "No visualization models allowed in JointNodes");
                 THROW_VR_EXCEPTION_IF(collisionModel, "No collision models allowed in JointNodes");
                 //THROW_VR_EXCEPTION_IF(postJointTransformation != Eigen::Matrix4f::Identity() , "No postJoint transformations allowed in JointNodes");
                 break;
 
             case Body:
                 //THROW_VR_EXCEPTION_IF(postJointTransformation != Eigen::Matrix4f::Identity() , "No transformations allowed in BodyNodes");
-                THROW_VR_EXCEPTION_IF(localTransformation != Eigen::Matrix4f::Identity(), "No transformations allowed in BodyNodes");
+                THROW_VR_EXCEPTION_IF(localTransformation != Eigen::Matrix4f::Identity(),
+                                      "No transformations allowed in BodyNodes");
 
                 break;
 
             case Transform:
-                THROW_VR_EXCEPTION_IF(visualizationModel, "No visualization models allowed in TransformationNodes");
-                THROW_VR_EXCEPTION_IF(collisionModel, "No collision models allowed in TransformationNodes");
+                THROW_VR_EXCEPTION_IF(visualizationModel,
+                                      "No visualization models allowed in TransformationNodes");
+                THROW_VR_EXCEPTION_IF(collisionModel,
+                                      "No collision models allowed in TransformationNodes");
                 break;
 
             default:
@@ -120,23 +123,39 @@ namespace VirtualRobot
         }
     }
 
-    bool RobotNode::getEnforceJointLimits() const
+    bool
+    RobotNode::getEnforceJointLimits() const
     {
         return enforceJointLimits;
     }
 
-    void RobotNode::setEnforceJointLimits(bool value)
+    void
+    RobotNode::setEnforceJointLimits(bool value)
     {
         enforceJointLimits = value;
     }
 
-    void RobotNode::removeAllSensors(bool recursive)
+    bool
+    RobotNode::getAllowJointLimitAvoidance() const
+    {
+        return allowJointLimitAvoidance;
+    }
+
+    void
+    RobotNode::setAllowJointLimitAvoidance(bool value)
+    {
+        allowJointLimitAvoidance = value;
+    }
+
+    void
+    RobotNode::removeAllSensors(bool recursive)
     {
         for (auto it = children.begin(); it != children.end();)
         {
             if (auto node = std::dynamic_pointer_cast<RobotNode>(*it))
             {
-                if (recursive) node->removeAllSensors(recursive);
+                if (recursive)
+                    node->removeAllSensors(recursive);
             }
             else if (auto node = std::dynamic_pointer_cast<Sensor>(*it))
             {
@@ -149,13 +168,15 @@ namespace VirtualRobot
         sensors.clear();
     }
 
-    RobotPtr RobotNode::getRobot() const
+    RobotPtr
+    RobotNode::getRobot() const
     {
         RobotPtr result(robot);
         return result;
     }
 
-    void RobotNode::setJointValue(float q)
+    void
+    RobotNode::setJointValue(float q)
     {
         RobotPtr r = getRobot();
         VR_ASSERT(r);
@@ -164,7 +185,8 @@ namespace VirtualRobot
         updatePose();
     }
 
-    void RobotNode::setJointValueNotInitialized(float q)
+    void
+    RobotNode::setJointValueNotInitialized(float q)
     {
         VR_ASSERT_MESSAGE((!std::isnan(q) && !std::isinf(q)), "Not a valid number...");
 
@@ -194,7 +216,9 @@ namespace VirtualRobot
 
         jointValue = q;
     }
-    void RobotNode::setJointValueNoUpdate(float q)
+
+    void
+    RobotNode::setJointValueNoUpdate(float q)
     {
         VR_ASSERT_MESSAGE(initialized, "Not initialized");
         VR_ASSERT_MESSAGE((!std::isnan(q) && !std::isinf(q)), "Not a valid number...");
@@ -238,7 +262,8 @@ namespace VirtualRobot
         jointValue = q;
     }
 
-    void RobotNode::updateTransformationMatrices()
+    void
+    RobotNode::updateTransformationMatrices()
     {
         if (this->getParent())
         {
@@ -260,19 +285,20 @@ namespace VirtualRobot
         }
     }
 
-    void RobotNode::setLocalTransformation(Eigen::Matrix4f& newLocalTransformation)
+    void
+    RobotNode::setLocalTransformation(Eigen::Matrix4f& newLocalTransformation)
     {
         this->localTransformation = newLocalTransformation;
-
     }
 
-    void RobotNode::updateTransformationMatrices(const Eigen::Matrix4f& parentPose)
+    void
+    RobotNode::updateTransformationMatrices(const Eigen::Matrix4f& parentPose)
     {
         this->globalPose = parentPose * localTransformation; // getLocalTransformation();
     }
 
-
-    void RobotNode::updatePose(bool updateChildren)
+    void
+    RobotNode::updatePose(bool updateChildren)
     {
         THROW_VR_EXCEPTION_IF(!initialized, this->getName() + " is not initialized");
 
@@ -285,7 +311,7 @@ namespace VirtualRobot
         if (propagatedJointValues.size() > 0)
         {
             RobotPtr r = robot.lock();
-            std::map< std::string, float>::iterator it = propagatedJointValues.begin();
+            std::map<std::string, float>::iterator it = propagatedJointValues.begin();
 
             while (it != propagatedJointValues.end())
             {
@@ -293,7 +319,8 @@ namespace VirtualRobot
 
                 if (!rn)
                 {
-                    VR_WARNING << "Could not propagate joint value from " << name << " to " << it->first << " because dependent joint does not exist...";
+                    VR_WARNING << "Could not propagate joint value from " << name << " to "
+                               << it->first << " because dependent joint does not exist...";
                 }
                 else
                 {
@@ -305,7 +332,8 @@ namespace VirtualRobot
         }
     }
 
-    void RobotNode::copyPoseFrom(const RobotNodePtr& other)
+    void
+    RobotNode::copyPoseFrom(const RobotNodePtr& other)
     {
         jointValue = other->jointValue;
         //the following code was manually inlined from
@@ -324,14 +352,16 @@ namespace VirtualRobot
         }
     }
 
-    void RobotNode::copyPoseFrom(const SceneObjectPtr& sceneobj)
+    void
+    RobotNode::copyPoseFrom(const SceneObjectPtr& sceneobj)
     {
         RobotNodePtr other = std::dynamic_pointer_cast<RobotNode>(sceneobj);
         THROW_VR_EXCEPTION_IF(!other, "The given SceneObject is no RobotNode");
         copyPoseFrom(other);
     }
 
-    void RobotNode::updatePose(const Eigen::Matrix4f& globalPose, bool updateChildren)
+    void
+    RobotNode::updatePose(const Eigen::Matrix4f& globalPose, bool updateChildren)
     {
         THROW_VR_EXCEPTION_IF(!initialized, this->getName() + " is not initialized");
 
@@ -351,7 +381,8 @@ namespace VirtualRobot
 
                 if (!rn)
                 {
-                    VR_WARNING << "Could not propagate joint value from " << name << " to " << jname << " because dependent joint does not exist...";
+                    VR_WARNING << "Could not propagate joint value from " << name << " to " << jname
+                               << " because dependent joint does not exist...";
                 }
                 else
                 {
@@ -361,11 +392,12 @@ namespace VirtualRobot
         }
     }
 
-    void RobotNode::collectAllRobotNodes(std::vector< RobotNodePtr >& storeNodes)
+    void
+    RobotNode::collectAllRobotNodes(std::vector<RobotNodePtr>& storeNodes)
     {
         storeNodes.push_back(std::static_pointer_cast<RobotNode>(shared_from_this()));
 
-        std::vector< SceneObjectPtr > children = this->getChildren();
+        std::vector<SceneObjectPtr> children = this->getChildren();
 
         for (size_t i = 0; i < children.size(); i++)
         {
@@ -378,13 +410,15 @@ namespace VirtualRobot
         }
     }
 
-    float RobotNode::getJointValue() const
+    float
+    RobotNode::getJointValue() const
     {
         ReadLockPtr lock = getRobot()->getReadLock();
         return jointValue;
     }
 
-    void RobotNode::respectJointLimits(float& jointValue) const
+    void
+    RobotNode::respectJointLimits(float& jointValue) const
     {
         if (jointValue < jointLimitLo)
         {
@@ -397,7 +431,8 @@ namespace VirtualRobot
         }
     }
 
-    bool RobotNode::checkJointLimits(float jointValue, bool verbose) const
+    bool
+    RobotNode::checkJointLimits(float jointValue, bool verbose) const
     {
         ReadLockPtr lock = getRobot()->getReadLock();
         bool res = true;
@@ -414,17 +449,22 @@ namespace VirtualRobot
 
         if (!res && verbose)
         {
-            VR_INFO << "Joint: " << getName() << ": joint value (" << jointValue << ") is out of joint boundaries (lo:" << jointLimitLo << ", hi: " << jointLimitHi << ")" << std::endl;
+            VR_INFO << "Joint: " << getName() << ": joint value (" << jointValue
+                    << ") is out of joint boundaries (lo:" << jointLimitLo
+                    << ", hi: " << jointLimitHi << ")" << std::endl;
         }
 
         return res;
     }
-    void RobotNode::setGlobalPose(const Eigen::Matrix4f& /*pose*/)
+
+    void
+    RobotNode::setGlobalPose(const Eigen::Matrix4f& /*pose*/)
     {
         THROW_VR_EXCEPTION("Use setJointValues to control the position of a RobotNode");
     }
 
-    void RobotNode::print(bool printChildren, bool printDecoration) const
+    void
+    RobotNode::print(bool printChildren, bool printDecoration) const
     {
         ReadLockPtr lock = getRobot()->getReadLock();
 
@@ -464,15 +504,20 @@ namespace VirtualRobot
 
         std::cout << "* Limits: Lo: " << jointLimitLo << ", Hi: " << jointLimitHi << std::endl;
         std::cout << "* Limitless: " << (limitless ? "true" : "false") << std::endl;
-        std::cout << "* max velocity " << maxVelocity  << " [m/s]" << std::endl;
-        std::cout << "* max acceleration " << maxAcceleration  << " [m/s^2]" << std::endl;
-        std::cout << "* max torque " << maxTorque  << " [Nm]" << std::endl;
-        std::cout << "* jointValue: " << this->getJointValue() << ", jointValueOffset: " << jointValueOffset << std::endl;
+        std::cout << "* Allow joint limit avoidance: "
+                  << (allowJointLimitAvoidance ? "true" : "false") << std::endl;
+        std::cout << "* max velocity " << maxVelocity << " [m/s]" << std::endl;
+        std::cout << "* max acceleration " << maxAcceleration << " [m/s^2]" << std::endl;
+        std::cout << "* max torque " << maxTorque << " [Nm]" << std::endl;
+        std::cout << "* jointValue: " << this->getJointValue()
+                  << ", jointValueOffset: " << jointValueOffset << std::endl;
 
         if (optionalDHParameter.isSet)
         {
             std::cout << "* DH parameters: ";
-            std::cout << " a:" << optionalDHParameter.aMM() << ", d:" << optionalDHParameter.dMM() << ", alpha:" << optionalDHParameter.alphaRadian() << ", theta:" << optionalDHParameter.thetaRadian() << std::endl;
+            std::cout << " a:" << optionalDHParameter.aMM() << ", d:" << optionalDHParameter.dMM()
+                      << ", alpha:" << optionalDHParameter.alphaRadian()
+                      << ", theta:" << optionalDHParameter.thetaRadian() << std::endl;
         }
         else
         {
@@ -526,7 +571,7 @@ namespace VirtualRobot
 
         if (printChildren)
         {
-            std::vector< SceneObjectPtr > children = this->getChildren();
+            std::vector<SceneObjectPtr> children = this->getChildren();
 
             for (unsigned int i = 0; i < children.size(); i++)
             {
@@ -535,11 +580,13 @@ namespace VirtualRobot
         }
     }
 
-    RobotNodePtr RobotNode::clone(RobotPtr newRobot, bool cloneChildren,
-                                  RobotNodePtr initializeWithParent,
-                                  CollisionCheckerPtr colChecker,
-                                  std::optional<float> scaling,
-                                  bool preventCloningMeshesIfScalingIs1)
+    RobotNodePtr
+    RobotNode::clone(RobotPtr newRobot,
+                     bool cloneChildren,
+                     RobotNodePtr initializeWithParent,
+                     CollisionCheckerPtr colChecker,
+                     std::optional<float> scaling,
+                     bool preventCloningMeshesIfScalingIs1)
     {
         const float actualScaling = scaling.value_or(this->scaling);
         const float scalingFactor = scaling.has_value() ? scaling.value() / this->scaling : 1.0f;
@@ -552,11 +599,12 @@ namespace VirtualRobot
             return RobotNodePtr();
         }
 
-        std::vector< std::string > clonedChildrenNames;
+        std::vector<std::string> clonedChildrenNames;
 
         VisualizationNodePtr clonedVisualizationNode;
 
-        const bool deepMeshClone = !preventCloningMeshesIfScalingIs1 || std::abs(scalingFactor - 1) <= 1e-12;
+        const bool deepMeshClone =
+            !preventCloningMeshesIfScalingIs1 || std::abs(scalingFactor - 1) <= 1e-12;
         if (visualizationModel)
         {
             clonedVisualizationNode = visualizationModel->clone(deepMeshClone, scalingFactor);
@@ -569,7 +617,8 @@ namespace VirtualRobot
             clonedCollisionModel = collisionModel->clone(colChecker, scalingFactor, deepMeshClone);
         }
 
-        RobotNodePtr result = _clone(newRobot, clonedVisualizationNode, clonedCollisionModel, colChecker, scalingFactor);
+        RobotNodePtr result = _clone(
+            newRobot, clonedVisualizationNode, clonedCollisionModel, colChecker, scalingFactor);
 
         if (!result)
         {
@@ -589,7 +638,7 @@ namespace VirtualRobot
 
         if (cloneChildren)
         {
-            std::vector< SceneObjectPtr > children = this->getChildren();
+            std::vector<SceneObjectPtr> children = this->getChildren();
 
             for (size_t i = 0; i < children.size(); i++)
             {
@@ -597,7 +646,12 @@ namespace VirtualRobot
 
                 if (n)
                 {
-                    RobotNodePtr c = n->clone(newRobot, true, RobotNodePtr(), colChecker, scaling, preventCloningMeshesIfScalingIs1);
+                    RobotNodePtr c = n->clone(newRobot,
+                                              true,
+                                              RobotNodePtr(),
+                                              colChecker,
+                                              scaling,
+                                              preventCloningMeshesIfScalingIs1);
 
                     if (c)
                     {
@@ -613,8 +667,9 @@ namespace VirtualRobot
         result->setMaxAcceleration(maxAcceleration);
         result->setMaxTorque(maxTorque);
         result->setLimitless(limitless);
+        result->setAllowJointLimitAvoidance(allowJointLimitAvoidance);
 
-        std::map< std::string, float>::iterator it = propagatedJointValues.begin();
+        std::map<std::string, float>::iterator it = propagatedJointValues.begin();
 
         while (it != propagatedJointValues.end())
         {
@@ -636,50 +691,58 @@ namespace VirtualRobot
         return result;
     }
 
-
-    float RobotNode::getJointLimitLo()
+    float
+    RobotNode::getJointLimitLo()
     {
         ReadLockPtr lock = getRobot()->getReadLock();
         return jointLimitLo;
     }
 
-    float RobotNode::getJointLimitHi()
+    float
+    RobotNode::getJointLimitHi()
     {
         ReadLockPtr lock = getRobot()->getReadLock();
         return jointLimitHi;
     }
 
-    bool RobotNode::isTranslationalJoint() const
+    bool
+    RobotNode::isTranslationalJoint() const
     {
         return false;
     }
 
-    bool RobotNode::isRotationalJoint() const
+    bool
+    RobotNode::isRotationalJoint() const
     {
         return false;
     }
 
-    bool RobotNode::isHemisphereJoint() const
-    {
-        return false;
-    }
-    
-    bool RobotNode::isFourBarJoint() const
+    bool
+    RobotNode::isHemisphereJoint() const
     {
         return false;
     }
 
-    void RobotNode::setLimitless(bool limitless)
+    bool
+    RobotNode::isFourBarJoint() const
+    {
+        return false;
+    }
+
+    void
+    RobotNode::setLimitless(bool limitless)
     {
         this->limitless = limitless;
     }
 
-    bool RobotNode::isLimitless() const
+    bool
+    RobotNode::isLimitless() const
     {
         return limitless;
     }
 
-    float RobotNode::getDelta(float target)
+    float
+    RobotNode::getDelta(float target)
     {
         float delta = 0.0f;
 
@@ -702,18 +765,22 @@ namespace VirtualRobot
         // eventually take the other way around if it is shorter and if this joint is limitless.
         if (limitless && (std::abs(delta) > static_cast<float>(M_PI)))
         {
-            delta = (-1) * ((delta > 0) - (delta < 0)) * ((2 * static_cast<float>(M_PI)) - std::abs(delta));
+            delta = (-1) * ((delta > 0) - (delta < 0)) *
+                    ((2 * static_cast<float>(M_PI)) - std::abs(delta));
         }
 
         return delta;
     }
 
-
-    void RobotNode::showCoordinateSystem(bool enable, float scaling, std::string* text, const std::string& visualizationType)
+    void
+    RobotNode::showCoordinateSystem(bool enable,
+                                    float scaling,
+                                    std::string* text,
+                                    const std::string& visualizationType)
     {
         if (!enable && !visualizationModel)
         {
-            return;    // nothing to do
+            return; // nothing to do
         }
 
         if (!ensureVisualization(visualizationType))
@@ -748,12 +815,14 @@ namespace VirtualRobot
 
             if (!visualizationFactory)
             {
-                VR_WARNING << "No visualization factory for name " << visualizationType << std::endl;
+                VR_WARNING << "No visualization factory for name " << visualizationType
+                           << std::endl;
                 return;
             }
 
             // create coord visu
-            VisualizationNodePtr visualizationNode = visualizationFactory->createCoordSystem(scaling, &coordName);
+            VisualizationNodePtr visualizationNode =
+                visualizationFactory->createCoordSystem(scaling, &coordName);
 
             // not needed any more
             // this is a little hack: The globalPose is used to set the "local" position of the attached Visualization:
@@ -767,13 +836,14 @@ namespace VirtualRobot
         }
     }
 
-    void RobotNode::showStructure(bool enable, const std::string& visualizationType)
+    void
+    RobotNode::showStructure(bool enable, const std::string& visualizationType)
     {
         ReadLockPtr lock = getRobot()->getReadLock();
 
         if (!enable && !visualizationModel)
         {
-            return;    // nothing to do
+            return; // nothing to do
         }
 
         if (!ensureVisualization(visualizationType))
@@ -817,7 +887,8 @@ namespace VirtualRobot
 
             if (!visualizationFactory)
             {
-                VR_WARNING << "No visualization factory for name " << visualizationType << std::endl;
+                VR_WARNING << "No visualization factory for name " << visualizationType
+                           << std::endl;
                 return;
             }
 
@@ -830,20 +901,25 @@ namespace VirtualRobot
                 {
                     // add to parent node (pre joint trafo moves with parent!)
                     //visualizationNode1 = visualizationFactory->createLine(parRN->postJointTransformation, parRN->postJointTransformation*localTransformation);
-                    const Eigen::Vector3f localTrafoPos = Eigen::Isometry3f{localTransformation}.translation();
-                    
-                    visualizationNode1 = visualizationFactory->createLine(Eigen::Vector3f::Zero(), localTrafoPos);
+                    const Eigen::Vector3f localTrafoPos =
+                        Eigen::Isometry3f{localTransformation}.translation();
+
+                    visualizationNode1 =
+                        visualizationFactory->createLine(Eigen::Vector3f::Zero(), localTrafoPos);
 
                     if (visualizationNode1)
                     {
-                        parRN->getVisualization()->attachVisualization(attachName1, visualizationNode1);
+                        parRN->getVisualization()->attachVisualization(attachName1,
+                                                                       visualizationNode1);
                     }
                 }
                 else
                 {
-                    const Eigen::Vector3f localTrafoInvPos = Eigen::Isometry3f{localTransformation}.inverse().translation();
+                    const Eigen::Vector3f localTrafoInvPos =
+                        Eigen::Isometry3f{localTransformation}.inverse().translation();
 
-                    visualizationNode1 = visualizationFactory->createLine(localTrafoInvPos, Eigen::Vector3f::Zero());
+                    visualizationNode1 =
+                        visualizationFactory->createLine(localTrafoInvPos, Eigen::Vector3f::Zero());
 
                     if (visualizationNode1)
                     {
@@ -851,17 +927,18 @@ namespace VirtualRobot
                     }
                 }
             }
-            else if (Eigen::Vector3f parPos = parRN
-                                            ? parRN->getPositionInFrame(getRobot()->getRobotNode(this->getName()))
-                                            : Eigen::Vector3f::Zero()
-                                            ; parPos.norm() > 0.01)
+            else if (Eigen::Vector3f parPos = parRN ? parRN->getPositionInFrame(
+                                                          getRobot()->getRobotNode(this->getName()))
+                                                    : Eigen::Vector3f::Zero();
+                     parPos.norm() > 0.01)
             {
                 // Some nodes (e.g. the Revolute and FourBar) offset their position by values that are not reflected in the local transformation.
                 // Check RobotNodeFourBar::updateTransformationMatrices and RobotNodeRevolute::updateTransformationMatrices.
                 // There the global pose is set to parent * local * tmp, where tmp is important but not part of
                 // This code catches these cases by checking the actual distance between the current node and its parent.
 
-                VisualizationNodePtr visualizationNode1 = visualizationFactory->createLine(Eigen::Vector3f::Zero(), parPos);
+                VisualizationNodePtr visualizationNode1 =
+                    visualizationFactory->createLine(Eigen::Vector3f::Zero(), parPos);
 
                 if (visualizationNode1)
                 {
@@ -878,7 +955,8 @@ namespace VirtualRobot
         }
     }
 
-    std::vector<RobotNodePtr> RobotNode::getAllParents(RobotNodeSetPtr rns)
+    std::vector<RobotNodePtr>
+    RobotNode::getAllParents(RobotNodeSetPtr rns)
     {
         std::vector<RobotNodePtr> result;
 
@@ -905,53 +983,67 @@ namespace VirtualRobot
         return result;
     }
 
-    void RobotNode::setJointLimits(float lo, float hi)
+    void
+    RobotNode::setJointLimits(float lo, float hi)
     {
         jointLimitLo = lo;
         jointLimitHi = hi;
     }
 
-    bool RobotNode::isJoint() const
+    bool
+    RobotNode::isJoint() const
     {
-        return isRotationalJoint() or isTranslationalJoint() or isHemisphereJoint() or isFourBarJoint();
+        return isRotationalJoint() or isTranslationalJoint() or isHemisphereJoint() or
+               isFourBarJoint();
     }
 
-    void RobotNode::setMaxTorque(float maxTo)
+    void
+    RobotNode::setMaxTorque(float maxTo)
     {
         maxTorque = maxTo;
     }
 
-    void RobotNode::setMaxAcceleration(float maxAcc)
+    void
+    RobotNode::setMaxAcceleration(float maxAcc)
     {
         maxAcceleration = maxAcc;
     }
 
-    void RobotNode::setMaxVelocity(float maxVel)
+    void
+    RobotNode::setMaxVelocity(float maxVel)
     {
         maxVelocity = maxVel;
     }
 
-    float RobotNode::getMaxVelocity()
+    float
+    RobotNode::getMaxVelocity()
     {
         return maxVelocity;
     }
 
-    float RobotNode::getMaxAcceleration()
+    float
+    RobotNode::getMaxAcceleration()
     {
         return maxAcceleration;
     }
 
-    float RobotNode::getMaxTorque()
+    float
+    RobotNode::getMaxTorque()
     {
         return maxTorque;
     }
 
-    void RobotNode::updateVisualizationPose(const Eigen::Matrix4f& globalPose, float jointValue, bool updateChildren)
+    void
+    RobotNode::updateVisualizationPose(const Eigen::Matrix4f& globalPose,
+                                       float jointValue,
+                                       bool updateChildren)
     {
         updateVisualizationPose(globalPose, updateChildren);
         this->jointValue = jointValue;
     }
-    void RobotNode::updateVisualizationPose(const Eigen::Matrix4f& globalPose, bool updateChildren)
+
+    void
+    RobotNode::updateVisualizationPose(const Eigen::Matrix4f& globalPose, bool updateChildren)
     {
         // check if we are a root node
         SceneObjectPtr parent = getParent();
@@ -959,7 +1051,8 @@ namespace VirtualRobot
 
         if (!parent || parent == rob)
         {
-            if (rob && rob->getRootNode() == std::static_pointer_cast<RobotNode>(shared_from_this()))
+            if (rob &&
+                rob->getRootNode() == std::static_pointer_cast<RobotNode>(shared_from_this()))
             {
                 Eigen::Matrix4f gpPre = globalPose * getLocalTransformation().inverse();
                 rob->setGlobalPose(gpPre, false);
@@ -976,19 +1069,23 @@ namespace VirtualRobot
         SceneObject::updatePose(updateChildren);
     }
 
-    Eigen::Matrix4f RobotNode::getGlobalPose() const
+    Eigen::Matrix4f
+    RobotNode::getGlobalPose() const
     {
         ReadLockPtr lock = getRobot()->getReadLock();
         return globalPose;
     }
 
-    Eigen::Matrix4f RobotNode::getPoseInRootFrame() const
+    Eigen::Matrix4f
+    RobotNode::getPoseInRootFrame() const
     {
         RobotPtr r = getRobot();
         ReadLockPtr lock = r->getReadLock();
         return r->getRootNode()->toLocalCoordinateSystem(globalPose);
     }
-    Eigen::Matrix4f RobotNode::getPoseInFrame(const RobotNodePtr& frame) const
+
+    Eigen::Matrix4f
+    RobotNode::getPoseInFrame(const RobotNodePtr& frame) const
     {
         if (!frame)
         {
@@ -999,49 +1096,59 @@ namespace VirtualRobot
         const Eigen::Matrix4f finroot = frame->getPoseInRootFrame();
         return finroot.inverse() * pinroot;
     }
-    Eigen::Vector3f RobotNode::getPositionInFrame(const RobotNodePtr& frame) const
+
+    Eigen::Vector3f
+    RobotNode::getPositionInFrame(const RobotNodePtr& frame) const
     {
         return getPoseInFrame(frame).topRightCorner<3, 1>();
     }
 
-    Eigen::Vector3f RobotNode::getPositionInRootFrame() const
+    Eigen::Vector3f
+    RobotNode::getPositionInRootFrame() const
     {
         RobotPtr r = getRobot();
         ReadLockPtr lock = r->getReadLock();
         return r->getRootNode()->toLocalCoordinateSystemVec(globalPose.block(0, 3, 3, 1));
     }
 
-    Eigen::Matrix3f RobotNode::getOrientationInRootFrame() const
+    Eigen::Matrix3f
+    RobotNode::getOrientationInRootFrame() const
     {
         return getPoseInRootFrame().block<3, 3>(0, 0);
     }
 
-    Eigen::Matrix4f RobotNode::getPoseInRootFrame(const Eigen::Matrix4f& localPose) const
+    Eigen::Matrix4f
+    RobotNode::getPoseInRootFrame(const Eigen::Matrix4f& localPose) const
     {
         return getPoseInRootFrame() * localPose;
     }
 
-    Eigen::Vector3f RobotNode::getPositionInRootFrame(const Eigen::Vector3f& localPosition) const
+    Eigen::Vector3f
+    RobotNode::getPositionInRootFrame(const Eigen::Vector3f& localPosition) const
     {
         return ::math::Helpers::TransformPosition(getPoseInRootFrame(), localPosition);
     }
 
-    Eigen::Vector3f RobotNode::getDirectionInRootFrame(const Eigen::Vector3f& localPosition) const
+    Eigen::Vector3f
+    RobotNode::getDirectionInRootFrame(const Eigen::Vector3f& localPosition) const
     {
         return ::math::Helpers::TransformDirection(getPoseInRootFrame(), localPosition);
     }
 
-    Eigen::Matrix3f RobotNode::getOrientationInRootFrame(const Eigen::Matrix3f& localOrientation) const
+    Eigen::Matrix3f
+    RobotNode::getOrientationInRootFrame(const Eigen::Matrix3f& localOrientation) const
     {
         return ::math::Helpers::TransformOrientation(getPoseInRootFrame(), localOrientation);
     }
 
-    RobotNode::RobotNodeType RobotNode::getType()
+    RobotNode::RobotNodeType
+    RobotNode::getType()
     {
         return nodeType;
     }
 
-    void RobotNode::propagateJointValue(const std::string& jointName, float factor /*= 1.0f*/)
+    void
+    RobotNode::propagateJointValue(const std::string& jointName, float factor /*= 1.0f*/)
     {
         if (factor == 0.0f)
         {
@@ -1053,7 +1160,11 @@ namespace VirtualRobot
         }
     }
 
-    std::string RobotNode::toXML(const std::string& basePath, const std::string& modelPathRelative, bool storeSensors, bool storeModelFiles)
+    std::string
+    RobotNode::toXML(const std::string& basePath,
+                     const std::string& modelPathRelative,
+                     bool storeSensors,
+                     bool storeModelFiles)
     {
         std::stringstream ss;
         ss << "\t<RobotNode name='" << name << "'>" << std::endl;
@@ -1074,9 +1185,11 @@ namespace VirtualRobot
 
         std::filesystem::path pBase(basePath);
 
-        if (visualizationModel && visualizationModel->getTriMeshModel() && visualizationModel->getTriMeshModel()->faces.size() > 0)
+        if (visualizationModel && visualizationModel->getTriMeshModel() &&
+            visualizationModel->getTriMeshModel()->faces.size() > 0)
         {
-            if (storeModelFiles) {
+            if (storeModelFiles)
+            {
                 std::string visuFile = getFilenameReplacementVisuModel();
 
                 std::filesystem::path pModel(modelPathRelative);
@@ -1086,12 +1199,15 @@ namespace VirtualRobot
 
                 ss << visualizationModel->toXML(pBase.string(), modelFileComplete.string(), 2);
             }
-            else ss << visualizationModel->toXML(basePath, 2);
+            else
+                ss << visualizationModel->toXML(basePath, 2);
         }
 
-        if (collisionModel && collisionModel->getTriMeshModel() && collisionModel->getTriMeshModel()->faces.size() > 0)
+        if (collisionModel && collisionModel->getTriMeshModel() &&
+            collisionModel->getTriMeshModel()->faces.size() > 0)
         {
-            if (storeModelFiles) {
+            if (storeModelFiles)
+            {
                 std::string colFile = getFilenameReplacementColModel();
                 std::filesystem::path pModel(modelPathRelative);
                 std::filesystem::path modelDirComplete = pBase / pModel;
@@ -1099,7 +1215,8 @@ namespace VirtualRobot
                 std::filesystem::path modelFileComplete = modelDirComplete / fn;
                 ss << collisionModel->toXML(pBase.string(), modelFileComplete.string(), 2);
             }
-            else ss << collisionModel->toXML(basePath, 2);
+            else
+                ss << collisionModel->toXML(basePath, 2);
         }
 
         std::vector<SceneObjectPtr> children = this->getChildren();

@@ -110,7 +110,6 @@ CompositeDiffIK::Result CompositeDiffIK::solve(Parameters params, SolveState &s)
             }
             else if (node->isFourBarJoint())
             {
-                // FIXME: ToDo @reister ?
                 regularization = params.jointRegularizationFourBar;
             }
 
