@@ -6,7 +6,6 @@
 #include <iomanip>
 
 #include <Eigen/Core>
-#include <Eigen/src/Geometry/Transform.h>
 
 #include <VirtualRobot/CollisionDetection/CollisionModel.h>
 #include <VirtualRobot/Robot.h>
@@ -48,6 +47,7 @@ namespace VirtualRobot
         //globalPosePostJoint = Eigen::Matrix4f::Identity();
         jointValue = 0.0f;
         limitless = false;
+        allowJointLimitAvoidance = true;
     }
 
     RobotNode::~RobotNode()
@@ -133,6 +133,18 @@ namespace VirtualRobot
     RobotNode::setEnforceJointLimits(bool value)
     {
         enforceJointLimits = value;
+    }
+
+    bool
+    RobotNode::getAllowJointLimitAvoidance() const
+    {
+        return allowJointLimitAvoidance;
+    }
+
+    void
+    RobotNode::setAllowJointLimitAvoidance(bool value)
+    {
+        allowJointLimitAvoidance = value;
     }
 
     void
@@ -492,6 +504,8 @@ namespace VirtualRobot
 
         std::cout << "* Limits: Lo: " << jointLimitLo << ", Hi: " << jointLimitHi << std::endl;
         std::cout << "* Limitless: " << (limitless ? "true" : "false") << std::endl;
+        std::cout << "* Allow joint limit avoidance: "
+                  << (allowJointLimitAvoidance ? "true" : "false") << std::endl;
         std::cout << "* max velocity " << maxVelocity << " [m/s]" << std::endl;
         std::cout << "* max acceleration " << maxAcceleration << " [m/s^2]" << std::endl;
         std::cout << "* max torque " << maxTorque << " [Nm]" << std::endl;
@@ -653,6 +667,7 @@ namespace VirtualRobot
         result->setMaxAcceleration(maxAcceleration);
         result->setMaxTorque(maxTorque);
         result->setLimitless(limitless);
+        result->setAllowJointLimitAvoidance(allowJointLimitAvoidance);
 
         std::map<std::string, float>::iterator it = propagatedJointValues.begin();
 

@@ -428,6 +428,9 @@ namespace VirtualRobot
         bool getEnforceJointLimits() const;
         void setEnforceJointLimits(bool value);
 
+        bool getAllowJointLimitAvoidance() const;
+        void setAllowJointLimitAvoidance(bool value);
+
         /*! Removes all sensors (for faster forward kinematics) */
         void removeAllSensors(bool recursive = true);
 
@@ -466,9 +469,12 @@ namespace VirtualRobot
         float jointValueOffset;
         float jointLimitLo, jointLimitHi;
         bool enforceJointLimits = true;
-        bool limitless; // whether this joint has limits or not (ignored if nodeType != Joint).
-        DHParameter
-            optionalDHParameter; // When the joint is defined via DH parameters they are stored here
+        bool allowJointLimitAvoidance = true;
+
+        // whether this joint has limits or not (ignored if nodeType != Joint).
+        bool limitless;
+        // When the joint is defined via DH parameters they are stored here
+        DHParameter optionalDHParameter;
         float maxVelocity; //! given in m/s
         float maxAcceleration; //! given in m/s^2
         float maxTorque; //! given in Nm
