@@ -54,15 +54,34 @@ function(SimoxQtLibrary name srcs incs mocFiles uiFiles)
     TARGET_LINK_LIBRARIES(${name} PUBLIC GraspStudio Saba)
 endfunction()
 
-macro(simox_subdirs result curdir)
-    file(GLOB children ${curdir}/*)
-    set(${result})
-    foreach(child ${children})
-        if(IS_DIRECTORY ${child})
-            list(APPEND ${result} ${child})
+function(simox_subdirs RESULT DIRECTORY)
+    file(GLOB CHILDREN ${DIRECTORY}/*)
+    # message("## children of ${DIRECTORY}: ${CHILDREN}")
+
+    set(DIR_CHILDREN "")
+    foreach(CHILD ${CHILDREN})
+        if (IS_DIRECTORY "${CHILD}")
+            list(APPEND DIR_CHILDREN ${CHILD})
         endif()
     endforeach()
-endmacro()
+
+    set(${RESULT} "${DIR_CHILDREN}" PARENT_SCOPE)
+endfunction()
+
+
+function(simox_subdirs_recursive RESULT DIRECTORY)
+    simox_subdirs(TOP_CHILDREN "${DIRECTORY}")
+    set(ALL_CHILDREN ${TOP_CHILDREN})
+
+    foreach(TOP_CHILD ${TOP_CHILDREN})
+        simox_subdirs_recursive(REC_CHILDREN ${TOP_CHILD})
+        list(APPEND ALL_CHILDREN ${REC_CHILDREN})
+    endforeach()
+
+    set(${RESULT} "${ALL_CHILDREN}" PARENT_SCOPE)
+
+endfunction()
+
 
 macro(simox_update_file file content) #macro since we want to provide simox_file_up_to_date
     set(simox_file_up_to_date 0)

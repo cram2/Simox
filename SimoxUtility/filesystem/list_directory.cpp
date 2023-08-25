@@ -2,31 +2,51 @@
 
 #include <algorithm>
 
-
 namespace simox
 {
-    std::vector<fs::path> fs::list_directory(const path& directory, bool local, bool sort)
+
+    namespace impl
     {
-        std::vector<path> entries;
-        for (const auto& entry : directory_iterator(directory))
-        {
-            entries.push_back(entry.path());
-        }
 
-        if (sort)
-        {
-            std::sort(entries.begin(), entries.end());
-        }
 
-        if (local)
+        template <class DirectoryIteratorT>
+        std::vector<fs::path>
+        list_directory(const fs::path& directory, bool local, bool sort)
         {
-            for (auto& entry : entries)
+            std::vector<fs::path> entries;
+            for (const auto& entry : DirectoryIteratorT(directory))
             {
-                entry = entry.filename();
+                entries.push_back(entry.path());
             }
+
+            if (sort)
+            {
+                std::sort(entries.begin(), entries.end());
+            }
+
+            if (local)
+            {
+                for (auto& entry : entries)
+                {
+                    entry = entry.filename();
+                }
+            }
+            return entries;
         }
-        return entries;
+
+    } // namespace impl
+
+    std::vector<fs::path>
+    fs::list_directory(const path& directory, bool local, bool sort)
+    {
+        return impl::list_directory<std::filesystem::directory_iterator>(directory, local, sort);
     }
 
-}
+    std::vector<std::filesystem::__cxx11::path>
+    fs::list_directory_recursive(const path& directory, bool local, bool sort)
+    {
+        return impl::list_directory<std::filesystem::recursive_directory_iterator>(
+            directory, local, sort);
+    }
 
+} // namespace simox

@@ -21,7 +21,7 @@ elseif(RELEASE_CODENAME STREQUAL focal OR RELEASE_CODENAME STREQUAL odin OR RELE
     SET(Simox_BOOST_VERSION 1.71.0)
 elseif(RELEASE_CODENAME STREQUAL impish)
     SET(Simox_BOOST_VERSION 1.74.0)
-elseif(RELEASE_CODENAME STREQUAL jammy)
+elseif(RELEASE_CODENAME STREQUAL jammy OR RELEASE_CODENAME STREQUAL horus)
     SET(Simox_BOOST_VERSION 1.74.0)
 else()
     SET(Simox_BOOST_VERSION 1.65.1)
@@ -230,7 +230,7 @@ list (APPEND Simox_LIBRARIES          SimoxQtUtility)
 #######################################################################################
 if (Simox_BUILD_VirtualRobot)
     add_subdirectory(VirtualRobot)
-    list(APPEND SIMOX_EXPORT_TARGET_LIST VirtualRobot)
+    list(APPEND SIMOX_EXPORT_TARGET_LIST VirtualRobot assimp_interface)
     list(APPEND Simox_LIBRARIES VirtualRobot)
 endif()
 

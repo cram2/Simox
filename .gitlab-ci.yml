@@ -1,7 +1,7 @@
-
 stages:
   - build-and-test
-  - documentation
+  - deploy
+  - post-deploy-test
   - downstream
 
 
@@ -62,11 +62,7 @@ stages:
     # Test.
     # ToDo: Add and use `axii ws test -m simox`
     - cd "$PROJECT_PATH_IN_WORKSPACE/build"
-    - ctest . || true
-    - ctest --rerun-failed --output-on-failure . || true
-    - cat Testing/Temporary/LastTest.log || true
-    # Once again to make the job fail if an error occurs.
-    - ctest .
+    - ctest --output-on-failure --output-junit "$CI_PROJECT_DIR/report.xml" .
 
     # Generate documentation.
     - cd "$PROJECT_PATH_IN_WORKSPACE/build"
@@ -82,6 +78,9 @@ build-and-test-bionic:
   image: git.h2t.iar.kit.edu:5050/sw/armarx/meta/axii:latest-bionic
 
   artifacts:
+    reports:
+      junit: report.xml
+
     name: "Simox-Documentation-$CI_COMMIT_REF_NAME"
     paths:
       - build/doc/html/
@@ -94,6 +93,78 @@ build-and-test-jammy:
   image: git.h2t.iar.kit.edu:5050/sw/armarx/meta/axii:latest-jammy
 
 
+docker-bionic:
+  stage: deploy
+  needs: ["build-and-test-bionic"]
+  image:
+    name: gcr.io/kaniko-project/executor:v1.9.0-debug
+    entrypoint: [""]
+  script:
+    - /kaniko/executor
+      --context "${CI_PROJECT_DIR}"
+      --dockerfile "${CI_PROJECT_DIR}/docker/bionic"
+      --destination "${CI_REGISTRY_IMAGE}:latest-bionic"
+
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master"
+
+
+docker-jammy:
+  stage: deploy
+  needs: ["build-and-test-jammy"]
+  image:
+    name: gcr.io/kaniko-project/executor:v1.9.0-debug
+    entrypoint: [""]
+  script:
+    - /kaniko/executor
+      --context "${CI_PROJECT_DIR}"
+      --dockerfile "${CI_PROJECT_DIR}/docker/jammy"
+      --destination "${CI_REGISTRY_IMAGE}:latest-jammy"
+
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master"
+
+
+.test-docker-image-common:
+
+  before_script:
+    - source /axii/scripts/install_axii.sh
+    - _axii_auto_env_refresh
+
+  script:
+    - echo "ArmarX Workspace = '$ARMARX_WORKSPACE'"
+    - printenv
+
+    - axii workspace list-modules
+    - axii workspace list-modules --deps
+    - axii workspace info
+
+    - echo "Simox directory = '$Simox_DIR'"
+    - which RobotViewer
+
+
+test-docker-image-bionic:
+  stage: post-deploy-test
+  needs: ["docker-bionic"]
+  extends: .test-docker-image-common
+
+  image: git.h2t.iar.kit.edu:5050/sw/simox/simox:latest-bionic
+
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master"
+
+
+test-docker-image-jammy:
+  stage: post-deploy-test
+  needs: ["docker-jammy"]
+  extends: .test-docker-image-common
+
+  image: git.h2t.iar.kit.edu:5050/sw/simox/simox:latest-jammy
+
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master"
+
+
 armarx-core:
   stage: downstream
 
@@ -103,7 +174,7 @@ armarx-core:
   trigger:
     project: sw/armarx/armarx-core
     # This is optional, but we could tell ArmarX which Simox branch to use.
-    branch: master  
+    branch: master
 
   rules:
     - if: $CI_COMMIT_BRANCH == "master"

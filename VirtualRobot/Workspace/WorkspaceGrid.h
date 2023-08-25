@@ -34,7 +34,7 @@ namespace VirtualRobot
     * A 2D grid which represents a quality distribution (e.g. the reachability) at 2D positions w.r.t. one or multiple grasp(s).
     * Internally the inverse workspace data (@see WorkspaceRepresentation), which encodes the
     * transformation between robot's base and grasping position, is used.
-    * This data is useful to quickly sample positions from where the probability that a grasp is reachable is high (see \func getRandomPos).
+    * This data is useful to quickly sample positions from where the probability that a grasp is reachable is high (see getRandomPos()).
     */
     class VIRTUAL_ROBOT_IMPORT_EXPORT WorkspaceGrid
     {

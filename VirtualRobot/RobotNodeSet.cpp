@@ -41,13 +41,7 @@ namespace VirtualRobot
             }
             THROW_VR_EXCEPTION_IF(!rob, "RobotNodeSet::RobotNodeSet: Robot is NULL");
             this->kinematicRoot = rob->getRootNode();
-            if (this->kinematicRoot)
-            {
-                VR_WARNING << "RobotNodeSet " << name << " initialized with invalid kinematic root '"
-                           << oldRootName << "': Falling back to robot root node '"
-                           <<  this->kinematicRoot->getName() << "'" << std::endl;
-            }
-            else
+            if (not this->kinematicRoot)
             {
                 std::stringstream str;
                 str << "RobotNodeSet " << name << " initialized with invalid kinematic root '"

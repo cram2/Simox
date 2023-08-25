@@ -55,10 +55,10 @@ namespace GraspStudio
          * \param object The object.
          * \param eef The end effector.
          * \param graspPreshape An optional preshape that can be used in order to "open" the eef.
-         * \param maxRandDist
+         * \param maxRetreatDist
          *      If >0, the resulting apporach pose is randomly moved in the approach direction
          *      (away from the object) in order to create different distances to the object.
-         * \param usefaceAreaDistribution
+         * \param useFaceAreaDistribution
          *      If true, the probability of a face being selected is proportional to its area.
          *      If false, all faces are selected with equal probability.
         */

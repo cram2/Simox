@@ -1,51 +1,57 @@
 #include "RobotNodeHemisphere.h"
-#include "Nodes/Sensor.h"
-#include "Robot.h"
-#include "VirtualRobotException.h"
 
 #include <algorithm>
 #include <cmath>
 
 #include <Eigen/Geometry>
 
-#include <SimoxUtility/meta/enum/EnumNames.hpp>
-#include <SimoxUtility/math/pose/pose.h>
 #include <SimoxUtility/math/convert/rad_to_deg.h>
+#include <SimoxUtility/math/pose/pose.h>
+#include <SimoxUtility/meta/enum/EnumNames.hpp>
 
+#include "Nodes/Sensor.h"
+#include "Robot.h"
+#include "VirtualRobotException.h"
 
 namespace VirtualRobot
 {
 
     static const float initialLimit = 1.0;
 
-    extern const simox::meta::EnumNames<RobotNodeHemisphere::Role> RoleNames =
-    {
-        { RobotNodeHemisphere::Role::FIRST, "first" },
-        { RobotNodeHemisphere::Role::SECOND, "second" },
+    extern const simox::meta::EnumNames<RobotNodeHemisphere::Role> RoleNames = {
+        {RobotNodeHemisphere::Role::FIRST, "first"},
+        {RobotNodeHemisphere::Role::SECOND, "second"},
     };
 
     VirtualRobot::RobotNodeHemisphere::RobotNodeHemisphere()
     {
     }
 
-    RobotNodeHemisphere::Role RobotNodeHemisphere::RoleFromString(const std::string& string)
+    RobotNodeHemisphere::Role
+    RobotNodeHemisphere::RoleFromString(const std::string& string)
     {
         return RoleNames.from_name(string);
     }
 
-    RobotNodeHemisphere::RobotNodeHemisphere(
-            RobotWeakPtr rob,
-            const std::string& name,
-            const Eigen::Matrix4f& preJointTransform,
-            VisualizationNodePtr visualization,
-            CollisionModelPtr collisionModel,
-            float jointValueOffset,
-            const SceneObject::Physics& physics,
-            CollisionCheckerPtr colChecker,
-            RobotNodeType type
-            ) :
-        RobotNode(rob, name, -initialLimit, initialLimit, visualization, collisionModel,
-                  jointValueOffset, physics, colChecker, type)
+    RobotNodeHemisphere::RobotNodeHemisphere(RobotWeakPtr rob,
+                                             const std::string& name,
+                                             const Eigen::Matrix4f& preJointTransform,
+                                             VisualizationNodePtr visualization,
+                                             CollisionModelPtr collisionModel,
+                                             float jointValueOffset,
+                                             const SceneObject::Physics& physics,
+                                             CollisionCheckerPtr colChecker,
+                                             RobotNodeType type) :
+        RobotNode(rob,
+                  name,
+                  -initialLimit,
+                  initialLimit,
+                  visualization,
+                  collisionModel,
+                  jointValueOffset,
+                  physics,
+                  colChecker,
+                  type)
     {
         initialized = false;
         optionalDHParameter.isSet = false;
@@ -53,20 +59,28 @@ namespace VirtualRobot
         checkValidRobotNodeType();
     }
 
-
-    RobotNodeHemisphere::RobotNodeHemisphere(
-            RobotWeakPtr rob,
-            const std::string& name,
-            float a, float d, float alpha, float theta,
-            VisualizationNodePtr visualization,
-            CollisionModelPtr collisionModel,
-            float jointValueOffset,
-            const SceneObject::Physics& physics,
-            CollisionCheckerPtr colChecker,
-            RobotNodeType type
-            ) :
-        RobotNode(rob, name, -initialLimit, initialLimit, visualization, collisionModel,
-                  jointValueOffset, physics, colChecker, type)
+    RobotNodeHemisphere::RobotNodeHemisphere(RobotWeakPtr rob,
+                                             const std::string& name,
+                                             float a,
+                                             float d,
+                                             float alpha,
+                                             float theta,
+                                             VisualizationNodePtr visualization,
+                                             CollisionModelPtr collisionModel,
+                                             float jointValueOffset,
+                                             const SceneObject::Physics& physics,
+                                             CollisionCheckerPtr colChecker,
+                                             RobotNodeType type) :
+        RobotNode(rob,
+                  name,
+                  -initialLimit,
+                  initialLimit,
+                  visualization,
+                  collisionModel,
+                  jointValueOffset,
+                  physics,
+                  colChecker,
+                  type)
     {
         initialized = false;
         optionalDHParameter.isSet = true;
@@ -95,34 +109,33 @@ namespace VirtualRobot
         checkValidRobotNodeType();
     }
 
+    RobotNodeHemisphere::~RobotNodeHemisphere() = default;
 
-    RobotNodeHemisphere::~RobotNodeHemisphere()
-    = default;
-
-
-    void RobotNodeHemisphere::setXmlInfo(const XmlInfo& info)
+    void
+    RobotNodeHemisphere::setXmlInfo(const XmlInfo& info)
     {
         VR_ASSERT(secondData.has_value());
         switch (info.role)
         {
-        case Role::FIRST:
-            firstData.emplace(FirstData{});
-            firstData->maths.maths.setConstants(info.lever, info.theta0Rad);
-            break;
+            case Role::FIRST:
+                firstData.emplace(FirstData{});
+                firstData->maths.maths.setConstants(
+                    info.lever, info.theta0Rad, info.limitLo, info.limitHi);
+                break;
 
-        case Role::SECOND:
-            secondData.emplace(SecondData{});
-            break;
+            case Role::SECOND:
+                secondData.emplace(SecondData{});
+                break;
         }
     }
 
-
-    bool RobotNodeHemisphere::initialize(
-            SceneObjectPtr parent,
-            const std::vector<SceneObjectPtr>& children)
+    bool
+    RobotNodeHemisphere::initialize(SceneObjectPtr parent,
+                                    const std::vector<SceneObjectPtr>& children)
     {
         VR_ASSERT_MESSAGE(firstData.has_value() xor secondData.has_value(),
-                          std::stringstream() << firstData.has_value() << " / " << secondData.has_value());
+                          std::stringstream()
+                              << firstData.has_value() << " / " << secondData.has_value());
 
         // The second node needs to store a reference to the first node.
         if (secondData)
@@ -132,11 +145,13 @@ namespace VirtualRobot
             RobotNodeHemisphere* firstNode = dynamic_cast<RobotNodeHemisphere*>(parent.get());
             RobotNodeHemisphere* secondNode = this;
 
-            if (not (firstNode and firstNode->firstData))
+            if (not(firstNode and firstNode->firstData))
             {
                 std::stringstream ss;
-                ss << "The parent of a hemisphere joint with role '" << RoleNames.to_name(Role::SECOND) << "' "
-                   << "must be a hemisphere joint with role '" << RoleNames.to_name(Role::FIRST) << "' ";
+                ss << "The parent of a hemisphere joint with role '"
+                   << RoleNames.to_name(Role::SECOND) << "' "
+                   << "must be a hemisphere joint with role '" << RoleNames.to_name(Role::FIRST)
+                   << "' ";
                 THROW_VR_EXCEPTION(ss.str());
             }
 
@@ -159,11 +174,12 @@ namespace VirtualRobot
         return RobotNode::initialize(parent, children);
     }
 
-
-    void RobotNodeHemisphere::updateTransformationMatrices(
-            const Eigen::Matrix4f& parentPose)
+    void
+    RobotNodeHemisphere::updateTransformationMatrices(const Eigen::Matrix4f& parentPose)
     {
-        VR_ASSERT_MESSAGE(firstData.has_value() xor secondData.has_value(), std::stringstream() << firstData.has_value() << " / " << secondData.has_value());
+        VR_ASSERT_MESSAGE(firstData.has_value() xor secondData.has_value(),
+                          std::stringstream()
+                              << firstData.has_value() << " / " << secondData.has_value());
 
         if (firstData)
         {
@@ -174,7 +190,8 @@ namespace VirtualRobot
             VR_ASSERT_MESSAGE(secondData->firstNode, "First node must be known to second node.");
 
             hemisphere::CachedMaths& maths = secondData->maths();
-            Eigen::Vector2f actuators(secondData->firstNode->getJointValue(), this->getJointValue());
+            Eigen::Vector2f actuators(secondData->firstNode->getJointValue(),
+                                      this->getJointValue());
 
             maths.update(actuators);
 
@@ -189,25 +206,34 @@ namespace VirtualRobot
             if (verbose)
             {
                 Eigen::IOFormat iof(5, 0, " ", "\n", "    [", "]");
-                std::cout << __FUNCTION__ << "() of second actuator with "
-                          << "\n  lever = " << maths.maths.lever
-                          << "\n  theta0 = " << maths.maths.theta0Rad
-                          << "\n  radius = " << maths.maths.radius
-                          << "\n  joint value = " << jointValue
-                          << "\n  actuator (angle) = \n" << actuators.transpose().format(iof)
-                          << "\n  actuator (pos) =  \n" << maths.maths.angleToPosition(actuators.cast<double>()).transpose().format(iof)
-                          << "\n  local transform = \n" << localTransformation.format(iof)
-                          << "\n  joint transform = \n" << transform.format(iof)
-                          << std::endl;
+                std::cout
+                    << __FUNCTION__ << "() of second actuator with "
+                    << "\n  lever = " << maths.maths.lever
+                    << "\n  theta0 = " << maths.maths.theta0Rad
+                    << "\n  theta0 = " << maths.maths.theta0Rad << " rad ("
+                    << simox::math::rad_to_deg(maths.maths.theta0Rad) << " deg)"
+                    << "\n  radius of rolling spheres = " << maths.maths.radiusOfRollingSpheres
+                    << "\n  joint limit lo = " << getJointLimitLo() << " rad ("
+                    << simox::math::rad_to_deg(getJointLimitLo()) << " deg)"
+                    << "\n  joint limit hi = " << getJointLimitHi() << " rad ("
+                    << simox::math::rad_to_deg(getJointLimitHi()) << " deg)"
+                    << "\n  actuator (angle) = \n"
+                    << actuators.transpose().format(iof) << "\n  actuator (pos) =  \n"
+                    << maths.maths.angleToPosition(actuators.cast<double>()).transpose().format(iof)
+                    << "\n  local transform = \n"
+                    << localTransformation.format(iof) << "\n  joint transform = \n"
+                    << transform.format(iof) << std::endl;
             }
         }
     }
 
-
-    void RobotNodeHemisphere::print(bool printChildren, bool printDecoration) const
+    void
+    RobotNodeHemisphere::print(bool printChildren, bool printDecoration) const
     {
         ReadLockPtr lock = getRobot()->getReadLock();
-        VR_ASSERT_MESSAGE(firstData.has_value() xor secondData.has_value(), std::stringstream() << firstData.has_value() << " / " << secondData.has_value());
+        VR_ASSERT_MESSAGE(firstData.has_value() xor secondData.has_value(),
+                          std::stringstream()
+                              << firstData.has_value() << " / " << secondData.has_value());
 
         if (printDecoration)
         {
@@ -223,7 +249,8 @@ namespace VirtualRobot
         else if (secondData)
         {
             std::cout << "* Hemisphere joint second node";
-            std::cout << "* Transform: \n" << secondData->maths().maths.getEndEffectorTransform() << std::endl;
+            std::cout << "* Transform: \n"
+                      << secondData->maths().maths.getEndEffectorTransform() << std::endl;
         }
 
         if (printDecoration)
@@ -240,13 +267,12 @@ namespace VirtualRobot
         }
     }
 
-
-    RobotNodePtr RobotNodeHemisphere::_clone(
-            const RobotPtr newRobot,
-            const VisualizationNodePtr visualizationModel,
-            const CollisionModelPtr collisionModel,
-            CollisionCheckerPtr colChecker,
-            float scaling)
+    RobotNodePtr
+    RobotNodeHemisphere::_clone(const RobotPtr newRobot,
+                                const VisualizationNodePtr visualizationModel,
+                                const CollisionModelPtr collisionModel,
+                                CollisionCheckerPtr colChecker,
+                                float scaling)
     {
         ReadLockPtr lock = getRobot()->getReadLock();
         Physics physics = this->physics.scale(scaling);
@@ -254,24 +280,32 @@ namespace VirtualRobot
         RobotNodeHemispherePtr cloned;
         if (optionalDHParameter.isSet)
         {
-            cloned.reset(new RobotNodeHemisphere(
-                             newRobot, name,
-                             optionalDHParameter.aMM() * scaling,
-                             optionalDHParameter.dMM() * scaling,
-                             optionalDHParameter.alphaRadian(),
-                             optionalDHParameter.thetaRadian(),
-                             visualizationModel, collisionModel,
-                             jointValueOffset,
-                             physics, colChecker, nodeType));
+            cloned.reset(new RobotNodeHemisphere(newRobot,
+                                                 name,
+                                                 optionalDHParameter.aMM() * scaling,
+                                                 optionalDHParameter.dMM() * scaling,
+                                                 optionalDHParameter.alphaRadian(),
+                                                 optionalDHParameter.thetaRadian(),
+                                                 visualizationModel,
+                                                 collisionModel,
+                                                 jointValueOffset,
+                                                 physics,
+                                                 colChecker,
+                                                 nodeType));
         }
         else
         {
             Eigen::Matrix4f localTransform = getLocalTransformation();
             simox::math::position(localTransform) *= scaling;
-            cloned.reset(new RobotNodeHemisphere(
-                             newRobot, name, localTransform,
-                             visualizationModel, collisionModel,
-                             jointValueOffset, physics, colChecker, nodeType));
+            cloned.reset(new RobotNodeHemisphere(newRobot,
+                                                 name,
+                                                 localTransform,
+                                                 visualizationModel,
+                                                 collisionModel,
+                                                 jointValueOffset,
+                                                 physics,
+                                                 colChecker,
+                                                 nodeType));
         }
 
         if (this->firstData)
@@ -288,45 +322,52 @@ namespace VirtualRobot
         return cloned;
     }
 
-
-    bool RobotNodeHemisphere::isHemisphereJoint() const
+    bool
+    RobotNodeHemisphere::isHemisphereJoint() const
     {
         return true;
     }
 
-    bool RobotNodeHemisphere::isFirstHemisphereJointNode() const
+    bool
+    RobotNodeHemisphere::isFirstHemisphereJointNode() const
     {
         return firstData.has_value();
     }
 
-    bool RobotNodeHemisphere::isSecondHemisphereJointNode() const
+    bool
+    RobotNodeHemisphere::isSecondHemisphereJointNode() const
     {
         return secondData.has_value();
     }
 
-    const RobotNodeHemisphere::SecondData& RobotNodeHemisphere::getSecondData() const
+    const RobotNodeHemisphere::SecondData&
+    RobotNodeHemisphere::getSecondData() const
     {
         VR_ASSERT(secondData.has_value());
         return secondData.value();
     }
 
-    RobotNodeHemisphere::SecondData& RobotNodeHemisphere::getSecondData()
+    RobotNodeHemisphere::SecondData&
+    RobotNodeHemisphere::getSecondData()
     {
         VR_ASSERT(secondData.has_value());
         return secondData.value();
     }
 
-    void RobotNodeHemisphere::checkValidRobotNodeType()
+    void
+    RobotNodeHemisphere::checkValidRobotNodeType()
     {
         RobotNode::checkValidRobotNodeType();
-        THROW_VR_EXCEPTION_IF(nodeType == Body || nodeType == Transform, "RobotNodeHemisphere must be a JointNode or a GenericNode");
+        THROW_VR_EXCEPTION_IF(nodeType == Body || nodeType == Transform,
+                              "RobotNodeHemisphere must be a JointNode or a GenericNode");
     }
 
-
-    std::string RobotNodeHemisphere::_toXML(const std::string& /*modelPath*/)
+    std::string
+    RobotNodeHemisphere::_toXML(const std::string& /*modelPath*/)
     {
         VR_ASSERT_MESSAGE(firstData.has_value() xor secondData.has_value(),
-                          std::stringstream() << firstData.has_value() << " / " << secondData.has_value());
+                          std::stringstream()
+                              << firstData.has_value() << " / " << secondData.has_value());
 
         std::stringstream ss;
         ss << "\t\t<Joint type='Hemisphere'>" << std::endl;
@@ -349,26 +390,31 @@ namespace VirtualRobot
         ss << "\t\t\t<MaxVelocity value='" << maxVelocity << "'/>" << std::endl;
         ss << "\t\t\t<MaxTorque value='" << maxTorque << "'/>" << std::endl;
 
-        for (auto propIt = propagatedJointValues.begin(); propIt != propagatedJointValues.end(); ++propIt)
+        for (auto propIt = propagatedJointValues.begin(); propIt != propagatedJointValues.end();
+             ++propIt)
         {
-            ss << "\t\t\t<PropagateJointValue name='" << propIt->first << "' factor='" << propIt->second << "'/>" << std::endl;
+            ss << "\t\t\t<PropagateJointValue name='" << propIt->first << "' factor='"
+               << propIt->second << "'/>" << std::endl;
         }
 
         ss << "\t\t</Joint>" << std::endl;
         return ss.str();
     }
 
-    hemisphere::CachedMaths& RobotNodeHemisphere::SecondData::maths()
+    hemisphere::CachedMaths&
+    RobotNodeHemisphere::SecondData::maths()
     {
         return firstNode->firstData->maths;
     }
 
-    const hemisphere::CachedMaths& RobotNodeHemisphere::SecondData::maths() const
+    const hemisphere::CachedMaths&
+    RobotNodeHemisphere::SecondData::maths() const
     {
         return firstNode->firstData->maths;
     }
 
-    hemisphere::Maths::Jacobian RobotNodeHemisphere::SecondData::getJacobian()
+    hemisphere::Maths::Jacobian
+    RobotNodeHemisphere::SecondData::getJacobian()
     {
         VR_ASSERT(firstNode);
         VR_ASSERT(secondNode);
@@ -382,4 +428,4 @@ namespace VirtualRobot
         return jacobian;
     }
 
-}
+} // namespace VirtualRobot

@@ -68,6 +68,7 @@ namespace Saba
             \param cspace A cspace, defining the used joints (the dimension/DoF) and the collision detection setup.
             \param mode Specify the RRT method that should be used
             \param probabilityExtendToGoal Specify how often the goal node should be used instead of a random config (value must be between 0 and 1)
+            \param samplingSize
         */
         Rrt(CSpacePtr cspace, RrtMethod mode = eConnect, float probabilityExtendToGoal = 0.1f, float samplingSize = -1);
         ~Rrt() override;

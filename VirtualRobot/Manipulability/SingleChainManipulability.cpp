@@ -30,8 +30,6 @@
 #include "VirtualRobot/RobotNodeSet.h"
 #include "VirtualRobot/Robot.h"
 #include <SimoxUtility/math/convert/pos_quat_to_mat4f.h>
-#include <VirtualRobot/Visualization/CoinVisualization/CoinVisualizationFactory.h>
-
 
 namespace VirtualRobot
 {
