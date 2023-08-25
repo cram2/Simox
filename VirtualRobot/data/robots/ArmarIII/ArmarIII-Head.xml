@@ -192,7 +192,7 @@
     <RobotNode name="VirtualCentralGaze">
         <Joint type="prismatic">
             <TranslationDirection x="1" y="0" z="0"/>
-            <Limits unit="mm" lo="0" hi="10000"/>
+            <Limits unit="mm" lo="0" hi="10000" allowAvoidance='false'/>
             <MaxVelocity unit="radian" value="1"/>
             <MaxAcceleration value="10"/>
         </Joint>
