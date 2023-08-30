@@ -171,7 +171,7 @@ namespace VirtualRobot
             so when defining a grasping pose, the inverse reachability can be represented by this grid
             Therefor the "world coordinates" of the inverse reachability distributions are computed by T_grasp * ReachTransformation^-1
         */
-        void setEntries(std::vector<WorkspaceRepresentation::WorkspaceCut2DTransformationPtr>& wsData, const Eigen::Matrix4f& graspGlobal, GraspPtr grasp);
+        void setEntries(std::vector<WorkspaceRepresentation::WorkspaceCut2DTransformation>& wsData, const Eigen::Matrix4f& graspGlobal, GraspPtr grasp);
 
         void checkAndReplaceValue(int& val, int newVal);
 
