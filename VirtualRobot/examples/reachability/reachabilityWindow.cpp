@@ -742,6 +742,8 @@ void reachabilityWindow::loadReachFile(std::string filename)
         reachSpace.reset();
         return;
     }
+    
+    reachSpace->invalidateBehindRobot();
 
     reachSpace->print();
 
