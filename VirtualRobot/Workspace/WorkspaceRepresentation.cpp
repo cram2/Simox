@@ -1293,32 +1293,32 @@ namespace VirtualRobot
                 {
                     if(inverted)
                     {
-                        if(voxelPositionX < 0)
+                        if(voxelPositionX <= 0)
                         {
                             data->reset(a,b,c);
                         }  
 
                         // 45 deg to the front for the other hands workspace
                         // if(-voxelPositionY > voxelPositionX)
-                        if(voxelPositionY < 0)
+                        if(voxelPositionY <= 0)
                         {
                             data->reset(a,b,c);
                         }
 
-                        if(voxelPositionY > 0 and voxelPositionX > 0 and voxelPositionY > voxelPositionX)
+                        if(voxelPositionY >= 0 and voxelPositionX >= 0 and voxelPositionY > voxelPositionX)
                         {
                             data->reset(a,b,c);
                         }
 
                     }else {
                     
-                        if(voxelPositionX > 0)
+                        if(voxelPositionX >= 0)
                         {
                             data->reset(a,b,c);
                         }   
 
                          // 45 deg to the front for the other hands workspace
-                        if(voxelPositionY < 0)
+                        if(voxelPositionY <= 0)
                         // if(-voxelPositionY > -voxelPositionX)
                         {
                             data->reset(a,b,c);
@@ -1326,7 +1326,7 @@ namespace VirtualRobot
 
                         // restrict to the side (here: 45° degrees)
                         // FIXME: parameterize this
-                        if(voxelPositionY > 0 and voxelPositionX < 0 and voxelPositionY > -voxelPositionX)
+                        if(voxelPositionY >= 0 and voxelPositionX =< 0 and voxelPositionY > -voxelPositionX)
                         {
                             data->reset(a,b,c);
                         }
