@@ -1326,7 +1326,7 @@ namespace VirtualRobot
 
                         // restrict to the side (here: 45° degrees)
                         // FIXME: parameterize this
-                        if(voxelPositionY >= 0 and voxelPositionX =< 0 and voxelPositionY > -voxelPositionX)
+                        if(voxelPositionY >= 0 and voxelPositionX <= 0 and voxelPositionY > -voxelPositionX)
                         {
                             data->reset(a,b,c);
                         }
