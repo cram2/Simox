@@ -13,6 +13,7 @@
 #include "../ManipulationObject.h"
 #include "../Grasping/Grasp.h"
 #include "../Grasping/GraspSet.h"
+#include "MathTools.h"
 #include "SimoxUtility/math/periodic/periodic_clamp.h"
 #include "VirtualRobot.h"
 #include <VirtualRobot/Random.h>
@@ -1296,16 +1297,15 @@ namespace VirtualRobot
                         if(voxelPositionX <= 0)
                         {
                             data->reset(a,b,c);
+                            continue;
                         }  
 
-                        // 45 deg to the front for the other hands workspace
-                        // if(-voxelPositionY > voxelPositionX)
-                        if(voxelPositionY <= 0)
-                        {
-                            data->reset(a,b,c);
-                        }
+                        const float angle = std::atan2(voxelPositionY, voxelPositionX);
 
-                        if(voxelPositionY >= 0 and voxelPositionX >= 0 and voxelPositionY > voxelPositionX)
+                        const float maxOpeningLeft = MathTools::deg2rad(60);
+                        const float maxOpeningRight = MathTools::deg2rad(45);
+
+                        if(angle > maxOpeningLeft or angle < -maxOpeningRight)
                         {
                             data->reset(a,b,c);
                         }
@@ -1315,18 +1315,15 @@ namespace VirtualRobot
                         if(voxelPositionX >= 0)
                         {
                             data->reset(a,b,c);
+                            continue;
                         }   
 
-                         // 45 deg to the front for the other hands workspace
-                        if(voxelPositionY <= 0)
-                        // if(-voxelPositionY > -voxelPositionX)
-                        {
-                            data->reset(a,b,c);
-                        }
+                        const float angle = std::atan2(voxelPositionY, voxelPositionX);
 
-                        // restrict to the side (here: 45° degrees)
-                        // FIXME: parameterize this
-                        if(voxelPositionY >= 0 and voxelPositionX <= 0 and voxelPositionY > -voxelPositionX)
+                        const float maxOpeningRight = MathTools::deg2rad(60);
+                        const float maxOpeningLeft = MathTools::deg2rad(45);
+
+                        if(angle <= (M_PI - maxOpeningRight) and angle >= (-M_PI + maxOpeningLeft))
                         {
                             data->reset(a,b,c);
                         }
