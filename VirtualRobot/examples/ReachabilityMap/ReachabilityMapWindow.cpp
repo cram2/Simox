@@ -675,6 +675,8 @@ void ReachabilityMapWindow::loadReachFile(std::string filename)
         }
     }
 
+    reachSpace->invalidateBehindRobot();
+
 
     reachSpace->print();
     /*if (reachSpace->getNodeSet())

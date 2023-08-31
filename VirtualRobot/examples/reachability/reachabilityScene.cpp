@@ -132,6 +132,7 @@ void endlessExtend(std::string robotFile, std::string reachFile, int steps, unsi
         return;
     }
 
+    reachSpace->invalidateBehindRobot();
 
     reachSpace->print();
 

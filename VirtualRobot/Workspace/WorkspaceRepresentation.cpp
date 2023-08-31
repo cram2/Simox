@@ -241,7 +241,7 @@ namespace VirtualRobot
             versionMinor = version[1];
             // Check Robot name
             FileIO::readString(tmpString, file);
-            THROW_VR_EXCEPTION_IF(tmpString != robot->getType(), "Wrong Robot");
+            // THROW_VR_EXCEPTION_IF(tmpString != robot->getType(), "Wrong Robot");
 
             // Check Node Set
             FileIO::readString(tmpString, file);
@@ -1305,6 +1305,11 @@ namespace VirtualRobot
                             data->reset(a,b,c);
                         }
 
+                        if(voxelPositionY > 0 and voxelPositionX > 0 and voxelPositionY > voxelPositionX)
+                        {
+                            data->reset(a,b,c);
+                        }
+
                     }else {
                     
                         if(voxelPositionX > 0)
@@ -1315,6 +1320,13 @@ namespace VirtualRobot
                          // 45 deg to the front for the other hands workspace
                         if(voxelPositionY < 0)
                         // if(-voxelPositionY > -voxelPositionX)
+                        {
+                            data->reset(a,b,c);
+                        }
+
+                        // restrict to the side (here: 45° degrees)
+                        // FIXME: parameterize this
+                        if(voxelPositionY > 0 and voxelPositionX < 0 and voxelPositionY > -voxelPositionX)
                         {
                             data->reset(a,b,c);
                         }
