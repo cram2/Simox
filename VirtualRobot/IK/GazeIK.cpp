@@ -139,7 +139,10 @@ namespace VirtualRobot
             return true;
         }
 
-        VR_INFO << "No solution from current configuration, trying with random seeded configuration" << std::endl;
+        if (verbose)
+        {
+            VR_INFO << "No solution from current configuration, trying with random seeded configuration" << std::endl;
+        }
 
         float posDist = getCurrentError(goal);
         jvBest = rns->getJointValues();
@@ -175,7 +178,11 @@ namespace VirtualRobot
             }
         }
 
-        VR_INFO << "Setting joint values ot best achieved config, dist to target:" << bestDist << std::endl;
+        if (verbose)
+        {
+            VR_INFO << "Setting joint values ot best achieved config, dist to target:" << bestDist << std::endl;
+        }
+
         rns->setJointValues(jvBest);
 
         return false;
