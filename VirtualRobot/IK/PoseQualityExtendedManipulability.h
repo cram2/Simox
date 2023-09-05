@@ -189,4 +189,3 @@ namespace VirtualRobot
     typedef std::shared_ptr<PoseQualityExtendedManipulability> PoseQualityExtendedManipulabilityPtr;
 
 }
-

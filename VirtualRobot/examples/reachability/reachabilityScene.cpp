@@ -133,7 +133,7 @@ void endlessExtend(std::string robotFile, std::string reachFile, int steps, unsi
     }
 
     VR_INFO << "Invalidating behind robot";
-    reachSpace->invalidateBehindRobot(true);
+    // reachSpace->invalidateBehindRobot(true);
 
     reachSpace->print();
 

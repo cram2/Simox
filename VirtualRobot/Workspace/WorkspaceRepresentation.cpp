@@ -17,10 +17,12 @@
 #include "SimoxUtility/math/periodic/periodic_clamp.h"
 #include "VirtualRobot.h"
 #include <VirtualRobot/Random.h>
+#include <cstddef>
 #include <fstream>
 #include <cmath>
 #include <cfloat>
 #include <climits>
+#include <ostream>
 #include <thread>
 
 #include <Eigen/Geometry>
@@ -2237,9 +2239,9 @@ namespace VirtualRobot
         }
 
         std::vector<std::thread> threads(numThreads);
-        unsigned int numPosesPerThread = loops / numThreads; // todo
+        std::size_t numPosesPerThread = loops / numThreads; // todo
 
-        for (unsigned int i = 0; i < numThreads; i++)
+        for (std::size_t i = 0; i < numThreads; i++)
         {
             threads[i] = std::thread([=, this] ()
             {
@@ -2263,18 +2265,18 @@ namespace VirtualRobot
                 }
 
                 // now sample some configs and add them to the workspace data
-                for (unsigned int j = 0; j < numPosesPerThread; j++)
+                for (std::size_t j = 0; j < numPosesPerThread; j++)
                 {
                     float rndValue;
                     float minJ, maxJ;
                     Eigen::VectorXf v(clonedNodeSet->getSize());
-                    float maxLoops = 1000;
+                    std::size_t maxLoops = 1000;
 
                     bool successfullyRandomized = false;
 
-                    for (int k = 0; k < maxLoops; k++)
+                    for (std::size_t k = 0; k < maxLoops; k++)
                     {
-                        for (unsigned int l = 0; l < clonedNodeSet->getSize(); l++)
+                        for (std::size_t l = 0; l < clonedNodeSet->getSize(); l++)
                         {
                             rndValue = RandomFloat(); // value from 0 to 1
                             minJ = (*nodeSet)[l]->getJointLimitLo();
