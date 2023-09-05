@@ -204,8 +204,13 @@ namespace SimDynamics
         }
         else if (primitive->type == Primitive::Cylinder::TYPE)
         {
-            Primitive::Cylinder* cyl = std::dynamic_pointer_cast<Primitive::Cylinder>(primitive).get();
-            btCylinderShape* cylShape = new btCylinderShape(btVector3(cyl->radius / 1000.0  * ScaleFactor, cyl->height / 1000.0  * ScaleFactor, cyl->radius / 1000.0  * ScaleFactor));
+            Primitive::Cylinder* cyl =
+                std::dynamic_pointer_cast<Primitive::Cylinder>(primitive).get();
+            // height has to be halved
+            btCylinderShape* cylShape =
+                new btCylinderShape(btVector3(cyl->radius / 1000.0 * ScaleFactor,
+                                              cyl->height / 1000.0 * ScaleFactor / 2,
+                                              cyl->radius / 1000.0 * ScaleFactor));
             result = cylShape;
         }
         else
