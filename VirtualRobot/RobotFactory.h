@@ -118,6 +118,15 @@ namespace VirtualRobot
         createReducedModel(Robot &robot, const std::vector<std::string>& actuatedJointNames,
                            const std::vector<std::string>& otherNodeNames = std::vector<std::string>());
 
+        /**
+         * Creates a cloned robot model that flattens the robot structure.
+         * This means that the pattern <joint> -> [<body>, <link>] is transformed to <joint> -> <body> -> <link> which is required for bullet simulation.
+         * @param robot The robot to clone.
+         * @return The created robot.
+         */
+        static VirtualRobot::RobotPtr
+        createFlattenedModel(Robot & robot);
+
         /*!
             Creates a clone with changed structure, so that the given robot node is the new root of the resulting kinematic tree.
         */
