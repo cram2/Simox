@@ -1860,52 +1860,42 @@ namespace VirtualRobot
         return true;
     }
 
-    std::vector<WorkspaceRepresentation::WorkspaceCut2DTransformationPtr> WorkspaceRepresentation::createCutTransformations(WorkspaceRepresentation::WorkspaceCut2DPtr cutXY, RobotNodePtr referenceNode, const float maxAngle)
+    std::vector<WorkspaceRepresentation::WorkspaceCut2DTransformation> WorkspaceRepresentation::createCutTransformations(WorkspaceRepresentation::WorkspaceCut2DPtr cutXY, RobotNodePtr referenceNode, const float maxAngle)
     {
         THROW_VR_EXCEPTION_IF(!cutXY, "NULL data");
         (void) maxAngle;  // Unused.
 
-        std::vector<WorkspaceRepresentation::WorkspaceCut2DTransformationPtr> result;
+        const std::size_t nX = cutXY->entries.rows();
+        const std::size_t nY = cutXY->entries.cols();
 
-        //float x,y,z;
-        //z = cutXY->referenceGlobalPose(2,3);
+        std::vector<WorkspaceRepresentation::WorkspaceCut2DTransformation> result;
+        result.reserve(nX * nY);
 
-        int nX = cutXY->entries.rows();
-        int nY = cutXY->entries.cols();
+        const float sizeX = (cutXY->maxBounds[0] - cutXY->minBounds[0]) / static_cast<float>(nX);
+        const float sizeY = (cutXY->maxBounds[1] - cutXY->minBounds[1]) / static_cast<float>(nY);
 
-        float sizeX = (cutXY->maxBounds[0] - cutXY->minBounds[0]) / (float)nX;
-        float sizeY = (cutXY->maxBounds[1] - cutXY->minBounds[1]) / (float)nY;
-
-        for (int x = 0; x < nX; x++)
+        for (std::size_t x = 0; x < nX; x++)
         {
-            for (int y = 0; y < nY; y++)
+            for (std::size_t y = 0; y < nY; y++)
             {
                 int v = cutXY->entries(x, y);
 
                 if (v > 0)
                 {
-                    WorkspaceCut2DTransformationPtr tp(new WorkspaceCut2DTransformation());
-                    tp->value = v;
-                    float xPos = cutXY->minBounds[0] + (float)x * sizeX + 0.5f * sizeX; // center of voxel
-                    float yPos = cutXY->minBounds[1] + (float)y * sizeY + 0.5f * sizeY; // center of voxel
-                    tp->transformation = cutXY->referenceGlobalPose;
-                    tp->transformation(0, 3) = xPos;
-                    tp->transformation(1, 3) = yPos;
+                    WorkspaceCut2DTransformation tp;
+                    tp.value = v;
+                    float xPos = cutXY->minBounds[0] + static_cast<float>(x) * sizeX + 0.5f * sizeX; // center of voxel
+                    float yPos = cutXY->minBounds[1] + static_cast<float>(y) * sizeY + 0.5f * sizeY; // center of voxel
+                    tp.transformation = cutXY->referenceGlobalPose;
+                    tp.transformation(0, 3) = xPos;
+                    tp.transformation(1, 3) = yPos;
 
                     if (referenceNode)
                     {
-                        tp->transformation = referenceNode->toLocalCoordinateSystem(tp->transformation);
+                        tp.transformation = referenceNode->toLocalCoordinateSystem(tp.transformation);
                     }
 
-                    Eigen::Isometry3f pose(tp->transformation);
-
-                    float yaw = std::atan2(pose.translation().y(), pose.translation().x()) - M_PI_2f32;
-                    yaw = simox::math::periodic_clamp(yaw, -M_PIf32, M_PIf32);
-
-                    // if (yaw < maxAngle and yaw > -maxAngle)
-                    // {
-                        result.push_back(tp);
-                    // }
+                    result.push_back(tp);
                 }
             }
         }

@@ -293,7 +293,7 @@ namespace VirtualRobot
         
     }
 
-    void WorkspaceGrid::setEntries(std::vector<WorkspaceRepresentation::WorkspaceCut2DTransformationPtr>& wsData, const Eigen::Matrix4f& graspGlobal, GraspPtr grasp)
+    void WorkspaceGrid::setEntries(std::vector<WorkspaceRepresentation::WorkspaceCut2DTransformation>& wsData, const Eigen::Matrix4f& graspGlobal, GraspPtr grasp)
     {
         if (!data)
         {
@@ -304,8 +304,8 @@ namespace VirtualRobot
 
         for (auto & i : wsData)
         {
-            const auto pos = global_T_grasp * Eigen::Isometry3f(i->transformation).inverse().translation();
-            setEntryCheckNeighbors(pos.x(), pos.y(), i->value, grasp);
+            const auto pos = global_T_grasp * Eigen::Isometry3f(i.transformation).inverse().translation();
+            setEntryCheckNeighbors(pos.x(), pos.y(), i.value, grasp);
         }
     }
 
@@ -495,14 +495,14 @@ namespace VirtualRobot
 
         WorkspaceRepresentation::WorkspaceCut2DPtr cutXY = ws->createCut(global_T_grasp.matrix(), discretizeSize, false);
 
-        std::vector<WorkspaceRepresentation::WorkspaceCut2DTransformationPtr> transformations = ws->createCutTransformations(cutXY, baseRobotNode, M_PI/*, isFlipped*/);
+        std::vector<WorkspaceRepresentation::WorkspaceCut2DTransformation> transformations = ws->createCutTransformations(cutXY, baseRobotNode, M_PI/*, isFlipped*/);
         
         // cut out a cylinder around the robot if minCenterDistance is specified
         if(minCenterDistance > 0)
         {
-            transformations.erase(std::remove_if(transformations.begin(), transformations.end(), [&](const WorkspaceRepresentation::WorkspaceCut2DTransformationPtr& tp){
+            transformations.erase(std::remove_if(transformations.begin(), transformations.end(), [&](const WorkspaceRepresentation::WorkspaceCut2DTransformation& tp){
                 
-                const Eigen::Isometry3f robot_T_tcp(tp->transformation);
+                const Eigen::Isometry3f robot_T_tcp(tp.transformation);
                 return robot_T_tcp.translation().head<2>().norm() < minCenterDistance; 
             }), transformations.end());
         }

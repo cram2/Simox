@@ -70,7 +70,7 @@ namespace VirtualRobot
         for (const auto& [node, childNames] : childrenMap)
         {
             THROW_VR_EXCEPTION_IF(!node, "Key in childrenMap is null! check childrenMap");
-            for (auto childName : childNames)
+            for (const auto& childName : childNames)
             {
                 if (!robot->hasRobotNode(childName))
                 {
@@ -366,7 +366,7 @@ namespace VirtualRobot
                                    const std::map<std::string, float> &customSegmentLengths,
                                    const std::map<std::string, float>& customSizeScaling)
     {
-        for (auto node : robot.getRobotNodes())
+        for (const auto& node : robot.getRobotNodes())
         {
             float model_height_scaling = sizeScaling;
 
@@ -393,7 +393,7 @@ namespace VirtualRobot
                 }
             }
 
-            for (auto sensor : node->getSensors())
+            for (const auto& sensor : node->getSensors())
             {
                 Eigen::Matrix4f lt = sensor->getParentNodeToSensorTransformation();
                 lt.block(0, 3, 3, 1) *= model_height_scaling;
@@ -549,7 +549,7 @@ namespace VirtualRobot
                     // exchange sensors
                     std::vector<SceneObjectPtr> childChildren = robot->getRobotNode(nodeName)->getChildren();
 
-                    for (auto cc : childChildren)
+                    for (const auto& cc : childChildren)
                     {
                         SensorPtr cs = std::dynamic_pointer_cast<Sensor>(cc);
 
@@ -581,7 +581,7 @@ namespace VirtualRobot
                     // clone sensors
                     std::vector<SceneObjectPtr> childChildren = robot->getRobotNode(nodeName)->getChildren();
 
-                    for (auto cc : childChildren)
+                    for (const auto& cc : childChildren)
                     {
                         SensorPtr cs = std::dynamic_pointer_cast<Sensor>(cc);
 
@@ -661,7 +661,7 @@ namespace VirtualRobot
             {
                 auto sensors = sensorMap[node];
 
-                for (auto s : sensors)
+                for (const auto& s : sensors)
                 {
                     node->registerSensor(s);
                 }
@@ -694,7 +694,7 @@ namespace VirtualRobot
         std::vector < SceneObjectPtr > children = nodeA->getChildren();
         std::vector<RobotNodePtr> childNodes;
 
-        for (auto c : children)
+        for (const auto& c : children)
         {
             RobotNodePtr cRN = std::dynamic_pointer_cast<RobotNode>(c);
 
@@ -712,7 +712,7 @@ namespace VirtualRobot
         std::vector < SceneObjectPtr > children = nodeA->getChildren();
         std::vector<RobotNodePtr> childNodes;
 
-        for (auto c : children)
+        for (const auto& c : children)
         {
             SensorPtr cS = std::dynamic_pointer_cast<Sensor>(c);
             RobotNodePtr cRN = std::dynamic_pointer_cast<RobotNode>(c);
@@ -936,7 +936,7 @@ namespace VirtualRobot
         std::vector< RobotNodePtr > initialNodes = startNode->getAllParents();
         // check for static nodes which are not parent of startNode
         std::vector< RobotNodePtr > allNodes = robot->getRobotNodes();
-        for (auto rn : allNodes)
+        for (const auto& rn : allNodes)
         {
             bool isFixed = true;
             for (const auto& node : nodes)
@@ -968,7 +968,7 @@ namespace VirtualRobot
 
         // collect sensor nodes
         std::vector<SensorPtr> childSensorNodes;
-        for (auto rn : initialNodes)
+        for (const auto& rn : initialNodes)
         {
             std::vector<SceneObjectPtr> c = rn->getChildren();
             for (const auto& j : c)
@@ -1252,6 +1252,175 @@ namespace VirtualRobot
         }
         return reducedModel;
     }
+
+    VirtualRobot::RobotPtr
+    RobotFactory::createFlattenedModel(Robot& robot)
+    {
+        const Eigen::Matrix4f globalPose = robot.getGlobalPose();
+        robot.setGlobalPose(Eigen::Matrix4f::Identity());
+
+        RobotPtr flattenedRobot =
+            std::make_shared<LocalRobot>("Flattened_" + robot.getName(), robot.getType());
+
+        struct NodeToClone
+        {
+            RobotNodePtr nodeInOriginalRobot;
+            RobotNodePtr parentInFlattenedRobot;
+        };
+
+        auto isBody = [](RobotNodePtr const& node) -> bool
+        { return node->getVisualization() != nullptr and node->getChildren<RobotNode>().empty(); };
+
+        auto isLink = [](RobotNodePtr const& node) -> bool {
+            return node->getVisualization() == nullptr and
+                   not node->getChildren<RobotNode>().empty();
+        };
+
+        auto pushAllChildren = [](RobotNodePtr const& original,
+                                  RobotNodePtr const& cloned,
+                                  std::queue<NodeToClone>& nodes)
+        {
+            for (const auto& child : original->getChildren())
+            {
+                auto const& childNode = std::dynamic_pointer_cast<RobotNode>(child);
+                if (childNode == nullptr)
+                {
+                    continue;
+                }
+
+                nodes.push({childNode, cloned});
+            }
+        };
+
+        struct BodyAndLink
+        {
+            RobotNodePtr body;
+            RobotNodePtr linkOrJoint;
+            std::vector<RobotNodePtr> others;
+        };
+
+        auto findBodyAndLink = [isBody,
+                                isLink](RobotNodePtr const& jointNode) -> std::optional<BodyAndLink>
+        {
+            std::optional<RobotNodePtr> body;
+            std::optional<RobotNodePtr> linkOrJoint;
+            std::vector<RobotNodePtr> others;
+
+            for (const auto& child : jointNode->getChildren())
+            {
+                auto const& childNode = std::dynamic_pointer_cast<RobotNode>(child);
+                if (childNode == nullptr)
+                {
+                    continue;
+                }
+
+                if (isBody(childNode))
+                {
+                    if (body.has_value())
+                    {
+                        return std::nullopt;
+                    }
+
+                    body = childNode;
+                }
+                else if (isLink(childNode) or childNode->isJoint())
+                {
+                    if (linkOrJoint.has_value())
+                    {
+                        return std::nullopt;
+                    }
+
+                    linkOrJoint = childNode;
+                }
+                else
+                {
+                    others.emplace_back(childNode);
+                }
+            }
+
+            if (body.has_value() and linkOrJoint.has_value())
+            {
+                return BodyAndLink{.body = body.value(), .linkOrJoint = linkOrJoint.value(), .others = others};
+            }
+
+            return std::nullopt;
+        };
+
+        auto performFlattenedAttach =
+            [&flattenedRobot](RobotNodePtr const& clonedParentJoint,
+                                               RobotNodePtr const& originalBody,
+                                               RobotNodePtr const& originalLinkOrJoint) -> RobotNodePtr
+        {
+            const bool cloneChildren = false;
+            RobotNodePtr clonedBody =
+                originalBody->clone(flattenedRobot, cloneChildren, clonedParentJoint);
+            RobotNodePtr clonedLinkOrJoint =
+                originalLinkOrJoint->clone(flattenedRobot, cloneChildren, clonedBody);
+
+            Eigen::Matrix4f global_T_body = originalBody->getGlobalPose();
+            Eigen::Matrix4f global_T_link = originalLinkOrJoint->getGlobalPose();
+
+            Eigen::Matrix4f body_T_link = simox::math::inverted_pose(global_T_body) * global_T_link;
+
+            clonedLinkOrJoint->setLocalTransformation(body_T_link);
+            clonedLinkOrJoint->updateTransformationMatrices();
+
+            return clonedLinkOrJoint;
+        };
+
+        std::queue<NodeToClone> nodes({{robot.getRootNode(), nullptr}});
+        while (not nodes.empty())
+        {
+            auto [currentOriginal, currentClonedParent] = nodes.front();
+            nodes.pop();
+
+            const bool cloneChildren = false;
+            RobotNodePtr currentClone = currentOriginal->clone(
+                flattenedRobot, cloneChildren, currentClonedParent);
+
+            if (currentClonedParent == nullptr)
+            {
+                flattenedRobot->setRootNode(currentClone);
+            }
+
+            while (currentOriginal->isJoint())
+            {
+                std::cout << "Checking joint: " << currentOriginal->getName();
+
+                std::optional<BodyAndLink> bodyAndLink =
+                    findBodyAndLink(currentOriginal);
+
+                if (not bodyAndLink.has_value())
+                {
+                    std::cout << " but no specials found!" << std::endl;
+                    break;
+                }
+
+                auto [body, linkOrJoint, others] = bodyAndLink.value();
+                std::cout << " and found body " << body->getName() << " and link/joint " << linkOrJoint->getName() << std::endl;
+
+                RobotNodePtr nextClone = performFlattenedAttach(currentClone, body, linkOrJoint);
+
+                for (const auto& other : others)
+                {
+                    nodes.push({other, currentClone});
+                }
+
+                currentOriginal = linkOrJoint;
+                currentClone = nextClone;
+            }
+
+            pushAllChildren(currentOriginal, currentClone, nodes);
+        }
+
+        robot.setGlobalPose(globalPose);
+        flattenedRobot->setGlobalPose(globalPose);
+
+        std::cout << flattenedRobot->toXML() << std::endl;
+
+        return flattenedRobot;
+    }
+
 
     void RobotFactory::cloneRecursiveUnite(RobotPtr robot, RobotNodePtr currentNode, RobotNodePtr currentNodeClone, std::vector<std::string> uniteWithAllChildren)
     {
