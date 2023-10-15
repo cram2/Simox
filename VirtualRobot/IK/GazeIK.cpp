@@ -130,7 +130,11 @@ namespace VirtualRobot
         // initialize the virtualGazeJoint with a guess
         float v = (goal - virtualTranslationJoint->getParent()->getGlobalPose().block(0, 3, 3, 1)).norm();
         virtualTranslationJoint->setJointValue(v);
-        //VR_INFO << "virtualTranslationJoint jv:" << v << std::endl;
+
+        if(verbose)
+        {
+            VR_INFO << "virtualTranslationJoint jv:" << v << std::endl;
+        }
 
 
         // first run: start with current joint angles
@@ -139,7 +143,10 @@ namespace VirtualRobot
             return true;
         }
 
-        VR_INFO << "No solution from current configuration, trying with random seeded configuration" << std::endl;
+        if(verbose)
+        {
+            VR_INFO << "No solution from current configuration, trying with random seeded configuration" << std::endl;
+        }
 
         float posDist = getCurrentError(goal);
         jvBest = rns->getJointValues();
@@ -175,7 +182,10 @@ namespace VirtualRobot
             }
         }
 
-        VR_INFO << "Setting joint values ot best achieved config, dist to target:" << bestDist << std::endl;
+        if(verbose)
+        {
+            VR_INFO << "Setting joint values ot best achieved config, dist to target:" << bestDist << std::endl;
+        }
         rns->setJointValues(jvBest);
 
         return false;
