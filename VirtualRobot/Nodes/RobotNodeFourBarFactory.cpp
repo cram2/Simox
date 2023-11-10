@@ -10,7 +10,6 @@
 #include "RobotNode.h"
 #include "RobotNodeFourBar.h"
 
-
 namespace VirtualRobot
 {
 
@@ -18,7 +17,6 @@ namespace VirtualRobot
 
 
     RobotNodeFourBarFactory::~RobotNodeFourBarFactory() = default;
-
 
     RobotNodePtr
     RobotNodeFourBarFactory::createRobotNode(RobotPtr robot,
@@ -34,7 +32,6 @@ namespace VirtualRobot
                                              const SceneObject::Physics& physics,
                                              RobotNode::RobotNodeType rntype) const
     {
-        std::cout << "CREATE NEW FOUR BAR JOINT" << std::endl;
         return std::make_shared<RobotNodeFourBar>(
             robot,
             nodeName,
@@ -50,7 +47,6 @@ namespace VirtualRobot
             rntype);
     }
 
-
     RobotNodePtr
     RobotNodeFourBarFactory::createRobotNodeDH(RobotPtr robot,
                                                const std::string& nodeName,
@@ -63,35 +59,31 @@ namespace VirtualRobot
                                                const SceneObject::Physics& physics,
                                                RobotNode::RobotNodeType rntype) const
     {
-        std::cout << "CREATE NEW FOUR BAR JOINT DH" << std::endl;
         return std::make_shared<RobotNodeFourBar>(robot,
-                                                     nodeName,
-                                                     limitLow,
-                                                     limitHigh,
-                                                     dhParameters.aMM(),
-                                                     dhParameters.dMM(),
-                                                     dhParameters.alphaRadian(),
-                                                     dhParameters.thetaRadian(),
-                                                     visualizationModel,
-                                                     collisionModel,
-                                                     jointValueOffset,
-                                                     physics,
-                                                     CollisionCheckerPtr(),
-                                                     rntype);
+                                                  nodeName,
+                                                  limitLow,
+                                                  limitHigh,
+                                                  dhParameters.aMM(),
+                                                  dhParameters.dMM(),
+                                                  dhParameters.alphaRadian(),
+                                                  dhParameters.thetaRadian(),
+                                                  visualizationModel,
+                                                  collisionModel,
+                                                  jointValueOffset,
+                                                  physics,
+                                                  CollisionCheckerPtr(),
+                                                  rntype);
     }
-
 
     RobotNodeFactory::SubClassRegistry
         RobotNodeFourBarFactory::registry(RobotNodeFourBarFactory::getName(),
                                           &RobotNodeFourBarFactory::createInstance);
-
 
     std::string
     RobotNodeFourBarFactory::getName()
     {
         return "four_bar";
     }
-
 
     std::shared_ptr<RobotNodeFactory>
     RobotNodeFourBarFactory::createInstance(void*)
