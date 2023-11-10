@@ -1,48 +1,46 @@
 
 #include "RobotFactory.h"
-#include "Robot.h"
-#include "Nodes/RobotNode.h"
-#include "RobotNodeSet.h"
-#include "Nodes/RobotNodeRevolute.h"
-#include "Nodes/RobotNodePrismatic.h"
-#include "Nodes/RobotNodeFixed.h"
-#include "Nodes/RobotNodeFixedFactory.h"
-#include "CollisionDetection/CollisionModel.h"
-#include "EndEffector/EndEffector.h"
-#include "Visualization/VisualizationNode.h"
-#include "Visualization//VisualizationFactory.h"
-#include "VirtualRobotException.h"
-
-#include <SimoxUtility/math/pose/invert.h>
 
 #include <algorithm>
 #include <cassert>
 #include <deque>
+
+#include <SimoxUtility/math/pose/invert.h>
+
+#include "CollisionDetection/CollisionModel.h"
+#include "EndEffector/EndEffector.h"
+#include "Nodes/RobotNode.h"
+#include "Nodes/RobotNodeFixed.h"
+#include "Nodes/RobotNodeFixedFactory.h"
+#include "Nodes/RobotNodePrismatic.h"
+#include "Nodes/RobotNodeRevolute.h"
+#include "Robot.h"
+#include "RobotNodeSet.h"
+#include "VirtualRobotException.h"
+#include "Visualization//VisualizationFactory.h"
+#include "Visualization/VisualizationNode.h"
 
 namespace VirtualRobot
 {
     using std::cout;
     using std::endl;
 
-    RobotFactory::RobotFactory()
-        = default;
+    RobotFactory::RobotFactory() = default;
 
-    RobotFactory::~RobotFactory()
-        = default;
+    RobotFactory::~RobotFactory() = default;
 
-
-    RobotPtr RobotFactory::createRobot(const std::string& name, const std::string& type)
+    RobotPtr
+    RobotFactory::createRobot(const std::string& name, const std::string& type)
     {
         RobotPtr result(new LocalRobot(name, type));
         return result;
-
     }
 
-    bool RobotFactory::initializeRobot(RobotPtr robot,
-                                       std::vector<RobotNodePtr >& robotNodes,
-                                       std::map< RobotNodePtr, std::vector<std::string> > childrenMap,
-                                       RobotNodePtr rootNode
-                                      )
+    bool
+    RobotFactory::initializeRobot(RobotPtr robot,
+                                  std::vector<RobotNodePtr>& robotNodes,
+                                  std::map<RobotNodePtr, std::vector<std::string>> childrenMap,
+                                  RobotNodePtr rootNode)
     {
         THROW_VR_EXCEPTION_IF(!robot, "Robot is null");
         bool result = true;
@@ -50,7 +48,7 @@ namespace VirtualRobot
         // check for root
         bool foundRoot = false;
 
-        for(const auto& node : robotNodes)
+        for (const auto& node : robotNodes)
         {
             THROW_VR_EXCEPTION_IF(!node, "Robot node is null! check robotNodes");
             if (node == rootNode)
@@ -75,12 +73,10 @@ namespace VirtualRobot
                 if (!robot->hasRobotNode(childName))
                 {
                     std::stringstream str;
-                    str << "Robot " << robot->getName() 
-                        << ": corrupted RobotNode <" << node->getName() 
-                        << " child :" << childName 
-                        << " does not exist...\n"
+                    str << "Robot " << robot->getName() << ": corrupted RobotNode <"
+                        << node->getName() << " child :" << childName << " does not exist...\n"
                         << "These nodes were given:\n";
-                    for(const auto& n : robotNodes)
+                    for (const auto& n : robotNodes)
                     {
                         str << "--- " << n->getName() << "\n";
                     }
@@ -108,14 +104,13 @@ namespace VirtualRobot
         {
             if (!robotNode->getParent() && robotNode != rootNode)
             {
-                VR_ERROR << "RobotNode " << robotNode->getName() << " is not connected to kinematic structure..." << std::endl;
+                VR_ERROR << "RobotNode " << robotNode->getName()
+                         << " is not connected to kinematic structure..." << std::endl;
             }
         }
 
         return result;
     }
-
-
 
     struct robotNodeDef
     {
@@ -129,7 +124,11 @@ namespace VirtualRobot
         std::vector<robotNodeDef> parentChildMapping;
     };
 
-    RobotPtr RobotFactory::cloneInversed(RobotPtr robot, const std::string& newRootName, bool cloneRNS, bool cloneEEF)
+    RobotPtr
+    RobotFactory::cloneInversed(RobotPtr robot,
+                                const std::string& newRootName,
+                                bool cloneRNS,
+                                bool cloneEEF)
     {
         VR_ASSERT(robot);
 
@@ -155,7 +154,8 @@ namespace VirtualRobot
             RobotTreeEdge currentEdge = edges.front();
             edges.pop_front();
 
-            RobotNodePtr parent = std::dynamic_pointer_cast<RobotNode>(currentEdge.second->getParent());
+            RobotNodePtr parent =
+                std::dynamic_pointer_cast<RobotNode>(currentEdge.second->getParent());
 
             std::vector<SceneObjectPtr> children = currentEdge.second->getChildren();
             RobotFactory::robotNodeDef rnDef;
@@ -225,8 +225,10 @@ namespace VirtualRobot
         return r;
     }
 
-
-    RobotPtr RobotFactory::cloneChangeStructure(RobotPtr robot, const std::string& startNode, const std::string& endNode)
+    RobotPtr
+    RobotFactory::cloneChangeStructure(RobotPtr robot,
+                                       const std::string& startNode,
+                                       const std::string& endNode)
     {
         VR_ASSERT(robot);
 
@@ -289,7 +291,11 @@ namespace VirtualRobot
         return RobotFactory::cloneChangeStructure(robot, newStructure);
     }
 
-    bool RobotFactory::attach(RobotPtr robot, SceneObjectPtr o, RobotNodePtr rn, const Eigen::Matrix4f& transformation)
+    bool
+    RobotFactory::attach(RobotPtr robot,
+                         SceneObjectPtr o,
+                         RobotNodePtr rn,
+                         const Eigen::Matrix4f& transformation)
     {
         if (!robot || !o || !rn)
         {
@@ -320,14 +326,25 @@ namespace VirtualRobot
         }
 
         auto rnf = RobotNodeFixedFactory::createInstance(nullptr);
-        RobotNodePtr newRN = rnf->createRobotNode(robot, name, v, c, 0, 0, 0, transformation, Eigen::Vector3f::Zero(), Eigen::Vector3f::Zero(), p);
+        RobotNodePtr newRN = rnf->createRobotNode(robot,
+                                                  name,
+                                                  v,
+                                                  c,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  transformation,
+                                                  Eigen::Vector3f::Zero(),
+                                                  Eigen::Vector3f::Zero(),
+                                                  p);
         rn->attachChild(newRN);
         newRN->initialize(rn);
         newRN->primitiveApproximation = o->getPrimitiveApproximation().clone();
         return true;
     }
 
-    bool RobotFactory::detach(RobotPtr robot, RobotNodePtr rn)
+    bool
+    RobotFactory::detach(RobotPtr robot, RobotNodePtr rn)
     {
         if (!robot || !rn || !rn->getParent())
         {
@@ -344,7 +361,8 @@ namespace VirtualRobot
         return true;
     }
 
-    void RobotFactory::scaleLinear(RobotNode &node, float sizeScaling, float weightScaling)
+    void
+    RobotFactory::scaleLinear(RobotNode& node, float sizeScaling, float weightScaling)
     {
         Eigen::Matrix4f localTransformation = node.getLocalTransformation();
         localTransformation.block(0, 3, 3, 1) *= sizeScaling;
@@ -362,9 +380,12 @@ namespace VirtualRobot
         node.setScaling(node.getScaling() * sizeScaling);
     }
 
-    void RobotFactory::scaleLinear(Robot &robot, float sizeScaling, float weightScaling,
-                                   const std::map<std::string, float> &customSegmentLengths,
-                                   const std::map<std::string, float>& customSizeScaling)
+    void
+    RobotFactory::scaleLinear(Robot& robot,
+                              float sizeScaling,
+                              float weightScaling,
+                              const std::map<std::string, float>& customSegmentLengths,
+                              const std::map<std::string, float>& customSizeScaling)
     {
         for (const auto& node : robot.getRobotNodes())
         {
@@ -409,7 +430,8 @@ namespace VirtualRobot
 
             if (auto col = node->getCollisionModel())
             {
-                node->setCollisionModel(col->clone(node->getCollisionChecker(), model_height_scaling, true));
+                node->setCollisionModel(
+                    col->clone(node->getCollisionChecker(), model_height_scaling, true));
             }
 
             node->getPrimitiveApproximation().scaleLinear(model_height_scaling);
@@ -418,7 +440,8 @@ namespace VirtualRobot
         robot.setMass(robot.getMass() * weightScaling);
     }
 
-    RobotPtr RobotFactory::cloneChangeStructure(RobotPtr robot, robotStructureDef& newStructure)
+    RobotPtr
+    RobotFactory::cloneChangeStructure(RobotPtr robot, robotStructureDef& newStructure)
     {
         VR_ASSERT(robot);
 
@@ -429,31 +452,33 @@ namespace VirtualRobot
         }
 
         std::map<std::string, RobotNodePtr> newNodes;
-        RobotPtr newRobot = createRobot(robot->getName(), robot->getType() + "_restructured_" + newStructure.rootName);
+        RobotPtr newRobot = createRobot(
+            robot->getName(), robot->getType() + "_restructured_" + newStructure.rootName);
         RobotNodePtr rn = robot->getRobotNode(newStructure.rootName);
         rn = rn->clone(newRobot, false);
         newNodes[newStructure.rootName] = rn;
         newRobot->setRootNode(newNodes[newStructure.rootName]);
 
         std::string nodeName;
-        typedef std::map < RobotNodePtr,
-                Eigen::Matrix4f,
-                std::less<RobotNodePtr>,
-                Eigen::aligned_allocator<std::pair<const RobotNodePtr, Eigen::Matrix4f> > >
-                NodeTransformationMapT;
+        typedef std::map<RobotNodePtr,
+                         Eigen::Matrix4f,
+                         std::less<RobotNodePtr>,
+                         Eigen::aligned_allocator<std::pair<const RobotNodePtr, Eigen::Matrix4f>>>
+            NodeTransformationMapT;
 
         NodeTransformationMapT localTransformations;
         std::map<RobotNodePtr, VisualizationNodePtr> visuMap;
         std::map<RobotNodePtr, CollisionModelPtr> colMap;
         std::map<RobotNodePtr, SceneObject::Physics> physicsMap;
-        std::map<RobotNodePtr, std::vector<SensorPtr> > sensorMap;
+        std::map<RobotNodePtr, std::vector<SensorPtr>> sensorMap;
         std::map<RobotNodePtr, bool> directionInversion;
 
         for (auto& i : newStructure.parentChildMapping)
         {
             if (!robot->hasRobotNode(i.name))
             {
-                VR_ERROR << "Error in parentChildMapping, no node with name " << i.name << std::endl;
+                VR_ERROR << "Error in parentChildMapping, no node with name " << i.name
+                         << std::endl;
                 return RobotPtr();
             }
 
@@ -474,7 +499,8 @@ namespace VirtualRobot
 
                 if (!robot->hasRobotNode(nodeName))
                 {
-                    VR_ERROR << "Error in parentChildMapping, no child node with name " << nodeName << std::endl;
+                    VR_ERROR << "Error in parentChildMapping, no child node with name " << nodeName
+                             << std::endl;
                     return RobotPtr();
                 }
 
@@ -528,7 +554,6 @@ namespace VirtualRobot
                         {
                             primitive->transform = tr * primitive->transform;
                         }
-
                     }
 
                     // exchange physics
@@ -547,7 +572,8 @@ namespace VirtualRobot
                     }
 
                     // exchange sensors
-                    std::vector<SceneObjectPtr> childChildren = robot->getRobotNode(nodeName)->getChildren();
+                    std::vector<SceneObjectPtr> childChildren =
+                        robot->getRobotNode(nodeName)->getChildren();
 
                     for (const auto& cc : childChildren)
                     {
@@ -559,9 +585,7 @@ namespace VirtualRobot
                             SensorPtr newSensor = cs->clone(parent);
                             sensorMap[parent].push_back(newSensor);
                         }
-
                     }
-
                 }
                 else
                 {
@@ -579,7 +603,8 @@ namespace VirtualRobot
                     }
 
                     // clone sensors
-                    std::vector<SceneObjectPtr> childChildren = robot->getRobotNode(nodeName)->getChildren();
+                    std::vector<SceneObjectPtr> childChildren =
+                        robot->getRobotNode(nodeName)->getChildren();
 
                     for (const auto& cc : childChildren)
                     {
@@ -591,7 +616,6 @@ namespace VirtualRobot
                             SensorPtr newSensor = cs->clone(child);
                             sensorMap[child].push_back(newSensor);
                         }
-
                     }
                 }
             }
@@ -614,13 +638,15 @@ namespace VirtualRobot
             VR_ASSERT(inv_it != directionInversion.end());
             if (inv_it->second)
             {
-                RobotNodeRevolutePtr rotJoint = std::dynamic_pointer_cast<RobotNodeRevolute>(it->first);
+                RobotNodeRevolutePtr rotJoint =
+                    std::dynamic_pointer_cast<RobotNodeRevolute>(it->first);
                 if (rotJoint)
                 {
                     rotJoint->jointRotationAxis *= -1.0f;
                 }
 
-                RobotNodePrismaticPtr prismaticJoint = std::dynamic_pointer_cast<RobotNodePrismatic>(it->first);
+                RobotNodePrismaticPtr prismaticJoint =
+                    std::dynamic_pointer_cast<RobotNodePrismatic>(it->first);
                 if (prismaticJoint)
                 {
                     prismaticJoint->jointTranslationDirection *= -1.0f;
@@ -673,8 +699,11 @@ namespace VirtualRobot
         return newRobot;
     }
 
-
-    RobotPtr RobotFactory::clone(RobotPtr robot, const std::string& name, CollisionCheckerPtr collisionChecker, float scaling)
+    RobotPtr
+    RobotFactory::clone(RobotPtr robot,
+                        const std::string& name,
+                        CollisionCheckerPtr collisionChecker,
+                        float scaling)
     {
         THROW_VR_EXCEPTION_IF(!robot, "NULL data");
 
@@ -683,15 +712,19 @@ namespace VirtualRobot
             collisionChecker = robot->getCollisionChecker();
         }
 
-        VirtualRobot::RobotPtr result = robot->extractSubPart(robot->getRootNode(), robot->getType(), name, true, true, collisionChecker, scaling);
+        VirtualRobot::RobotPtr result = robot->extractSubPart(
+            robot->getRootNode(), robot->getType(), name, true, true, collisionChecker, scaling);
         result->setGlobalPose(robot->getGlobalPose());
         return result;
     }
 
-    void RobotFactory::getChildNodes(RobotNodePtr nodeA, RobotNodePtr nodeExclude, std::vector<RobotNodePtr>& appendNodes)
+    void
+    RobotFactory::getChildNodes(RobotNodePtr nodeA,
+                                RobotNodePtr nodeExclude,
+                                std::vector<RobotNodePtr>& appendNodes)
     {
         THROW_VR_EXCEPTION_IF(!nodeA, "NULL data");
-        std::vector < SceneObjectPtr > children = nodeA->getChildren();
+        std::vector<SceneObjectPtr> children = nodeA->getChildren();
         std::vector<RobotNodePtr> childNodes;
 
         for (const auto& c : children)
@@ -706,10 +739,13 @@ namespace VirtualRobot
         }
     }
 
-    void RobotFactory::getChildSensorNodes(RobotNodePtr nodeA, RobotNodePtr nodeExclude, std::vector<SensorPtr>& appendNodes)
+    void
+    RobotFactory::getChildSensorNodes(RobotNodePtr nodeA,
+                                      RobotNodePtr nodeExclude,
+                                      std::vector<SensorPtr>& appendNodes)
     {
         THROW_VR_EXCEPTION_IF(!nodeA, "NULL data");
-        std::vector < SceneObjectPtr > children = nodeA->getChildren();
+        std::vector<SceneObjectPtr> children = nodeA->getChildren();
         std::vector<RobotNodePtr> childNodes;
 
         for (const auto& c : children)
@@ -729,7 +765,12 @@ namespace VirtualRobot
         }
     }
 
-    RobotNodePtr RobotFactory::accumulateTransformations(RobotPtr robot, RobotNodePtr nodeA, RobotNodePtr nodeAClone, RobotNodePtr nodeB, Eigen::Matrix4f& storeTrafo)
+    RobotNodePtr
+    RobotFactory::accumulateTransformations(RobotPtr robot,
+                                            RobotNodePtr nodeA,
+                                            RobotNodePtr nodeAClone,
+                                            RobotNodePtr nodeB,
+                                            Eigen::Matrix4f& storeTrafo)
     {
         THROW_VR_EXCEPTION_IF(!robot, "NULL data");
         THROW_VR_EXCEPTION_IF(!nodeA, "NULL data");
@@ -758,12 +799,19 @@ namespace VirtualRobot
             storeTrafo = simox::math::inverted_pose(startPose) * goalPose;
         }
 
-        RobotNodePtr res = createUnitedRobotNode(robot, childNodes, nodeA, nodeAClone, Eigen::Matrix4f::Identity(), childSensorNodes);
+        RobotNodePtr res = createUnitedRobotNode(
+            robot, childNodes, nodeA, nodeAClone, Eigen::Matrix4f::Identity(), childSensorNodes);
 
         return res;
     }
 
-    RobotNodePtr RobotFactory::createUnitedRobotNode(RobotPtr robot, const std::vector< RobotNodePtr >& nodes, RobotNodePtr parent, RobotNodePtr parentClone, const Eigen::Matrix4f& trafo, const std::vector<SensorPtr>& sensors)
+    RobotNodePtr
+    RobotFactory::createUnitedRobotNode(RobotPtr robot,
+                                        const std::vector<RobotNodePtr>& nodes,
+                                        RobotNodePtr parent,
+                                        RobotNodePtr parentClone,
+                                        const Eigen::Matrix4f& trafo,
+                                        const std::vector<SensorPtr>& sensors)
     {
         THROW_VR_EXCEPTION_IF(!robot, "NULL data");
 
@@ -780,7 +828,17 @@ namespace VirtualRobot
 
         if (nodes.size() == 0)
         {
-            RobotNodePtr newRN = rnf->createRobotNode(robot, name, v, c, 0, 0, 0, trafo, Eigen::Vector3f::Zero(), Eigen::Vector3f::Zero(), p);
+            RobotNodePtr newRN = rnf->createRobotNode(robot,
+                                                      name,
+                                                      v,
+                                                      c,
+                                                      0,
+                                                      0,
+                                                      0,
+                                                      trafo,
+                                                      Eigen::Vector3f::Zero(),
+                                                      Eigen::Vector3f::Zero(),
+                                                      p);
 
             if (parentClone)
             {
@@ -797,8 +855,8 @@ namespace VirtualRobot
         }
 
         VisualizationFactoryPtr vf = VisualizationFactory::first(NULL);
-        std::vector < VisualizationNodePtr > visus;
-        std::vector < VisualizationNodePtr > colVisus;
+        std::vector<VisualizationNodePtr> visus;
+        std::vector<VisualizationNodePtr> colVisus;
         float kg = 0;
 
 
@@ -840,7 +898,8 @@ namespace VirtualRobot
 
         p.massKg = kg;
 
-        RobotNodePtr newRN = rnf->createRobotNode(robot, name, v, c, 0, 0, 0, trafo, Eigen::Vector3f::Zero(), Eigen::Vector3f::Zero(), p);
+        RobotNodePtr newRN = rnf->createRobotNode(
+            robot, name, v, c, 0, 0, 0, trafo, Eigen::Vector3f::Zero(), Eigen::Vector3f::Zero(), p);
 
         newRN->initialize(parentClone);
 
@@ -850,8 +909,10 @@ namespace VirtualRobot
         for (const auto& node : nodes)
         {
             const auto& primitiveApproximation = node->getPrimitiveApproximation();
-            const Eigen::Matrix4f localTransformation = simox::math::inverted_pose(trafoToNewRN) * node->getGlobalPose();
-            newRN->getPrimitiveApproximation().join(primitiveApproximation.clone().localTransformation(localTransformation));
+            const Eigen::Matrix4f localTransformation =
+                simox::math::inverted_pose(trafoToNewRN) * node->getGlobalPose();
+            newRN->getPrimitiveApproximation().join(
+                primitiveApproximation.clone().localTransformation(localTransformation));
         }
 
         // attach sensors
@@ -865,7 +926,8 @@ namespace VirtualRobot
         return newRN;
     }
 
-    void RobotFactory::cloneRNS(const Robot& from, RobotPtr to)
+    void
+    RobotFactory::cloneRNS(const Robot& from, RobotPtr to)
     {
         for (const auto& rns : from.getRobotNodeSets())
         {
@@ -878,7 +940,7 @@ namespace VirtualRobot
                     break;
                 }
             }
-            const auto &tcp = rns->getTCP();
+            const auto& tcp = rns->getTCP();
             if (hasNodes && (!tcp || to->hasRobotNode(tcp->getName())))
             {
                 if (const auto& kinRoot = rns->getKinematicRoot())
@@ -894,13 +956,17 @@ namespace VirtualRobot
         }
     }
 
-    RobotPtr RobotFactory::cloneSubSet(RobotPtr robot, RobotNodeSetPtr rns, const std::string& name, bool addTCP)
+    RobotPtr
+    RobotFactory::cloneSubSet(RobotPtr robot,
+                              RobotNodeSetPtr rns,
+                              const std::string& name,
+                              bool addTCP)
     {
         THROW_VR_EXCEPTION_IF(!robot, "NULL data");
         THROW_VR_EXCEPTION_IF(!rns, "NULL data");
         THROW_VR_EXCEPTION_IF(rns->getRobot() != robot, "Inconsitent data");
 
-        std::vector< RobotNodePtr > nodes = rns->getAllRobotNodes();
+        std::vector<RobotNodePtr> nodes = rns->getAllRobotNodes();
         THROW_VR_EXCEPTION_IF(nodes.size() == 0, "0 data");
 
         // ensure tcp is part of nodes
@@ -933,9 +999,9 @@ namespace VirtualRobot
         }
 
         // first create initial node
-        std::vector< RobotNodePtr > initialNodes = startNode->getAllParents();
+        std::vector<RobotNodePtr> initialNodes = startNode->getAllParents();
         // check for static nodes which are not parent of startNode
-        std::vector< RobotNodePtr > allNodes = robot->getRobotNodes();
+        std::vector<RobotNodePtr> allNodes = robot->getRobotNodes();
         for (const auto& rn : allNodes)
         {
             bool isFixed = true;
@@ -947,7 +1013,8 @@ namespace VirtualRobot
                     break;
                 }
             }
-            if (isFixed && std::find(initialNodes.begin(), initialNodes.end(), rn) == initialNodes.end())
+            if (isFixed &&
+                std::find(initialNodes.begin(), initialNodes.end(), rn) == initialNodes.end())
             {
                 // check if rn is child of the nodes in the rns
                 if (!startNode->hasChild(rn, true))
@@ -981,7 +1048,12 @@ namespace VirtualRobot
             }
         }
 
-        RobotNodePtr rootNode = createUnitedRobotNode(result, initialNodes, RobotNodePtr(), RobotNodePtr(), Eigen::Matrix4f::Identity(), childSensorNodes);
+        RobotNodePtr rootNode = createUnitedRobotNode(result,
+                                                      initialNodes,
+                                                      RobotNodePtr(),
+                                                      RobotNodePtr(),
+                                                      Eigen::Matrix4f::Identity(),
+                                                      childSensorNodes);
         result->setRootNode(rootNode);
         RobotNodePtr currentParent = rootNode;
 
@@ -1004,7 +1076,8 @@ namespace VirtualRobot
                 std::cout << "end";
             }
 
-            RobotNodePtr newNodeFixed = accumulateTransformations(result, nodes[i], newNode, secondNode, currentTrafo);
+            RobotNodePtr newNodeFixed =
+                accumulateTransformations(result, nodes[i], newNode, secondNode, currentTrafo);
 
             if (newNodeFixed)
             {
@@ -1015,14 +1088,17 @@ namespace VirtualRobot
         cloneRNS(*robot.get(), result);
 
         result->setGlobalPose(robot->getGlobalPose());
-        if(robot->getHumanMapping().has_value())
+        if (robot->getHumanMapping().has_value())
         {
             result->registerHumanMapping(robot->getHumanMapping().value());
         }
         return result;
     }
 
-    RobotPtr RobotFactory::cloneUniteSubsets(RobotPtr robot, const std::string& name, std::vector<std::string> uniteWithAllChildren)
+    RobotPtr
+    RobotFactory::cloneUniteSubsets(RobotPtr robot,
+                                    const std::string& name,
+                                    std::vector<std::string> uniteWithAllChildren)
     {
         THROW_VR_EXCEPTION_IF(!robot, "NULL data");
         if (uniteWithAllChildren.size() == 0)
@@ -1048,15 +1124,17 @@ namespace VirtualRobot
         cloneRNS(*robot.get(), result);
 
         result->setGlobalPose(robot->getGlobalPose());
-        if(robot->getHumanMapping().has_value())
+        if (robot->getHumanMapping().has_value())
         {
             result->registerHumanMapping(robot->getHumanMapping().value());
         }
         return result;
     }
 
-    RobotPtr RobotFactory::createReducedModel(Robot &robot, const std::vector<std::string> &actuatedJointNames,
-                                              const std::vector<std::string> &otherNodeNames)
+    RobotPtr
+    RobotFactory::createReducedModel(Robot& robot,
+                                     const std::vector<std::string>& actuatedJointNames,
+                                     const std::vector<std::string>& otherNodeNames)
     {
         const Eigen::Matrix4f globalPose = robot.getGlobalPose();
         robot.setGlobalPose(Eigen::Matrix4f::Identity());
@@ -1088,7 +1166,8 @@ namespace VirtualRobot
         }
         robot.updatePose();
 
-        RobotPtr reducedModel = std::make_shared<LocalRobot>("Reduced_" + robot.getName(), robot.getType());
+        RobotPtr reducedModel =
+            std::make_shared<LocalRobot>("Reduced_" + robot.getName(), robot.getType());
 
         struct Node
         {
@@ -1098,13 +1177,15 @@ namespace VirtualRobot
             RobotNodePtr parentNode_cloned = nullptr;
             std::vector<RobotNodePtr> childNodes = std::vector<RobotNodePtr>();
         };
+
         std::queue<Node> nodes;
-        nodes.push(Node { .node = robot.getRootNode() });
+        nodes.push(Node{.node = robot.getRootNode()});
 
         std::function<void(RobotNodePtr, Node&)> collect;
-        collect = [joint_set, other_set, &collect, &nodes](RobotNodePtr currentNode, Node& node) -> void
+        collect = [joint_set, other_set, &collect, &nodes](RobotNodePtr currentNode,
+                                                           Node& node) -> void
         {
-            for (const auto &child : currentNode->getChildren())
+            for (const auto& child : currentNode->getChildren())
             {
                 if (const auto& childNode = std::dynamic_pointer_cast<RobotNode>(child))
                 {
@@ -1116,14 +1197,16 @@ namespace VirtualRobot
                     }
                     else
                     {
-                        nodes.push(Node { .node = childNode, .is_actuated_joint=is_actuated_joint, .parentNode_cloned = node.node_cloned });
+                        nodes.push(Node{.node = childNode,
+                                        .is_actuated_joint = is_actuated_joint,
+                                        .parentNode_cloned = node.node_cloned});
                     }
                 }
             }
         };
 
         const auto fixed_node_factory = RobotNodeFixedFactory::createInstance(nullptr);
-        while(!nodes.empty())
+        while (!nodes.empty())
         {
             auto n = nodes.front();
             nodes.pop();
@@ -1131,13 +1214,18 @@ namespace VirtualRobot
             // If node is a joint but is not part of the joints it will be converted to a fixed transformation node
             if (!n.is_actuated_joint && n.node->isJoint())
             {
-                n.node_cloned = fixed_node_factory->createRobotNode(reducedModel, n.node->getName(),
-                                                                    n.node->getVisualization() ? n.node->getVisualization()->clone() : nullptr,
-                                                                    n.node->getCollisionModel() ? n.node->getCollisionModel()->clone() : nullptr,
-                                                                    0.f, 0.f, 0.f,
-                                                                    n.node->getLocalTransformation(),
-                                                                    Eigen::Vector3f::Zero(), Eigen::Vector3f::Zero(),
-                                                                    n.node->getPhysics());
+                n.node_cloned = fixed_node_factory->createRobotNode(
+                    reducedModel,
+                    n.node->getName(),
+                    n.node->getVisualization() ? n.node->getVisualization()->clone() : nullptr,
+                    n.node->getCollisionModel() ? n.node->getCollisionModel()->clone() : nullptr,
+                    0.f,
+                    0.f,
+                    0.f,
+                    n.node->getLocalTransformation(),
+                    Eigen::Vector3f::Zero(),
+                    Eigen::Vector3f::Zero(),
+                    n.node->getPhysics());
                 n.node_cloned->primitiveApproximation = n.node->getPrimitiveApproximation().clone();
                 if (n.parentNode_cloned)
                 {
@@ -1161,7 +1249,9 @@ namespace VirtualRobot
             }
             else
             {
-                Eigen::Matrix4f localTransformation = simox::math::inverted_pose(n.parentNode_cloned->getGlobalPose()) * n.node->getGlobalPose();
+                Eigen::Matrix4f localTransformation =
+                    simox::math::inverted_pose(n.parentNode_cloned->getGlobalPose()) *
+                    n.node->getGlobalPose();
                 n.node_cloned->setLocalTransformation(localTransformation);
                 n.node_cloned->updateTransformationMatrices();
             }
@@ -1175,13 +1265,15 @@ namespace VirtualRobot
                 {
                     visus.push_back(childNode->getVisualization());
                 }
-                if (childNode->getCollisionModel() && childNode->getCollisionModel()->getVisualization())
+                if (childNode->getCollisionModel() &&
+                    childNode->getCollisionModel()->getVisualization())
                 {
                     colVisus.push_back(childNode->getCollisionModel()->getVisualization());
                 }
                 n.node_cloned->physics.massKg += childNode->getMass(); // TODO fix physics somehow
             }
-            const Eigen::Matrix4f globalPoseInv = simox::math::inverted_pose(n.node_cloned->getGlobalPose());
+            const Eigen::Matrix4f globalPoseInv =
+                simox::math::inverted_pose(n.node_cloned->getGlobalPose());
             if (!visus.empty())
             {
                 if (visus.size() == 1)
@@ -1206,7 +1298,8 @@ namespace VirtualRobot
             {
                 if (colVisus.size() == 1)
                 {
-                    n.node_cloned->setCollisionModel(std::make_shared<CollisionModel>(colVisus.front(), n.node->getName()));
+                    n.node_cloned->setCollisionModel(
+                        std::make_shared<CollisionModel>(colVisus.front(), n.node->getName()));
                 }
                 else
                 {
@@ -1222,15 +1315,17 @@ namespace VirtualRobot
                     {
                         colVisu->setLocalPose(globalPoseInv);
                     }
-                    n.node_cloned->setCollisionModel(std::make_shared<CollisionModel>(colVisu, n.node->getName()));
+                    n.node_cloned->setCollisionModel(
+                        std::make_shared<CollisionModel>(colVisu, n.node->getName()));
                 }
-
             }
 
             for (const auto& childNode : n.childNodes)
             {
                 const auto& primitiveApproximation = childNode->getPrimitiveApproximation();
-                n.node_cloned->getPrimitiveApproximation().join(primitiveApproximation.clone().localTransformation(globalPoseInv * childNode->getGlobalPose()));
+                n.node_cloned->getPrimitiveApproximation().join(
+                    primitiveApproximation.clone().localTransformation(globalPoseInv *
+                                                                       childNode->getGlobalPose()));
 
                 // attach sensors
                 for (const auto& sensor : childNode->getSensors())
@@ -1246,7 +1341,7 @@ namespace VirtualRobot
 
         cloneRNS(robot, reducedModel);
 
-        if(robot.getHumanMapping().has_value())
+        if (robot.getHumanMapping().has_value())
         {
             reducedModel->registerHumanMapping(robot.getHumanMapping().value());
         }
@@ -1340,7 +1435,8 @@ namespace VirtualRobot
 
             if (body.has_value() and linkOrJoint.has_value())
             {
-                return BodyAndLink{.body = body.value(), .linkOrJoint = linkOrJoint.value(), .others = others};
+                return BodyAndLink{
+                    .body = body.value(), .linkOrJoint = linkOrJoint.value(), .others = others};
             }
 
             return std::nullopt;
@@ -1348,8 +1444,8 @@ namespace VirtualRobot
 
         auto performFlattenedAttach =
             [&flattenedRobot](RobotNodePtr const& clonedParentJoint,
-                                               RobotNodePtr const& originalBody,
-                                               RobotNodePtr const& originalLinkOrJoint) -> RobotNodePtr
+                              RobotNodePtr const& originalBody,
+                              RobotNodePtr const& originalLinkOrJoint) -> RobotNodePtr
         {
             const bool cloneChildren = false;
             RobotNodePtr clonedBody =
@@ -1375,8 +1471,8 @@ namespace VirtualRobot
             nodes.pop();
 
             const bool cloneChildren = false;
-            RobotNodePtr currentClone = currentOriginal->clone(
-                flattenedRobot, cloneChildren, currentClonedParent);
+            RobotNodePtr currentClone =
+                currentOriginal->clone(flattenedRobot, cloneChildren, currentClonedParent);
 
             if (currentClonedParent == nullptr)
             {
@@ -1387,8 +1483,7 @@ namespace VirtualRobot
             {
                 std::cout << "Checking joint: " << currentOriginal->getName();
 
-                std::optional<BodyAndLink> bodyAndLink =
-                    findBodyAndLink(currentOriginal);
+                std::optional<BodyAndLink> bodyAndLink = findBodyAndLink(currentOriginal);
 
                 if (not bodyAndLink.has_value())
                 {
@@ -1397,7 +1492,8 @@ namespace VirtualRobot
                 }
 
                 auto [body, linkOrJoint, others] = bodyAndLink.value();
-                std::cout << " and found body " << body->getName() << " and link/joint " << linkOrJoint->getName() << std::endl;
+                std::cout << " and found body " << body->getName() << " and link/joint "
+                          << linkOrJoint->getName() << std::endl;
 
                 RobotNodePtr nextClone = performFlattenedAttach(currentClone, body, linkOrJoint);
 
@@ -1421,15 +1517,19 @@ namespace VirtualRobot
         return flattenedRobot;
     }
 
-
-    void RobotFactory::cloneRecursiveUnite(RobotPtr robot, RobotNodePtr currentNode, RobotNodePtr currentNodeClone, std::vector<std::string> uniteWithAllChildren)
+    void
+    RobotFactory::cloneRecursiveUnite(RobotPtr robot,
+                                      RobotNodePtr currentNode,
+                                      RobotNodePtr currentNodeClone,
+                                      std::vector<std::string> uniteWithAllChildren)
     {
         std::vector<SceneObjectPtr> c = currentNode->getChildren();
 
 
         for (auto& i : c)
         {
-            if (std::find(uniteWithAllChildren.begin(), uniteWithAllChildren.end(), i->getName()) != uniteWithAllChildren.end())
+            if (std::find(uniteWithAllChildren.begin(), uniteWithAllChildren.end(), i->getName()) !=
+                uniteWithAllChildren.end())
             {
                 RobotNodePtr currentRN = std::dynamic_pointer_cast<RobotNode>(i);
                 THROW_VR_EXCEPTION_IF(!currentRN, "Only RN allowed in list");
@@ -1443,7 +1543,12 @@ namespace VirtualRobot
 
                 if (childNodes.size() > 0 || childSensorNodes.size() > 0)
                 {
-                    RobotNodePtr res = createUnitedRobotNode(robot, childNodes, currentRN, currentRNClone, Eigen::Matrix4f::Identity(), childSensorNodes);
+                    RobotNodePtr res = createUnitedRobotNode(robot,
+                                                             childNodes,
+                                                             currentRN,
+                                                             currentRNClone,
+                                                             Eigen::Matrix4f::Identity(),
+                                                             childSensorNodes);
                     // res is automatically added
                 }
             }
@@ -1468,9 +1573,7 @@ namespace VirtualRobot
                     }
                 }
             }
-
         }
-
     }
 
 } // namespace VirtualRobot
