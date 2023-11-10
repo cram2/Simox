@@ -1031,17 +1031,11 @@ namespace VirtualRobot
                                loadMode);
 
         // process childfromrobot tags
-        std::map<RobotNodePtr, std::vector<ChildFromRobotDef>>::iterator iter =
-            childrenFromRobotFilesMap.begin();
-
-        while (iter != childrenFromRobotFilesMap.end())
+        for (auto& [node, childrenFromRobot] : childrenFromRobotFilesMap)
         {
-            std::vector<ChildFromRobotDef> childrenFromRobot = iter->second;
-            RobotNodePtr node = iter->first;
-
-            for (auto& i : childrenFromRobot)
+            for (auto& child : childrenFromRobot)
             {
-                std::filesystem::path filenameNew(i.filename);
+                std::filesystem::path filenameNew(child.filename);
                 std::filesystem::path filenameBasePath(basePath);
 
                 std::filesystem::path filenameNewComplete = filenameBasePath / filenameNew;
@@ -1062,15 +1056,16 @@ namespace VirtualRobot
                 THROW_VR_EXCEPTION_IF(
                     !r,
                     "Could not add child-from-robot due to failed loading of robot from file"
-                        << i.filename);
+                        << child.filename);
                 RobotNodePtr root = r->getRootNode();
-                THROW_VR_EXCEPTION_IF(
-                    !root, "Could not add child-from-robot. No root node in file" << i.filename);
+                THROW_VR_EXCEPTION_IF(!root,
+                                      "Could not add child-from-robot. No root node in file"
+                                          << child.filename);
 
                 RobotNodePtr rootNew = root->clone(robo, true, node);
                 THROW_VR_EXCEPTION_IF(!rootNew,
                                       "Clone failed. Could not add child-from-robot from file "
-                                          << i.filename);
+                                          << child.filename);
 
                 std::vector<EndEffectorPtr> eefs;
                 r->getEndEffectors(eefs);
@@ -1091,8 +1086,6 @@ namespace VirtualRobot
                 // already performed in root->clone
                 //node->attachChild(rootNew);
             }
-
-            iter++;
         }
 
         { // handle attachments
@@ -1126,7 +1119,6 @@ namespace VirtualRobot
             }
         }
 
-        //std::vector<RobotNodeSetPtr> robotNodeSets
         for (auto& endeffectorNode : endeffectorNodes)
         {
             EndEffectorPtr eef = processEndeffectorNode(endeffectorNode, robo);
@@ -1134,23 +1126,24 @@ namespace VirtualRobot
         }
 
         int rnsCounter = 0;
-
         for (auto& robotNodeSetNode : robotNodeSetNodes)
         {
             RobotNodeSetPtr rns =
                 processRobotNodeSet(robotNodeSetNode, robo, robotRoot, rnsCounter);
-            //nodeSets.push_back(rns);
+            (void)rns;
         }
 
-        std::vector<RobotNodePtr> nodes;
-        robo->getRobotNodes(nodes);
-        RobotNodePtr root = robo->getRootNode();
-
-        for (auto& node : nodes)
         {
-            if (node != root && !(node->getParent()))
+            std::vector<RobotNodePtr> nodes;
+            robo->getRobotNodes(nodes);
+            RobotNodePtr rootNode = robo->getRootNode();
+            for (RobotNodePtr& node : nodes)
             {
-                THROW_VR_EXCEPTION("Node without parent: " << node->getName());
+                if (not(node->getParent() or node == rootNode))
+                {
+                    VR_ERROR << "RobotNode '" << node->getName()
+                             << "' is not connected to kinematic structure." << std::endl;
+                }
             }
         }
 
@@ -1160,7 +1153,6 @@ namespace VirtualRobot
         {
             robo->registerHumanMapping(humanMapping.value());
         }
-
 
         return robo;
     }

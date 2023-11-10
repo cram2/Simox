@@ -100,15 +100,6 @@ namespace VirtualRobot
         // register root (performs an initialization of all robot nodes)
         robot->setRootNode(rootNode);
 
-        for (auto& robotNode : robotNodes)
-        {
-            if (!robotNode->getParent() && robotNode != rootNode)
-            {
-                VR_ERROR << "RobotNode " << robotNode->getName()
-                         << " is not connected to kinematic structure..." << std::endl;
-            }
-        }
-
         return result;
     }
 
