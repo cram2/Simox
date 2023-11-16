@@ -27,8 +27,23 @@ BOOST_AUTO_TEST_CASE(fuzzy_multi_match)
     option_to_word[1] = {"one", "1"};
     option_to_word[2] = {"two", "2"};
 
-    BOOST_CHECK_EQUAL(*simox::alg::fuzzy_multi_match<int>(std::string("zeroes"), option_to_word),
-                      0);
-    BOOST_CHECK_EQUAL(*simox::alg::fuzzy_multi_match<int>(std::string("ones"), option_to_word), 1);
-    BOOST_CHECK_EQUAL(*simox::alg::fuzzy_multi_match<int>(std::string("twos"), option_to_word), 2);
+    BOOST_CHECK_EQUAL(
+        simox::alg::fuzzy_multi_match<int>(std::string("zeroes"), option_to_word)->option,
+        &option_to_word.find(0)->first);
+    BOOST_CHECK_EQUAL(
+        simox::alg::fuzzy_multi_match<int>(std::string("ones"), option_to_word)->option,
+        &option_to_word.find(1)->first);
+    BOOST_CHECK_EQUAL(
+        simox::alg::fuzzy_multi_match<int>(std::string("twos"), option_to_word)->option,
+        &option_to_word.find(2)->first);
+}
+
+BOOST_AUTO_TEST_CASE(fuzzy_multi_match_empty)
+{
+    std::map<int, std::vector<std::string>> option_to_word;
+
+    BOOST_CHECK(
+        not simox::alg::fuzzy_multi_match<int>(std::string("zeroes"), option_to_word).has_value());
+    BOOST_CHECK(
+        not simox::alg::fuzzy_multi_match<int>(std::string("ones"), option_to_word).has_value());
 }

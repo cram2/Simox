@@ -8,7 +8,6 @@ SET(SOURCES
 
     algorithm/string/string_tools.cpp
     algorithm/string/fuzzy_match.cpp
-    algorithm/string/fuzzy_multi_match.cpp
 
     caching/CacheMap.cpp
 
@@ -73,7 +72,6 @@ SET(INCLUDES
     algorithm/minmax.h
     algorithm/string/fuzzy_match.h
     algorithm/string/fuzzy_match.hpp
-    algorithm/string/fuzzy_multi_match.h
     algorithm/string/fuzzy_multi_match.hpp
     algorithm/string/string_tools.h
     algorithm/string/string_conversion.h

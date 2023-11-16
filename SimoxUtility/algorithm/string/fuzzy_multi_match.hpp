@@ -3,51 +3,75 @@
 #ifdef DIFFLIB_FOUND
 
 #include <iomanip>
+#include <optional>
 
 #include <SimoxUtility/algorithm/string/fuzzy_match.hpp>
 
-namespace simox::alg::detail
+namespace simox::alg
 {
-    template <class OptionT, class StringT = std::string, class RankT = double>
-    struct RatedOption
+    /**
+     * @brief A matched option.
+     */
+    template <class OptionT, class StringT = std::string, class RatioT = double>
+    struct MatchedOption
     {
-        const StringT* word;
-        RankT ratio;
+        /**
+         * @brief The option.
+         */
         const OptionT* option;
+        /**
+         * @brief The word representing the option.
+         */
+        const StringT* word;
+        /**
+         * @brief The match ratio in [0, 1] between the option word and the probed word.
+         */
+        RatioT ratio;
 
+        /**
+         * @brief Comare ratios ascendingly.
+         */
         static bool
-        compare(const RatedOption& lhs, const RatedOption& rhs)
+        compare(const MatchedOption& lhs, const MatchedOption& rhs)
         {
             return lhs.ratio < rhs.ratio;
         }
 
+        /**
+         * @brief Comare ratios descendingly.
+         */
         static bool
-        compare_reverse(const RatedOption& lhs, const RatedOption& rhs)
+        compare_reverse(const MatchedOption& lhs, const MatchedOption& rhs)
         {
             return lhs.ratio > rhs.ratio;
         }
     };
+} // namespace simox::alg
 
-    template <class OptionT, class StringT = std::string, class RankT = double>
-    std::vector<RatedOption<OptionT, StringT, RankT>>
+namespace simox::alg::detail
+{
+
+    template <class OptionT, class StringT = std::string, class RatioT = double>
+    std::vector<MatchedOption<OptionT, StringT, RatioT>>
     fuzzy_multi_match(
         const StringT& word,
         const std::map<OptionT, std::vector<StringT>>& option_to_words,
-        const std::function<RankT(const StringT& ls, const StringT& rhs)>& matchRatioFn)
+        const std::function<RatioT(const StringT& ls, const StringT& rhs)>& matchRatioFn)
     {
-        std::vector<RatedOption<OptionT, StringT, RankT>> rated_options;
+        std::vector<MatchedOption<OptionT, StringT, RatioT>> matched_options;
 
         for (const auto& [option, option_words] : option_to_words)
         {
             for (const auto& option_word : option_words)
             {
-                RankT ratio = matchRatioFn(word, option_word);
-                rated_options.emplace_back(&option_word, ratio, &option);
+                RatioT ratio = matchRatioFn(word, option_word);
+                matched_options.emplace_back(&option, &option_word, ratio);
             }
         }
 
-        return rated_options;
+        return matched_options;
     }
+
 } // namespace simox::alg::detail
 
 namespace simox::alg
@@ -76,78 +100,79 @@ namespace simox::alg
      * @param option_to_words_dict Dictionary mapping options to candidate words.
      * @param match_ratio_fn Function returning a matching ratio between two words.
      * @param log Stream to log a summary to.
-     * @return Option whose words have the highest matching ratio against `word`.
+     * @return
+     *   Option whose words have the highest matching ratio against `word`,
+     *   or `std::nullopt` if there are no options.
      */
     template <class OptionT, class StringT = std::string, class RatioT = double>
-    OptionT const*
+    std::optional<MatchedOption<OptionT, StringT, RatioT>>
     fuzzy_multi_match(
         const StringT& word,
         const std::map<OptionT, std::vector<StringT>>& option_to_words,
         const std::function<RatioT(const StringT& ls, const StringT& rhs)>& match_ratio_fn,
         std::ostream& log)
     {
-        using RatedOption = detail::RatedOption<OptionT, StringT, RatioT>;
+        using MatchedOption = MatchedOption<OptionT, StringT, RatioT>;
 
-        std::vector<RatedOption> rated_options =
+        std::vector<MatchedOption> matched_options =
             detail::fuzzy_multi_match(word, option_to_words, match_ratio_fn);
 
-        if (rated_options.empty())
+        if (matched_options.empty())
         {
-            return nullptr;
+            return std::nullopt;
         }
 
-        std::sort(rated_options.begin(), rated_options.end(), RatedOption::compare_reverse);
+        std::sort(matched_options.begin(), matched_options.end(), MatchedOption::compare_reverse);
 
-        const RatedOption& max_element = rated_options.front();
+        const MatchedOption& max_element = matched_options.front();
 
         const StringT& option_word = *max_element.word;
         const RatioT& ratio = max_element.ratio;
         const OptionT& option = *max_element.option;
 
-        log << "Selection option '" << option << "' for word '" << word
+        log << "Selecting option '" << option << "' for word '" << word
             << "' because its candidate word '" << option_word << "' matches '" << word << "' by "
             << std::fixed << std::setprecision(1) << (ratio * 100) << "%"
             << "\nAll option words were:";
-        for (const RatedOption& rated_option : rated_options)
+        for (const MatchedOption& matched_option : matched_options)
         {
-            log << "\n- " << std::fixed << std::setprecision(1) << (rated_option.ratio * 100)
-                << "%: \t'" << *rated_option.word << "' \t(option '" << *rated_option.option
+            log << "\n- " << std::fixed << std::setprecision(1) << (matched_option.ratio * 100)
+                << "%: \t'" << *matched_option.word << "' \t(option '" << *matched_option.option
                 << "') ";
         }
 
-        return &option;
+        return max_element;
     }
 
-    template <class OptionT, class StringT = std::string, class RankT = double>
-    OptionT const*
+    template <class OptionT, class StringT = std::string, class RatioT = double>
+    std::optional<MatchedOption<OptionT, StringT, RatioT>>
     fuzzy_multi_match(
         const StringT& word,
         const std::map<OptionT, std::vector<StringT>>& option_to_words,
-        const std::function<RankT(const StringT& ls, const StringT& rhs)>& match_ratio_fn)
+        const std::function<RatioT(const StringT& ls, const StringT& rhs)>& match_ratio_fn)
     {
-        using RatedOption = detail::RatedOption<OptionT, StringT, RankT>;
+        using MatchedOption = MatchedOption<OptionT, StringT, RatioT>;
 
-        std::vector<RatedOption> rated_options =
+        std::vector<MatchedOption> matched_options =
             detail::fuzzy_multi_match(word, option_to_words, match_ratio_fn);
 
-        if (rated_options.empty())
+        if (matched_options.empty())
         {
-            return nullptr;
+            return std::nullopt;
         }
 
-        auto max_element =
-            std::max_element(rated_options.begin(), rated_options.end(), RatedOption::compare);
-        if (max_element == rated_options.end())
+        auto max_element = std::max_element(
+            matched_options.begin(), matched_options.end(), MatchedOption::compare);
+        if (max_element == matched_options.end())
         {
-            return nullptr;
+            return std::nullopt;
         }
 
-        const OptionT* option = max_element->option;
-        return option;
+        return *max_element;
     }
 
     template <class OptionT, class StringT = std::string>
-    OptionT const*
+    std::optional<MatchedOption<OptionT, StringT, double>>
     fuzzy_multi_match(const StringT& word,
                       const std::map<OptionT, std::vector<StringT>>& option_to_words)
     {
@@ -156,7 +181,7 @@ namespace simox::alg
     }
 
     template <class OptionT, class StringT = std::string>
-    OptionT const*
+    std::optional<MatchedOption<OptionT, StringT, double>>
     fuzzy_multi_match(const StringT& word,
                       const std::map<OptionT, std::vector<StringT>>& option_to_words,
                       std::ostream& log)
