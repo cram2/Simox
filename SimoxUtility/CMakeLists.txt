@@ -7,6 +7,8 @@ SET(SOURCES
     SimoxUtility.cpp
 
     algorithm/string/string_tools.cpp
+    algorithm/string/fuzzy_match.cpp
+    algorithm/string/fuzzy_multi_match.cpp
 
     caching/CacheMap.cpp
 
@@ -67,12 +69,16 @@ SET(INCLUDES
     algorithm/for_each_if.h
     algorithm/fuzzy_find.h
     algorithm/get_map_keys_values.h
+    algorithm/ordered_circular_buffer.h
     algorithm/minmax.h
-    algorithm/vector.hpp
+    algorithm/string/fuzzy_match.h
+    algorithm/string/fuzzy_match.hpp
+    algorithm/string/fuzzy_multi_match.h
+    algorithm/string/fuzzy_multi_match.hpp
     algorithm/string/string_tools.h
     algorithm/string/string_conversion.h
     algorithm/string/string_conversion_eigen.h
-    algorithm/ordered_circular_buffer.h
+    algorithm/vector.hpp
 
     backport/span/gcc_header.h
 
@@ -271,16 +277,23 @@ target_link_libraries(SimoxUtility PUBLIC stdc++fs)
 #######################################################################
 # Setup dependencies
 #######################################################################
-#### Eigen
+# Eigen
 target_link_libraries(SimoxUtility PUBLIC Eigen3::Eigen)
 
-#### BOOST
+# BOOST
 target_link_libraries(SimoxUtility PUBLIC
         Boost::boost
         Boost::program_options
         Boost::thread
         Boost::regex
 )
+
+# difflib
+if (difflib_FOUND)
+    target_link_libraries(SimoxUtility PUBLIC difflib::difflib)
+    target_compile_definitions(SimoxUtility PUBLIC DIFFLIB_FOUND)
+endif()
+
 
 target_compile_options(SimoxUtility PUBLIC -include SimoxUtility/eigen/AssertAsException.h)
 
