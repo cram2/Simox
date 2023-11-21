@@ -58,14 +58,19 @@ namespace simox::alg::detail
         const std::map<OptionT, std::vector<StringT>>& option_to_words,
         const std::function<RatioT(const StringT& ls, const StringT& rhs)>& matchRatioFn)
     {
-        std::vector<MatchedOption<OptionT, StringT, RatioT>> matched_options;
+        using MatchedOption = MatchedOption<OptionT, StringT, RatioT>;
+        std::vector<MatchedOption> matched_options;
 
         for (const auto& [option, option_words] : option_to_words)
         {
             for (const auto& option_word : option_words)
             {
                 RatioT ratio = matchRatioFn(word, option_word);
-                matched_options.emplace_back(&option, &option_word, ratio);
+                matched_options.push_back(MatchedOption{
+                    .option = &option,
+                    .word = &option_word,
+                    .ratio = ratio,
+                });
             }
         }
 
