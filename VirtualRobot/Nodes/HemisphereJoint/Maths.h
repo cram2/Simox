@@ -27,11 +27,10 @@ namespace VirtualRobot::hemisphere
         Maths();
         Maths(double lever, double theta0);
 
-
         void setConstants(double lever,
                           double theta0,
-                          std::optional<double> limitLo,
-                          std::optional<double> limitHi);
+                          std::optional<double> limitLoRadians,
+                          std::optional<double> limitHiRadians);
 
         void computeFkOfAngle(const ActuatorAngle& alpha12);
 

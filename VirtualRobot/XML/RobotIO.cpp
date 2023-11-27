@@ -206,8 +206,11 @@ namespace VirtualRobot
                               RobotNode::RobotNodeType rntype,
                               Eigen::Matrix4f& transformationMatrix)
     {
-        float jointLimitLow = -M_PIf32;
-        float jointLimitHigh = M_PIf32;
+        static const float jointLimitLowDefault = -M_PIf32;
+        static const float jointLimitHighDefault = M_PIf32;
+
+        std::optional<float> jointLimitLow;
+        std::optional<float> jointLimitHigh;
         bool limitless = false;
         bool allowJointLimitAvoidance = true;
 
@@ -230,18 +233,19 @@ namespace VirtualRobot
                 RobotNodeFactory::fromName(RobotNodeFixedFactory::getName(), nullptr);
             if (fixedNodeFactory)
             {
-                robotNode = fixedNodeFactory->createRobotNode(robot,
-                                                              robotNodeName,
-                                                              visualizationNode,
-                                                              collisionModel,
-                                                              jointLimitLow,
-                                                              jointLimitHigh,
-                                                              jointOffset,
-                                                              preJointTransform,
-                                                              axis,
-                                                              translationDir,
-                                                              physics,
-                                                              rntype);
+                robotNode = fixedNodeFactory->createRobotNode(
+                    robot,
+                    robotNodeName,
+                    visualizationNode,
+                    collisionModel,
+                    jointLimitLow.value_or(jointLimitLowDefault),
+                    jointLimitHigh.value_or(jointLimitHighDefault),
+                    jointOffset,
+                    preJointTransform,
+                    axis,
+                    translationDir,
+                    physics,
+                    rntype);
             }
             return robotNode;
         }
@@ -305,8 +309,11 @@ namespace VirtualRobot
                                       "Multiple limits definitions in <Joint> tag of robot node <"
                                           << robotNodeName << ">." << endl);
                 limitsNode = node;
-                processLimitsNode(
-                    limitsNode, jointLimitLow, jointLimitHigh, limitless, allowJointLimitAvoidance);
+                processLimitsNode(limitsNode,
+                                  jointLimitLow.emplace(),
+                                  jointLimitHigh.emplace(),
+                                  limitless,
+                                  allowJointLimitAvoidance);
             }
             else if (nodeName == "prejointtransform")
             {
@@ -517,14 +524,6 @@ namespace VirtualRobot
                         hemisphere->lever = getFloatByAttributeName(node, "lever");
                         hemisphere->theta0Rad =
                             simox::math::deg_to_rad(getFloatByAttributeName(node, "theta0"));
-                        if (node->first_attribute("limitLo"))
-                        {
-                            hemisphere->limitLo = getFloatByAttributeName(node, "limitLo");
-                        }
-                        if (node->first_attribute("limitHi"))
-                        {
-                            hemisphere->limitHi = getFloatByAttributeName(node, "limitHi");
-                        }
                         break;
                     case RobotNodeHemisphere::Role::SECOND:
                         break;
@@ -644,18 +643,19 @@ namespace VirtualRobot
             } else
             {*/
             // create nodes that are not defined via DH parameters
-            robotNode = robotNodeFactory->createRobotNode(robot,
-                                                          robotNodeName,
-                                                          visualizationNode,
-                                                          collisionModel,
-                                                          jointLimitLow,
-                                                          jointLimitHigh,
-                                                          jointOffset,
-                                                          preJointTransform,
-                                                          axis,
-                                                          translationDir,
-                                                          physics,
-                                                          rntype);
+            robotNode =
+                robotNodeFactory->createRobotNode(robot,
+                                                  robotNodeName,
+                                                  visualizationNode,
+                                                  collisionModel,
+                                                  jointLimitLow.value_or(jointLimitLowDefault),
+                                                  jointLimitHigh.value_or(jointLimitHighDefault),
+                                                  jointOffset,
+                                                  preJointTransform,
+                                                  axis,
+                                                  translationDir,
+                                                  physics,
+                                                  rntype);
             //}
         }
         else
@@ -685,6 +685,8 @@ namespace VirtualRobot
         if (robotNode->isHemisphereJoint() and hemisphere.has_value())
         {
             RobotNodeHemispherePtr node = std::dynamic_pointer_cast<RobotNodeHemisphere>(robotNode);
+            hemisphere->limitLoRadians = jointLimitLow;
+            hemisphere->limitHiRadians = jointLimitHigh;
             node->setXmlInfo(hemisphere.value());
         }
 

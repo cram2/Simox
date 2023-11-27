@@ -120,7 +120,7 @@ namespace VirtualRobot
             case Role::FIRST:
                 firstData.emplace(FirstData{});
                 firstData->maths.maths.setConstants(
-                    info.lever, info.theta0Rad, info.limitLo, info.limitHi);
+                    info.lever, info.theta0Rad, info.limitLoRadians, info.limitHiRadians);
                 break;
 
             case Role::SECOND:
