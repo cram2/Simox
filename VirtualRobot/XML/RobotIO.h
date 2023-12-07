@@ -121,6 +121,7 @@ namespace VirtualRobot
             NodeMapping& nodeMapping,
             std::optional<HumanMapping>& humanMapping,
             std::map<std::string, std::vector<std::string>>& attachments,
+            std::map<std::string, std::map<std::string, float>>& configurations,
             RobotDescription loadMode = eFull);
         static RobotNodePtr processRobotNode(rapidxml::xml_node<char>* robotNodeXMLNode,
                                              RobotPtr robo,

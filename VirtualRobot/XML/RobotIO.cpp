@@ -1018,6 +1018,8 @@ namespace VirtualRobot
         NodeMapping nodeMapping;
         std::optional<HumanMapping> humanMapping;
 
+        std::map<std::string, std::map<std::string, float>> configurations;
+
         std::map<std::string, std::vector<std::string>> attachments;
 
         processRobotChildNodes(robotXMLNode,
@@ -1030,6 +1032,7 @@ namespace VirtualRobot
                                nodeMapping,
                                humanMapping,
                                attachments,
+                               configurations,
                                loadMode);
 
         // process childfromrobot tags
@@ -1156,6 +1159,12 @@ namespace VirtualRobot
             robo->registerHumanMapping(humanMapping.value());
         }
 
+        for(const auto& [name, configuration]: configurations)
+        {
+            VR_INFO << "Registering configuration `" << name << "`." << std::endl;
+            robo->registerConfiguration(name, configuration);
+        }
+
         return robo;
     }
 
@@ -1280,6 +1289,7 @@ namespace VirtualRobot
         NodeMapping& nodeMapping,
         std::optional<HumanMapping>& humanMapping,
         std::map<std::string, std::vector<std::string>>& attachments,
+        std::map<std::string, std::map<std::string, float>>& configurations,
         RobotDescription loadMode)
     {
         std::vector<RobotNodePtr> robotNodes;
@@ -1396,6 +1406,13 @@ namespace VirtualRobot
 
                 // implicit vector instantiation
                 attachments[parent].push_back(child);
+            }
+            else if (nodeName == "configuration")
+            {
+                auto [name, configuration] = processConfigurationNode(XMLNode);
+
+                THROW_VR_EXCEPTION_IF(configurations.count(name)> 0, "Configuration `" << name << "` specified multiple times!");
+                configurations.emplace(name, configuration);
             }
             else
             {

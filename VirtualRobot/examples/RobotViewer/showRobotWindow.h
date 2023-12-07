@@ -69,6 +69,8 @@ public slots:
     void exportXML();
     void updatePointDistanceVisu();
     void openDiffIK();
+    void selectConfiguration(int nr);
+    void setConfiguration();
 
     SoQtExaminerViewer* getExaminerViewer()
     {
@@ -100,6 +102,8 @@ protected:
     VirtualRobot::RobotNodeSetPtr currentRobotNodeSet;
     VirtualRobot::RobotNodePtr currentRobotNode;
 
+    std::vector<std::string> currentConfigurations;
+    std::string currentConfiguration;
 
     bool useColModel;
     bool structureEnabled;
@@ -116,4 +120,3 @@ protected:
     };
     PtDistanceVisu ptDistance;
 };
-
