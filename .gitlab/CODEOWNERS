@@ -1,19 +1,7 @@
 /SimDynamics/ @patrickhegemann @reister
 
-/SimoxUtility/algorithm/get_map_keys_values.h @kartmann
-/SimoxUtility/caching/ @kartmann
-/SimoxUtility/color/ @kartmann
-/SimoxUtility/json/ @kartmann
-/SimoxUtility/math/pose/ @kartmann
-/SimoxUtility/math/statistics/ @kartmann
-/SimoxUtility/math/SoftMinMax.* @kartmann
-/SimoxUtility/meta/EnumNames.hpp @kartmann
-/SimoxUtility/meta/type_name.* @kartmann
-/SimoxUtility/shapes/AxisAlignedBoundingBox.* @kartmann
-/SimoxUtility/threads/CountingSemaphore.* @kartmann
-
 /VirtualRobot/IK/platform @reister @dreher
-/VirtualRobot/MJCF/ @kartmann
-/VirtualRobot/Nodes/HemisphereJoint/ @kartmann
-/VirtualRobot/Nodes/RobotNodeHemisphere.* @kartmann
-/VirtualRobot/XML/mujoco/ @kartmann
+/VirtualRobot/MJCF/ @reister
+/VirtualRobot/Nodes/HemisphereJoint/ @reister
+/VirtualRobot/Nodes/RobotNodeHemisphere.* @reister
+/VirtualRobot/XML/mujoco/ @reister
