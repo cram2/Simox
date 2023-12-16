@@ -72,6 +72,8 @@ FIND_PACKAGE(Boost ${Simox_BOOST_VERSION} EXACT COMPONENTS
 
 find_package(difflib QUIET)
 find_package(doctest QUIET)
+find_package(nlohmann_json 3.11.3 REQUIRED)
+find_package(RBDL QUIET)
 
 
 FIND_PACKAGE(SoQt QUIET)
