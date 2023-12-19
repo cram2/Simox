@@ -230,24 +230,24 @@ namespace VirtualRobot
         */
         virtual void setJointLimits(float lo, float hi);
 
-        bool isJoint() const;
-        virtual bool isTranslationalJoint() const;
-        virtual bool isRotationalJoint() const;
-        virtual bool isHemisphereJoint() const;
-        virtual bool isFourBarJoint() const;
+        bool isJoint() const noexcept;
+        virtual bool isTranslationalJoint() const noexcept;
+        virtual bool isRotationalJoint() const noexcept;
+        virtual bool isHemisphereJoint() const noexcept;
+        virtual bool isFourBarJoint() const noexcept;
 
         /**
          * @param limitless wheter this node has joint limits or not.
          */
         virtual void setLimitless(bool limitless);
-        bool isLimitless() const;
+        bool isLimitless() const noexcept;
 
         /**
          * @param target the target joint value in [rad]
          * @return the signed distance between current and target joint values in [rad].
          *         If the given target value violates joint limits or this robotnode is not a joint, 0.0f is returned instead.
          */
-        virtual float getDelta(float target);
+        virtual float getDelta(float target) const;
 
         /*!
             Visualize the structure of this RobotNode.
@@ -281,19 +281,19 @@ namespace VirtualRobot
                                    bool preventCloningMeshesIfScalingIs1 = false);
 
         inline float
-        getJointValueOffset() const
+        getJointValueOffset() const noexcept
         {
             return jointValueOffset;
         }
 
         inline float
-        getJointLimitHigh() const
+        getJointLimitHigh() const noexcept
         {
             return jointLimitHi;
         }
 
         inline float
-        getJointLimitLow() const
+        getJointLimitLow() const noexcept
         {
             return jointLimitLo;
         }
@@ -347,11 +347,10 @@ namespace VirtualRobot
         virtual void setMaxDeceleration(float maxAcc);
 
         /*!
-            Set maximum torque for this joint in rad/s^3 or m/s^3.
+            Set maximum jerk for this joint in rad/s^3 or m/s^3.
             To disable max. jerk, set to -1.0f.
         */
         virtual void setMaxJerk(float maxTo);
-
 
         /*!
             Set maximum torque pf this joint in Nm.
@@ -399,7 +398,7 @@ namespace VirtualRobot
             When joint was created via DH parameters, they can be accessed here.
         */
         const DHParameter&
-        getOptionalDHParameters()
+        getOptionalDHParameters() const noexcept
         {
             return optionalDHParameter;
         }
@@ -445,10 +444,10 @@ namespace VirtualRobot
         */
         virtual void setJointValueNoUpdate(float q);
 
-        bool getEnforceJointLimits() const;
+        bool getEnforceJointLimits() const noexcept;
         void setEnforceJointLimits(bool value);
 
-        bool getAllowJointLimitAvoidance() const;
+        bool getAllowJointLimitAvoidance() const noexcept;
         void setAllowJointLimitAvoidance(bool value);
 
         /*! Removes all sensors (for faster forward kinematics) */

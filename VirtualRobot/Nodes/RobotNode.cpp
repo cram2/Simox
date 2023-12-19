@@ -123,7 +123,7 @@ namespace VirtualRobot
     }
 
     bool
-    RobotNode::getEnforceJointLimits() const
+    RobotNode::getEnforceJointLimits() const noexcept
     {
         return enforceJointLimits;
     }
@@ -135,7 +135,7 @@ namespace VirtualRobot
     }
 
     bool
-    RobotNode::getAllowJointLimitAvoidance() const
+    RobotNode::getAllowJointLimitAvoidance() const noexcept
     {
         return allowJointLimitAvoidance;
     }
@@ -705,25 +705,25 @@ namespace VirtualRobot
     }
 
     bool
-    RobotNode::isTranslationalJoint() const
+    RobotNode::isTranslationalJoint() const noexcept
     {
         return false;
     }
 
     bool
-    RobotNode::isRotationalJoint() const
+    RobotNode::isRotationalJoint() const noexcept
     {
         return false;
     }
 
     bool
-    RobotNode::isHemisphereJoint() const
+    RobotNode::isHemisphereJoint() const noexcept
     {
         return false;
     }
 
     bool
-    RobotNode::isFourBarJoint() const
+    RobotNode::isFourBarJoint() const noexcept
     {
         return false;
     }
@@ -735,13 +735,13 @@ namespace VirtualRobot
     }
 
     bool
-    RobotNode::isLimitless() const
+    RobotNode::isLimitless() const noexcept
     {
         return limitless;
     }
 
     float
-    RobotNode::getDelta(float target)
+    RobotNode::getDelta(float target) const
     {
         float delta = 0.0f;
 
@@ -990,7 +990,7 @@ namespace VirtualRobot
     }
 
     bool
-    RobotNode::isJoint() const
+    RobotNode::isJoint() const noexcept
     {
         return isRotationalJoint() or isTranslationalJoint() or isHemisphereJoint() or
                isFourBarJoint();
@@ -1153,7 +1153,7 @@ namespace VirtualRobot
     }
 
     RobotNode::RobotNodeType
-    RobotNode::getType()
+    RobotNode::getType() const noexcept
     {
         return nodeType;
     }

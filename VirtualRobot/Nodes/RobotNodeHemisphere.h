@@ -141,7 +141,7 @@ namespace VirtualRobot
         /// Print status information.
         void print(bool printChildren = false, bool printDecoration = true) const override;
 
-        bool isHemisphereJoint() const override;
+        bool isHemisphereJoint() const noexcept override;
 
         bool isFirstHemisphereJointNode() const;
         bool isSecondHemisphereJointNode() const;

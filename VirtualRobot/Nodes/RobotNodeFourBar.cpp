@@ -449,7 +449,7 @@ namespace VirtualRobot
 
 
     bool
-    RobotNodeFourBar::isFourBarJoint() const
+    RobotNodeFourBar::isFourBarJoint() const noexcept
     {
         return true;
     }

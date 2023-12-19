@@ -144,7 +144,7 @@ namespace VirtualRobot
         return result;
     }
 
-    bool RobotNodeRevolute::isRotationalJoint() const
+    bool RobotNodeRevolute::isRotationalJoint() const noexcept
     {
         return true;
     }

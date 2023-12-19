@@ -323,7 +323,7 @@ namespace VirtualRobot
     }
 
     bool
-    RobotNodeHemisphere::isHemisphereJoint() const
+    RobotNodeHemisphere::isHemisphereJoint() const noexcept
     {
         return true;
     }
