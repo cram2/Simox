@@ -1269,7 +1269,7 @@ namespace VirtualRobot
 
         for(const auto& [name, configuration]: configurations)
         {
-            VR_INFO << "Registering configuration `" << name << "`." << std::endl;
+            // VR_INFO << "Registering configuration `" << name << "`." << std::endl;
             robo->registerConfiguration(name, configuration);
         }
 
@@ -1365,7 +1365,7 @@ namespace VirtualRobot
             const std::string passiveStrRep = attr->value();
             passive = toBool(passiveStrRep);
 
-            VR_INFO << "Robot is 'passive' according to config" << std::endl;
+            // VR_INFO << "Robot is 'passive' according to config" << std::endl;
         }
 
         // build robot
