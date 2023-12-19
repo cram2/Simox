@@ -620,7 +620,10 @@ void showRobotWindow::setConfiguration()
 {
     std::cout << "Setting robot to configuration `" << currentConfiguration << "`" << std::endl;
 
-    robot->setToConfiguration(currentConfiguration);
+    if(not robot->setToConfiguration(currentConfiguration))
+    {
+        VR_WARNING << "Failed to set robot to config `" << currentConfiguration << "`!";
+    }
 }
 
 
