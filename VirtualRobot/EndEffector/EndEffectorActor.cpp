@@ -583,10 +583,12 @@ namespace VirtualRobot
         for (const auto& actor : actors)
         {
             const float v = actor.robotNode->getJointValue();
+            const float jointLimitHigh = actor.robotNode->getJointLimitHi();
+            const float jointLimitLow = actor.robotNode->getJointLimitLo();
             const auto [min, max] =
                 std::minmax(
-                    actor.robotNode->getJointLimitHi(),
-                    actor.robotNode->getJointLimitLo()
+                    jointLimitHigh,
+                    jointLimitLow
                 );
             if (actor.directionAndSpeed > 0)
             {
@@ -611,10 +613,12 @@ namespace VirtualRobot
         for (const auto& actor : actors)
         {
             const float v = actor.robotNode->getJointValue();
+            const float jointLimitHigh = actor.robotNode->getJointLimitHi();
+            const float jointLimitLow = actor.robotNode->getJointLimitLo();
             const auto [min, max] =
                 std::minmax(
-                    actor.robotNode->getJointLimitHi(),
-                    actor.robotNode->getJointLimitLo()
+                    jointLimitHigh,
+                    jointLimitLow
                 );
             if (actor.directionAndSpeed > 0)
             {
