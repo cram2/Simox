@@ -773,6 +773,7 @@ namespace VirtualRobot
         robotNode->setMaxAcceleration(maxAcceleration);
         robotNode->setMaxDeceleration(maxDeceleration);
         robotNode->setMaxTorque(maxTorque);
+        robotNode->setMaxJerk(maxJerk);
         robotNode->setLimitless(limitless);
         robotNode->setAllowJointLimitAvoidance(allowJointLimitAvoidance);
 

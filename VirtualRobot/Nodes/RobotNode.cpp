@@ -1,6 +1,5 @@
 #include "RobotNode.h"
 
-#include <algorithm>
 #include <cmath>
 #include <filesystem>
 #include <iomanip>
@@ -998,6 +997,12 @@ namespace VirtualRobot
     }
 
     void
+    RobotNode::setMaxJerk(float maxTo)
+    {
+        maxJerk = maxTo;
+    }
+
+    void
     RobotNode::setMaxTorque(float maxTo)
     {
         maxTorque = maxTo;
@@ -1022,19 +1027,19 @@ namespace VirtualRobot
     }
 
     float
-    RobotNode::getMaxVelocity()
+    RobotNode::getMaxVelocity() const noexcept
     {
         return maxVelocity;
     }
 
     float
-    RobotNode::getMaxAcceleration()
+    RobotNode::getMaxAcceleration() const noexcept
     {
         return maxAcceleration;
     }
 
     float
-    RobotNode::getMaxTorque()
+    RobotNode::getMaxTorque() const noexcept
     {
         return maxTorque;
     }
