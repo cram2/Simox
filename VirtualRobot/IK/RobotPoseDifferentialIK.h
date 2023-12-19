@@ -42,16 +42,16 @@ namespace VirtualRobot
         */
         RobotPoseDifferentialIK(RobotPtr robot,RobotNodeSetPtr rns, RobotNodePtr coordSystem = RobotNodePtr(), JacobiProvider::InverseJacobiMethod invJacMethod = eSVDDamped);
 
-        Eigen::MatrixXf getJacobianMatrix(SceneObjectPtr tcp, IKSolver::CartesianSelection mode);
+        Eigen::MatrixXf getJacobianMatrix(SceneObjectPtr tcp, IKSolver::CartesianSelection mode) override;
 
-        Eigen::MatrixXf getJacobianMatrix();
+        Eigen::MatrixXf getJacobianMatrix() override;
 
         /*!	@brief Compute a single IK step.
             @param stepSize Controls the amount of error to be reduced in each step: \f$ 0 < \beta \leq 1 \f$
             @return The changes \f$\Delta \theta\f$ in the joint angles.
             \note{Note} This does not affect the joints values of the robot.
         */
-        Eigen::VectorXf computeStep(float stepSize=1.0);
+        Eigen::VectorXf computeStep(float stepSize=1.0) override;
 
         /*!	@brief Computes the complete inverse kinematics.
             @param stepSize Controls the amount of error to be reduced in each step: \f$ 0 < \beta \leq 1 \f$
@@ -60,7 +60,9 @@ namespace VirtualRobot
             @param performMinOneStep If set, at least one step is performed (helps escaping local minima, but may also cause pose jittering)
             @note{Note}  Sets the node's joint angles automatically.
         */
-        bool computeSteps(float stepSize, float minChange, int maxSteps, bool performMinOneStep = true);
+        bool computeSteps(float stepSize, float minChange, int maxSteps, bool performMinOneStep);
+
+        bool computeSteps(float stepSize, float minChange, int maxSteps) override;
 
         /*!
             If enabled (standard), joint limits are considered via box constraints.
@@ -69,7 +71,7 @@ namespace VirtualRobot
 
     protected:
 
-        bool checkTolerances();
+        bool checkTolerances() override;
 
         Eigen::MatrixXd computePseudoInverseJacobianMatrixDampedD(const Eigen::MatrixXd &m);
         std::vector<Eigen::MatrixXf> localJacobians;
