@@ -44,7 +44,7 @@ namespace VirtualRobot
         */
         ~ManipulationObject() override;
 
-        void print(bool printDecoration = true) override;
+        void print(bool printChildren = false, bool printDecoration = true) const override;
 
         /*!
             Creates an XML representation of this object.
