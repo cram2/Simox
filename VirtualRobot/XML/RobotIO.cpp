@@ -283,7 +283,9 @@ namespace VirtualRobot
 
         float maxVelocity = -1.0f; // m/s
         float maxAcceleration = -1.0f; // m/s^2
+        float maxDeceleration = -1.0f; // m/s^2
         float maxTorque = -1.0f; // Nm
+        float maxJerk = -1.0f;
         bool scaleVisu = false;
         Eigen::Vector3f scaleVisuFactor = Eigen::Vector3f::Zero();
 
@@ -451,6 +453,110 @@ namespace VirtualRobot
                 }
 
                 maxAcceleration *= factor;
+            }
+            else if (nodeName == "maxdeceleration")
+            {
+                maxDeceleration = getFloatByAttributeName(node, "value");
+
+                // convert to m/s^2
+                std::vector<Units> unitsAttr = getUnitsAttributes(node);
+                Units uTime("sec");
+                Units uLength("m");
+                Units uAngle("rad");
+
+                for (auto& i : unitsAttr)
+                {
+                    if (i.isTime())
+                    {
+                        uTime = i;
+                    }
+
+                    if (i.isLength())
+                    {
+                        uLength = i;
+                    }
+
+                    if (i.isAngle())
+                    {
+                        uAngle = i;
+                    }
+                }
+
+                float factor = 1.0f;
+
+                if (uTime.isMinute())
+                {
+                    factor /= 3600.0f;
+                }
+
+                if (uTime.isHour())
+                {
+                    factor /= 12960000.0f;
+                }
+
+                if (uLength.isMillimeter())
+                {
+                    factor *= 0.001f;
+                }
+
+                if (uAngle.isDegree())
+                {
+                    factor *= float(M_PI / 180.0);
+                }
+
+                maxDeceleration *= factor;
+            }
+            else if (nodeName == "maxjerk")
+            {
+                maxJerk = getFloatByAttributeName(node, "value");
+
+                // convert to m/s^3
+                std::vector<Units> unitsAttr = getUnitsAttributes(node);
+                Units uTime("sec");
+                Units uLength("m");
+                Units uAngle("rad");
+
+                for (auto& i : unitsAttr)
+                {
+                    if (i.isTime())
+                    {
+                        uTime = i;
+                    }
+
+                    if (i.isLength())
+                    {
+                        uLength = i;
+                    }
+
+                    if (i.isAngle())
+                    {
+                        uAngle = i;
+                    }
+                }
+
+                float factor = 1.0f;
+
+                if (uTime.isMinute())
+                {
+                    factor /= std::pow<float>(60.0f, 3.f);
+                }
+
+                if (uTime.isHour())
+                {
+                    factor /= std::pow<float>(3600.f, 3.f);
+                }
+
+                if (uLength.isMillimeter())
+                {
+                    factor *= 0.001f;
+                }
+
+                if (uAngle.isDegree())
+                {
+                    factor *= float(M_PI / 180.0);
+                }
+
+                maxJerk *= factor;
             }
             else if (nodeName == "maxtorque")
             {
@@ -665,7 +771,9 @@ namespace VirtualRobot
 
         robotNode->setMaxVelocity(maxVelocity);
         robotNode->setMaxAcceleration(maxAcceleration);
+        robotNode->setMaxDeceleration(maxDeceleration);
         robotNode->setMaxTorque(maxTorque);
+        robotNode->setMaxJerk(maxJerk);
         robotNode->setLimitless(limitless);
         robotNode->setAllowJointLimitAvoidance(allowJointLimitAvoidance);
 

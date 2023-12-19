@@ -513,7 +513,7 @@ namespace VirtualRobot
         std::optional<std::map<std::string, float>> getConfiguration(const std::string& name) const;
         std::map<std::string, std::map<std::string, float>> getConfigurations() const;
 
-        bool setToConfiguration(const std::string& name);
+        [[nodiscard]] bool setToConfiguration(const std::string& name);
 
     protected:
         Robot();

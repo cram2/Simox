@@ -230,24 +230,24 @@ namespace VirtualRobot
         */
         virtual void setJointLimits(float lo, float hi);
 
-        bool isJoint() const;
-        virtual bool isTranslationalJoint() const;
-        virtual bool isRotationalJoint() const;
-        virtual bool isHemisphereJoint() const;
-        virtual bool isFourBarJoint() const;
+        bool isJoint() const noexcept;
+        virtual bool isTranslationalJoint() const noexcept;
+        virtual bool isRotationalJoint() const noexcept;
+        virtual bool isHemisphereJoint() const noexcept;
+        virtual bool isFourBarJoint() const noexcept;
 
         /**
          * @param limitless wheter this node has joint limits or not.
          */
         virtual void setLimitless(bool limitless);
-        bool isLimitless() const;
+        bool isLimitless() const noexcept;
 
         /**
          * @param target the target joint value in [rad]
          * @return the signed distance between current and target joint values in [rad].
          *         If the given target value violates joint limits or this robotnode is not a joint, 0.0f is returned instead.
          */
-        virtual float getDelta(float target);
+        virtual float getDelta(float target) const;
 
         /*!
             Visualize the structure of this RobotNode.
@@ -281,19 +281,19 @@ namespace VirtualRobot
                                    bool preventCloningMeshesIfScalingIs1 = false);
 
         inline float
-        getJointValueOffset() const
+        getJointValueOffset() const noexcept
         {
             return jointValueOffset;
         }
 
         inline float
-        getJointLimitHigh() const
+        getJointLimitHigh() const noexcept
         {
             return jointLimitHi;
         }
 
         inline float
-        getJointLimitLow() const
+        getJointLimitLow() const noexcept
         {
             return jointLimitLo;
         }
@@ -330,19 +330,31 @@ namespace VirtualRobot
 
         /*!
             Set maximum velocity of this joint in rad/s or m/s.
-            To disbale max. velocity set to -1.0f.
+            To disable max. velocity set to -1.0f.
         */
         virtual void setMaxVelocity(float maxVel);
 
         /*!
             Set maximum acceleration pf this joint in rad/s^2 or m/s^2.
-            To disbale max. acceleration set to -1.0f.
+            To disable max. acceleration set to -1.0f.
         */
         virtual void setMaxAcceleration(float maxAcc);
 
         /*!
+            Set maximum deceleration pf this joint in rad/s^2 or m/s^2.
+            To disable max. deceleration set to -1.0f.
+        */
+        virtual void setMaxDeceleration(float maxAcc);
+
+        /*!
+            Set maximum jerk for this joint in rad/s^3 or m/s^3.
+            To disable max. jerk, set to -1.0f.
+        */
+        virtual void setMaxJerk(float maxTo);
+
+        /*!
             Set maximum torque pf this joint in Nm.
-            To disbale max. torque set to -1.0f.
+            To disable max. torque set to -1.0f.
         */
         virtual void setMaxTorque(float maxTo);
 
@@ -350,21 +362,28 @@ namespace VirtualRobot
             Maximum velocity in rad/s or m/s.
             Returns -1.0f if no maxium value is set.
         */
-        float getMaxVelocity();
+        float getMaxVelocity() const noexcept;
 
         /*!
             Maximum acceleration in rad/s^2 or m/s^2.
             Returns -1.0f if no maxium value is set.
         */
-        float getMaxAcceleration();
+        float getMaxAcceleration() const noexcept;
 
         /*!
             Maximum acceleration in Nm.
             Returns -1.0f if no maxium value is set.
         */
-        float getMaxTorque();
+        float getMaxTorque() const noexcept;
 
-        RobotNodeType getType();
+        /*!
+            Maximum jerk in rad/s^3 or m/s^3.
+            Returns -1.0f if no maxium value is set.
+        */
+        float getMaxJerk() const noexcept;
+
+
+        RobotNodeType getType() const noexcept;
 
         //! Forbid cloning method from SceneObject. We need to know the new robot for cloning
         SceneObjectPtr
@@ -379,7 +398,7 @@ namespace VirtualRobot
             When joint was created via DH parameters, they can be accessed here.
         */
         const DHParameter&
-        getOptionalDHParameters()
+        getOptionalDHParameters() const noexcept
         {
             return optionalDHParameter;
         }
@@ -425,10 +444,10 @@ namespace VirtualRobot
         */
         virtual void setJointValueNoUpdate(float q);
 
-        bool getEnforceJointLimits() const;
+        bool getEnforceJointLimits() const noexcept;
         void setEnforceJointLimits(bool value);
 
-        bool getAllowJointLimitAvoidance() const;
+        bool getAllowJointLimitAvoidance() const noexcept;
         void setAllowJointLimitAvoidance(bool value);
 
         /*! Removes all sensors (for faster forward kinematics) */
@@ -475,9 +494,11 @@ namespace VirtualRobot
         bool limitless;
         // When the joint is defined via DH parameters they are stored here
         DHParameter optionalDHParameter;
-        float maxVelocity; //! given in m/s
-        float maxAcceleration; //! given in m/s^2
-        float maxTorque; //! given in Nm
+        float maxVelocity; //! given in [m/s] or [rad/s]
+        float maxAcceleration; //! given in [m/s^2] or [rad/s^2]
+        float maxDeceleration; //! given in [m/s^2] or [rad/s^2]
+        float maxJerk; //! given in [m/s^3] or [rad/s^3]
+        float maxTorque; //! given in [Nm]
         Eigen::Matrix4f localTransformation;
 
         std::map<std::string, float> propagatedJointValues;

@@ -82,7 +82,7 @@ namespace VirtualRobot
         */
         void print(bool printChildren = false, bool printDecoration = true) const override;
 
-        bool isTranslationalJoint() const override;
+        bool isTranslationalJoint() const noexcept override;
 
         /*!
             In global coord system.
@@ -136,4 +136,3 @@ namespace VirtualRobot
     typedef std::shared_ptr<RobotNodePrismatic> RobotNodePrismaticPtr;
 
 } // namespace VirtualRobot
-
