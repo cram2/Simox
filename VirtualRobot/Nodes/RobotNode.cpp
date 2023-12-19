@@ -1010,6 +1010,12 @@ namespace VirtualRobot
     }
 
     void
+    RobotNode::setMaxDeceleration(float maxDec)
+    {
+        maxDeceleration = maxDec;
+    }
+
+    void
     RobotNode::setMaxVelocity(float maxVel)
     {
         maxVelocity = maxVel;

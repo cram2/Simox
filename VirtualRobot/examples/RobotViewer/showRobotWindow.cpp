@@ -3,6 +3,7 @@
 #include "DiffIKWidget.h"
 #include "SimoxUtility/algorithm/get_map_keys_values.h"
 #include "VirtualRobot/EndEffector/EndEffector.h"
+#include "VirtualRobot/VirtualRobot.h"
 #include "VirtualRobot/Workspace/Reachability.h"
 #include <VirtualRobot/RuntimeEnvironment.h>
 #include <VirtualRobot/Import/RobotImporterFactory.h>

@@ -341,6 +341,12 @@ namespace VirtualRobot
         virtual void setMaxAcceleration(float maxAcc);
 
         /*!
+            Set maximum deceleration pf this joint in rad/s^2 or m/s^2.
+            To disbale max. deceleration set to -1.0f.
+        */
+        virtual void setMaxDeceleration(float maxAcc);
+
+        /*!
             Set maximum torque pf this joint in Nm.
             To disbale max. torque set to -1.0f.
         */
@@ -477,6 +483,7 @@ namespace VirtualRobot
         DHParameter optionalDHParameter;
         float maxVelocity; //! given in m/s
         float maxAcceleration; //! given in m/s^2
+        float maxDeceleration; //! given in m/s^2
         float maxTorque; //! given in Nm
         Eigen::Matrix4f localTransformation;
 
