@@ -21,7 +21,7 @@ namespace simox::qt
         return QColor{c.r, c.g, c.b}.rgb();
     }
 
-#if QWT_VERSION > 0x060200
+#if QWT_VERSION >= 0x060200
     uint SimoxQwtColorMap::colorIndex(int numColors,
                                  const QwtInterval& interval, double value) const
 #else

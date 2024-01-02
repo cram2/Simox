@@ -13,7 +13,7 @@ namespace simox::qt
         SimoxQwtColorMap(const std::string& n = "viridis");
         SimoxQwtColorMap(const simox::color::ColorMap& cm);
         QRgb rgb(const QwtInterval& interval, double value) const override;
-#if QWT_VERSION > 0x060200
+#if QWT_VERSION >= 0x060200
         uint colorIndex(int numColors, const QwtInterval& interval, double value) const override;
 #else
         unsigned char colorIndex(const QwtInterval& interval, double value) const override;
