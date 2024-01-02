@@ -548,5 +548,11 @@ namespace VirtualRobot
         return false;
     }
 
+    bool
+    RobotPoseDifferentialIK::computeSteps(float stepSize, float minChange, int maxSteps)
+    {
+        return computeSteps(stepSize, minChange, maxSteps, true);
+    }
+
 }
 

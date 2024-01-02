@@ -1,4 +1,5 @@
 #include "SimoxQwtColorMap.h"
+#include <qwt_interval.h>
 
 namespace simox::qt
 {
@@ -20,7 +21,12 @@ namespace simox::qt
         return QColor{c.r, c.g, c.b}.rgb();
     }
 
-    unsigned char SimoxQwtColorMap::colorIndex(const QwtInterval&, double) const
+#if QWT_VERSION >= 0x060200
+    uint SimoxQwtColorMap::colorIndex(int numColors,
+                                 const QwtInterval& interval, double value) const
+#else
+    unsigned char colorIndex(const QwtInterval& interval, double value)
+#endif
     {
         return 0;
     }

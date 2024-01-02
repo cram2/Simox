@@ -56,7 +56,7 @@ namespace VirtualRobot
         */
         ~Obstacle() override;
 
-        virtual void print(bool printDecoration = true);
+        virtual void print(bool printChildren = false, bool printDecoration = true) const override;
 
         /*!
             Clones this object. If no col checker is given, the one of the original object is used.
