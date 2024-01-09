@@ -244,7 +244,7 @@ namespace VirtualRobot
             versionMinor = version[1];
             // Check Robot name
             FileIO::readString(tmpString, file);
-            // THROW_VR_EXCEPTION_IF(tmpString != robot->getType(), "Wrong Robot");
+            THROW_VR_EXCEPTION_IF(tmpString != robot->getType(), "Wrong Robot");
 
             // Check Node Set
             FileIO::readString(tmpString, file);
