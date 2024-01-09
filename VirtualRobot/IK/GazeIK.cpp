@@ -143,7 +143,7 @@ namespace VirtualRobot
             return true;
         }
 
-        if(verbose)
+        if (verbose)
         {
             VR_INFO << "No solution from current configuration, trying with random seeded configuration" << std::endl;
         }
@@ -182,10 +182,11 @@ namespace VirtualRobot
             }
         }
 
-        if(verbose)
+        if (verbose)
         {
             VR_INFO << "Setting joint values ot best achieved config, dist to target:" << bestDist << std::endl;
         }
+
         rns->setJointValues(jvBest);
 
         return false;

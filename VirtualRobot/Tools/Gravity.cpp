@@ -207,13 +207,13 @@ void Gravity::GravityData::computeCoMAndTorque(Eigen::Vector3f &comPositionGloba
 //        VR_INFO << "CoM of " << node->getName() << ": " << node->getCoMGlobal() << " accumulated CoM: " << comPositionGlobal << "\nmass: " << node->getMass() << " massSum: " << massSum << std::endl;
     if(computeTorque)
     {
-        VirtualRobot::RobotNodeRevolutePtr rnRevolute = std::dynamic_pointer_cast<VirtualRobot::RobotNodeRevolute>(node);
-        Eigen::Vector3f axisGlobal = rnRevolute->getJointRotationAxis();
-        VirtualRobot::MathTools::BaseLine<Eigen::Vector3f> l(node->getGlobalPose().block<3,1>(0,3), axisGlobal);
-        Eigen::Vector3f pointOnAxis = VirtualRobot::MathTools::nearestPointOnLine<Eigen::Vector3f>(l, comPositionGlobal);
+        const VirtualRobot::RobotNodeRevolutePtr rnRevolute = std::dynamic_pointer_cast<VirtualRobot::RobotNodeRevolute>(node);
+        const Eigen::Vector3f axisGlobal = rnRevolute->getJointRotationAxis();
+        const VirtualRobot::MathTools::BaseLine<Eigen::Vector3f> l(node->getGlobalPose().block<3,1>(0,3), axisGlobal);
+        const auto pointOnAxis = VirtualRobot::MathTools::nearestPointOnLine<Eigen::Vector3f>(l, comPositionGlobal);
         Eigen::Vector3f r = comPositionGlobal - pointOnAxis; // vector from axis to com (change sign?)
         r *= 0.001f; // mm -> m
-        Eigen::Vector3f F(0, 0, -9.81 * massSum);
+        Eigen::Vector3f const F(0, 0, -9.81 * massSum);
         torque = (r.cross(F)).dot(axisGlobal);
         // gravity compensation: invert the gravity torque
         torque *= -1.0f;
