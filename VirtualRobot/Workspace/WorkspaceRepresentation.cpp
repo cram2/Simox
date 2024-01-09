@@ -1273,7 +1273,13 @@ namespace VirtualRobot
         return true;
     }
 
+
     void WorkspaceRepresentation::invalidateBehindRobot(const bool inverted)
+    {
+        invalidateRegion(inverted, MathTools::deg2rad(90), MathTools::deg2rad(90));
+    }
+
+    void WorkspaceRepresentation::invalidateRegion(const bool inverted, const float maxOpeningLeft, const float maxOpeningRight)
     {
         int step = 1;
 
@@ -1285,12 +1291,12 @@ namespace VirtualRobot
 
         for (int a = 0; a < numVoxels[0]; a += step)
         {
-            float voxelPositionX = minBounds[0] + (a + 0.5f) * size(0);
+            const float voxelPositionX = minBounds[0] + (a + 0.5f) * size(0);
 
             for (int b = 0; b < numVoxels[1]; b += step)
             {
 
-                float voxelPositionY = minBounds[1] + (b + 0.5f) * size(1);
+                const float voxelPositionY = minBounds[1] + (b + 0.5f) * size(1);
 
                 for(int c = 0; c < numVoxels[2]; c+= step)
                 {
@@ -1303,10 +1309,6 @@ namespace VirtualRobot
                         }  
 
                         const float angle = std::atan2(voxelPositionY, voxelPositionX);
-
-                        const float maxOpeningLeft = MathTools::deg2rad(60);
-                        const float maxOpeningRight = MathTools::deg2rad(45);
-
                         if(angle > maxOpeningLeft or angle < -maxOpeningRight)
                         {
                             data->reset(a,b,c);
@@ -1321,10 +1323,6 @@ namespace VirtualRobot
                         }   
 
                         const float angle = std::atan2(voxelPositionY, voxelPositionX);
-
-                        const float maxOpeningRight = MathTools::deg2rad(60);
-                        const float maxOpeningLeft = MathTools::deg2rad(45);
-
                         if(angle <= (M_PI - maxOpeningRight) and angle >= (-M_PI + maxOpeningLeft))
                         {
                             data->reset(a,b,c);
