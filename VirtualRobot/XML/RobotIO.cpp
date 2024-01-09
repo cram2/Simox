@@ -206,8 +206,11 @@ namespace VirtualRobot
                               RobotNode::RobotNodeType rntype,
                               Eigen::Matrix4f& transformationMatrix)
     {
-        float jointLimitLow = -M_PIf32;
-        float jointLimitHigh = M_PIf32;
+        static const float jointLimitLowDefault = -M_PIf32;
+        static const float jointLimitHighDefault = M_PIf32;
+
+        std::optional<float> jointLimitLow;
+        std::optional<float> jointLimitHigh;
         bool limitless = false;
         bool allowJointLimitAvoidance = true;
 
@@ -230,18 +233,19 @@ namespace VirtualRobot
                 RobotNodeFactory::fromName(RobotNodeFixedFactory::getName(), nullptr);
             if (fixedNodeFactory)
             {
-                robotNode = fixedNodeFactory->createRobotNode(robot,
-                                                              robotNodeName,
-                                                              visualizationNode,
-                                                              collisionModel,
-                                                              jointLimitLow,
-                                                              jointLimitHigh,
-                                                              jointOffset,
-                                                              preJointTransform,
-                                                              axis,
-                                                              translationDir,
-                                                              physics,
-                                                              rntype);
+                robotNode = fixedNodeFactory->createRobotNode(
+                    robot,
+                    robotNodeName,
+                    visualizationNode,
+                    collisionModel,
+                    jointLimitLow.value_or(jointLimitLowDefault),
+                    jointLimitHigh.value_or(jointLimitHighDefault),
+                    jointOffset,
+                    preJointTransform,
+                    axis,
+                    translationDir,
+                    physics,
+                    rntype);
             }
             return robotNode;
         }
@@ -279,7 +283,9 @@ namespace VirtualRobot
 
         float maxVelocity = -1.0f; // m/s
         float maxAcceleration = -1.0f; // m/s^2
+        float maxDeceleration = -1.0f; // m/s^2
         float maxTorque = -1.0f; // Nm
+        float maxJerk = -1.0f;
         bool scaleVisu = false;
         Eigen::Vector3f scaleVisuFactor = Eigen::Vector3f::Zero();
 
@@ -305,8 +311,11 @@ namespace VirtualRobot
                                       "Multiple limits definitions in <Joint> tag of robot node <"
                                           << robotNodeName << ">." << endl);
                 limitsNode = node;
-                processLimitsNode(
-                    limitsNode, jointLimitLow, jointLimitHigh, limitless, allowJointLimitAvoidance);
+                processLimitsNode(limitsNode,
+                                  jointLimitLow.emplace(),
+                                  jointLimitHigh.emplace(),
+                                  limitless,
+                                  allowJointLimitAvoidance);
             }
             else if (nodeName == "prejointtransform")
             {
@@ -445,6 +454,110 @@ namespace VirtualRobot
 
                 maxAcceleration *= factor;
             }
+            else if (nodeName == "maxdeceleration")
+            {
+                maxDeceleration = getFloatByAttributeName(node, "value");
+
+                // convert to m/s^2
+                std::vector<Units> unitsAttr = getUnitsAttributes(node);
+                Units uTime("sec");
+                Units uLength("m");
+                Units uAngle("rad");
+
+                for (auto& i : unitsAttr)
+                {
+                    if (i.isTime())
+                    {
+                        uTime = i;
+                    }
+
+                    if (i.isLength())
+                    {
+                        uLength = i;
+                    }
+
+                    if (i.isAngle())
+                    {
+                        uAngle = i;
+                    }
+                }
+
+                float factor = 1.0f;
+
+                if (uTime.isMinute())
+                {
+                    factor /= 3600.0f;
+                }
+
+                if (uTime.isHour())
+                {
+                    factor /= 12960000.0f;
+                }
+
+                if (uLength.isMillimeter())
+                {
+                    factor *= 0.001f;
+                }
+
+                if (uAngle.isDegree())
+                {
+                    factor *= float(M_PI / 180.0);
+                }
+
+                maxDeceleration *= factor;
+            }
+            else if (nodeName == "maxjerk")
+            {
+                maxJerk = getFloatByAttributeName(node, "value");
+
+                // convert to m/s^3
+                std::vector<Units> unitsAttr = getUnitsAttributes(node);
+                Units uTime("sec");
+                Units uLength("m");
+                Units uAngle("rad");
+
+                for (auto& i : unitsAttr)
+                {
+                    if (i.isTime())
+                    {
+                        uTime = i;
+                    }
+
+                    if (i.isLength())
+                    {
+                        uLength = i;
+                    }
+
+                    if (i.isAngle())
+                    {
+                        uAngle = i;
+                    }
+                }
+
+                float factor = 1.0f;
+
+                if (uTime.isMinute())
+                {
+                    factor /= std::pow<float>(60.0f, 3.f);
+                }
+
+                if (uTime.isHour())
+                {
+                    factor /= std::pow<float>(3600.f, 3.f);
+                }
+
+                if (uLength.isMillimeter())
+                {
+                    factor *= 0.001f;
+                }
+
+                if (uAngle.isDegree())
+                {
+                    factor *= float(M_PI / 180.0);
+                }
+
+                maxJerk *= factor;
+            }
             else if (nodeName == "maxtorque")
             {
                 maxTorque = getFloatByAttributeName(node, "value");
@@ -517,14 +630,6 @@ namespace VirtualRobot
                         hemisphere->lever = getFloatByAttributeName(node, "lever");
                         hemisphere->theta0Rad =
                             simox::math::deg_to_rad(getFloatByAttributeName(node, "theta0"));
-                        if (node->first_attribute("limitLo"))
-                        {
-                            hemisphere->limitLo = getFloatByAttributeName(node, "limitLo");
-                        }
-                        if (node->first_attribute("limitHi"))
-                        {
-                            hemisphere->limitHi = getFloatByAttributeName(node, "limitHi");
-                        }
                         break;
                     case RobotNodeHemisphere::Role::SECOND:
                         break;
@@ -644,18 +749,19 @@ namespace VirtualRobot
             } else
             {*/
             // create nodes that are not defined via DH parameters
-            robotNode = robotNodeFactory->createRobotNode(robot,
-                                                          robotNodeName,
-                                                          visualizationNode,
-                                                          collisionModel,
-                                                          jointLimitLow,
-                                                          jointLimitHigh,
-                                                          jointOffset,
-                                                          preJointTransform,
-                                                          axis,
-                                                          translationDir,
-                                                          physics,
-                                                          rntype);
+            robotNode =
+                robotNodeFactory->createRobotNode(robot,
+                                                  robotNodeName,
+                                                  visualizationNode,
+                                                  collisionModel,
+                                                  jointLimitLow.value_or(jointLimitLowDefault),
+                                                  jointLimitHigh.value_or(jointLimitHighDefault),
+                                                  jointOffset,
+                                                  preJointTransform,
+                                                  axis,
+                                                  translationDir,
+                                                  physics,
+                                                  rntype);
             //}
         }
         else
@@ -665,7 +771,9 @@ namespace VirtualRobot
 
         robotNode->setMaxVelocity(maxVelocity);
         robotNode->setMaxAcceleration(maxAcceleration);
+        robotNode->setMaxDeceleration(maxDeceleration);
         robotNode->setMaxTorque(maxTorque);
+        robotNode->setMaxJerk(maxJerk);
         robotNode->setLimitless(limitless);
         robotNode->setAllowJointLimitAvoidance(allowJointLimitAvoidance);
 
@@ -685,6 +793,8 @@ namespace VirtualRobot
         if (robotNode->isHemisphereJoint() and hemisphere.has_value())
         {
             RobotNodeHemispherePtr node = std::dynamic_pointer_cast<RobotNodeHemisphere>(robotNode);
+            hemisphere->limitLoRadians = jointLimitLow;
+            hemisphere->limitHiRadians = jointLimitHigh;
             node->setXmlInfo(hemisphere.value());
         }
 
@@ -1016,6 +1126,8 @@ namespace VirtualRobot
         NodeMapping nodeMapping;
         std::optional<HumanMapping> humanMapping;
 
+        std::map<std::string, std::map<std::string, float>> configurations;
+
         std::map<std::string, std::vector<std::string>> attachments;
 
         processRobotChildNodes(robotXMLNode,
@@ -1028,20 +1140,15 @@ namespace VirtualRobot
                                nodeMapping,
                                humanMapping,
                                attachments,
+                               configurations,
                                loadMode);
 
         // process childfromrobot tags
-        std::map<RobotNodePtr, std::vector<ChildFromRobotDef>>::iterator iter =
-            childrenFromRobotFilesMap.begin();
-
-        while (iter != childrenFromRobotFilesMap.end())
+        for (auto& [node, childrenFromRobot] : childrenFromRobotFilesMap)
         {
-            std::vector<ChildFromRobotDef> childrenFromRobot = iter->second;
-            RobotNodePtr node = iter->first;
-
-            for (auto& i : childrenFromRobot)
+            for (auto& child : childrenFromRobot)
             {
-                std::filesystem::path filenameNew(i.filename);
+                std::filesystem::path filenameNew(child.filename);
                 std::filesystem::path filenameBasePath(basePath);
 
                 std::filesystem::path filenameNewComplete = filenameBasePath / filenameNew;
@@ -1062,15 +1169,16 @@ namespace VirtualRobot
                 THROW_VR_EXCEPTION_IF(
                     !r,
                     "Could not add child-from-robot due to failed loading of robot from file"
-                        << i.filename);
+                        << child.filename);
                 RobotNodePtr root = r->getRootNode();
-                THROW_VR_EXCEPTION_IF(
-                    !root, "Could not add child-from-robot. No root node in file" << i.filename);
+                THROW_VR_EXCEPTION_IF(!root,
+                                      "Could not add child-from-robot. No root node in file"
+                                          << child.filename);
 
                 RobotNodePtr rootNew = root->clone(robo, true, node);
                 THROW_VR_EXCEPTION_IF(!rootNew,
                                       "Clone failed. Could not add child-from-robot from file "
-                                          << i.filename);
+                                          << child.filename);
 
                 std::vector<EndEffectorPtr> eefs;
                 r->getEndEffectors(eefs);
@@ -1091,8 +1199,6 @@ namespace VirtualRobot
                 // already performed in root->clone
                 //node->attachChild(rootNew);
             }
-
-            iter++;
         }
 
         { // handle attachments
@@ -1126,7 +1232,6 @@ namespace VirtualRobot
             }
         }
 
-        //std::vector<RobotNodeSetPtr> robotNodeSets
         for (auto& endeffectorNode : endeffectorNodes)
         {
             EndEffectorPtr eef = processEndeffectorNode(endeffectorNode, robo);
@@ -1134,23 +1239,24 @@ namespace VirtualRobot
         }
 
         int rnsCounter = 0;
-
         for (auto& robotNodeSetNode : robotNodeSetNodes)
         {
             RobotNodeSetPtr rns =
                 processRobotNodeSet(robotNodeSetNode, robo, robotRoot, rnsCounter);
-            //nodeSets.push_back(rns);
+            (void)rns;
         }
 
-        std::vector<RobotNodePtr> nodes;
-        robo->getRobotNodes(nodes);
-        RobotNodePtr root = robo->getRootNode();
-
-        for (auto& node : nodes)
         {
-            if (node != root && !(node->getParent()))
+            std::vector<RobotNodePtr> nodes;
+            robo->getRobotNodes(nodes);
+            RobotNodePtr rootNode = robo->getRootNode();
+            for (RobotNodePtr& node : nodes)
             {
-                THROW_VR_EXCEPTION("Node without parent: " << node->getName());
+                if (not(node->getParent() or node == rootNode))
+                {
+                    VR_ERROR << "RobotNode '" << node->getName()
+                             << "' is not connected to kinematic structure." << std::endl;
+                }
             }
         }
 
@@ -1161,6 +1267,11 @@ namespace VirtualRobot
             robo->registerHumanMapping(humanMapping.value());
         }
 
+        for(const auto& [name, configuration]: configurations)
+        {
+            // VR_INFO << "Registering configuration `" << name << "`." << std::endl;
+            robo->registerConfiguration(name, configuration);
+        }
 
         return robo;
     }
@@ -1254,7 +1365,7 @@ namespace VirtualRobot
             const std::string passiveStrRep = attr->value();
             passive = toBool(passiveStrRep);
 
-            VR_INFO << "Robot is 'passive' according to config" << std::endl;
+            // VR_INFO << "Robot is 'passive' according to config" << std::endl;
         }
 
         // build robot
@@ -1286,6 +1397,7 @@ namespace VirtualRobot
         NodeMapping& nodeMapping,
         std::optional<HumanMapping>& humanMapping,
         std::map<std::string, std::vector<std::string>>& attachments,
+        std::map<std::string, std::map<std::string, float>>& configurations,
         RobotDescription loadMode)
     {
         std::vector<RobotNodePtr> robotNodes;
@@ -1402,6 +1514,13 @@ namespace VirtualRobot
 
                 // implicit vector instantiation
                 attachments[parent].push_back(child);
+            }
+            else if (nodeName == "configuration")
+            {
+                auto [name, configuration] = processConfigurationNode(XMLNode);
+
+                THROW_VR_EXCEPTION_IF(configurations.count(name)> 0, "Configuration `" << name << "` specified multiple times!");
+                configurations.emplace(name, configuration);
             }
             else
             {

@@ -115,7 +115,7 @@ namespace VirtualRobot
         /// Print status information.
         void print(bool printChildren = false, bool printDecoration = true) const override;
 
-        bool isFourBarJoint() const override;
+        bool isFourBarJoint() const noexcept override;
 
         Eigen::Vector3f getJointRotationAxis(const SceneObjectPtr& coordSystem) const;
 

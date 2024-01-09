@@ -20,16 +20,17 @@ namespace VirtualRobot::hemisphere
     void
     Maths::setConstants(double lever,
                         double theta0,
-                        std::optional<double> limitLo,
-                        std::optional<double> limitHi)
+                        std::optional<double> limitLoRadians,
+                        std::optional<double> limitHiRadians)
     {
         this->lever = lever;
         this->theta0Rad = theta0;
         this->radiusOfRollingSpheres = std::sin(theta0) * lever;
 
-        this->limitHi = simox::math::deg_to_rad(limitHi.has_value() ? limitHi.value() : (45 - 6.0));
-        this->limitLo =
-            simox::math::deg_to_rad(limitLo.has_value() ? limitLo.value() : -(45 - 14.0));
+        this->limitHi =
+            limitHiRadians.has_value() ? limitHiRadians.value() : simox::math::deg_to_rad(45 - 6.0);
+        this->limitLo = limitLoRadians.has_value() ? limitLoRadians.value()
+                                                   : simox::math::deg_to_rad(-(45 - 14.0));
     }
 
     void

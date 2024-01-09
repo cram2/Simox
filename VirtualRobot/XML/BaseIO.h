@@ -89,7 +89,7 @@ namespace VirtualRobot
         static float getFloatByAttributeName(const rapidxml::xml_node<char>* xmlNode, const std::string& attributeName);
         static float getOptionalFloatByAttributeName(const rapidxml::xml_node<char>* xmlNode, const std::string& attributeName, float standardValue);
 
-        static bool processConfigurationNode(const rapidxml::xml_node<char>* configXMLNode, std::vector< RobotConfig::Configuration >& storeConfigDefinitions, std::string&  storeConfigName);
+        static bool processGraspConfigurationNode(const rapidxml::xml_node<char>* configXMLNode, std::vector< RobotConfig::Configuration >& storeConfigDefinitions, std::string&  storeConfigName);
         static bool processConfigurationNodeList(const rapidxml::xml_node<char>* configXMLNode, std::vector< std::vector< RobotConfig::Configuration > >& configDefinitions, std::vector< std::string >& configNames, std::vector< std::string >& tcpNames);
 
         static std::string getLowerCase(const char* c);
@@ -112,6 +112,8 @@ namespace VirtualRobot
 
         static NodeMapping processNodeMapping(const rapidxml::xml_node<char>* XMLNode, RobotPtr robot);
         static HumanMapping processHumanMapping(const rapidxml::xml_node<char>* XMLNode, const RobotPtr& robot);
+
+        static std::tuple<std::string, std::map<std::string, float>> processConfigurationNode(const rapidxml::xml_node<char>* XMLNode);
 
         static std::string toXML(const Eigen::Matrix4f& m, std::string ident = "\t");
 

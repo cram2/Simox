@@ -130,7 +130,11 @@ namespace VirtualRobot
         // initialize the virtualGazeJoint with a guess
         float v = (goal - virtualTranslationJoint->getParent()->getGlobalPose().block(0, 3, 3, 1)).norm();
         virtualTranslationJoint->setJointValue(v);
-        //VR_INFO << "virtualTranslationJoint jv:" << v << std::endl;
+
+        if(verbose)
+        {
+            VR_INFO << "virtualTranslationJoint jv:" << v << std::endl;
+        }
 
 
         // first run: start with current joint angles

@@ -68,8 +68,8 @@ namespace VirtualRobot
             // Only set for first:
             double theta0Rad = -1;
             double lever = -1;
-            std::optional<double> limitLo = std::nullopt;
-            std::optional<double> limitHi = std::nullopt;
+            std::optional<double> limitLoRadians = std::nullopt;
+            std::optional<double> limitHiRadians = std::nullopt;
         };
 
         /// Data held by the first joint.
@@ -141,7 +141,7 @@ namespace VirtualRobot
         /// Print status information.
         void print(bool printChildren = false, bool printDecoration = true) const override;
 
-        bool isHemisphereJoint() const override;
+        bool isHemisphereJoint() const noexcept override;
 
         bool isFirstHemisphereJointNode() const;
         bool isSecondHemisphereJointNode() const;

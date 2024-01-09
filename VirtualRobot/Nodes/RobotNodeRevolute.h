@@ -78,7 +78,7 @@ namespace VirtualRobot
         //! Print status information.
         void print(bool printChildren = false, bool printDecoration = true) const override;
 
-        bool isRotationalJoint() const override;
+        bool isRotationalJoint() const noexcept override;
         /*!
             Standard: In global coordinate system.
             \param coordSystem When not set the axis is transformed to global coordinate system. Otherwise any scene object can be used as coord system.
@@ -142,4 +142,3 @@ namespace VirtualRobot
     typedef std::shared_ptr<RobotNodeRevolute> RobotNodeRevolutePtr;
 
 } // namespace VirtualRobot
-

@@ -152,7 +152,7 @@ Eigen::MatrixXd DiffIKWidget::readFollowManipulability() {
             matrix = Eigen::Matrix<double, 6, 6>();
         }
         else if (strList.size() == 3) {
-            matrix = Eigen::Matrix3d();
+            matrix = Eigen::Matrix3d::Identity();
         }
         else {
             return Eigen::Matrix<double, 0, 0>();

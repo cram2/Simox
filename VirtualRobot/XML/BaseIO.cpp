@@ -29,6 +29,7 @@
 #include <fstream>
 #include <stdexcept>
 #include <string>
+#include <tuple>
 
 namespace VirtualRobot
 {
@@ -677,6 +678,29 @@ namespace VirtualRobot
 
         return nodeMapping;
     }
+
+    std::tuple<std::string, std::map<std::string, float>> BaseIO::processConfigurationNode(const rapidxml::xml_node<char>* node)
+    {
+        const std::string configurationName = processStringAttribute("name", node, true);
+
+        std::map<std::string, float> configuration;
+
+        rapidxml::xml_node<>* nodeNode = node->first_node("node", 0, false);
+        while (nodeNode)
+        {
+            const std::string name = processStringAttribute("name", nodeNode, true);
+            const float value = processFloatAttribute("value", nodeNode, true);
+
+            THROW_VR_EXCEPTION_IF(configuration.count(name) > 0, "Duplicate `" << name << "` node in configuration `" << configurationName << "`!");
+            configuration.emplace(name, value);
+
+            // advance to next 
+            nodeNode = nodeNode->next_sibling();
+        }
+
+        return std::make_tuple(configurationName, configuration);
+    }
+
 
     HumanMapping BaseIO::processHumanMapping(const rapidxml::xml_node<char>* XMLNode, const RobotPtr& robot)
     {
@@ -1333,7 +1357,7 @@ namespace VirtualRobot
             {
                 VisualizationFactoryPtr factory = VisualizationFactory::fromName(fileType, NULL);
 
-                if (factory = VisualizationFactory::fromName(fileType, NULL))
+                if (factory)
                 {
                     if (tmpFileType == fileType)
                     {
@@ -1344,7 +1368,7 @@ namespace VirtualRobot
                         VR_WARNING << "Ignoring data from " << visuFileXMLNode->value() << ": visualization type does not match to data from before." << std::endl;
                     }
                 }
-                else if (auto factory = VisualizationFactory::fromName("inventor", NULL))
+                else if ((factory = VisualizationFactory::fromName("inventor", NULL)) != nullptr)
                 {
                     VR_WARNING << "VisualizationFactory of type '" << fileType << "' not present. Trying factory for 'inventor' " << std::endl;
                     if (tmpFileType == fileType)
@@ -1711,7 +1735,7 @@ namespace VirtualRobot
         return fileName;
     }
 
-    bool BaseIO::processConfigurationNode(const rapidxml::xml_node<char>* configXMLNode, std::vector< RobotConfig::Configuration >& storeConfigDefinitions, std::string&  storeConfigName)
+    bool BaseIO::processGraspConfigurationNode(const rapidxml::xml_node<char>* configXMLNode, std::vector< RobotConfig::Configuration >& storeConfigDefinitions, std::string&  storeConfigName)
     {
         THROW_VR_EXCEPTION_IF(!configXMLNode, "NULL data in processConfigurationNode");
         storeConfigName = processNameAttribute(configXMLNode, true);
@@ -1779,7 +1803,7 @@ namespace VirtualRobot
         std::vector< RobotConfig::Configuration > configs;
 
 
-        if (!processConfigurationNode(configXMLNode, configs, name))
+        if (!processGraspConfigurationNode(configXMLNode, configs, name))
         {
             return false;
         }
@@ -2086,7 +2110,7 @@ namespace VirtualRobot
             else if (nodeName == "configuration")
             {
                 THROW_VR_EXCEPTION_IF(configDefinitions.size() > 0, "Only one configuration per grasp allowed");
-                bool cOK = processConfigurationNode(node, configDefinitions, configName);
+                bool cOK = processGraspConfigurationNode(node, configDefinitions, configName);
                 THROW_VR_EXCEPTION_IF(!cOK, "Invalid configuration defined in grasp tag '" << name << "'." << endl);
 
             }

@@ -23,6 +23,8 @@ elseif(RELEASE_CODENAME STREQUAL impish)
     SET(Simox_BOOST_VERSION 1.74.0)
 elseif(RELEASE_CODENAME STREQUAL jammy OR RELEASE_CODENAME STREQUAL horus)
     SET(Simox_BOOST_VERSION 1.74.0)
+elseif(RELEASE_CODENAME STREQUAL noble) #Ubuntu 24
+    SET(Simox_BOOST_VERSION 1.74.0)
 else()
     SET(Simox_BOOST_VERSION 1.65.1)
 endif()
@@ -56,6 +58,15 @@ endif()
 set(CMAKE_CXX_STANDARD_DEFAULT)
 add_definitions(-std=c++2a)
 
+include(CheckCXXCompilerFlag)
+CHECK_CXX_COMPILER_FLAG("-std=c++2b" COMPILER_SUPPORTS_CXX2B)
+if(COMPILER_SUPPORTS_CXX2B)
+    message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has C++2b support.")
+    add_definitions(-std=c++2b)
+else()
+    message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++2b support.")
+endif()
+
 list(APPEND CMAKE_MODULE_PATH ${Simox_SOURCE_DIR}/CMakeModules)
 MESSAGE (STATUS "** Module path: "  ${CMAKE_MODULE_PATH})
 
@@ -79,6 +90,9 @@ FIND_PACKAGE(Boost ${Simox_BOOST_VERSION} EXACT COMPONENTS
     regex
     REQUIRED)
 MESSAGE (STATUS "Boost found at: ${Boost_INCLUDE_DIR}")
+
+FIND_PACKAGE (difflib QUIET)
+
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 

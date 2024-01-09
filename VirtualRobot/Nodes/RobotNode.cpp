@@ -1,6 +1,5 @@
 #include "RobotNode.h"
 
-#include <algorithm>
 #include <cmath>
 #include <filesystem>
 #include <iomanip>
@@ -124,7 +123,7 @@ namespace VirtualRobot
     }
 
     bool
-    RobotNode::getEnforceJointLimits() const
+    RobotNode::getEnforceJointLimits() const noexcept
     {
         return enforceJointLimits;
     }
@@ -136,7 +135,7 @@ namespace VirtualRobot
     }
 
     bool
-    RobotNode::getAllowJointLimitAvoidance() const
+    RobotNode::getAllowJointLimitAvoidance() const noexcept
     {
         return allowJointLimitAvoidance;
     }
@@ -706,25 +705,25 @@ namespace VirtualRobot
     }
 
     bool
-    RobotNode::isTranslationalJoint() const
+    RobotNode::isTranslationalJoint() const noexcept
     {
         return false;
     }
 
     bool
-    RobotNode::isRotationalJoint() const
+    RobotNode::isRotationalJoint() const noexcept
     {
         return false;
     }
 
     bool
-    RobotNode::isHemisphereJoint() const
+    RobotNode::isHemisphereJoint() const noexcept
     {
         return false;
     }
 
     bool
-    RobotNode::isFourBarJoint() const
+    RobotNode::isFourBarJoint() const noexcept
     {
         return false;
     }
@@ -736,13 +735,13 @@ namespace VirtualRobot
     }
 
     bool
-    RobotNode::isLimitless() const
+    RobotNode::isLimitless() const noexcept
     {
         return limitless;
     }
 
     float
-    RobotNode::getDelta(float target)
+    RobotNode::getDelta(float target) const
     {
         float delta = 0.0f;
 
@@ -991,10 +990,16 @@ namespace VirtualRobot
     }
 
     bool
-    RobotNode::isJoint() const
+    RobotNode::isJoint() const noexcept
     {
         return isRotationalJoint() or isTranslationalJoint() or isHemisphereJoint() or
                isFourBarJoint();
+    }
+
+    void
+    RobotNode::setMaxJerk(float maxTo)
+    {
+        maxJerk = maxTo;
     }
 
     void
@@ -1010,25 +1015,31 @@ namespace VirtualRobot
     }
 
     void
+    RobotNode::setMaxDeceleration(float maxDec)
+    {
+        maxDeceleration = maxDec;
+    }
+
+    void
     RobotNode::setMaxVelocity(float maxVel)
     {
         maxVelocity = maxVel;
     }
 
     float
-    RobotNode::getMaxVelocity()
+    RobotNode::getMaxVelocity() const noexcept
     {
         return maxVelocity;
     }
 
     float
-    RobotNode::getMaxAcceleration()
+    RobotNode::getMaxAcceleration() const noexcept
     {
         return maxAcceleration;
     }
 
     float
-    RobotNode::getMaxTorque()
+    RobotNode::getMaxTorque() const noexcept
     {
         return maxTorque;
     }
@@ -1142,7 +1153,7 @@ namespace VirtualRobot
     }
 
     RobotNode::RobotNodeType
-    RobotNode::getType()
+    RobotNode::getType() const noexcept
     {
         return nodeType;
     }

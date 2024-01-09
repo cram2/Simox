@@ -22,10 +22,10 @@
 */
 #pragma once
 
-#include "../DynamicsObject.h"
-#include "SimoxMotionState.h"
 #include <VirtualRobot/Primitive.h>
 
+#include "../DynamicsObject.h"
+#include "SimoxMotionState.h"
 #include "btBulletDynamicsCommon.h"
 
 namespace SimDynamics
@@ -58,7 +58,8 @@ namespace SimDynamics
         */
         void setPose(const Eigen::Matrix4f& pose) override;
 
-        Eigen::Vector3f getCom()
+        Eigen::Vector3f
+        getCom()
         {
             return com;
         }
@@ -97,7 +98,6 @@ namespace SimDynamics
         static float MassFactor;
 
     protected:
-
         void setPoseIntern(const Eigen::Matrix4f& pose);
         btCollisionShape* getShapeFromPrimitive(VirtualRobot::Primitive::PrimitivePtr primitive);
 
@@ -111,10 +111,8 @@ namespace SimDynamics
 
         btScalar btMargin;
         SimoxMotionState* motionState;
-
     };
 
     typedef std::shared_ptr<BulletObject> BulletObjectPtr;
 
 } // namespace SimDynamics
-

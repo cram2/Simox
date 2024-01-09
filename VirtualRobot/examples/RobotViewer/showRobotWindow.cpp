@@ -1,7 +1,9 @@
 
 #include "showRobotWindow.h"
 #include "DiffIKWidget.h"
+#include "SimoxUtility/algorithm/get_map_keys_values.h"
 #include "VirtualRobot/EndEffector/EndEffector.h"
+#include "VirtualRobot/VirtualRobot.h"
 #include "VirtualRobot/Workspace/Reachability.h"
 #include <VirtualRobot/RuntimeEnvironment.h>
 #include <VirtualRobot/Import/RobotImporterFactory.h>
@@ -142,6 +144,8 @@ void showRobotWindow::setupUI()
     connect(UI.checkBoxShowCoordSystem, SIGNAL(clicked()), this, SLOT(showCoordSystem()));
     connect(UI.comboBoxRobotNodeSet, SIGNAL(activated(int)), this, SLOT(selectRNS(int)));
     connect(UI.comboBoxJoint, SIGNAL(activated(int)), this, SLOT(selectJoint(int)));
+    connect(UI.comboBoxConfiguration, SIGNAL(activated(int)), this, SLOT(selectConfiguration(int)));
+    connect(UI.buttonSetConfiguration, SIGNAL(clicked()), this, SLOT(setConfiguration()));
     connect(UI.horizontalSliderPos, SIGNAL(valueChanged(int)), this, SLOT(jointValueChanged(int)));
 
     connect(UI.checkBoxDistToPtEnabled,  &QCheckBox::clicked,           this, &showRobotWindow::updatePointDistanceVisu);
@@ -603,6 +607,26 @@ void showRobotWindow::selectJoint(int nr)
     displayTriangles();
 }
 
+
+void showRobotWindow::selectConfiguration(int nr)
+{
+    std::cout << "Selecting configuration nr " << nr << std::endl;
+
+    currentConfiguration = currentConfigurations[nr];
+}
+
+
+void showRobotWindow::setConfiguration()
+{
+    std::cout << "Setting robot to configuration `" << currentConfiguration << "`" << std::endl;
+
+    if(not robot->setToConfiguration(currentConfiguration))
+    {
+        VR_WARNING << "Failed to set robot to config `" << currentConfiguration << "`!";
+    }
+}
+
+
 void showRobotWindow::jointValueChanged(int pos)
 {
     int nr = UI.comboBoxJoint->currentIndex();
@@ -857,6 +881,27 @@ void showRobotWindow::updatRobotInfo()
     for (const std::string& id : ids)
     {
         UI.comboBoxPrimitiveModel->addItem(QString::fromStdString(id));
+    }
+
+
+    UI.comboBoxConfiguration->clear();
+    currentConfigurations = ::simox::alg::get_keys(robot->getConfigurations());
+
+    if(not currentConfigurations.empty())
+    {
+        currentConfiguration = currentConfigurations.front();
+    }
+    else
+    {
+        currentConfiguration.clear();
+    }
+
+    // add empty / zero?
+    // UI.comboBoxConfiguration->addItem(QString(""));
+
+    for (auto& configurationName : currentConfigurations)
+    {
+        UI.comboBoxConfiguration->addItem(QString(configurationName.c_str()));
     }
 
 
