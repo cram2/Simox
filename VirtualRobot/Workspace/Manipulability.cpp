@@ -9,7 +9,6 @@
 #include <VirtualRobot/IK/PoseQualityExtendedManipulability.h>
 #include <VirtualRobot/XML/RobotIO.h>
 #include <VirtualRobot/Random.h>
-#include "VirtualRobot.h"
 
 #include <fstream>
 #include <cmath>
@@ -761,15 +760,6 @@ namespace VirtualRobot
             // each thread gets a cloned robot
             CollisionCheckerPtr cc(new CollisionChecker());
             RobotPtr clonedRobot = VirtualRobot::RobotIO::loadRobot(this->robot->getFilename(), RobotIO::eCollisionModel);
-            
-            // FIXME cloned robot check primitive approx active?
-            clonedRobot->setPrimitiveApproximationModel({"ApproxHand"}, true);
-
-            // RobotPtr clonedRobot = this->robot->clone();
-
-            clonedRobot->setUpdateVisualization(false);
-            
-            
             threads[i] = std::thread([=, this] ()
             {
 
