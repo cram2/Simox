@@ -122,7 +122,7 @@ endif()
 
 #######################################################################################
 #options
-# OPTION (Simox_USE_RBDL_LIB "Use RBDL" ON)
+OPTION (Simox_USE_RBDL_LIB "Use RBDL" ON)
 OPTION (Simox_USE_NLOPT "Use NLOPT" ON)
 OPTION(SimDynamics_USE_BULLET "Use Bullet Physics Engine" ON)
 OPTION(Simox_USE_COIN_VISUALIZATION "Use Coin3D for visualization" ON)
@@ -230,12 +230,12 @@ ADD_DEFINITIONS(-DSimox_TEST_DIR=\"${Simox_TEST_DIR}/\")
 
 set (SIMOX_EXPORT_TARGET_LIST "")
 
-# if (Simox_USE_RBDL_LIB)
+if (Simox_USE_RBDL_LIB)
 #     message(STATUS "Using rbdl")
 #     add_subdirectory(3rdParty/rbdl)
 #     list (APPEND SIMOX_EXPORT_TARGET_LIST rbdl)
 #     list (APPEND Simox_LIBRARIES rbdl)
-# endif()
+endif()
 
 #######################################################################################
 add_subdirectory(SimoxUtility)
