@@ -1357,7 +1357,7 @@ namespace VirtualRobot
             {
                 VisualizationFactoryPtr factory = VisualizationFactory::fromName(fileType, NULL);
 
-                if (factory = VisualizationFactory::fromName(fileType, NULL))
+                if (factory)
                 {
                     if (tmpFileType == fileType)
                     {
@@ -1368,7 +1368,7 @@ namespace VirtualRobot
                         VR_WARNING << "Ignoring data from " << visuFileXMLNode->value() << ": visualization type does not match to data from before." << std::endl;
                     }
                 }
-                else if (auto factory = VisualizationFactory::fromName("inventor", NULL))
+                else if ((factory = VisualizationFactory::fromName("inventor", NULL)) != nullptr)
                 {
                     VR_WARNING << "VisualizationFactory of type '" << fileType << "' not present. Trying factory for 'inventor' " << std::endl;
                     if (tmpFileType == fileType)

@@ -40,7 +40,7 @@ BOOST_AUTO_TEST_CASE(testSimDynamicsBulletFactoryCreateObject)
     BOOST_REQUIRE_NO_THROW(dynObj = world->CreateDynamicsObject(o));
     BOOST_REQUIRE(dynObj);
 
-    bool ok;
+    bool ok{false};
 
     BOOST_REQUIRE_NO_THROW(ok = world->addObject(dynObj));
     BOOST_REQUIRE(ok);

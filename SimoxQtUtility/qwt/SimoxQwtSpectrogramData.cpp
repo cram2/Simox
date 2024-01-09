@@ -9,7 +9,7 @@ namespace simox::qt
     {
         setFrequency(frequency, bucket_count);
         setIterations(iterations);
-        setInterval(Qt::ZAxis, QwtInterval(0.0, 10.0));
+//        setInterval(Qt::ZAxis, QwtInterval(0.0, 10.0));
     }
 
     double SimoxQwtSpectrogramData::value(double fx, double fy) const
@@ -67,13 +67,13 @@ namespace simox::qt
     void SimoxQwtSpectrogramData::setIterations(std::size_t iterations)
     {
         _iterations = iterations;
-        setInterval(Qt::XAxis, QwtInterval(0, iterations));
+//        setInterval(Qt::XAxis, QwtInterval(0, iterations));
     }
 
     void SimoxQwtSpectrogramData::setFrequency(float freq, std::size_t bucket_count)
     {
         _bucket_height = freq / 2 / bucket_count;
         _bucket_count = bucket_count;
-        setInterval(Qt::YAxis, QwtInterval(0, freq / 2));
+//        setInterval(Qt::YAxis, QwtInterval(0, freq / 2));
     }
 }

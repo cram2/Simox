@@ -264,14 +264,14 @@ namespace VirtualRobot
         return result;
     }
 
-    void Obstacle::print(bool printDecoration /*= true*/)
+    void Obstacle::print(bool printChildren, bool printDecoration) const
     {
         if (printDecoration)
         {
             std::cout << "**** Obstacle ****" << std::endl;
         }
 
-        SceneObject::print(false);
+        SceneObject::print(printChildren, printDecoration);
         std::cout << " * id: " << id << std::endl;
 
         printGrasps();
