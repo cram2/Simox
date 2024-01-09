@@ -18,7 +18,7 @@ target_link_libraries(VirtualRobot PUBLIC SimoxUtility SimoxQtUtility)
 if (Simox_USE_RBDL_LIB)
 #    target_include_directories(VirtualRobot PUBLIC "../3rdParty/rbdl/src")
 #    target_include_directories(VirtualRobot PUBLIC "../3rdParty/rbdl/include")
-    target_link_libraries(VirtualRobot LINK_PUBLIC rbdl)
+    target_link_libraries(VirtualRobot LINK_PUBLIC ${RBDL_LIBRARY})
 endif()
 
 #### NLOPT
