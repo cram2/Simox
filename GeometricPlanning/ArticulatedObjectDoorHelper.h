@@ -42,10 +42,10 @@ namespace simox::geometric_planning
     public:
         struct Params
         {
-            float preContactDistance = 300;
+            float preContactDistance = 300; // [mm]
 
-            float doorContactHandleLateralShift = 0; // shift along handle
-            float doorContactHandleDistance = -140;
+            float doorContactHandleLateralShift = 0; // [mm] shift along handle
+            float doorContactHandleDistance = 0; // [mm];
         };
 
         struct NamedRobotNodeSet

@@ -90,6 +90,7 @@ namespace simox::geometric_planning
         const float initialDoorDistance = door_surface_T_tcp.translation().z();
         // VR_INFO << "Initial door distance " << initialDoorDistance;
 
-        return Pose(Eigen::Translation3f{0, 0, initialDoorDistance});
+        return Pose(
+            Eigen::Translation3f{params.doorContactHandleLateralShift, 0, initialDoorDistance});
     }
 } // namespace simox::geometric_planning
