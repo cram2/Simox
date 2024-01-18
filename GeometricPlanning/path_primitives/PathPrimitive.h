@@ -14,6 +14,8 @@ namespace simox::geometric_planning
         float max;
 
         bool isInRange(float t) const noexcept;
+
+        float parameterFromUnitRange(float u) const noexcept;
     };
 
     class PathPrimitive : virtual public ::math::AbstractFunctionR1R6
