@@ -958,8 +958,18 @@ void showRobotWindow::openHand()
 void showRobotWindow::selectPrimitiveModel(int nr)
 {
     std::cout << "Selecting primitive model nr " << nr << std::endl;
-    std::vector<std::string> ids = { UI.comboBoxPrimitiveModel->itemText(nr).toStdString() };
-    robot->setPrimitiveApproximationModel(ids, true);
+
+    const std::string id = UI.comboBoxPrimitiveModel->itemText(nr).toStdString();
+
+    if(id.empty())
+    {
+        robot->setPrimitiveApproximationModel({}, true);
+    }else
+    {
+        const std::vector<std::string> ids = { id };
+        robot->setPrimitiveApproximationModel(ids, false);
+    }
+
     rebuildVisualization();
 }
 
