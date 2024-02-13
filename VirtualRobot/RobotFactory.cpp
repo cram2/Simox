@@ -1135,6 +1135,7 @@ namespace VirtualRobot
 
         // Check joint nodes and set robot joints to default value
         std::map<std::string, float> joint_values;
+        std::map<std::string, bool> enforce_joint_limits;
         for (const auto& joint_name : actuatedJointNames)
         {
             if (robot.hasRobotNode(joint_name))
@@ -1146,7 +1147,9 @@ namespace VirtualRobot
                     return nullptr;
                 }
                 joint_values[joint_name] = node->getJointValue();
+                enforce_joint_limits[joint_name] = node->getEnforceJointLimits();
                 // Set joints do default starting value
+                node->setEnforceJointLimits(false); // required if 0. is not within in the limits
                 node->setJointValueNoUpdate(0.);
             }
             else
@@ -1329,6 +1332,11 @@ namespace VirtualRobot
 
         reducedModel->setGlobalPose(globalPose);
         reducedModel->setJointValues(joint_values);
+
+        for (const auto& [joint_name, enforce_limits] : enforce_joint_limits)
+        {
+            robot.getRobotNode(joint_name)->setEnforceJointLimits(enforce_limits);
+        }
 
         cloneRNS(robot, reducedModel);
 

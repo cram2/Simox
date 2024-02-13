@@ -7,7 +7,6 @@
 
 #include <GeometricPlanning/assert/assert.h>
 
-
 namespace simox::geometric_planning
 {
     ArticulatedObjectDoorHelper::ArticulatedObjectDoorHelper(const VirtualRobot::RobotPtr& object,
@@ -21,17 +20,20 @@ namespace simox::geometric_planning
     ArticulatedObjectDoorHelper::planInteraction(const std::string& nodeSetName) const
     {
         const auto rns = object->getRobotNodeSet(nodeSetName);
-        CHECK_MESSAGE(rns != nullptr, std::string("Robot node set `" + nodeSetName + "` does not exist!"));
+        CHECK_MESSAGE(rns != nullptr,
+                      std::string("Robot node set `" + nodeSetName + "` does not exist!"));
 
         const std::string jointNodeName = nodeSetName + constants::JointSuffix;
         const std::string handleNodeName = nodeSetName + constants::HandleSuffix;
         const std::string surfaceProjectionNodeName = nodeSetName + constants::SurfaceSuffix;
 
-        const auto checkNodeExists = [&rns, &nodeSetName]([[maybe_unused]] const std::string& nodeName)
+        const auto checkNodeExists =
+            [&rns, &nodeSetName]([[maybe_unused]] const std::string& nodeName)
         {
             CHECK_MESSAGE(rns->hasRobotNode(nodeName),
-                            std::string("Robot node `" + nodeName + "` does not exist within robot node set `"
-                                           + nodeSetName + "`!"));
+                          std::string("Robot node `" + nodeName +
+                                      "` does not exist within robot node set `" + nodeSetName +
+                                      "`!"));
         };
 
         for (const auto& nodeName : {jointNodeName, handleNodeName, surfaceProjectionNodeName})
@@ -39,18 +41,15 @@ namespace simox::geometric_planning
             checkNodeExists(nodeName);
         }
 
-        CHECK_MESSAGE(params.doorContactHandleDistance > 0.,
-                        "Grasping from the other side not implemented yet!");
-
-        constexpr float doorContactHandleLateralShift = 25;
-        constexpr float doorContactHandleDistance = -140;
+        // CHECK_MESSAGE(params.doorContactHandleDistance > 0.,
+        //               "Grasping from the other side not implemented yet!");
 
         return DoorInteractionContext{
             .rns = {.joint = rns->getNode(jointNodeName),
                     .handle = rns->getNode(handleNodeName),
                     .handleSurfaceProjection = rns->getNode(surfaceProjectionNodeName)},
-            .handleSurfaceProjection_T_door_initial_contact =
-                Pose(Eigen::Translation3f{doorContactHandleLateralShift, doorContactHandleDistance, 0.F}),
+            .handleSurfaceProjection_T_door_initial_contact = Pose(Eigen::Translation3f{
+                params.doorContactHandleLateralShift, params.doorContactHandleDistance, 0.F}),
             .door_initial_contact_T_pre_contact =
                 Pose(Eigen::Translation3f{0.F, 0, params.preContactDistance})};
     }
@@ -91,6 +90,7 @@ namespace simox::geometric_planning
         const float initialDoorDistance = door_surface_T_tcp.translation().z();
         // VR_INFO << "Initial door distance " << initialDoorDistance;
 
-        return Pose(Eigen::Translation3f{0, 0, initialDoorDistance});
+        return Pose(
+            Eigen::Translation3f{params.doorContactHandleLateralShift, 0, initialDoorDistance});
     }
 } // namespace simox::geometric_planning
