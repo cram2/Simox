@@ -277,7 +277,7 @@ namespace VirtualRobot
         return result;
     }
 
-    std::vector< SceneObjectPtr > SceneObjectSet::getSceneObjects()
+    const std::vector< SceneObjectPtr >& SceneObjectSet::getSceneObjects()
     {
         return sceneObjects;
     }
@@ -367,4 +367,3 @@ namespace VirtualRobot
     }
 
 } // namespace VirtualRobot
-
