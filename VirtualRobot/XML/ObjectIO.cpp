@@ -1,7 +1,6 @@
 
 #include "ObjectIO.h"
 #include "../VirtualRobotException.h"
-#include "Affordances.h"
 #include "VirtualRobot.h"
 #include "rapidxml.hpp"
 
@@ -11,14 +10,11 @@
 #include "../Visualization/TriMeshModel.h"
 
 #include <iostream>
-#include <Eigen/src/Geometry/Transform.h>
 
 using namespace std;
 
 namespace VirtualRobot
 {
-
-
 
     ObjectIO::ObjectIO()
         = default;
