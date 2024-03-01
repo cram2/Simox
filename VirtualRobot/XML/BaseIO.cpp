@@ -1,35 +1,38 @@
 
 #include "BaseIO.h"
-#include "../Robot.h"
-#include "../RobotFactory.h"
-#include "../RobotNodeSet.h"
-#include "../Trajectory.h"
-#include "../RuntimeEnvironment.h"
-#include "../VirtualRobotException.h"
-#include "../CollisionDetection/CollisionModel.h"
-#include "../EndEffector/EndEffector.h"
-#include "../EndEffector/EndEffectorActor.h"
-#include "../Nodes/RobotNodeFactory.h"
-#include "../Nodes/RobotNodeFixedFactory.h"
-#include "../Transformation/DHParameter.h"
-#include "../Visualization/VisualizationFactory.h"
-#include "../Visualization/VisualizationNode.h"
-#include "../Grasping/Grasp.h"
-#include "../Grasping/ChainedGrasp.h"
-#include "../Grasping/GraspSet.h"
-#include "../Nodes/SensorFactory.h"
-#include <SimoxUtility/filesystem/make_relative.h>
-#include <SimoxUtility/algorithm/string/string_conversion.h>
-#include "SimoxUtility/algorithm/string/string_tools.h"
-#include "SimoxUtility/color/Color.h"
-#include "VirtualRobot.h"
-#include "rapidxml.hpp"
 
 #include <filesystem>
 #include <fstream>
 #include <stdexcept>
 #include <string>
 #include <tuple>
+
+#include <SimoxUtility/algorithm/string/string_conversion.h>
+#include <SimoxUtility/filesystem/make_relative.h>
+
+#include "../CollisionDetection/CollisionModel.h"
+#include "../EndEffector/EndEffector.h"
+#include "../EndEffector/EndEffectorActor.h"
+#include "../Grasping/ChainedGrasp.h"
+#include "../Grasping/Grasp.h"
+#include "../Grasping/GraspSet.h"
+#include "../Nodes/RobotNodeFactory.h"
+#include "../Nodes/RobotNodeFixedFactory.h"
+#include "../Nodes/SensorFactory.h"
+#include "../Robot.h"
+#include "../RobotFactory.h"
+#include "../RobotNodeSet.h"
+#include "../RuntimeEnvironment.h"
+#include "../Trajectory.h"
+#include "../Transformation/DHParameter.h"
+#include "../VirtualRobotException.h"
+#include "../Visualization/VisualizationFactory.h"
+#include "../Visualization/VisualizationNode.h"
+#include "Affordances.h"
+#include "SimoxUtility/algorithm/string/string_tools.h"
+#include "SimoxUtility/color/Color.h"
+#include "VirtualRobot.h"
+#include "rapidxml.hpp"
 
 namespace VirtualRobot
 {
@@ -42,7 +45,8 @@ namespace VirtualRobot
 
     BaseIO::~BaseIO() = default;
 
-    bool BaseIO::isTrue(const char* s)
+    bool
+    BaseIO::isTrue(const char* s)
     {
         std::string e = getLowerCase(s);
 
@@ -54,7 +58,6 @@ namespace VirtualRobot
         return false;
     }
 
-
     /**
      * This method converts \p s into a float value and returns it.
      * If \p s is NULL or not a string representation of a float
@@ -64,7 +67,8 @@ namespace VirtualRobot
      *
      * \return the passed in float value
      */
-    float BaseIO::convertToFloat(const char* s)
+    float
+    BaseIO::convertToFloat(const char* s)
     {
         THROW_VR_EXCEPTION_IF(nullptr == s, "Passing Null string to convertToFloat()");
         std::stringstream floatStream;
@@ -79,7 +83,8 @@ namespace VirtualRobot
         return result;
     }
 
-    int BaseIO::convertToInt(const char* s)
+    int
+    BaseIO::convertToInt(const char* s)
     {
         THROW_VR_EXCEPTION_IF(nullptr == s, "Passing Null string to convertToInt()");
         std::stringstream intStream;
@@ -94,18 +99,22 @@ namespace VirtualRobot
         return result;
     }
 
-
     /**
      * This method gets the attribute \p attributeName from xml_node \p xmlNode and
      * returns its value as float.
      * If an error occurs (NULL data, missing attribute, conversion failed)
      * a VirtualRobot::VirtualRobotException is thrown.
      */
-    float BaseIO::getFloatByAttributeName(const rapidxml::xml_node<char>* xmlNode, const std::string& attributeName)
+    float
+    BaseIO::getFloatByAttributeName(const rapidxml::xml_node<char>* xmlNode,
+                                    const std::string& attributeName)
     {
         THROW_VR_EXCEPTION_IF(!xmlNode, "getFloatByAttributeName got NULL data");
         rapidxml::xml_attribute<>* attr = xmlNode->first_attribute(attributeName.c_str(), 0, false);
-        THROW_VR_EXCEPTION_IF(!attr, "The node <" << xmlNode->name() << "> does not contain an attribute named " << attributeName);
+        THROW_VR_EXCEPTION_IF(!attr,
+                              "The node <" << xmlNode->name()
+                                           << "> does not contain an attribute named "
+                                           << attributeName);
         return convertToFloat(attr->value());
     }
 
@@ -115,7 +124,10 @@ namespace VirtualRobot
      * When no attribute \p attributeName is present the \p standardValue is returned.
      *
      */
-    float BaseIO::getOptionalFloatByAttributeName(const rapidxml::xml_node<char>* xmlNode, const std::string& attributeName, float standardValue)
+    float
+    BaseIO::getOptionalFloatByAttributeName(const rapidxml::xml_node<char>* xmlNode,
+                                            const std::string& attributeName,
+                                            float standardValue)
     {
         THROW_VR_EXCEPTION_IF(!xmlNode, "getFloatByAttributeName got NULL data");
         rapidxml::xml_attribute<>* attr = xmlNode->first_attribute(attributeName.c_str(), 0, false);
@@ -128,7 +140,8 @@ namespace VirtualRobot
         return convertToFloat(attr->value());
     }
 
-    Eigen::Matrix3f BaseIO::process3x3Matrix(const rapidxml::xml_node<char>* matrixXMLNode)
+    Eigen::Matrix3f
+    BaseIO::process3x3Matrix(const rapidxml::xml_node<char>* matrixXMLNode)
     {
         Eigen::Matrix3f m;
         m.setIdentity();
@@ -167,13 +180,73 @@ namespace VirtualRobot
         return m;
     }
 
+    void
+    BaseIO::processAffordances(const rapidxml::xml_node<char>* XMLNode,
+                               SceneObject::Affordances& affordances)
+    {
+        rapidxml::xml_node<>* node = XMLNode->first_node();
+
+        while (node)
+        {
+            const std::string nodeName = getLowerCase(node->name());
+
+            VR_ASSERT(nodeName == "location");
+
+            affordances::Location locationWithAffordances;
+
+            // if (node->first_node("transform", 0, false) != nullptr)
+            {
+                VR_INFO << "Processing `transform` node" << std::endl;
+                processTransformNode(node, nodeName, locationWithAffordances.pose.pose.matrix());
+                VR_INFO << "Processing `transform` node: " << locationWithAffordances.pose.pose.matrix() << std::endl;
+            
+            }
+
+            if (auto* referenceFrame = node->first_attribute("reference_frame", 0, false))
+            {
+                VR_INFO << "Processing `reference_frame` node" << std::endl;
+                locationWithAffordances.pose.frame = referenceFrame->value();
+            }
+
+            auto* affordanceNode = node->first_node("affordance", 0, false);
+            while (affordanceNode != nullptr)
+            {
+                VR_INFO << "Processing `affordance` node" << std::endl;
+                affordances::Affordance affordance;
+                if (auto* typeNode = affordanceNode->first_attribute("type", 0, false))
+                {
+                    VR_INFO << "Processing `type` node" << std::endl;
+                    affordance.type = typeNode->value();
+                }
+
+                if (affordanceNode->first_node("primitives", 0, false) != nullptr)
+                {
+                    VR_INFO << "Processing `primitives` node" << std::endl;
+                    affordance.primitiveRepresentation = processPrimitives(affordanceNode);
+                }
+
+                locationWithAffordances.affordances.push_back(affordance);
+
+                // finally advance to next 'affordance'
+                affordanceNode = affordanceNode->next_sibling();
+            }
+
+            affordances.push_back(locationWithAffordances);
+
+            // finally advance to next 'location'
+            node = node->next_sibling();
+        }
+    }
 
     /**
      * This method processes \<Transform\> tags.
      * If \p transformXMLNode is NULL (e.g. the tag does not exist) \p transform
      * is set to contain the identity matrix.
      */
-    void BaseIO::processTransformNode(const rapidxml::xml_node<char>* transformXMLNode, const std::string& tagName, Eigen::Matrix4f& transform)
+    void
+    BaseIO::processTransformNode(const rapidxml::xml_node<char>* transformXMLNode,
+                                 const std::string& tagName,
+                                 Eigen::Matrix4f& transform)
     {
         if (!transformXMLNode)
         {
@@ -191,7 +264,8 @@ namespace VirtualRobot
         else
         {
             trXMLNode = transformXMLNode->first_node("transform", 0, false);
-            THROW_VR_EXCEPTION_IF(!trXMLNode, "transformation node does not specify a <transform> tag")
+            THROW_VR_EXCEPTION_IF(!trXMLNode,
+                                  "transformation node does not specify a <transform> tag")
         }
 
         //bool rotation = false;
@@ -359,14 +433,13 @@ namespace VirtualRobot
 
             node = node->next_sibling();
         }
-
     }
 
-
-    void BaseIO::processDHNode(const rapidxml::xml_node<char>* dhXMLNode, DHParameter& dh)
+    void
+    BaseIO::processDHNode(const rapidxml::xml_node<char>* dhXMLNode, DHParameter& dh)
     {
         rapidxml::xml_attribute<>* attr;
-        std::vector< Units > unitsAttr = getUnitsAttributes(dhXMLNode);
+        std::vector<Units> unitsAttr = getUnitsAttributes(dhXMLNode);
         Units uAngle("rad");
         Units uLength("mm");
 
@@ -414,10 +487,9 @@ namespace VirtualRobot
             dh.setThetaRadian(convertToFloat(attr->value()), isRadian);
         }
     }
-    
-    
 
-    bool BaseIO::hasUnitsAttribute(const rapidxml::xml_node<char>* node)
+    bool
+    BaseIO::hasUnitsAttribute(const rapidxml::xml_node<char>* node)
     {
         rapidxml::xml_attribute<>* attr = node->first_attribute("unit", 0, false);
 
@@ -449,7 +521,10 @@ namespace VirtualRobot
         return (attr != nullptr);
     }
 
-    void BaseIO::getAllAttributes(const rapidxml::xml_node<char>* node, const std::string& attrString, std::vector<std::string>& storeValues)
+    void
+    BaseIO::getAllAttributes(const rapidxml::xml_node<char>* node,
+                             const std::string& attrString,
+                             std::vector<std::string>& storeValues)
     {
         rapidxml::xml_attribute<>* attr = node->first_attribute(attrString.c_str(), 0, false);
 
@@ -462,9 +537,10 @@ namespace VirtualRobot
         }
     }
 
-    std::vector< Units > BaseIO::getUnitsAttributes(const rapidxml::xml_node<char>* node)
+    std::vector<Units>
+    BaseIO::getUnitsAttributes(const rapidxml::xml_node<char>* node)
     {
-        std::vector< Units > result;
+        std::vector<Units> result;
         std::vector<std::string> attrStr;
         getAllAttributes(node, "unit", attrStr);
         getAllAttributes(node, "units", attrStr);
@@ -488,7 +564,8 @@ namespace VirtualRobot
      *
      * \return instance of VirtualRobot::Units
      */
-    Units BaseIO::getUnitsAttribute(const rapidxml::xml_node<char>* node, Units::UnitsType u)
+    Units
+    BaseIO::getUnitsAttribute(const rapidxml::xml_node<char>* node, Units::UnitsType u)
     {
         THROW_VR_EXCEPTION_IF(!node, "NULL data for getUnitsAttribute().")
         rapidxml::xml_attribute<>* attr = node->first_attribute("unit", 0, false);
@@ -543,7 +620,8 @@ namespace VirtualRobot
             }
         }
 
-        THROW_VR_EXCEPTION_IF(!attr, "Tag <" << node->name() << "> is missing a unit/units attribute.")
+        THROW_VR_EXCEPTION_IF(!attr,
+                              "Tag <" << node->name() << "> is missing a unit/units attribute.")
 
         Units unitsAttribute(getLowerCase(attr->value()));
 
@@ -551,25 +629,29 @@ namespace VirtualRobot
         {
             case Units::eAngle:
             {
-                THROW_VR_EXCEPTION_IF(!unitsAttribute.isAngle(), "Wrong <Units> tag! Expecting angle type." << endl);
+                THROW_VR_EXCEPTION_IF(!unitsAttribute.isAngle(),
+                                      "Wrong <Units> tag! Expecting angle type." << endl);
             }
             break;
 
             case Units::eLength:
             {
-                THROW_VR_EXCEPTION_IF(!unitsAttribute.isLength(), "Wrong <Units> tag! Expecting length type." << endl);
+                THROW_VR_EXCEPTION_IF(!unitsAttribute.isLength(),
+                                      "Wrong <Units> tag! Expecting length type." << endl);
             }
             break;
 
             case Units::eWeight:
             {
-                THROW_VR_EXCEPTION_IF(!unitsAttribute.isWeight(), "Wrong <Units> tag! Expecting weight type." << endl);
+                THROW_VR_EXCEPTION_IF(!unitsAttribute.isWeight(),
+                                      "Wrong <Units> tag! Expecting weight type." << endl);
             }
             break;
 
             case Units::eTime:
             {
-                THROW_VR_EXCEPTION_IF(!unitsAttribute.isTime(), "Wrong <Units> tag! Expecting time type." << endl);
+                THROW_VR_EXCEPTION_IF(!unitsAttribute.isTime(),
+                                      "Wrong <Units> tag! Expecting time type." << endl);
             }
             break;
 
@@ -580,13 +662,13 @@ namespace VirtualRobot
         return unitsAttribute;
     }
 
-
     /**
      * This method creates a std::string from the parameter \p c and calls
      * VirtualRobot::BaseIO::getLowerCase(std::string) on the created string.
      * Afterwards the transformed string is returned.
      */
-    std::string BaseIO::getLowerCase(const char* c)
+    std::string
+    BaseIO::getLowerCase(const char* c)
     {
         THROW_VR_EXCEPTION_IF(nullptr == c, "Passing Null string to getLowerCase()");
         std::string res = c;
@@ -597,11 +679,14 @@ namespace VirtualRobot
     /**
      * This method applies tolower() to all characters in the string \p aString.
      */
-    void BaseIO::getLowerCase(std::string& aString)
+    void
+    BaseIO::getLowerCase(std::string& aString)
     {
-        std::transform(aString.begin(), aString.end(), aString.begin(), [](unsigned char c){ return std::tolower(c); });
+        std::transform(aString.begin(),
+                       aString.end(),
+                       aString.begin(),
+                       [](unsigned char c) { return std::tolower(c); });
     }
-
 
     /**
      * This method processes the \p parentNode Tag and extracts a list of \<Node name="xyz"/\> tags.
@@ -610,7 +695,11 @@ namespace VirtualRobot
      *
      * If the parameter \p clearList is true all elements from \p nodeList are removed.
      */
-    void BaseIO::processNodeList(const rapidxml::xml_node<char>* parentNode, RobotPtr robot, std::vector<RobotNodePtr>& nodeList, bool clearList /*= true*/)
+    void
+    BaseIO::processNodeList(const rapidxml::xml_node<char>* parentNode,
+                            RobotPtr robot,
+                            std::vector<RobotNodePtr>& nodeList,
+                            bool clearList /*= true*/)
     {
         if (clearList)
         {
@@ -627,24 +716,30 @@ namespace VirtualRobot
             if (nodeName == "node")
             {
                 std::string nodeNameAttr = processNameAttribute(node);
-                THROW_VR_EXCEPTION_IF(nodeNameAttr.empty(), "Missing name attribute for <Node> belonging to Robot node set " << parentName);
+                THROW_VR_EXCEPTION_IF(
+                    nodeNameAttr.empty(),
+                    "Missing name attribute for <Node> belonging to Robot node set " << parentName);
                 RobotNodePtr robotNode = robot->getRobotNode(nodeNameAttr);
-                THROW_VR_EXCEPTION_IF(!robotNode, "<node> tag with name '" << nodeNameAttr << "' not present in the current robot");
+                THROW_VR_EXCEPTION_IF(!robotNode,
+                                      "<node> tag with name '"
+                                          << nodeNameAttr << "' not present in the current robot");
                 nodeList.push_back(robotNode);
             }
             else
             {
-                THROW_VR_EXCEPTION("XML definition <" << nodeName << "> not supported in <RobotNodeSet> with name " << parentName);
+                THROW_VR_EXCEPTION("XML definition <"
+                                   << nodeName << "> not supported in <RobotNodeSet> with name "
+                                   << parentName);
             }
 
             node = node->next_sibling();
         }
     }
 
-
-    NodeMapping BaseIO::processNodeMapping(const rapidxml::xml_node<char>* XMLNode, RobotPtr robot)
+    NodeMapping
+    BaseIO::processNodeMapping(const rapidxml::xml_node<char>* XMLNode, RobotPtr robot)
     {
-        (void) robot;
+        (void)robot;
 
         std::string parentName = processNameAttribute(XMLNode, true);
         rapidxml::xml_node<>* node = XMLNode->first_node();
@@ -660,8 +755,9 @@ namespace VirtualRobot
                 const std::string to = processStringAttribute("to", node, true);
                 const float sign = processFloatAttribute("sign", node, true);
 
-                THROW_VR_EXCEPTION_IF(not(sign == 1 or sign == -1), "'sign' attribute has to be either '1' or '-1'");
-                THROW_VR_EXCEPTION_IF(from.empty(),  "'from' attribute is empty!");
+                THROW_VR_EXCEPTION_IF(not(sign == 1 or sign == -1),
+                                      "'sign' attribute has to be either '1' or '-1'");
+                THROW_VR_EXCEPTION_IF(from.empty(), "'from' attribute is empty!");
                 THROW_VR_EXCEPTION_IF(to.empty(), "'to' attribute is empty!");
 
                 // allow bidirectional lookup
@@ -670,7 +766,9 @@ namespace VirtualRobot
             }
             else
             {
-                THROW_VR_EXCEPTION("XML definition <" << nodeName << "> not supported in <NodeMapping> with name " << parentName);
+                THROW_VR_EXCEPTION("XML definition <"
+                                   << nodeName << "> not supported in <NodeMapping> with name "
+                                   << parentName);
             }
 
             node = node->next_sibling();
@@ -679,7 +777,8 @@ namespace VirtualRobot
         return nodeMapping;
     }
 
-    std::tuple<std::string, std::map<std::string, float>> BaseIO::processConfigurationNode(const rapidxml::xml_node<char>* node)
+    std::tuple<std::string, std::map<std::string, float>>
+    BaseIO::processConfigurationNode(const rapidxml::xml_node<char>* node)
     {
         const std::string configurationName = processStringAttribute("name", node, true);
 
@@ -691,20 +790,22 @@ namespace VirtualRobot
             const std::string name = processStringAttribute("name", nodeNode, true);
             const float value = processFloatAttribute("value", nodeNode, true);
 
-            THROW_VR_EXCEPTION_IF(configuration.count(name) > 0, "Duplicate `" << name << "` node in configuration `" << configurationName << "`!");
+            THROW_VR_EXCEPTION_IF(configuration.count(name) > 0,
+                                  "Duplicate `" << name << "` node in configuration `"
+                                                << configurationName << "`!");
             configuration.emplace(name, value);
 
-            // advance to next 
+            // advance to next
             nodeNode = nodeNode->next_sibling();
         }
 
         return std::make_tuple(configurationName, configuration);
     }
 
-
-    HumanMapping BaseIO::processHumanMapping(const rapidxml::xml_node<char>* XMLNode, const RobotPtr& robot)
+    HumanMapping
+    BaseIO::processHumanMapping(const rapidxml::xml_node<char>* XMLNode, const RobotPtr& robot)
     {
-        (void) robot;
+        (void)robot;
 
         HumanMapping humanMapping;
 
@@ -714,32 +815,33 @@ namespace VirtualRobot
             RIGHT
         };
 
-        const auto getSide = [&](const auto node){
+        const auto getSide = [&](const auto node)
+        {
             VR_ASSERT(node != nullptr);
             const std::string side = processStringAttribute("side", node, true);
 
-            if(side == "left")
+            if (side == "left")
             {
                 return Side::LEFT;
             }
 
-            if(side == "right")
+            if (side == "right")
             {
                 return Side::RIGHT;
             }
 
-            VR_ERROR << "Unknown side `" << side <<  "`";
+            VR_ERROR << "Unknown side `" << side << "`";
             throw std::invalid_argument("Unknown side `" + side + "`");
         };
 
         {
-            if(XMLNode == nullptr)
+            if (XMLNode == nullptr)
             {
                 VR_ERROR << "XMLNode must not be null!";
             }
 
             rapidxml::xml_node<>* armNode = XMLNode->first_node("humanmapping", 0, false);
-            if(armNode == nullptr)
+            if (armNode == nullptr)
             {
                 VR_ERROR << "No humanmapping found!";
             }
@@ -748,24 +850,25 @@ namespace VirtualRobot
             {
                 const auto side = getSide(armNode);
 
-                const rapidxml::xml_node<char> *segmentsNode =
+                const rapidxml::xml_node<char>* segmentsNode =
                     armNode->first_node("segmentnodes", 0, false);
 
-                if(segmentsNode == nullptr)
+                if (segmentsNode == nullptr)
                 {
                     VR_ERROR << "SegmentNodes missing for side " << static_cast<int>(side) << "!";
                 }
 
-                const auto findSegmentNode = [&segmentsNode](const std::string& type) -> rapidxml::xml_node<char>*
+                const auto findSegmentNode =
+                    [&segmentsNode](const std::string& type) -> rapidxml::xml_node<char>*
                 {
-
                     auto* jointNode = segmentsNode->first_node("SegmentNode");
 
-                    while(jointNode != nullptr)
+                    while (jointNode != nullptr)
                     {
-                        const std::string nodeType = processStringAttribute("type", jointNode, true);
+                        const std::string nodeType =
+                            processStringAttribute("type", jointNode, true);
 
-                        if(simox::alg::to_lower(type) == simox::alg::to_lower(nodeType))
+                        if (simox::alg::to_lower(type) == simox::alg::to_lower(nodeType))
                         {
                             return jointNode;
                         }
@@ -782,7 +885,7 @@ namespace VirtualRobot
                 {
                     // find the segment node with the correct type
                     const auto* node = findSegmentNode(type);
-                    if(node == nullptr)
+                    if (node == nullptr)
                     {
                         VR_ERROR << "SegmentNode missing for type " << type << "!";
                     }
@@ -790,16 +893,15 @@ namespace VirtualRobot
                     const std::string name = processStringAttribute("name", node, true);
 
                     Eigen::Matrix4f transform;
-                    processTransformNode(node->first_node("transform", 0, false), "transform", transform);
+                    processTransformNode(
+                        node->first_node("transform", 0, false), "transform", transform);
 
-                    return HumanMapping::ArmDescription::Segment
-                    {
-                        .nodeName = name,
-                        .offset = transform
-                    };
+                    return HumanMapping::ArmDescription::Segment{.nodeName = name,
+                                                                 .offset = transform};
                 };
 
-                const HumanMapping::ArmDescription::Segment shoulder = processSegmentNode("shoulder");
+                const HumanMapping::ArmDescription::Segment shoulder =
+                    processSegmentNode("shoulder");
                 const HumanMapping::ArmDescription::Segment elbow = processSegmentNode("elbow");
                 const HumanMapping::ArmDescription::Segment wrist = processSegmentNode("wrist");
                 const HumanMapping::ArmDescription::Segment palm = processSegmentNode("palm");
@@ -807,38 +909,38 @@ namespace VirtualRobot
 
                 const std::string nodeSet = processStringAttribute("name", armNode, true);
 
-                const HumanMapping::ArmDescription::Segments segments
-                {
-                    .shoulder = shoulder,
-                    .elbow = elbow,
-                    .wrist = wrist,
-                    .palm = palm,
-                    .tcp = tcp
-                };
+                const HumanMapping::ArmDescription::Segments segments{
+                    .shoulder = shoulder, .elbow = elbow, .wrist = wrist, .palm = palm, .tcp = tcp};
 
-                const rapidxml::xml_node<char>* armJointsNode = armNode->first_node("JointNodes", 0, false);
+                const rapidxml::xml_node<char>* armJointsNode =
+                    armNode->first_node("JointNodes", 0, false);
                 VR_ASSERT(armJointsNode != nullptr);
 
                 HumanMapping::ArmDescription::JointMapping jointMapping;
-                const rapidxml::xml_node<char>* jointNode = armJointsNode->first_node("JointNode", 0, false);
+                const rapidxml::xml_node<char>* jointNode =
+                    armJointsNode->first_node("JointNode", 0, false);
                 VR_ASSERT(jointNode != nullptr);
 
-                if(jointNode == nullptr)
+                if (jointNode == nullptr)
                 {
                     VR_ERROR << "No JointNode available!";
                 }
 
-                while(jointNode != nullptr)
+                while (jointNode != nullptr)
                 {
-                    const std::string type = simox::alg::to_lower(processStringAttribute("type", jointNode, true));
-                    const std::string motion = simox::alg::to_lower(processStringAttribute("motion", jointNode, true));
+                    const std::string type =
+                        simox::alg::to_lower(processStringAttribute("type", jointNode, true));
+                    const std::string motion =
+                        simox::alg::to_lower(processStringAttribute("motion", jointNode, true));
                     const std::string node = processStringAttribute("node", jointNode, true);
-                    const bool inverted = processOptionalBoolAttribute("inverted", jointNode, false);
+                    const bool inverted =
+                        processOptionalBoolAttribute("inverted", jointNode, false);
                     const float offset = processFloatAttribute("offset", jointNode, true);
 
                     // VR_INFO << type << "/" << motion << std::endl;
 
-                    jointMapping[node] = HumanMapping::ArmDescription::HumanJointDescription{.type = type, .motion = motion, .offset = offset, .inverted = inverted};
+                    jointMapping[node] = HumanMapping::ArmDescription::HumanJointDescription{
+                        .type = type, .motion = motion, .offset = offset, .inverted = inverted};
 
                     // advance to next sibling
                     jointNode = jointNode->next_sibling("JointNode", 0, false);
@@ -846,14 +948,10 @@ namespace VirtualRobot
 
                 // VR_INFO << "Joint mapping size: " << jointMapping.size() << std::endl;
 
-                const HumanMapping::ArmDescription armDescription
-                {
-                    .segments = segments,
-                    .jointMapping = jointMapping,
-                    .nodeSet = nodeSet  
-                };
+                const HumanMapping::ArmDescription armDescription{
+                    .segments = segments, .jointMapping = jointMapping, .nodeSet = nodeSet};
 
-                switch(side)
+                switch (side)
                 {
                     case Side::LEFT:
                         humanMapping.leftArm = armDescription;
@@ -864,13 +962,11 @@ namespace VirtualRobot
                 }
 
                 armNode = armNode->next_sibling("humanmapping", 0, false);
-
             }
         }
 
         return humanMapping;
     }
-
 
     /**
     * This method takes a rapidxml::xml_node and returns the value of the
@@ -883,9 +979,13 @@ namespace VirtualRobot
     *
     * \return the value of the attribute or 0.0 if no attribute was found
     */
-    float BaseIO::processFloatAttribute(const std::string& attributeName, const rapidxml::xml_node<char>* node, bool allowOtherAttributes /* = false */)
+    float
+    BaseIO::processFloatAttribute(const std::string& attributeName,
+                                  const rapidxml::xml_node<char>* node,
+                                  bool allowOtherAttributes /* = false */)
     {
-        THROW_VR_EXCEPTION_IF(!node, "Can not process name attribute `" << attributeName << "` of NULL node" << endl);
+        THROW_VR_EXCEPTION_IF(
+            !node, "Can not process name attribute `" << attributeName << "` of NULL node" << endl);
 
         bool result = false;
         float value = 0.0f;
@@ -898,7 +998,10 @@ namespace VirtualRobot
 
             if (attributeName == name)
             {
-                THROW_VR_EXCEPTION_IF(result, "<" << node->name() << "> tag contains multiple attributes with name " << attributeName);
+                THROW_VR_EXCEPTION_IF(result,
+                                      "<" << node->name()
+                                          << "> tag contains multiple attributes with name "
+                                          << attributeName);
                 value = convertToFloat(attr->value());
                 result = true;
             }
@@ -906,7 +1009,8 @@ namespace VirtualRobot
             {
                 if (!allowOtherAttributes)
                 {
-                    THROW_VR_EXCEPTION("<" << node->name() << "> tag contains unknown attribute: " << attr->name());
+                    THROW_VR_EXCEPTION("<" << node->name()
+                                           << "> tag contains unknown attribute: " << attr->name());
                 }
             }
 
@@ -915,7 +1019,6 @@ namespace VirtualRobot
 
         return value;
     }
-
 
     /**
     * This method takes a rapidxml::xml_node and returns the value of the
@@ -928,9 +1031,13 @@ namespace VirtualRobot
     *
     * \return the value of the attribute or 0.0 if no attribute was found
     */
-    int BaseIO::processIntAttribute(const std::string& attributeName, const rapidxml::xml_node<char>* node, bool allowOtherAttributes /* = false */)
+    int
+    BaseIO::processIntAttribute(const std::string& attributeName,
+                                const rapidxml::xml_node<char>* node,
+                                bool allowOtherAttributes /* = false */)
     {
-        THROW_VR_EXCEPTION_IF(!node, "Can not process name attribute `" << attributeName << "` of NULL node" << endl);
+        THROW_VR_EXCEPTION_IF(
+            !node, "Can not process name attribute `" << attributeName << "` of NULL node" << endl);
 
         bool result = false;
         int value = 0;
@@ -943,7 +1050,10 @@ namespace VirtualRobot
 
             if (attributeName == name)
             {
-                THROW_VR_EXCEPTION_IF(result, "<" << node->name() << "> tag contains multiple attributes with name " << attributeName);
+                THROW_VR_EXCEPTION_IF(result,
+                                      "<" << node->name()
+                                          << "> tag contains multiple attributes with name "
+                                          << attributeName);
                 value = convertToInt(attr->value());
                 result = true;
             }
@@ -951,7 +1061,8 @@ namespace VirtualRobot
             {
                 if (!allowOtherAttributes)
                 {
-                    THROW_VR_EXCEPTION("<" << node->name() << "> tag contains unknown attribute: " << attr->name());
+                    THROW_VR_EXCEPTION("<" << node->name()
+                                           << "> tag contains unknown attribute: " << attr->name());
                 }
             }
 
@@ -961,21 +1072,24 @@ namespace VirtualRobot
         return value;
     }
 
-
-    bool BaseIO::processOptionalBoolAttribute(const std::string& attributeName, const rapidxml::xml_node<char>* node, bool defaultValue)
+    bool
+    BaseIO::processOptionalBoolAttribute(const std::string& attributeName,
+                                         const rapidxml::xml_node<char>* node,
+                                         bool defaultValue)
     {
-        THROW_VR_EXCEPTION_IF(!node, "Can not process name attribute `" << attributeName << "` of NULL node" << endl);
+        THROW_VR_EXCEPTION_IF(
+            !node, "Can not process name attribute `" << attributeName << "` of NULL node" << endl);
 
-        rapidxml::xml_attribute<char>* attr = node->first_attribute(attributeName.c_str(), 0, false);
+        rapidxml::xml_attribute<char>* attr =
+            node->first_attribute(attributeName.c_str(), 0, false);
 
-        if(attr == nullptr)
+        if (attr == nullptr)
         {
             return defaultValue;
         }
 
         return isTrue(attr->value());
     }
-    
 
     /**
         * This method takes a rapidxml::xml_node and returns the value of the
@@ -989,9 +1103,13 @@ namespace VirtualRobot
         *
         * \return the value of the name attribute or an empty string on error
         */
-    std::string BaseIO::processStringAttribute(const std::string& attributeName, const rapidxml::xml_node<char>* node, bool allowOtherAttributes /* = false */)
+    std::string
+    BaseIO::processStringAttribute(const std::string& attributeName,
+                                   const rapidxml::xml_node<char>* node,
+                                   bool allowOtherAttributes /* = false */)
     {
-        THROW_VR_EXCEPTION_IF(!node, "Can not process name attribute `" << attributeName << "` of NULL node" << endl);
+        THROW_VR_EXCEPTION_IF(
+            !node, "Can not process name attribute `" << attributeName << "` of NULL node" << endl);
 
         bool result = false;
         std::string value;
@@ -1004,7 +1122,10 @@ namespace VirtualRobot
 
             if (attributeName == name)
             {
-                THROW_VR_EXCEPTION_IF(result, "<" << node->name() << "> tag contains multiple attributes with name " << attributeName);
+                THROW_VR_EXCEPTION_IF(result,
+                                      "<" << node->name()
+                                          << "> tag contains multiple attributes with name "
+                                          << attributeName);
                 value = attr->value();
                 result = true;
             }
@@ -1012,7 +1133,8 @@ namespace VirtualRobot
             {
                 if (!allowOtherAttributes)
                 {
-                    THROW_VR_EXCEPTION("<" << node->name() << "> tag contains unknown attribute: " << attr->name());
+                    THROW_VR_EXCEPTION("<" << node->name()
+                                           << "> tag contains unknown attribute: " << attr->name());
                 }
             }
 
@@ -1022,7 +1144,8 @@ namespace VirtualRobot
         return value;
     }
 
-    void BaseIO::makeAbsolutePath(const std::string& basePath, std::string& filename)
+    void
+    BaseIO::makeAbsolutePath(const std::string& basePath, std::string& filename)
     {
         if (filename.empty())
         {
@@ -1036,17 +1159,17 @@ namespace VirtualRobot
         filename = filenameNewComplete.string();
     }
 
-    void BaseIO::makeRelativePath(const std::string& basePath, std::string& filename)
+    void
+    BaseIO::makeRelativePath(const std::string& basePath, std::string& filename)
     {
         if (filename.empty())
         {
             return;
         }
 
-        filename = simox::fs::make_relative(std::filesystem::path(basePath), std::filesystem::path(filename));
+        filename = simox::fs::make_relative(std::filesystem::path(basePath),
+                                            std::filesystem::path(filename));
     }
-
-
 
     /**
      * This method takes a rapidxml::xml_node and returns the value of the
@@ -1059,15 +1182,19 @@ namespace VirtualRobot
      *
      * \return the value of the name attribute or an empty string on error
      */
-    std::string BaseIO::processNameAttribute(const rapidxml::xml_node<char>* node, bool allowOtherAttributes /* = false */)
+    std::string
+    BaseIO::processNameAttribute(const rapidxml::xml_node<char>* node,
+                                 bool allowOtherAttributes /* = false */)
     {
         std::string nameStr("name");
         return processStringAttribute(nameStr, node, allowOtherAttributes);
     }
 
-
-
-    VisualizationNodePtr BaseIO::processVisualizationTag(const rapidxml::xml_node<char>* visuXMLNode, const std::string& tagName, const std::string& basePath, bool& useAsColModel)
+    VisualizationNodePtr
+    BaseIO::processVisualizationTag(const rapidxml::xml_node<char>* visuXMLNode,
+                                    const std::string& tagName,
+                                    const std::string& basePath,
+                                    bool& useAsColModel)
     {
         bool enableVisu = true;
         bool coordAxis = false;
@@ -1104,7 +1231,9 @@ namespace VirtualRobot
         {
             visualizationNodes = processVisuFiles(visuXMLNode, basePath, visuFileType);
             primitives = processPrimitives(visuXMLNode);
-            THROW_VR_EXCEPTION_IF(primitives.size() != 0 && visualizationNodes.size() != 0, "Multiple visualization sources defined (file and primitives)" << endl);
+            THROW_VR_EXCEPTION_IF(primitives.size() != 0 && visualizationNodes.size() != 0,
+                                  "Multiple visualization sources defined (file and primitives)"
+                                      << endl);
 
             if (visualizationNodes.size() == 1)
             {
@@ -1113,7 +1242,8 @@ namespace VirtualRobot
             else if (visualizationNodes.size() > 1)
             {
                 VisualizationFactoryPtr visualizationFactory = VisualizationFactory::first(NULL);
-                visualizationNode = visualizationFactory->createUnitedVisualization(visualizationNodes);
+                visualizationNode =
+                    visualizationFactory->createUnitedVisualization(visualizationNodes);
             }
 
             else if (not primitives.empty())
@@ -1122,11 +1252,13 @@ namespace VirtualRobot
 
                 const auto color = simox::Color::kit_green(128);
 
-                visualizationNode = visualizationFactory->getVisualizationFromPrimitives(primitives, false, color);
+                visualizationNode =
+                    visualizationFactory->getVisualizationFromPrimitives(primitives, false, color);
             }
 
 
-            rapidxml::xml_node<>* coordXMLNode = visuXMLNode->first_node("coordinateaxis", 0, false);
+            rapidxml::xml_node<>* coordXMLNode =
+                visuXMLNode->first_node("coordinateaxis", 0, false);
 
             if (coordXMLNode)
             {
@@ -1140,7 +1272,8 @@ namespace VirtualRobot
                 if (coordAxis)
                 {
 
-                    coordAxisFactor = getOptionalFloatByAttributeName(coordXMLNode, "scaling", 1.0f);
+                    coordAxisFactor =
+                        getOptionalFloatByAttributeName(coordXMLNode, "scaling", 1.0f);
 
                     attr = coordXMLNode->first_attribute("text", 0, false);
 
@@ -1175,7 +1308,8 @@ namespace VirtualRobot
                     }
 
                     getLowerCase(visuCoordType);
-                    VisualizationFactoryPtr visualizationFactory = VisualizationFactory::fromName(visuCoordType, NULL);
+                    VisualizationFactoryPtr visualizationFactory =
+                        VisualizationFactory::fromName(visuCoordType, NULL);
 
                     if (!visualizationNode)
                     {
@@ -1186,29 +1320,38 @@ namespace VirtualRobot
                         }
                         else
                         {
-                            VR_WARNING << "VisualizationFactory of type '" << visuFileType << "' not present. Ignoring Visualization data in Robot Node <" << tagName << ">" << std::endl;
+                            VR_WARNING
+                                << "VisualizationFactory of type '" << visuFileType
+                                << "' not present. Ignoring Visualization data in Robot Node <"
+                                << tagName << ">" << std::endl;
                         }
                     }
                     else
                     {
-                        THROW_VR_EXCEPTION_IF(visuCoordType.compare(visuFileType) != 0, "Different 'type' attributes not supported for <CoordinateAxis> tag and <File> tag of node " << tagName << "." << endl);
+                        THROW_VR_EXCEPTION_IF(visuCoordType.compare(visuFileType) != 0,
+                                              "Different 'type' attributes not supported for "
+                                              "<CoordinateAxis> tag and <File> tag of node "
+                                                  << tagName << "." << endl);
                     }
 
                     if (visualizationNode && visualizationFactory)
                     {
-                        VisualizationNodePtr coordVisu = visualizationFactory->createCoordSystem(coordAxisFactor, &coordAxisText);
+                        VisualizationNodePtr coordVisu = visualizationFactory->createCoordSystem(
+                            coordAxisFactor, &coordAxisText);
                         visualizationNode->attachVisualization("CoordinateSystem", coordVisu);
                         //visualizationNode->showCoordinateSystem(true,coordAxisFactor,&coordAxisText);
                     }
                     else
                     {
-                        VR_WARNING << "VisualizationFactory of type '" << visuFileType << "' not present. Ignoring Visualization data in Robot Node <" << tagName << ">" << std::endl;
+                        VR_WARNING << "VisualizationFactory of type '" << visuFileType
+                                   << "' not present. Ignoring Visualization data in Robot Node <"
+                                   << tagName << ">" << std::endl;
                     }
-
                 }
             }
 
-            rapidxml::xml_node<>* useColModel = visuXMLNode->first_node("useascollisionmodel", 0, false);
+            rapidxml::xml_node<>* useColModel =
+                visuXMLNode->first_node("useascollisionmodel", 0, false);
 
             if (useColModel)
             {
@@ -1219,7 +1362,10 @@ namespace VirtualRobot
         return visualizationNode;
     }
 
-    CollisionModelPtr BaseIO::processCollisionTag(const rapidxml::xml_node<char>* colXMLNode, const std::string& tagName, const std::string& basePath)
+    CollisionModelPtr
+    BaseIO::processCollisionTag(const rapidxml::xml_node<char>* colXMLNode,
+                                const std::string& tagName,
+                                const std::string& basePath)
     {
         rapidxml::xml_attribute<>* attr;
         std::string collisionFileType = "";
@@ -1241,7 +1387,9 @@ namespace VirtualRobot
 
             visuNodes = processVisuFiles(colXMLNode, basePath, collisionFileType);
             primitives = processPrimitives(colXMLNode);
-            THROW_VR_EXCEPTION_IF(primitives.size() != 0 && visuNodes.size() != 0, "Multiple collision model sources defined (file and primitives)" << endl);
+            THROW_VR_EXCEPTION_IF(primitives.size() != 0 && visuNodes.size() != 0,
+                                  "Multiple collision model sources defined (file and primitives)"
+                                      << endl);
 
             if (visuNodes.size() != 0)
             {
@@ -1257,19 +1405,23 @@ namespace VirtualRobot
                     }
                     else if (auto factory = VisualizationFactory::fromName("inventor", NULL))
                     {
-                        VR_WARNING << "VisualizationFactory of type '" << collisionFileType << "' not present. Trying factory for 'inventor' " << std::endl;
+                        VR_WARNING << "VisualizationFactory of type '" << collisionFileType
+                                   << "' not present. Trying factory for 'inventor' " << std::endl;
                         visualizationNode = factory->createUnitedVisualization(visuNodes);
                     }
                     else
                     {
-                        VR_WARNING << "VisualizationFactory of type '" << collisionFileType << "' not present. Ignoring Visualization data in Robot Node <" << tagName << ">" << std::endl;
+                        VR_WARNING << "VisualizationFactory of type '" << collisionFileType
+                                   << "' not present. Ignoring Visualization data in Robot Node <"
+                                   << tagName << ">" << std::endl;
                     }
                 }
             }
             else if (primitives.size() != 0)
             {
                 VisualizationFactoryPtr visualizationFactory = VisualizationFactory::first(NULL);
-                visualizationNode = visualizationFactory->getVisualizationFromPrimitives(primitives);
+                visualizationNode =
+                    visualizationFactory->getVisualizationFromPrimitives(primitives);
             }
 
             if (visualizationNode)
@@ -1277,21 +1429,25 @@ namespace VirtualRobot
                 std::string colModelName = tagName;
                 colModelName += "_ColModel";
                 // todo: ID?
-                collisionModel.reset(new CollisionModel(visualizationNode, colModelName, CollisionCheckerPtr()));
+                collisionModel.reset(
+                    new CollisionModel(visualizationNode, colModelName, CollisionCheckerPtr()));
             }
         }
 
         return collisionModel;
     }
 
-    void BaseIO::processPrimitiveModelTag(SceneObject::PrimitiveApproximation& primitiveApproximation,
-                                          const rapidxml::xml_node<char>* primitiveApproximationXMLNode)
+    void
+    BaseIO::processPrimitiveModelTag(SceneObject::PrimitiveApproximation& primitiveApproximation,
+                                     const rapidxml::xml_node<char>* primitiveApproximationXMLNode)
     {
-        rapidxml::xml_attribute<>* attr = primitiveApproximationXMLNode->first_attribute("enable", 0, false);
+        rapidxml::xml_attribute<>* attr =
+            primitiveApproximationXMLNode->first_attribute("enable", 0, false);
         if (!attr || isTrue(attr->value()))
         {
             auto primitives = processPrimitives(primitiveApproximationXMLNode);
-            rapidxml::xml_attribute<>* idAttr = primitiveApproximationXMLNode->first_attribute("id", 0, false);
+            rapidxml::xml_attribute<>* idAttr =
+                primitiveApproximationXMLNode->first_attribute("id", 0, false);
             std::string id = idAttr ? idAttr->value() : std::string();
             if (primitives.size() > 0)
             {
@@ -1300,7 +1456,10 @@ namespace VirtualRobot
         }
     }
 
-    std::vector<VisualizationNodePtr> BaseIO::processVisuFiles(const rapidxml::xml_node<char>* visualizationXMLNode, const std::string& basePath, std::string& fileType)
+    std::vector<VisualizationNodePtr>
+    BaseIO::processVisuFiles(const rapidxml::xml_node<char>* visualizationXMLNode,
+                             const std::string& basePath,
+                             std::string& fileType)
     {
         const rapidxml::xml_node<>* node = visualizationXMLNode;
         std::vector<VisualizationNodePtr> result;
@@ -1365,24 +1524,31 @@ namespace VirtualRobot
                     }
                     else
                     {
-                        VR_WARNING << "Ignoring data from " << visuFileXMLNode->value() << ": visualization type does not match to data from before." << std::endl;
+                        VR_WARNING << "Ignoring data from " << visuFileXMLNode->value()
+                                   << ": visualization type does not match to data from before."
+                                   << std::endl;
                     }
                 }
                 else if ((factory = VisualizationFactory::fromName("inventor", NULL)) != nullptr)
                 {
-                    VR_WARNING << "VisualizationFactory of type '" << fileType << "' not present. Trying factory for 'inventor' " << std::endl;
+                    VR_WARNING << "VisualizationFactory of type '" << fileType
+                               << "' not present. Trying factory for 'inventor' " << std::endl;
                     if (tmpFileType == fileType)
                     {
                         result.push_back(factory->getVisualizationFromFile(visuFile, bbox));
                     }
                     else
                     {
-                        VR_WARNING << "Ignoring data from " << visuFileXMLNode->value() << ": visualization type does not match to data from before." << std::endl;
+                        VR_WARNING << "Ignoring data from " << visuFileXMLNode->value()
+                                   << ": visualization type does not match to data from before."
+                                   << std::endl;
                     }
                 }
                 else
                 {
-                    VR_WARNING << "VisualizationFactory of type '" << fileType << "' not present. Ignoring Visualization data from " << visuFileXMLNode->value() << std::endl;
+                    VR_WARNING << "VisualizationFactory of type '" << fileType
+                               << "' not present. Ignoring Visualization data from "
+                               << visuFileXMLNode->value() << std::endl;
                 }
             }
 
@@ -1392,7 +1558,8 @@ namespace VirtualRobot
         return result;
     }
 
-    std::vector<Primitive::PrimitivePtr> BaseIO::processPrimitives(const rapidxml::xml_node<char>* primitivesXMLNode)
+    std::vector<Primitive::PrimitivePtr>
+    BaseIO::processPrimitives(const rapidxml::xml_node<char>* primitivesXMLNode)
     {
         std::vector<Primitive::PrimitivePtr> result;
         const rapidxml::xml_node<>* node;
@@ -1439,29 +1606,45 @@ namespace VirtualRobot
             if (pName == "box")
             {
                 Primitive::Box* box = new Primitive::Box;
-                box->width = convertToFloat(primitiveXMLNode->first_attribute("width", 0, false)->value()) * lenFactor;
-                box->height = convertToFloat(primitiveXMLNode->first_attribute("height", 0, false)->value()) * lenFactor;
-                box->depth = convertToFloat(primitiveXMLNode->first_attribute("depth", 0, false)->value()) * lenFactor;
+                box->width =
+                    convertToFloat(primitiveXMLNode->first_attribute("width", 0, false)->value()) *
+                    lenFactor;
+                box->height =
+                    convertToFloat(primitiveXMLNode->first_attribute("height", 0, false)->value()) *
+                    lenFactor;
+                box->depth =
+                    convertToFloat(primitiveXMLNode->first_attribute("depth", 0, false)->value()) *
+                    lenFactor;
                 primitive.reset(box);
             }
             else if (pName == "sphere")
             {
                 Primitive::Sphere* sphere = new Primitive::Sphere;
-                sphere->radius = convertToFloat(primitiveXMLNode->first_attribute("radius", 0, false)->value()) * lenFactor;
+                sphere->radius =
+                    convertToFloat(primitiveXMLNode->first_attribute("radius", 0, false)->value()) *
+                    lenFactor;
                 primitive.reset(sphere);
             }
             else if (pName == "cylinder")
             {
                 Primitive::Cylinder* cylinder = new Primitive::Cylinder;
-                cylinder->radius = convertToFloat(primitiveXMLNode->first_attribute("radius", 0, false)->value()) * lenFactor;
-                cylinder->height = convertToFloat(primitiveXMLNode->first_attribute("height", 0, false)->value()) * lenFactor;
+                cylinder->radius =
+                    convertToFloat(primitiveXMLNode->first_attribute("radius", 0, false)->value()) *
+                    lenFactor;
+                cylinder->height =
+                    convertToFloat(primitiveXMLNode->first_attribute("height", 0, false)->value()) *
+                    lenFactor;
                 primitive.reset(cylinder);
             }
             else if (pName == "capsule")
             {
                 Primitive::Capsule* capsule = new Primitive::Capsule;
-                capsule->radius = convertToFloat(primitiveXMLNode->first_attribute("radius", 0, false)->value()) * lenFactor;
-                capsule->height = convertToFloat(primitiveXMLNode->first_attribute("height", 0, false)->value()) * lenFactor;
+                capsule->radius =
+                    convertToFloat(primitiveXMLNode->first_attribute("radius", 0, false)->value()) *
+                    lenFactor;
+                capsule->height =
+                    convertToFloat(primitiveXMLNode->first_attribute("height", 0, false)->value()) *
+                    lenFactor;
                 primitive.reset(capsule);
             }
             else
@@ -1472,7 +1655,8 @@ namespace VirtualRobot
             if (primitive)
             {
                 Eigen::Matrix4f transform;
-                processTransformNode(primitiveXMLNode->first_node("transform", 0, false), "transform", transform);
+                processTransformNode(
+                    primitiveXMLNode->first_node("transform", 0, false), "transform", transform);
                 primitive->transform = transform;
                 result.push_back(primitive);
             }
@@ -1483,9 +1667,13 @@ namespace VirtualRobot
         return result;
     }
 
-    void BaseIO::processPhysicsTag(const rapidxml::xml_node<char>* physicsXMLNode, const std::string& nodeName, SceneObject::Physics& physics)
+    void
+    BaseIO::processPhysicsTag(const rapidxml::xml_node<char>* physicsXMLNode,
+                              const std::string& nodeName,
+                              SceneObject::Physics& physics)
     {
-        THROW_VR_EXCEPTION_IF(!physicsXMLNode, "NULL data for physicsXMLNode in processPhysicsNode()");
+        THROW_VR_EXCEPTION_IF(!physicsXMLNode,
+                              "NULL data for physicsXMLNode in processPhysicsNode()");
         rapidxml::xml_attribute<>* attr;
         rapidxml::xml_node<>* massXMLNode = physicsXMLNode->first_node("mass", 0, false);
 
@@ -1509,11 +1697,11 @@ namespace VirtualRobot
             {
                 physics.massKg *= 1000.0f;
             }
-
         }
         else
         {
-            VR_WARNING << "Expecting mass tag for physics node in <" << nodeName << ">." << std::endl;
+            VR_WARNING << "Expecting mass tag for physics node in <" << nodeName << ">."
+                       << std::endl;
             physics.massKg = 0.0f;
         }
 
@@ -1560,10 +1748,8 @@ namespace VirtualRobot
                     {
                         physics.localCoM *= 1000.0f;
                     }
-
                 }
             }
-
         }
 
         rapidxml::xml_node<>* inMatXMLNode = physicsXMLNode->first_node("inertiamatrix", 0, false);
@@ -1571,7 +1757,7 @@ namespace VirtualRobot
         if (inMatXMLNode)
         {
             physics.inertiaMatrix = process3x3Matrix(inMatXMLNode);
-            std::vector< Units > unitsAttr = getUnitsAttributes(inMatXMLNode);
+            std::vector<Units> unitsAttr = getUnitsAttributes(inMatXMLNode);
             Units uWeight("kg");
             Units uLength("m");
 
@@ -1606,30 +1792,34 @@ namespace VirtualRobot
             }
 
             physics.inertiaMatrix *= factor;
-
         }
         else
         {
-            physics.inertiaMatrix.setZero(); // this will trigger an automatically determination of the inertia matrix during initialization
+            physics.inertiaMatrix
+                .setZero(); // this will trigger an automatically determination of the inertia matrix during initialization
         }
 
-        rapidxml::xml_node<>* ignoreColXMLNode = physicsXMLNode->first_node("ignorecollision", 0, false);
+        rapidxml::xml_node<>* ignoreColXMLNode =
+            physicsXMLNode->first_node("ignorecollision", 0, false);
 
         while (ignoreColXMLNode)
         {
             rapidxml::xml_attribute<>* attr = ignoreColXMLNode->first_attribute("name", 0, false);
-            THROW_VR_EXCEPTION_IF(!attr, "Expecting 'name' attribute in <IgnoreCollision> tag..." << endl)
+            THROW_VR_EXCEPTION_IF(!attr,
+                                  "Expecting 'name' attribute in <IgnoreCollision> tag..." << endl)
             std::string s(attr->value());
             physics.ignoreCollisions.push_back(s);
             ignoreColXMLNode = ignoreColXMLNode->next_sibling("ignorecollision", 0, false);
         }
 
-        rapidxml::xml_node<>* simulationtype = physicsXMLNode->first_node("simulationtype", 0, false);
+        rapidxml::xml_node<>* simulationtype =
+            physicsXMLNode->first_node("simulationtype", 0, false);
 
         if (simulationtype)
         {
             rapidxml::xml_attribute<>* attr = simulationtype->first_attribute("value", 0, false);
-            THROW_VR_EXCEPTION_IF(!attr, "Expecting 'value' attribute in <SimulationType> tag..." << endl)
+            THROW_VR_EXCEPTION_IF(!attr,
+                                  "Expecting 'value' attribute in <SimulationType> tag..." << endl)
             std::string s(attr->value());
             getLowerCase(s);
 
@@ -1658,11 +1848,10 @@ namespace VirtualRobot
         {
             physics.friction = -1.0f;
         }
-
-
     }
 
-    std::string BaseIO::processFileNode(const rapidxml::xml_node<char>* fileNode, const std::string& basePath)
+    std::string
+    BaseIO::processFileNode(const rapidxml::xml_node<char>* fileNode, const std::string& basePath)
     {
         THROW_VR_EXCEPTION_IF(!fileNode, "NULL data");
         std::string fileName = fileNode->value();
@@ -1697,7 +1886,9 @@ namespace VirtualRobot
                     return fileName;
                 }
             }
-            catch (...) {}
+            catch (...)
+            {
+            }
 
             // check file relative
             std::string absFileName = fileName;
@@ -1711,7 +1902,9 @@ namespace VirtualRobot
                     return absFileName;
                 }
             }
-            catch (...) {}
+            catch (...)
+            {
+            }
 
             // check file in data paths
             absFileName = fileName;
@@ -1735,7 +1928,11 @@ namespace VirtualRobot
         return fileName;
     }
 
-    bool BaseIO::processGraspConfigurationNode(const rapidxml::xml_node<char>* configXMLNode, std::vector< RobotConfig::Configuration >& storeConfigDefinitions, std::string&  storeConfigName)
+    bool
+    BaseIO::processGraspConfigurationNode(
+        const rapidxml::xml_node<char>* configXMLNode,
+        std::vector<RobotConfig::Configuration>& storeConfigDefinitions,
+        std::string& storeConfigName)
     {
         THROW_VR_EXCEPTION_IF(!configXMLNode, "NULL data in processConfigurationNode");
         storeConfigName = processNameAttribute(configXMLNode, true);
@@ -1751,7 +1948,9 @@ namespace VirtualRobot
             {
                 RobotConfig::Configuration c;
                 c.name = processNameAttribute(node, true);
-                THROW_VR_EXCEPTION_IF(c.name.empty(), "Expecting a name in configuration tag '" << storeConfigName << "'.");
+                THROW_VR_EXCEPTION_IF(c.name.empty(),
+                                      "Expecting a name in configuration tag '" << storeConfigName
+                                                                                << "'.");
                 c.value = getFloatByAttributeName(node, "value");
 
                 if (!hasUnitsAttribute(node))
@@ -1779,7 +1978,10 @@ namespace VirtualRobot
             }
             else
             {
-                THROW_VR_EXCEPTION("XML definition <" << nodeName << "> not supported in configuration definition with name '" << storeConfigName << "'." << endl);
+                THROW_VR_EXCEPTION("XML definition <"
+                                   << nodeName
+                                   << "> not supported in configuration definition with name '"
+                                   << storeConfigName << "'." << endl);
             }
 
             node = node->next_sibling();
@@ -1788,7 +1990,12 @@ namespace VirtualRobot
         return true;
     }
 
-    bool BaseIO::processConfigurationNodeList(const rapidxml::xml_node<char>* configXMLNode, std::vector< std::vector< RobotConfig::Configuration > >& configDefinitions, std::vector< std::string >& configNames, std::vector< std::string >& tcpNames)
+    bool
+    BaseIO::processConfigurationNodeList(
+        const rapidxml::xml_node<char>* configXMLNode,
+        std::vector<std::vector<RobotConfig::Configuration>>& configDefinitions,
+        std::vector<std::string>& configNames,
+        std::vector<std::string>& tcpNames)
     {
         THROW_VR_EXCEPTION_IF(!configXMLNode, "NULL data in processConfigurationNode");
         std::string name = processNameAttribute(configXMLNode, true);
@@ -1800,7 +2007,7 @@ namespace VirtualRobot
         //std::cout << "tcp: " << tcp << std::endl;
 
 
-        std::vector< RobotConfig::Configuration > configs;
+        std::vector<RobotConfig::Configuration> configs;
 
 
         if (!processGraspConfigurationNode(configXMLNode, configs, name))
@@ -1814,8 +2021,11 @@ namespace VirtualRobot
         return true;
     }
 
-
-    RobotNodeSetPtr BaseIO::processRobotNodeSet(const rapidxml::xml_node<char>* setXMLNode, RobotPtr robo, const std::string& robotRootNode, int& robotNodeSetCounter)
+    RobotNodeSetPtr
+    BaseIO::processRobotNodeSet(const rapidxml::xml_node<char>* setXMLNode,
+                                RobotPtr robo,
+                                const std::string& robotRootNode,
+                                int& robotNodeSetCounter)
     {
         THROW_VR_EXCEPTION_IF(!setXMLNode, "NULL data for setXMLNode");
 
@@ -1832,17 +2042,26 @@ namespace VirtualRobot
 
             if (name == "name")
             {
-                THROW_VR_EXCEPTION_IF(!nodeSetName.empty(), "Robot node set contains multiple definitions of attribute name. First value of name is: " << nodeSetName);
+                THROW_VR_EXCEPTION_IF(!nodeSetName.empty(),
+                                      "Robot node set contains multiple definitions of attribute "
+                                      "name. First value of name is: "
+                                          << nodeSetName);
                 nodeSetName = attr->value();
             }
             else if (name == "kinematicroot")
             {
-                THROW_VR_EXCEPTION_IF(!rootNodeName.empty(), "Robot node set contains multiple definitions of attribute kinematicroot. First value of kinematicroot is: " << rootNodeName);
+                THROW_VR_EXCEPTION_IF(!rootNodeName.empty(),
+                                      "Robot node set contains multiple definitions of attribute "
+                                      "kinematicroot. First value of kinematicroot is: "
+                                          << rootNodeName);
                 rootNodeName = attr->value();
             }
             else if (name == "tcp")
             {
-                THROW_VR_EXCEPTION_IF(!tcpName.empty(), "Robot node set contains multiple definitions of attribute tcp. First value of tcpis: " << tcpName);
+                THROW_VR_EXCEPTION_IF(!tcpName.empty(),
+                                      "Robot node set contains multiple definitions of attribute "
+                                      "tcp. First value of tcpis: "
+                                          << tcpName);
                 tcpName = attr->value();
             }
 
@@ -1855,7 +2074,8 @@ namespace VirtualRobot
             ss << robo->getType() << "_RobotNodeSet_" << robotNodeSetCounter;
             nodeSetName = ss.str();
             robotNodeSetCounter++;
-            VR_WARNING << "RobotNodeSet definition expects attribute 'name'. Setting name to " << nodeSetName << std::endl;
+            VR_WARNING << "RobotNodeSet definition expects attribute 'name'. Setting name to "
+                       << nodeSetName << std::endl;
         }
 
         if (rootNodeName.empty())
@@ -1872,8 +2092,8 @@ namespace VirtualRobot
         {
             if (!robo->hasRobotNode(rootNodeName))
             {
-                VR_WARNING << "In robot node set '" << nodeSetName
-                           << "': No root node '" << rootNodeName << "' found";
+                VR_WARNING << "In robot node set '" << nodeSetName << "': No root node '"
+                           << rootNodeName << "' found";
             }
             kinRoot = robo->getRobotNode(rootNodeName);
         }
@@ -1884,19 +2104,22 @@ namespace VirtualRobot
         {
             if (!robo->hasRobotNode(tcpName))
             {
-                VR_WARNING << "In robot node set '" << nodeSetName
-                           << "': No root node '" << tcpName << "' found";
+                VR_WARNING << "In robot node set '" << nodeSetName << "': No root node '" << tcpName
+                           << "' found";
             }
             tcp = robo->getRobotNode(tcpName);
         }
 
-        RobotNodeSetPtr rns = RobotNodeSet::createRobotNodeSet(robo, nodeSetName, nodeList, kinRoot, tcp, true);
+        RobotNodeSetPtr rns =
+            RobotNodeSet::createRobotNodeSet(robo, nodeSetName, nodeList, kinRoot, tcp, true);
 
         return rns;
     }
 
-
-    bool BaseIO::processFloatValueTags(const rapidxml::xml_node<char>* XMLNode, int dim, Eigen::VectorXf& stroreResult)
+    bool
+    BaseIO::processFloatValueTags(const rapidxml::xml_node<char>* XMLNode,
+                                  int dim,
+                                  Eigen::VectorXf& stroreResult)
     {
         if (!XMLNode || dim <= 0)
         {
@@ -1913,23 +2136,29 @@ namespace VirtualRobot
 
             if (nodeName == "c")
             {
-                THROW_VR_EXCEPTION_IF(entry >= dim, "Too many entries in trajectory's point definition..." << endl);
+                THROW_VR_EXCEPTION_IF(
+                    entry >= dim, "Too many entries in trajectory's point definition..." << endl);
                 stroreResult(entry) = getFloatByAttributeName(node, "value");
             }
             else
             {
-                THROW_VR_EXCEPTION("XML definition <" << nodeName << "> not supported in trajectory point definition" << endl);
+                THROW_VR_EXCEPTION("XML definition <"
+                                   << nodeName << "> not supported in trajectory point definition"
+                                   << endl);
             }
 
             entry++;
             node = node->next_sibling();
         }
 
-        THROW_VR_EXCEPTION_IF(entry < dim, "Not enough entries in trajectory's point definition..." << endl);
+        THROW_VR_EXCEPTION_IF(entry < dim,
+                              "Not enough entries in trajectory's point definition..." << endl);
         return true;
     }
 
-    TrajectoryPtr BaseIO::processTrajectory(const rapidxml::xml_node<char>* trajectoryXMLNode, std::vector<RobotPtr>& robots)
+    TrajectoryPtr
+    BaseIO::processTrajectory(const rapidxml::xml_node<char>* trajectoryXMLNode,
+                              std::vector<RobotPtr>& robots)
     {
         THROW_VR_EXCEPTION_IF(!trajectoryXMLNode, "NULL data for trajectoryXMLNode");
 
@@ -1947,22 +2176,34 @@ namespace VirtualRobot
 
             if (name == "name")
             {
-                THROW_VR_EXCEPTION_IF(!trajName.empty(), "Trajectory contains multiple definitions of attribute name. First value  is: " << trajName);
+                THROW_VR_EXCEPTION_IF(
+                    !trajName.empty(),
+                    "Trajectory contains multiple definitions of attribute name. First value  is: "
+                        << trajName);
                 trajName = attr->value();
             }
             else if (name == "robot" || name == "model")
             {
-                THROW_VR_EXCEPTION_IF(!robotName.empty(), "Trajectory contains multiple definitions of attribute Robot. First value is: " << robotName);
+                THROW_VR_EXCEPTION_IF(
+                    !robotName.empty(),
+                    "Trajectory contains multiple definitions of attribute Robot. First value is: "
+                        << robotName);
                 robotName = attr->value();
             }
             else if (name == "robotnodeset" || name == "modelnodeset")
             {
-                THROW_VR_EXCEPTION_IF(!nodeSetName.empty(), "Trajectory contains multiple definitions of attribute RobotNodeSet. First value is: " << nodeSetName);
+                THROW_VR_EXCEPTION_IF(!nodeSetName.empty(),
+                                      "Trajectory contains multiple definitions of attribute "
+                                      "RobotNodeSet. First value is: "
+                                          << nodeSetName);
                 nodeSetName = attr->value();
             }
             else if (name == "dim" || name == "dimension")
             {
-                THROW_VR_EXCEPTION_IF(dim != -1, "Trajectory contains multiple definitions of attribute dim. First value of dim: " << dim);
+                THROW_VR_EXCEPTION_IF(dim != -1,
+                                      "Trajectory contains multiple definitions of attribute dim. "
+                                      "First value of dim: "
+                                          << dim);
                 dim = convertToInt(attr->value());
             }
 
@@ -1975,7 +2216,8 @@ namespace VirtualRobot
         if (trajName.empty())
         {
             trajName = "Trajectory";
-            VR_WARNING << "Trajectory definition expects attribute 'RobotNodeSet'. Setting to " << trajName << std::endl;
+            VR_WARNING << "Trajectory definition expects attribute 'RobotNodeSet'. Setting to "
+                       << trajName << std::endl;
         }
 
         RobotPtr r;
@@ -1991,12 +2233,14 @@ namespace VirtualRobot
 
         THROW_VR_EXCEPTION_IF(!r, "Could not find robot with name " << robotName);
         RobotNodeSetPtr rns = r->getRobotNodeSet(nodeSetName);
-        THROW_VR_EXCEPTION_IF(!rns, "Could not find RNS with name " << nodeSetName << " in robot " << robotName);
+        THROW_VR_EXCEPTION_IF(
+            !rns, "Could not find RNS with name " << nodeSetName << " in robot " << robotName);
 
         assert(dim >= 0);
         if (static_cast<unsigned int>(dim) != rns->getSize())
         {
-            VR_WARNING << " Invalid dim attribute (" << dim << "). Setting dimension to " << rns->getSize() << std::endl;
+            VR_WARNING << " Invalid dim attribute (" << dim << "). Setting dimension to "
+                       << rns->getSize() << std::endl;
             dim = rns->getSize();
         }
 
@@ -2019,11 +2263,13 @@ namespace VirtualRobot
                 {
                     res->addPoint(p);
                 }
-
             }
             else
             {
-                THROW_VR_EXCEPTION("XML definition <" << nodeName << "> not supported in trajectory definition with name '" << trajName << "'." << endl);
+                THROW_VR_EXCEPTION("XML definition <"
+                                   << nodeName
+                                   << "> not supported in trajectory definition with name '"
+                                   << trajName << "'." << endl);
             }
 
             node = node->next_sibling();
@@ -2032,7 +2278,8 @@ namespace VirtualRobot
         return res;
     }
 
-    bool BaseIO::writeXMLFile(const std::string& filename, const std::string& content, bool overwrite)
+    bool
+    BaseIO::writeXMLFile(const std::string& filename, const std::string& content, bool overwrite)
     {
         try
         {
@@ -2041,7 +2288,9 @@ namespace VirtualRobot
                 return false;
             }
         }
-        catch (...) {}
+        catch (...)
+        {
+        }
 
         // save file
         std::ofstream out(filename.c_str(), std::ios::out | std::ios::trunc);
@@ -2056,7 +2305,8 @@ namespace VirtualRobot
         return true;
     }
 
-    std::string BaseIO::toXML(const Eigen::Matrix4f& m, std::string ident /*= "\t"*/)
+    std::string
+    BaseIO::toXML(const Eigen::Matrix4f& m, std::string ident /*= "\t"*/)
     {
         std::stringstream ss;
         ss << ident << "<Matrix4x4 units='mm'>" << std::endl;
@@ -2077,7 +2327,11 @@ namespace VirtualRobot
         return ss.str();
     }
 
-    GraspPtr BaseIO::processGrasp(const rapidxml::xml_node<char>* graspXMLNode, const std::string& robotType, const std::string& eef, const std::string& /*objName*/)
+    GraspPtr
+    BaseIO::processGrasp(const rapidxml::xml_node<char>* graspXMLNode,
+                         const std::string& robotType,
+                         const std::string& eef,
+                         const std::string& /*objName*/)
     {
         THROW_VR_EXCEPTION_IF(!graspXMLNode, "No <Grasp> tag ?!");
         // get name
@@ -2087,7 +2341,7 @@ namespace VirtualRobot
         std::string preshapeName = processStringAttribute("preshape", graspXMLNode, true);
         Eigen::Matrix4f pose;
         pose.setIdentity();
-        std::vector< RobotConfig::Configuration > configDefinitions;
+        std::vector<RobotConfig::Configuration> configDefinitions;
         std::string configName;
 
         rapidxml::xml_node<>* node = graspXMLNode->first_node();
@@ -2101,7 +2355,6 @@ namespace VirtualRobot
             if (nodeName == "transform")
             {
                 processTransformNode(node, name, pose);
-
             }
             else if (nodeName == "chaingrasp")
             {
@@ -2109,14 +2362,16 @@ namespace VirtualRobot
             }
             else if (nodeName == "configuration")
             {
-                THROW_VR_EXCEPTION_IF(configDefinitions.size() > 0, "Only one configuration per grasp allowed");
+                THROW_VR_EXCEPTION_IF(configDefinitions.size() > 0,
+                                      "Only one configuration per grasp allowed");
                 bool cOK = processGraspConfigurationNode(node, configDefinitions, configName);
-                THROW_VR_EXCEPTION_IF(!cOK, "Invalid configuration defined in grasp tag '" << name << "'." << endl);
-
+                THROW_VR_EXCEPTION_IF(
+                    !cOK, "Invalid configuration defined in grasp tag '" << name << "'." << endl);
             }
             else
             {
-                THROW_VR_EXCEPTION("XML definition <" << nodeName << "> not supported in Grasp <" << name << ">." << endl);
+                THROW_VR_EXCEPTION("XML definition <" << nodeName << "> not supported in Grasp <"
+                                                      << name << ">." << endl);
             }
 
             node = node->next_sibling();
@@ -2126,8 +2381,10 @@ namespace VirtualRobot
 
         if (!chainedGraspNode)
             grasp.reset(new Grasp(name, robotType, eef, pose, method, quality, preshapeName));
-        else {
-            ChainedGraspPtr chainedGrasp(new ChainedGrasp(name, robotType, eef, Eigen::Matrix4f::Zero(), method, quality, preshapeName));
+        else
+        {
+            ChainedGraspPtr chainedGrasp(new ChainedGrasp(
+                name, robotType, eef, Eigen::Matrix4f::Zero(), method, quality, preshapeName));
             node = chainedGraspNode->first_node();
             while (node)
             {
@@ -2140,19 +2397,28 @@ namespace VirtualRobot
                 else if (nodeName == "virtualjoint")
                 {
                     rapidxml::xml_attribute<>* attrName = node->first_attribute("name", 0, false);
-                    THROW_VR_EXCEPTION_IF(!attrName, "XML tag <VirtualJoint> does not contain an attribute 'name'!" << std::endl);
+                    THROW_VR_EXCEPTION_IF(
+                        !attrName,
+                        "XML tag <VirtualJoint> does not contain an attribute 'name'!"
+                            << std::endl);
                     auto joint = chainedGrasp->getVirtualJoint(attrName->value());
                     rapidxml::xml_attribute<>* attrValue = node->first_attribute("value", 0, false);
-                    THROW_VR_EXCEPTION_IF(!attrName, "XML tag <VirtualJoint> does not contain an attribute 'value'!" << std::endl);
+                    THROW_VR_EXCEPTION_IF(
+                        !attrName,
+                        "XML tag <VirtualJoint> does not contain an attribute 'value'!"
+                            << std::endl);
                     joint->setValue(simox::alg::to_<float>(attrValue->value()));
                     rapidxml::xml_attribute<>* attrMin = node->first_attribute("min", 0, false);
                     rapidxml::xml_attribute<>* attrMax = node->first_attribute("max", 0, false);
                     if (attrMin && attrMax)
-                        joint->setLimits(simox::alg::to_<float>(attrMin->value()), simox::alg::to_<float>(attrMax->value()));
+                        joint->setLimits(simox::alg::to_<float>(attrMin->value()),
+                                         simox::alg::to_<float>(attrMax->value()));
                 }
                 else
                 {
-                    THROW_VR_EXCEPTION("XML definition <" << nodeName << "> not supported in Grasp <" << name << ">." << endl);
+                    THROW_VR_EXCEPTION("XML definition <"
+                                       << nodeName << "> not supported in Grasp <" << name << ">."
+                                       << endl);
                 }
 
                 node = node->next_sibling();
@@ -2163,11 +2429,11 @@ namespace VirtualRobot
         if (!configDefinitions.empty())
         {
             // create & register configs
-            std::map< std::string, float > rc;
+            std::map<std::string, float> rc;
 
             for (auto& configDefinition : configDefinitions)
             {
-                rc[ configDefinition.name ] = configDefinition.value;
+                rc[configDefinition.name] = configDefinition.value;
             }
 
             grasp->setConfiguration(rc);
@@ -2176,18 +2442,23 @@ namespace VirtualRobot
         return grasp;
     }
 
-    GraspSetPtr BaseIO::processGraspSet(const rapidxml::xml_node<char>* graspSetXMLNode, const std::string& objName)
+    GraspSetPtr
+    BaseIO::processGraspSet(const rapidxml::xml_node<char>* graspSetXMLNode,
+                            const std::string& objName)
     {
         THROW_VR_EXCEPTION_IF(!graspSetXMLNode, "No <GraspSet> tag ?!");
 
         // get name
         std::string gsName = processNameAttribute(graspSetXMLNode, true);
-        std::string gsRobotType = processStringAttribute(std::string("robottype"), graspSetXMLNode, true);
-        std::string gsEEF = processStringAttribute(std::string("endeffector"), graspSetXMLNode, true);
+        std::string gsRobotType =
+            processStringAttribute(std::string("robottype"), graspSetXMLNode, true);
+        std::string gsEEF =
+            processStringAttribute(std::string("endeffector"), graspSetXMLNode, true);
 
         if (gsName.empty() || gsRobotType.empty() || gsEEF.empty())
         {
-            THROW_VR_EXCEPTION("GraspSet tags must have valid attributes 'Name', 'RobotType' and 'EndEffector'");
+            THROW_VR_EXCEPTION(
+                "GraspSet tags must have valid attributes 'Name', 'RobotType' and 'EndEffector'");
         }
 
         GraspSetPtr result(new GraspSet(gsName, gsRobotType, gsEEF));
@@ -2201,12 +2472,14 @@ namespace VirtualRobot
             if (nodeName == "grasp")
             {
                 GraspPtr grasp = processGrasp(node, gsRobotType, gsEEF, objName);
-                THROW_VR_EXCEPTION_IF(!grasp, "Invalid 'Grasp' tag in '" << objName << "'." << endl);
+                THROW_VR_EXCEPTION_IF(!grasp,
+                                      "Invalid 'Grasp' tag in '" << objName << "'." << endl);
                 result->addGrasp(grasp);
             }
             else
             {
-                THROW_VR_EXCEPTION("XML definition <" << nodeName << "> not supported in GraspSet <" << gsName << ">." << endl);
+                THROW_VR_EXCEPTION("XML definition <" << nodeName << "> not supported in GraspSet <"
+                                                      << gsName << ">." << endl);
             }
 
             node = node->next_sibling();
@@ -2215,7 +2488,11 @@ namespace VirtualRobot
         return result;
     }
 
-    bool BaseIO::processSensor(GraspableSensorizedObjectPtr rn, const rapidxml::xml_node<char>* sensorXMLNode, RobotDescription loadMode, const std::string& basePath)
+    bool
+    BaseIO::processSensor(GraspableSensorizedObjectPtr rn,
+                          const rapidxml::xml_node<char>* sensorXMLNode,
+                          RobotDescription loadMode,
+                          const std::string& basePath)
     {
         if (!rn || !sensorXMLNode)
         {
@@ -2234,7 +2511,9 @@ namespace VirtualRobot
         }
         else
         {
-            VR_WARNING << "No 'type' attribute for <Sensor> tag. Skipping Sensor definition of RobotNode " << rn->getName() << "!" << std::endl;
+            VR_WARNING
+                << "No 'type' attribute for <Sensor> tag. Skipping Sensor definition of RobotNode "
+                << rn->getName() << "!" << std::endl;
             return false;
         }
 
@@ -2249,7 +2528,9 @@ namespace VirtualRobot
         }
         else
         {
-            VR_WARNING << "No Factory found for sensor of type " << sensorType << ". Skipping Sensor definition of RobotNode " << rn->getName() << "!" << std::endl;
+            VR_WARNING << "No Factory found for sensor of type " << sensorType
+                       << ". Skipping Sensor definition of RobotNode " << rn->getName() << "!"
+                       << std::endl;
             return false;
         }
 

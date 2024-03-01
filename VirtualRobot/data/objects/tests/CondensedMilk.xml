@@ -1,0 +1,56 @@
+<ManipulationObject name='CondensedMilk'>
+	<Visualization>
+		<File>CondensedMilk.wrl</File>
+	</Visualization>
+	<CollisionModel>
+		<File>CondensedMilk.wrl</File>
+	</CollisionModel>
+	<Physics>
+		<SimulationType value='Dynamic' />
+		<Mass
+				unit='kg'
+				value='0' />
+		<CoM location='VisualizationBBoxCenter' />
+		<InertiaMatrix>
+			<row1
+					c1='1'
+					c2='0'
+					c3='0' />
+			<row2
+					c1='0'
+					c2='1'
+					c3='0' />
+			<row3
+					c1='0'
+					c2='0'
+					c3='1' />
+		</InertiaMatrix>
+	</Physics>
+	<Affordances>
+		<Location
+				name="nose"
+				reference_frame="root">
+			<Transform>
+				<translation
+						x="0"
+						y="50"
+						z="0" />
+				<rpy
+						roll="0"
+						pitch="10"
+						yaw="0"
+						unit="degree" />
+			</Transform>
+
+			<!-- <Affordance type="fillable" /> -->
+			<Affordance type="pourable">
+				<PrimitiveRepresentation>
+					<Cylinder
+							radius="5"
+							height="0" />
+				</PrimitiveRepresentation>
+			</Affordance>
+		</Location>
+	</Affordances>
+
+</ManipulationObject>
