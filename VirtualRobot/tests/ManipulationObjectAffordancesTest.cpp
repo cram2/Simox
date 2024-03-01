@@ -7,7 +7,7 @@
 #include <boost/test/tools/old/interface.hpp>
 
 #include "VirtualRobot.h"
-// #define BOOST_TEST_MODULE VirtualRobot_VirtualRobotIOTest
+#define BOOST_TEST_MODULE VirtualRobot_VirtualRobotIOTest
 
 #include <string>
 
@@ -24,12 +24,9 @@
 #include <VirtualRobot/XML/ObjectIO.h>
 #include <VirtualRobot/XML/RobotIO.h>
 
-// BOOST_AUTO_TEST_SUITE(VirtualRobotIO)
+BOOST_AUTO_TEST_SUITE(VirtualRobotIO)
 
-// BOOST_AUTO_TEST_CASE(testLoadManipulationObjectWithAffordances)
-
-int
-main()
+BOOST_AUTO_TEST_CASE(testLoadManipulationObjectWithAffordances)
 {
     std::string filename = "objects/tests/CondensedMilk.xml";
     const bool fileOK = VirtualRobot::RuntimeEnvironment::getDataFileAbsolute(filename);
@@ -46,16 +43,16 @@ main()
     BOOST_REQUIRE(object->getAffordancesOfType("pourable").size() == 1);
     BOOST_REQUIRE(object->getAffordancesOfType("nonexisting").empty());
 
-    for (const auto& location : object->getAffordances())
-    {
-        VR_INFO << location.pose.pose.matrix() << std::endl;
-        VR_INFO << location.pose.frame << std::endl;
-        for (const auto& a : location.affordances)
-        {
-            VR_INFO << a.type << std::endl;
-            VR_INFO << a.primitiveRepresentation.size() << std::endl;
-        }
-    }
+    // for (const auto& location : object->getAffordances())
+    // {
+    //     VR_INFO << location.pose.pose.matrix() << std::endl;
+    //     VR_INFO << location.pose.frame << std::endl;
+    //     for (const auto& a : location.affordances)
+    //     {
+    //         VR_INFO << a.type << std::endl;
+    //         VR_INFO << a.primitiveRepresentation.size() << std::endl;
+    //     }
+    // }
 }
 
-// BOOST_AUTO_TEST_SUITE_END()
+BOOST_AUTO_TEST_SUITE_END()

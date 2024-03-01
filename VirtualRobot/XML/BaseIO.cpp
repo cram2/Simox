@@ -194,34 +194,33 @@ namespace VirtualRobot
 
             affordances::Location locationWithAffordances;
 
-            // if (node->first_node("transform", 0, false) != nullptr)
+            if (node->first_node("transform", 0, false) != nullptr)
             {
-                VR_INFO << "Processing `transform` node" << std::endl;
+                // VR_INFO << "Processing `transform` node" << std::endl;
                 processTransformNode(node, nodeName, locationWithAffordances.pose.pose.matrix());
-                VR_INFO << "Processing `transform` node: " << locationWithAffordances.pose.pose.matrix() << std::endl;
-            
+                // VR_INFO << "Processing `transform` node: " << locationWithAffordances.pose.pose.matrix() << std::endl;
             }
 
             if (auto* referenceFrame = node->first_attribute("reference_frame", 0, false))
             {
-                VR_INFO << "Processing `reference_frame` node" << std::endl;
+                // VR_INFO << "Processing `reference_frame` node" << std::endl;
                 locationWithAffordances.pose.frame = referenceFrame->value();
             }
 
             auto* affordanceNode = node->first_node("affordance", 0, false);
             while (affordanceNode != nullptr)
             {
-                VR_INFO << "Processing `affordance` node" << std::endl;
+                // VR_INFO << "Processing `affordance` node" << std::endl;
                 affordances::Affordance affordance;
                 if (auto* typeNode = affordanceNode->first_attribute("type", 0, false))
                 {
-                    VR_INFO << "Processing `type` node" << std::endl;
+                    // VR_INFO << "Processing `type` node" << std::endl;
                     affordance.type = typeNode->value();
                 }
 
                 if (affordanceNode->first_node("primitives", 0, false) != nullptr)
                 {
-                    VR_INFO << "Processing `primitives` node" << std::endl;
+                    // VR_INFO << "Processing `primitives` node" << std::endl;
                     affordance.primitiveRepresentation = processPrimitives(affordanceNode);
                 }
 
