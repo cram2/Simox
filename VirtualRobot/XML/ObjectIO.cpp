@@ -16,8 +16,6 @@ using namespace std;
 namespace VirtualRobot
 {
 
-
-
     ObjectIO::ObjectIO()
         = default;
 
@@ -309,6 +307,7 @@ namespace VirtualRobot
         Eigen::Matrix4f globalPose = Eigen::Matrix4f::Identity();
         std::vector< rapidxml::xml_node<>* > sensorTags;
         SceneObject::PrimitiveApproximation primitiveApproximation;
+        SceneObject::Affordances affordances;
 
         // get name
         std::string objName = processNameAttribute(objectXMLNode);
@@ -400,6 +399,10 @@ namespace VirtualRobot
             {
                 processTransformNode(node, objName, globalPose);
             }
+            else if (nodeName == "affordances")
+            {
+                processAffordances(node, affordances);
+            }
             else
             {
                 THROW_VR_EXCEPTION("XML definition <" << nodeName << "> not supported in ManipulationObject <" << objName << ">." << endl);
@@ -426,6 +429,8 @@ namespace VirtualRobot
 
         object->setGlobalPose(globalPose);
         object->setPrimitiveApproximation(primitiveApproximation);
+
+        object->setAffordances(affordances);
 
         return object;
     }
