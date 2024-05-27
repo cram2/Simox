@@ -17,15 +17,20 @@ namespace simox::geometric_planning
     }
 
     ArticulatedObjectDoorHelper::DoorInteractionContext
-    ArticulatedObjectDoorHelper::planInteraction(const std::string& nodeSetName) const
+    ArticulatedObjectDoorHelper::planInteraction(
+        const std::string& nodeSetName,
+        const std::optional<std::string>& targetFrameSuffix,
+        const std::optional<std::string>& surfaceProjectionFrameSuffix) const
     {
         const auto rns = object->getRobotNodeSet(nodeSetName);
         CHECK_MESSAGE(rns != nullptr,
                       std::string("Robot node set `" + nodeSetName + "` does not exist!"));
 
-        const std::string jointNodeName = nodeSetName + constants::JointSuffix;
-        const std::string handleNodeName = nodeSetName + constants::HandleSuffix;
-        const std::string surfaceProjectionNodeName = nodeSetName + constants::SurfaceSuffix;
+        const std::string jointNodeName = nodeSetName + "_" + constants::JointSuffix;
+        const std::string handleNodeName =
+            nodeSetName + "_" + targetFrameSuffix.value_or(constants::HandleSuffix);
+        const std::string surfaceProjectionNodeName =
+            nodeSetName + "_" + surfaceProjectionFrameSuffix.value_or(constants::SurfaceSuffix);
 
         const auto checkNodeExists =
             [&rns, &nodeSetName]([[maybe_unused]] const std::string& nodeName)
@@ -36,10 +41,18 @@ namespace simox::geometric_planning
                                       "`!"));
         };
 
+        VR_INFO << nodeSetName << std::endl;
+        VR_INFO << jointNodeName << std::endl;
+        VR_INFO << handleNodeName << std::endl;
+        VR_INFO << surfaceProjectionNodeName << std::endl;
+
         for (const auto& nodeName : {jointNodeName, handleNodeName, surfaceProjectionNodeName})
         {
+            VR_INFO << nodeName << std::endl;
             checkNodeExists(nodeName);
         }
+
+        VR_INFO << "Nodes exist." << std::endl;
 
         // CHECK_MESSAGE(params.doorContactHandleDistance > 0.,
         //               "Grasping from the other side not implemented yet!");
@@ -55,10 +68,14 @@ namespace simox::geometric_planning
     }
 
     ArticulatedObjectDoorHelper::DoorInteractionContextExtended
-    ArticulatedObjectDoorHelper::planInteractionExtended(const std::string& nodeSetName,
-                                                         const Pose& global_T_tcp_in_contact) const
+    ArticulatedObjectDoorHelper::planInteractionExtended(
+        const std::string& nodeSetName,
+        const Pose& global_T_tcp_in_contact,
+        const std::optional<std::string>& targetFrameSuffix,
+        const std::optional<std::string>& surfaceProjectionFrameSuffix) const
     {
-        const auto interactionInfo = planInteraction(nodeSetName);
+        const auto interactionInfo =
+            planInteraction(nodeSetName, targetFrameSuffix, surfaceProjectionFrameSuffix);
 
         DoorInteractionContextExtended extendedInfo;
         extendedInfo.door_initial_contact_T_pre_contact =
