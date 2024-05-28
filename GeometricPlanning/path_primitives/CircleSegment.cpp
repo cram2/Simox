@@ -12,8 +12,8 @@ namespace simox::geometric_planning
         // VR_INFO << "Circle parameter range " << Circle::parameterRange().min << " "
         //             << Circle::parameterRange().max;
 
-        REQUIRE(Circle::parameterRange().isInRange(range.min));
-        REQUIRE(Circle::parameterRange().isInRange(range.max));
+         REQUIRE(Circle::parameterRange().isInRange(range.min));
+         REQUIRE(Circle::parameterRange().isInRange(range.max));
     }
 
     ParameterRange
