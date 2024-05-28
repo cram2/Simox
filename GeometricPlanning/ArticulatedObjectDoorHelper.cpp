@@ -41,18 +41,10 @@ namespace simox::geometric_planning
                                       "`!"));
         };
 
-        VR_INFO << nodeSetName << std::endl;
-        VR_INFO << jointNodeName << std::endl;
-        VR_INFO << handleNodeName << std::endl;
-        VR_INFO << surfaceProjectionNodeName << std::endl;
-
         for (const auto& nodeName : {jointNodeName, handleNodeName, surfaceProjectionNodeName})
         {
-            VR_INFO << nodeName << std::endl;
             checkNodeExists(nodeName);
         }
-
-        VR_INFO << "Nodes exist." << std::endl;
 
         // CHECK_MESSAGE(params.doorContactHandleDistance > 0.,
         //               "Grasping from the other side not implemented yet!");
