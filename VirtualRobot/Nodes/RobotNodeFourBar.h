@@ -28,7 +28,7 @@
 #include <Eigen/Core>
 
 #include "../VirtualRobot.h"
-#include "Nodes/FourBar/Joint.h"
+#include "FourBar/Joint.h"
 #include "RobotNode.h"
 
 
