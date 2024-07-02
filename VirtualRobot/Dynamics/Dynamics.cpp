@@ -195,7 +195,7 @@ namespace VirtualRobot
         return std::make_tuple(combinedInertia.cast<double>(), combinedCoM.cast<double>(), massSum);
     }
 
-    RigidBodyDynamics::Body
+    std::shared_ptr<RigidBodyDynamics::Body>
     Dynamics::computeCombinedBody(const std::set<RobotNodePtr>& nodes,
                                   const RobotNodePtr& referenceNode) const
     {
@@ -205,8 +205,8 @@ namespace VirtualRobot
             referenceNode->getInertiaMatrix().cast<double>();
 
         auto mainBody = rnsBodies && rnsBodies->hasRobotNode(referenceNode)
-                            ? RigidBodyDynamics::Body(referenceNode->getMass(), CoM, inertia)
-                            : RigidBodyDynamics::Body();
+                            ? std::make_shared<RigidBodyDynamics::Body>(referenceNode->getMass(), CoM, inertia)
+                            : std::make_shared<RigidBodyDynamics::Body>();
 
         for (auto node : nodes)
         {
@@ -218,7 +218,7 @@ namespace VirtualRobot
             RigidBodyDynamics::Math::SpatialTransform rbdlTransform(
                 transform.block<3, 3>(0, 0).cast<double>(),
                 transform.block<3, 1>(0, 3).cast<double>() / 1000);
-            mainBody.Join(rbdlTransform, otherBody);
+            mainBody->Join(rbdlTransform, otherBody);
         }
         return mainBody;
     }
@@ -499,7 +499,7 @@ namespace VirtualRobot
         auto combinedBody = computeCombinedBody(relevantChildNodes, node);
 
 
-        RigidBodyDynamics::Body body = combinedBody; //Body(mass, com, inertia);
+        RigidBodyDynamics::Body body = *combinedBody.get(); //Body(mass, com, inertia);
 
 
         // spatial transform next

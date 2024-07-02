@@ -4,10 +4,14 @@
 
 #include "../Nodes/RobotNode.h"
 #include "../RobotNodeSet.h"
-#include <rbdl/rbdl.h>
 
 #include <set>
 
+namespace RigidBodyDynamics
+{
+    class Model;
+    class Body;
+}
 
 namespace VirtualRobot
 {
@@ -59,7 +63,7 @@ namespace VirtualRobot
          * @return tuple of new InertiaMatrix relative to new CoM, new global CoM and sum of masses
          */
         static std::tuple<Eigen::Matrix3d, Eigen::Vector3d, double> computeCombinedPhysics(const std::set<RobotNodePtr>& nodes, const RobotNodePtr &referenceNode);
-        RigidBodyDynamics::Body computeCombinedBody(const std::set<RobotNodePtr>& nodes, const RobotNodePtr &referenceNode) const;
+        std::shared_ptr<RigidBodyDynamics::Body> computeCombinedBody(const std::set<RobotNodePtr>& nodes, const RobotNodePtr &referenceNode) const;
         bool getVerbose() const;
         void setVerbose(bool value);
 
