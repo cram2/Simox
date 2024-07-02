@@ -38,7 +38,7 @@ namespace VirtualRobot
             THROW_VR_EXCEPTION("ERROR negative grid size");
         }
 
-        VR_INFO << ": creating grid with " << gridSizeX << "x" << gridSizeY << " = " << gridSizeX* gridSizeY << " entries" << std::endl;
+        // VR_INFO << ": creating grid with " << gridSizeX << "x" << gridSizeY << " = " << gridSizeX* gridSizeY << " entries" << std::endl;
         data = new int[gridSizeX * gridSizeY];
         graspLink = new std::vector<GraspPtr>[gridSizeX * gridSizeY];
         memset(data, INVALID_VALUE, sizeof(int)*gridSizeX * gridSizeY);

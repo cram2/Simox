@@ -22,6 +22,7 @@
 */
 #pragma once
 
+#include "Affordances.h"
 #include "VirtualRobot.h"
 
 #include <Eigen/Core>
@@ -424,6 +425,7 @@ namespace VirtualRobot
 
         const std::string& getVisualizationModelXML() const;
 
+        // Primitive approximation
         const PrimitiveApproximation& getPrimitiveApproximation() const;
 
         PrimitiveApproximation& getPrimitiveApproximation();
@@ -436,6 +438,18 @@ namespace VirtualRobot
         void setPrimitiveApproximationModel(const std::vector<std::string> &ids, bool loadDefault = true);
 
         void getPrimitiveApproximationIDs(std::set<std::string> &ids) const;
+
+        // Affordances
+        using Affordances = std::vector<affordances::Location>;
+
+        void setAffordances(const Affordances& affordances);
+        const Affordances& getAffordances() const;
+
+        Affordances
+        getAffordancesOfType(const affordances::Affordance::Type& affordanceType) const;
+
+        std::set<affordances::Affordance::Type> 
+        getAllAffordanceTypes() const;
 
     protected:
         virtual SceneObject* _clone(const std::string& name, CollisionCheckerPtr colChecker = CollisionCheckerPtr(), float scaling = 1.0f) const;
@@ -488,6 +502,8 @@ namespace VirtualRobot
         float scaling = 1.0f;
 
         PrimitiveApproximation primitiveApproximation;
+
+        Affordances affordances;
     };
 
 
@@ -507,4 +523,3 @@ namespace VirtualRobot
     }
 
 } // namespace VirtualRobot
-

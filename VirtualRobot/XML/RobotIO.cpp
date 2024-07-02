@@ -1125,6 +1125,8 @@ namespace VirtualRobot
 
         NodeMapping nodeMapping;
         std::optional<HumanMapping> humanMapping;
+        SceneObject::Affordances affordances;
+
 
         std::map<std::string, std::map<std::string, float>> configurations;
 
@@ -1139,6 +1141,7 @@ namespace VirtualRobot
                                endeffectorNodes,
                                nodeMapping,
                                humanMapping,
+                               affordances,
                                attachments,
                                configurations,
                                loadMode);
@@ -1266,6 +1269,9 @@ namespace VirtualRobot
         {
             robo->registerHumanMapping(humanMapping.value());
         }
+
+        robo->setAffordances(affordances);
+
 
         for(const auto& [name, configuration]: configurations)
         {
@@ -1396,6 +1402,7 @@ namespace VirtualRobot
         std::vector<rapidxml::xml_node<char>*>& endeffectorNodes,
         NodeMapping& nodeMapping,
         std::optional<HumanMapping>& humanMapping,
+        SceneObject::Affordances& affordances,
         std::map<std::string, std::vector<std::string>>& attachments,
         std::map<std::string, std::map<std::string, float>>& configurations,
         RobotDescription loadMode)
@@ -1521,6 +1528,10 @@ namespace VirtualRobot
 
                 THROW_VR_EXCEPTION_IF(configurations.count(name)> 0, "Configuration `" << name << "` specified multiple times!");
                 configurations.emplace(name, configuration);
+            }
+            else if (nodeName == "affordances")
+            {
+                processAffordances(XMLNode, affordances);
             }
             else
             {

@@ -222,11 +222,8 @@ namespace VirtualRobot
         {
             BaseLine() {}
 
-            BaseLine(const VectorT& point, const VectorT& dir)
+            BaseLine(const VectorT& point, const VectorT& dir) : p(point), d(dir)
             {
-                p = point;
-                d = dir;
-
                 if (d.norm() > 1e-9)
                 {
                     d.normalize();
@@ -680,4 +677,3 @@ namespace VirtualRobot
 
     }
 } // namespace VirtualRobot
-

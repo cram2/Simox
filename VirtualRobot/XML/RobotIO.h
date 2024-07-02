@@ -120,6 +120,7 @@ namespace VirtualRobot
             std::vector<rapidxml::xml_node<char>*>& endeffectorNodes,
             NodeMapping& nodeMapping,
             std::optional<HumanMapping>& humanMapping,
+            SceneObject::Affordances& affordances,
             std::map<std::string, std::vector<std::string>>& attachments,
             std::map<std::string, std::map<std::string, float>>& configurations,
             RobotDescription loadMode = eFull);

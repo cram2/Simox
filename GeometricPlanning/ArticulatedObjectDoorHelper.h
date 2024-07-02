@@ -21,6 +21,7 @@
 
 #pragma once
 
+#include <optional>
 #include <string>
 
 #include <VirtualRobot/VirtualRobot.h>
@@ -32,9 +33,9 @@ namespace simox::geometric_planning
 
     namespace constants
     {
-        inline const std::string JointSuffix = "_joint";
-        inline const std::string HandleSuffix = "_handle";
-        inline const std::string SurfaceSuffix = "_handle_surface_projection";
+        inline const std::string JointSuffix = "joint";
+        inline const std::string HandleSuffix = "handle";
+        inline const std::string SurfaceSuffix = "handle_surface_projection";
     } // namespace constants
 
     class ArticulatedObjectDoorHelper
@@ -42,8 +43,10 @@ namespace simox::geometric_planning
     public:
         struct Params
         {
-            float doorContactHandleDistance = 100;
-            float preContactDistance = 300;
+            float preContactDistance = 300; // [mm] shift into z direction
+
+            float doorContactHandleLateralShift = 0; // [mm] shift along handle, x direction
+            float doorContactHandleDistance = 0; // [mm]; shift along y direction
         };
 
         struct NamedRobotNodeSet
@@ -69,11 +72,16 @@ namespace simox::geometric_planning
 
         ArticulatedObjectDoorHelper(const VirtualRobot::RobotPtr& object, const Params& params);
 
-        DoorInteractionContext planInteraction(const std::string& nodeSetName) const;
+        DoorInteractionContext
+        planInteraction(const std::string& nodeSetName,
+                        const std::optional<std::string>& targetFrameSuffix = std::nullopt,
+                        const std::optional<std::string>& surfaceProjectionFrameSuffix = std::nullopt) const;
 
-        DoorInteractionContextExtended
-        planInteractionExtended(const std::string& nodeSetName,
-                                const Pose& global_T_tcp_in_contact) const;
+        DoorInteractionContextExtended planInteractionExtended(
+            const std::string& nodeSetName,
+            const Pose& global_T_tcp_in_contact,
+            const std::optional<std::string>& targetFrameSuffix = std::nullopt,
+            const std::optional<std::string>& surfaceProjectionFrameSuffix = std::nullopt) const;
 
 
     protected:
