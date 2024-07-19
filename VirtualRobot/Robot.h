@@ -95,6 +95,21 @@ namespace VirtualRobot
         ArmDescription rightArm;
     };
 
+    struct ManipulationCapabilities
+    {
+        struct Capability
+        {
+            std::string affordance;
+            std::string tcp;
+            std::optional<std::string> type;
+            std::optional<std::string> shape;
+        };
+
+        using Capabilities = std::vector<Capability>; 
+
+        std::map<std::string, Capabilities> capabilities; 
+    };
+
     /*!
         This is the main object defining the kinematic structure of a robot.
 
@@ -230,6 +245,8 @@ namespace VirtualRobot
         */
         const NodeMapping& getNodeMapping() const;
         const std::optional<HumanMapping>& getHumanMapping() const;
+
+        const std::optional<ManipulationCapabilities>& getManipulationCapabilities() const;
 
         /**
          *
@@ -548,6 +565,8 @@ namespace VirtualRobot
     private:
         NodeMapping nodeMapping;
         std::optional<HumanMapping> humanMapping;
+
+        std::optional<ManipulationCapabilities> manipulationCapabilities;
 
         std::map<std::string, std::map<std::string, float>> configurations;
 

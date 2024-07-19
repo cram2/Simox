@@ -3,6 +3,7 @@
 
 #include <filesystem>
 #include <fstream>
+#include <optional>
 #include <stdexcept>
 #include <string>
 #include <tuple>
@@ -178,6 +179,82 @@ namespace VirtualRobot
         }
 
         return m;
+    }
+
+    void 
+    BaseIO::processManipulationCapabilities(const rapidxml::xml_node<char>* XMLNode, ManipulationCapabilities& manipulationCapabilities)
+    {
+
+        const auto processManipulationCapability = [](const auto* capabiltyNode) -> std::optional<ManipulationCapabilities::Capability> 
+        {
+            ManipulationCapabilities::Capability capability;
+
+            // required member `affordance`
+            if (auto* eNode = capabiltyNode->first_attribute("affordance", 0, false))
+            {
+                capability.affordance = eNode->value();
+            }
+            else
+            {
+                VR_WARNING << "Missing member `affordance` in capability!" << std::endl;
+                return std::nullopt;
+            }
+
+            // required member `tcp`
+            if (auto* eNode = capabiltyNode->first_attribute("tcp", 0, false))
+            {
+                capability.tcp = eNode->value();
+            }
+            else
+            {
+                VR_WARNING << "Missing member `tcp` in capability!" << std::endl;
+                return std::nullopt;
+            }
+
+            // optional member `shape`
+            if (auto* eNode = capabiltyNode->first_attribute("shape", 0, false))
+            {
+                capability.shape = eNode->value();
+            }
+
+            // optional member `affordance`
+            if (auto* eNode = capabiltyNode->first_attribute("type", 0, false))
+            {
+                capability.type = eNode->value();
+            }
+
+            return capability;
+
+        };
+
+        rapidxml::xml_node<>* node = XMLNode->first_node();
+        while (node != nullptr)
+        {
+            // this can be any string
+            const std::string nodeName = node->name();
+
+            ManipulationCapabilities::Capabilities capabilities;
+            {
+                auto* capabiltyNode = node->first_node("capability", 0, false);
+                while(capabiltyNode != nullptr)
+                {
+                    if(const auto capability = processManipulationCapability(capabiltyNode))
+                    {
+                        capabilities.push_back(capability.value());
+                    }
+
+                    // advance to next sibling
+                    capabiltyNode = capabiltyNode->next_sibling();
+                }
+
+                VR_INFO << nodeName << " with " << capabilities.size() << " capabilities" << std::endl;
+
+                manipulationCapabilities.capabilities.emplace(nodeName, capabilities);
+            }
+
+            // finally advance to next sibling
+            node = node->next_sibling();
+        }
     }
 
     void

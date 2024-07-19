@@ -123,7 +123,9 @@ namespace VirtualRobot
             SceneObject::Affordances& affordances,
             std::map<std::string, std::vector<std::string>>& attachments,
             std::map<std::string, std::map<std::string, float>>& configurations,
+            std::optional<ManipulationCapabilities>& manipulationCapabilities,
             RobotDescription loadMode = eFull);
+        
         static RobotNodePtr processRobotNode(rapidxml::xml_node<char>* robotNodeXMLNode,
                                              RobotPtr robo,
                                              const std::string& basePath,

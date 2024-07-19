@@ -1125,6 +1125,7 @@ namespace VirtualRobot
 
         NodeMapping nodeMapping;
         std::optional<HumanMapping> humanMapping;
+        std::optional<ManipulationCapabilities> manipulationCapabilities;
         SceneObject::Affordances affordances;
 
 
@@ -1144,6 +1145,7 @@ namespace VirtualRobot
                                affordances,
                                attachments,
                                configurations,
+                               manipulationCapabilities,
                                loadMode);
 
         // process childfromrobot tags
@@ -1405,6 +1407,7 @@ namespace VirtualRobot
         SceneObject::Affordances& affordances,
         std::map<std::string, std::vector<std::string>>& attachments,
         std::map<std::string, std::map<std::string, float>>& configurations,
+        std::optional<ManipulationCapabilities>& manipulationCapabilities,
         RobotDescription loadMode)
     {
         std::vector<RobotNodePtr> robotNodes;
@@ -1532,6 +1535,11 @@ namespace VirtualRobot
             else if (nodeName == "affordances")
             {
                 processAffordances(XMLNode, affordances);
+            }
+            else if (nodeName == "manipulationcapabilities")
+            {
+                manipulationCapabilities.emplace();
+                processManipulationCapabilities(XMLNode, manipulationCapabilities.value());
             }
             else
             {
