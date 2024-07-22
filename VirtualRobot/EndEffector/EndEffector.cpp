@@ -746,4 +746,38 @@ namespace VirtualRobot
     {
         return manipulationCapabilities;
     }
+
+    bool
+    ManipulationCapabilities::hasCapability(const std::string& affordance,
+                                            const std::string& tcp) const
+    {
+        return (std::any_of(capabilities.begin(),
+                            capabilities.end(),
+                            [&](const auto& capability) {
+                                return capability.affordance == affordance && capability.tcp == tcp;
+                            }));
+    }
+
+    bool
+    ManipulationCapabilities::hasCapability(const std::string& affordance) const
+    {
+        return (std::any_of(capabilities.begin(),
+                            capabilities.end(),
+                            [&](const auto& capability)
+                            { return capability.affordance == affordance; }));
+    }
+
+    ManipulationCapabilities::Capabilities
+    ManipulationCapabilities::getCapabilitiesForAffordance(const std::string& affordance) const
+    {
+        Capabilities result;
+        for (const auto& capability : capabilities)
+        {
+            if (capability.affordance == affordance)
+            {
+                result.push_back(capability);
+            }
+        }
+        return result;
+    }
 } // namespace VirtualRobot

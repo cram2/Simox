@@ -45,7 +45,12 @@ namespace VirtualRobot
 
         using Capabilities = std::vector<Capability>; 
 
-        std::map<std::string, Capabilities> capabilities; 
+        Capabilities capabilities;
+
+        bool hasCapability(const std::string& affordance, const std::string& tcp) const;
+        bool hasCapability(const std::string& affordance) const;
+        
+        Capabilities getCapabilitiesForAffordance(const std::string& affordance) const;
     };
 
     class VIRTUAL_ROBOT_IMPORT_EXPORT EndEffector : public std::enable_shared_from_this<EndEffector>
