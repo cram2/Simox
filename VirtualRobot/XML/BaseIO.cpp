@@ -222,33 +222,20 @@ namespace VirtualRobot
 
         };
 
-        rapidxml::xml_node<>* node = XMLNode->first_node();
-        while (node != nullptr)
+        ManipulationCapabilities::Capabilities capabilities;
         {
-            // this can be any string
-            const std::string nodeName = node->name();
-
-            ManipulationCapabilities::Capabilities capabilities;
+            auto* capabiltyNode = XMLNode->first_node("capability", 0, false);
+            while(capabiltyNode != nullptr)
             {
-                auto* capabiltyNode = node->first_node("capability", 0, false);
-                while(capabiltyNode != nullptr)
+                if(const auto capability = processManipulationCapability(capabiltyNode))
                 {
-                    if(const auto capability = processManipulationCapability(capabiltyNode))
-                    {
-                        capabilities.push_back(capability.value());
-                    }
-
-                    // advance to next sibling
-                    capabiltyNode = capabiltyNode->next_sibling();
+                    capabilities.push_back(capability.value());
                 }
 
-                VR_INFO << nodeName << " with " << capabilities.size() << " capabilities" << std::endl;
-
-                manipulationCapabilities.capabilities.emplace(nodeName, capabilities);
+                // advance to next sibling
+                capabiltyNode = capabiltyNode->next_sibling();
             }
-
-            // finally advance to next sibling
-            node = node->next_sibling();
+            manipulationCapabilities.capabilities = capabilities;
         }
     }
 

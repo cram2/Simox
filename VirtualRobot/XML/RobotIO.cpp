@@ -1684,6 +1684,8 @@ namespace VirtualRobot
             {
                 manipulationCapabilities.emplace();
                 processManipulationCapabilities(node, manipulationCapabilities.value());
+            
+                // VR_INFO << "End effector `" << endeffectorName << "` has " << manipulationCapabilities.value().capabilities.size() << " predefined manipulation capabilities." << std::endl;
             }
             else
             {
