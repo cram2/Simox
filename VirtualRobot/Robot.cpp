@@ -1308,11 +1308,6 @@ namespace VirtualRobot
         return humanMapping;
     }
 
-    const std::optional<ManipulationCapabilities>& Robot::getManipulationCapabilities() const
-    {
-        return manipulationCapabilities;
-    }
-
     void Robot::registerConfiguration(const std::string& name, const std::map<std::string, float>& configuration)
     {
         if(hasConfiguration(name))

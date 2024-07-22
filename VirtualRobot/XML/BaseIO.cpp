@@ -205,11 +205,6 @@ namespace VirtualRobot
             {
                 capability.tcp = eNode->value();
             }
-            else
-            {
-                VR_WARNING << "Missing member `tcp` in capability!" << std::endl;
-                return std::nullopt;
-            }
 
             // optional member `shape`
             if (auto* eNode = capabiltyNode->first_attribute("shape", 0, false))

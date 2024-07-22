@@ -44,6 +44,8 @@ namespace rapidxml
 namespace VirtualRobot
 {
 
+    class ManipulationCapabilities;
+
     /*!
         Several basic XML IO methods.
         \see RobotIO, SceneIO, ObjectIO
