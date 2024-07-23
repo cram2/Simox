@@ -27,6 +27,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <optional>
 #include <Eigen/Core>
 
 namespace VirtualRobot
@@ -49,7 +50,7 @@ namespace VirtualRobot
 
         bool hasCapability(const std::string& affordance, const std::string& tcp) const;
         bool hasCapability(const std::string& affordance) const;
-        
+
         Capabilities getCapabilitiesForAffordance(const std::string& affordance) const;
     };
 
