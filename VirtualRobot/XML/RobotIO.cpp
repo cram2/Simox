@@ -1646,6 +1646,10 @@ namespace VirtualRobot
         std::vector<std::vector<RobotConfig::Configuration>> configDefinitions;
         std::vector<std::string> configNames;
         std::vector<std::string> tcpNames;
+
+        std::optional<ManipulationCapabilities> manipulationCapabilities;
+
+
         rapidxml::xml_node<>* node = endeffectorXMLNode->first_node();
 
         while (node)
@@ -1676,6 +1680,13 @@ namespace VirtualRobot
                                       "Invalid Preshape defined in robot's eef tag '"
                                           << nodeName << "'." << endl);
             }
+            else if (nodeName == "manipulationcapabilities")
+            {
+                manipulationCapabilities.emplace();
+                processManipulationCapabilities(node, manipulationCapabilities.value());
+            
+                // VR_INFO << "End effector `" << endeffectorName << "` has " << manipulationCapabilities.value().capabilities.size() << " predefined manipulation capabilities." << std::endl;
+            }
             else
             {
                 THROW_VR_EXCEPTION("XML tag <" << nodeName << "> not supported in endeffector <"
@@ -1696,7 +1707,7 @@ namespace VirtualRobot
         }
 
         EndEffectorPtr endEffector(
-            new EndEffector(endeffectorName, actors, staticParts, baseNode, tcpNode, gcpNode));
+            new EndEffector(endeffectorName, actors, staticParts, baseNode, tcpNode, gcpNode, {}, manipulationCapabilities));
 
         // create & register configs
         THROW_VR_EXCEPTION_IF(configDefinitions.size() != configNames.size(),

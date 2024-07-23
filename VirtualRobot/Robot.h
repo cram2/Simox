@@ -95,6 +95,7 @@ namespace VirtualRobot
         ArmDescription rightArm;
     };
 
+
     /*!
         This is the main object defining the kinematic structure of a robot.
 
