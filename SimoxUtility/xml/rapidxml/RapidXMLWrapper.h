@@ -301,10 +301,10 @@ public:
     Eigen::Matrix4f value_matrix4f() {
         Eigen::Matrix4f matrix;
         for (int i = 1; i <= 4; i++) {
-            std::string row = "row" + simox::alg::to_string(i);
+            const std::string row = std::string("row") + simox::alg::to_string(i);
             simox::xml::RapidXMLWrapperNodePtr rowNode = first_node(row.c_str());
             for (int j = 1; j <= 4; j++) {
-                std::string column = "c" + simox::alg::to_string(j);
+                const std::string column = std::string("c") + simox::alg::to_string(j);
                 matrix(i - 1, j - 1) = rowNode->attribute_value_<float>(column.c_str());
             }
         }
@@ -460,10 +460,10 @@ public:
     RapidXMLWrapperNodePtr append_data_node(const Eigen::Matrix4f &matrix, const std::string &name) {
         simox::xml::RapidXMLWrapperNodePtr matrixNode = append_node(name);
         for (int i = 1; i <= 4; i++) {
-            std::string row = "row" + alg::to_string(i);
+            const std::string row = std::string("row") + alg::to_string(i);
             simox::xml::RapidXMLWrapperNodePtr rowNode = matrixNode->append_node(row);
             for (int j = 1; j <= 4; j++) {
-                std::string column = "c" + alg::to_string(j);
+                const std::string column = std::string("c") + alg::to_string(j);
                 rowNode->append_attribute(column, matrix(i - 1, j - 1));
             }
         }
