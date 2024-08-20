@@ -399,9 +399,12 @@ namespace VirtualRobot
                 }
                 else
                 {
-                    const float l = node->getLocalTransformation().block(0, 3, 3, 1).norm();
-                    if (l != 0.0f)
+                    const float l
+                        = node->getLocalTransformation().block(0, 3, 3, 1).cwiseAbs().maxCoeff();
+                    if (l > 0.0f)
+                    {
                         model_height_scaling = 1.0f / l * segLengthIt->second;
+                    }
                 }
             }
 
