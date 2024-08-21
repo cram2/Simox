@@ -31,7 +31,6 @@
 #include "FourBar/Joint.h"
 #include "RobotNode.h"
 
-
 namespace VirtualRobot
 {
 
@@ -119,7 +118,7 @@ namespace VirtualRobot
 
         Eigen::Vector3f getJointRotationAxis(const SceneObjectPtr& coordSystem) const;
 
-        // the root of the 
+        // the root of the
         Eigen::Matrix4f baseFrame(const SceneObjectPtr& coordSystem) const;
 
         four_bar::Joint::Jacobian getJacobian(const Eigen::Vector3f& global_P_eef) const;
@@ -144,7 +143,7 @@ namespace VirtualRobot
                             float scaling) override;
 
 
-    protected:
+    public:
         struct JointMath
         {
             /// The actuator values that were used to compute the joint math.
@@ -159,7 +158,6 @@ namespace VirtualRobot
         {
             // JointMath math;
         };
-        std::optional<First> first;
 
         struct Second
         {
@@ -177,9 +175,17 @@ namespace VirtualRobot
             //     return passive->first->math;
             // }
         };
+
+        inline bool
+        isActive() const
+        {
+            return active.has_value();
+        }
+
+    private:
+        std::optional<First> first;
+
         std::optional<Second> active;
-
-
 
         std::optional<XmlInfo> xmlInfo;
     };
