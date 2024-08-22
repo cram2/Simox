@@ -175,7 +175,7 @@ void    GLDebugDrawStringInternal(int x, int y, const char* string, const btVect
 
         for (int i = 0; i < int (strlen(string)); i++)
         {
-            char ch = string[i] - 32;
+            signed char ch = string[i] - 32;
 
             if (ch >= 0)
             {
