@@ -152,7 +152,7 @@ Eigen::MatrixXd DiffIKWidget::readFollowManipulability() {
             matrix = Eigen::Matrix<double, 6, 6>();
         }
         else if (strList.size() == 3) {
-            matrix = Eigen::Matrix3d();
+            matrix = Eigen::Matrix3d::Identity();
         }
         else {
             return Eigen::Matrix<double, 0, 0>();
@@ -553,8 +553,11 @@ void DiffIKWidget::resetJointValues() {
 void DiffIKWidget::setAverageJointValues() {
     robot->setPropagatingJointValuesEnabled(false);
     for (auto node : robot->getRobotNodes()) {
-        if (node->isRotationalJoint())
+        if (node->isJoint()) 
+        {
             robot->setJointValue(node, (node->getJointLimitLo() + node->getJointLimitHi()) / 2.0f);
+        }
+
     }
     robot->setPropagatingJointValuesEnabled(true);
     robot->updatePose();
@@ -578,7 +581,7 @@ void DiffIKWidget::setRandomJointValues() {
     }
     for (const auto &name : robotNodeNames) {
         auto node = robot->getRobotNode(name);
-        if (node->isRotationalJoint()) {
+        if (node->isJoint()) {
             float jointValue = randomFloat(node->getJointLimitLo(), node->getJointLimitHi());
             if (!std::isnan(jointValue))
                 robot->setJointValue(node, jointValue);

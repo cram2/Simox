@@ -93,7 +93,7 @@ namespace VirtualRobot
             Returns all covered collision models.
         */
         std::vector< CollisionModelPtr > getCollisionModels();
-        std::vector< SceneObjectPtr > getSceneObjects();
+        const std::vector< SceneObjectPtr >& getSceneObjects();
 
         virtual unsigned int getSize() const;
         virtual SceneObjectPtr getSceneObject(unsigned int nr);
@@ -138,4 +138,3 @@ namespace VirtualRobot
     };
 
 } // namespace VirtualRobot
-

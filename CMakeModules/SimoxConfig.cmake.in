@@ -70,6 +70,7 @@ FIND_PACKAGE(Boost ${Simox_BOOST_VERSION} EXACT COMPONENTS
     regex
     QUIET)
 
+find_package(difflib QUIET)
 find_package(doctest QUIET)
 
 

@@ -3,6 +3,7 @@
 #include <map>
 #include <string>
 #include <stdexcept>
+#include <set>
 
 #include <boost/bimap.hpp>
 

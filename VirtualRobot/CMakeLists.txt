@@ -37,7 +37,13 @@ endif ()
 #### VISUALIZATION Coin3D+Qt+SoQt / OSG+Qt
 
 find_package(assimp REQUIRED)
-target_link_libraries(VirtualRobot PUBLIC assimp)
+add_library(assimp_interface INTERFACE)
+set_target_properties(assimp_interface PROPERTIES
+        INTERFACE_LINK_LIBRARIES assimp
+        INTERFACE_INCLUDE_DIRECTORIES "${ASSIMP_INCLUDE_DIRS}"
+        INTERFACE_LINK_DIRECTORIES "${ASSIMP_LIBRARY_DIRS}")
+target_link_libraries(VirtualRobot PUBLIC assimp_interface)
+
 
 if (Simox_USE_COIN_VISUALIZATION)
     MESSAGE(STATUS "Searching Coin3D, Qt and SoQt...")
@@ -821,7 +827,7 @@ SET_TARGET_PROPERTIES(VirtualRobot PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${Simox_L
 ############################ Setup for installation ###################################
 #######################################################################################
 
-install(TARGETS VirtualRobot
+install(TARGETS VirtualRobot assimp_interface
     # IMPORTANT: Add the library to the "export-set"
     EXPORT SimoxTargets
     RUNTIME DESTINATION bin COMPONENT bin

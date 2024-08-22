@@ -13,13 +13,16 @@
 #include "../ManipulationObject.h"
 #include "../Grasping/Grasp.h"
 #include "../Grasping/GraspSet.h"
+#include "MathTools.h"
 #include "SimoxUtility/math/periodic/periodic_clamp.h"
 #include "VirtualRobot.h"
 #include <VirtualRobot/Random.h>
+#include <cstddef>
 #include <fstream>
 #include <cmath>
 #include <cfloat>
 #include <climits>
+#include <ostream>
 #include <thread>
 
 #include <Eigen/Geometry>
@@ -1270,7 +1273,13 @@ namespace VirtualRobot
         return true;
     }
 
+
     void WorkspaceRepresentation::invalidateBehindRobot(const bool inverted)
+    {
+        invalidateRegion(inverted, MathTools::deg2rad(90), MathTools::deg2rad(90));
+    }
+
+    void WorkspaceRepresentation::invalidateRegion(const bool inverted, const float maxOpeningLeft, const float maxOpeningRight)
     {
         int step = 1;
 
@@ -1282,39 +1291,39 @@ namespace VirtualRobot
 
         for (int a = 0; a < numVoxels[0]; a += step)
         {
-            float voxelPositionX = minBounds[0] + (a + 0.5f) * size(0);
+            const float voxelPositionX = minBounds[0] + (a + 0.5f) * size(0);
 
             for (int b = 0; b < numVoxels[1]; b += step)
             {
 
-                float voxelPositionY = minBounds[1] + (b + 0.5f) * size(1);
+                const float voxelPositionY = minBounds[1] + (b + 0.5f) * size(1);
 
                 for(int c = 0; c < numVoxels[2]; c+= step)
                 {
                     if(inverted)
                     {
-                        if(voxelPositionX < 0)
+                        if(voxelPositionX <= 0)
                         {
                             data->reset(a,b,c);
+                            continue;
                         }  
 
-                        // 45 deg to the front for the other hands workspace
-                        // if(-voxelPositionY > voxelPositionX)
-                        if(voxelPositionY < 0)
+                        const float angle = std::atan2(voxelPositionY, voxelPositionX);
+                        if(angle > maxOpeningLeft or angle < -maxOpeningRight)
                         {
                             data->reset(a,b,c);
                         }
 
                     }else {
                     
-                        if(voxelPositionX > 0)
+                        if(voxelPositionX >= 0)
                         {
                             data->reset(a,b,c);
+                            continue;
                         }   
 
-                         // 45 deg to the front for the other hands workspace
-                        if(voxelPositionY < 0)
-                        // if(-voxelPositionY > -voxelPositionX)
+                        const float angle = std::atan2(voxelPositionY, voxelPositionX);
+                        if(angle <= (M_PI - maxOpeningRight) and angle >= (-M_PI + maxOpeningLeft))
                         {
                             data->reset(a,b,c);
                         }
@@ -1851,52 +1860,42 @@ namespace VirtualRobot
         return true;
     }
 
-    std::vector<WorkspaceRepresentation::WorkspaceCut2DTransformationPtr> WorkspaceRepresentation::createCutTransformations(WorkspaceRepresentation::WorkspaceCut2DPtr cutXY, RobotNodePtr referenceNode, const float maxAngle)
+    std::vector<WorkspaceRepresentation::WorkspaceCut2DTransformation> WorkspaceRepresentation::createCutTransformations(WorkspaceRepresentation::WorkspaceCut2DPtr cutXY, RobotNodePtr referenceNode, const float maxAngle)
     {
         THROW_VR_EXCEPTION_IF(!cutXY, "NULL data");
         (void) maxAngle;  // Unused.
 
-        std::vector<WorkspaceRepresentation::WorkspaceCut2DTransformationPtr> result;
+        const std::size_t nX = cutXY->entries.rows();
+        const std::size_t nY = cutXY->entries.cols();
 
-        //float x,y,z;
-        //z = cutXY->referenceGlobalPose(2,3);
+        std::vector<WorkspaceRepresentation::WorkspaceCut2DTransformation> result;
+        result.reserve(nX * nY);
 
-        int nX = cutXY->entries.rows();
-        int nY = cutXY->entries.cols();
+        const float sizeX = (cutXY->maxBounds[0] - cutXY->minBounds[0]) / static_cast<float>(nX);
+        const float sizeY = (cutXY->maxBounds[1] - cutXY->minBounds[1]) / static_cast<float>(nY);
 
-        float sizeX = (cutXY->maxBounds[0] - cutXY->minBounds[0]) / (float)nX;
-        float sizeY = (cutXY->maxBounds[1] - cutXY->minBounds[1]) / (float)nY;
-
-        for (int x = 0; x < nX; x++)
+        for (std::size_t x = 0; x < nX; x++)
         {
-            for (int y = 0; y < nY; y++)
+            for (std::size_t y = 0; y < nY; y++)
             {
                 int v = cutXY->entries(x, y);
 
                 if (v > 0)
                 {
-                    WorkspaceCut2DTransformationPtr tp(new WorkspaceCut2DTransformation());
-                    tp->value = v;
-                    float xPos = cutXY->minBounds[0] + (float)x * sizeX + 0.5f * sizeX; // center of voxel
-                    float yPos = cutXY->minBounds[1] + (float)y * sizeY + 0.5f * sizeY; // center of voxel
-                    tp->transformation = cutXY->referenceGlobalPose;
-                    tp->transformation(0, 3) = xPos;
-                    tp->transformation(1, 3) = yPos;
+                    WorkspaceCut2DTransformation tp;
+                    tp.value = v;
+                    float xPos = cutXY->minBounds[0] + static_cast<float>(x) * sizeX + 0.5f * sizeX; // center of voxel
+                    float yPos = cutXY->minBounds[1] + static_cast<float>(y) * sizeY + 0.5f * sizeY; // center of voxel
+                    tp.transformation = cutXY->referenceGlobalPose;
+                    tp.transformation(0, 3) = xPos;
+                    tp.transformation(1, 3) = yPos;
 
                     if (referenceNode)
                     {
-                        tp->transformation = referenceNode->toLocalCoordinateSystem(tp->transformation);
+                        tp.transformation = referenceNode->toLocalCoordinateSystem(tp.transformation);
                     }
 
-                    Eigen::Isometry3f pose(tp->transformation);
-
-                    float yaw = std::atan2(pose.translation().y(), pose.translation().x()) - M_PI_2f32;
-                    yaw = simox::math::periodic_clamp(yaw, -M_PIf32, M_PIf32);
-
-                    // if (yaw < maxAngle and yaw > -maxAngle)
-                    // {
-                        result.push_back(tp);
-                    // }
+                    result.push_back(tp);
                 }
             }
         }
@@ -2238,9 +2237,9 @@ namespace VirtualRobot
         }
 
         std::vector<std::thread> threads(numThreads);
-        unsigned int numPosesPerThread = loops / numThreads; // todo
+        std::size_t numPosesPerThread = loops / numThreads; // todo
 
-        for (unsigned int i = 0; i < numThreads; i++)
+        for (std::size_t i = 0; i < numThreads; i++)
         {
             threads[i] = std::thread([=, this] ()
             {
@@ -2264,18 +2263,18 @@ namespace VirtualRobot
                 }
 
                 // now sample some configs and add them to the workspace data
-                for (unsigned int j = 0; j < numPosesPerThread; j++)
+                for (std::size_t j = 0; j < numPosesPerThread; j++)
                 {
                     float rndValue;
                     float minJ, maxJ;
                     Eigen::VectorXf v(clonedNodeSet->getSize());
-                    float maxLoops = 1000;
+                    std::size_t maxLoops = 1000;
 
                     bool successfullyRandomized = false;
 
-                    for (int k = 0; k < maxLoops; k++)
+                    for (std::size_t k = 0; k < maxLoops; k++)
                     {
-                        for (unsigned int l = 0; l < clonedNodeSet->getSize(); l++)
+                        for (std::size_t l = 0; l < clonedNodeSet->getSize(); l++)
                         {
                             rndValue = RandomFloat(); // value from 0 to 1
                             minJ = (*nodeSet)[l]->getJointLimitLo();

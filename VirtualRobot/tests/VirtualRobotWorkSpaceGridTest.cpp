@@ -128,15 +128,15 @@ BOOST_AUTO_TEST_CASE(testWorkSpaceGrid)
     }
 
     // check transformations
-    std::vector<VirtualRobot::WorkspaceRepresentation::WorkspaceCut2DTransformationPtr> transformations = reach->createCutTransformations(cutXY, rootNode);
+    std::vector<VirtualRobot::WorkspaceRepresentation::WorkspaceCut2DTransformation> transformations = reach->createCutTransformations(cutXY, rootNode);
     BOOST_REQUIRE_EQUAL(transformations.size(), 1);
-    BOOST_REQUIRE_EQUAL(transformations.at(0)->value, 1);
-    VirtualRobot::MathTools::getPoseDiff(m, transformations.at(0)->transformation, diffPos, diffRot);
+    BOOST_REQUIRE_EQUAL(transformations.at(0).value, 1);
+    VirtualRobot::MathTools::getPoseDiff(m, transformations.at(0).transformation, diffPos, diffRot);
     BOOST_REQUIRE_LE(diffPos, discrTr3);
     BOOST_REQUIRE_LE(diffRot, discrRot3);
 
     // check m
-    Eigen::Matrix4f tmpPos2 = m * transformations.at(0)->transformation.inverse();
+    Eigen::Matrix4f tmpPos2 = m * transformations.at(0).transformation.inverse();
     VirtualRobot::MathTools::getPoseDiff(Eigen::Matrix4f::Identity(), tmpPos2, diffPos, diffRot);
     BOOST_REQUIRE_LE(diffPos, discrTr3);
     BOOST_REQUIRE_LE(diffRot, discrRot3);
@@ -145,7 +145,7 @@ BOOST_AUTO_TEST_CASE(testWorkSpaceGrid)
     // move pose by 500
     m2=m;
     m2(0,3) += 500.0f;
-    tmpPos2 = m2 * transformations.at(0)->transformation.inverse();
+    tmpPos2 = m2 * transformations.at(0).transformation.inverse();
     Eigen::Matrix4f tmpPos3 = Eigen::Matrix4f::Identity();
     tmpPos3(0,3) += 500.0f;
     VirtualRobot::MathTools::getPoseDiff(tmpPos3, tmpPos2, diffPos, diffRot);
@@ -155,7 +155,7 @@ BOOST_AUTO_TEST_CASE(testWorkSpaceGrid)
     // rotate pose by 90 degree
     m2 = VirtualRobot::MathTools::axisangle2eigen4f(Eigen::Vector3f(0,0,1), M_PI/2.0);
     m2(2,3) = m(2,3);
-    Eigen::Matrix4f invTr = transformations.at(0)->transformation.inverse();
+    Eigen::Matrix4f invTr = transformations.at(0).transformation.inverse();
     tmpPos2 = m2 * invTr;
     tmpPos3 = Eigen::Matrix4f::Identity();
     tmpPos3(0,3) = -80.0f; // the inverse (-40/80/-120) rotated by 90 degree around z

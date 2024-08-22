@@ -3,7 +3,11 @@ if (qwt_INCLUDE_DIR AND qwt_LIBRARIES)
     set(qwt_FOUND TRUE)
 else()
     if (NOT qwt_DIR)
-        set(qwt_DIR $ENV{QWT_DIR})
+        if (DEFINED ENV{QWT_DIR})
+            set(qwt_DIR $ENV{QWT_DIR})
+        elseif (DEFINED ENV{qwt_DIR})
+            set(qwt_DIR $ENV{qwt_DIR})
+        endif()
     endif (NOT qwt_DIR)
     find_path(qwt_INCLUDE_DIR qwt.h
         # installation selected by user
@@ -16,10 +20,8 @@ else()
     message(STATUS "qwt_DIR: ${qwt_DIR}")
     message(STATUS "qwt-Include: ${qwt_INCLUDE_DIR}")
 
-    set(qwtlibname qwt-qt5)
-
     find_library(qwt_LIBRARY
-                 NAMES ${qwtlibname}
+                 NAMES qwt qwt-qt5
                  PATHS ${qwt_DIR}/lib)
     message(STATUS "qwt-lib: ${qwt_LIBRARY}")
 

@@ -212,6 +212,12 @@ namespace VirtualRobot
         for (unsigned int i = 0; i < rns->getSize(); i++)
         {
             RobotNodePtr r = rns->getNode(i);
+
+            if(r->isLimitless())
+            {
+                continue;
+            }
+
             VR_ASSERT(r);
             float d = r->getJointLimitHi() - r->getJointLimitLo();
             d = d * d;

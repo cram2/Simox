@@ -491,8 +491,16 @@ namespace VirtualRobot
                     const RobotNodeFourBar* fourBarJoint = dynamic_cast<RobotNodeFourBar*>(dof.get());
 
                     const Eigen::Vector3f global_P_tcp = tcp->getGlobalPosition().cast<float>();
-                    
-                    const auto jacobianInBase = fourBarJoint->getJacobian(global_P_tcp).cast<float>(); 
+
+                    const four_bar::Joint::Jacobian jacobianInBaseD = fourBarJoint->getJacobian(global_P_tcp);
+                    Eigen::Vector3f jacobianInBase = jacobianInBaseD.cast<float>();
+
+                    if (convertMMtoM) // positional part
+                    {
+                        jacobianInBase(0) /= 1000.f;
+                        jacobianInBase(1) /= 1000.f;
+                    }
+
                     axis = fourBarJoint->getJointRotationAxis(coordSystem);
 
                     // if necessary calculate the position part of the Jacobian
@@ -520,19 +528,10 @@ namespace VirtualRobot
                                     - dof->getGlobalPose().block(0, 3, 3, 1);
                         }
 
-                        if (convertMMtoM)
-                        {
-                            toTCP /= 1000.0f;
-                        }
-
-                        const Eigen::Vector3f jacobianPosInBaseFrame{jacobianInBase(0) / 1000, jacobianInBase(1) / 1000, 0};
+                        const Eigen::Vector3f jacobianPosInBaseFrame{jacobianInBase(0), jacobianInBase(1), 0};
                         const Eigen::Vector3f jacobianPosInRefFrame = ref_R_base * jacobianPosInBaseFrame;
-                        
 
-                        //cout << "toTCP: " << tcp->getName() << std::endl;
-                        //cout << toTCP << std::endl;
-                        // tmpUpdateJacobianPosition.block(0, i, 3, 1) = axis.cross(toTCP);
-                        tmpUpdateJacobianPosition.block(0, i, 3, 1) = jacobianPosInRefFrame;
+                        tmpUpdateJacobianPosition.block<3,1>(0, i) = jacobianPosInRefFrame;
                     }
 
                     // and the orientation part

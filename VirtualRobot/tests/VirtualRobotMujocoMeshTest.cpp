@@ -65,7 +65,7 @@ BOOST_FIXTURE_TEST_CASE(test_consistency_after_read, Fixture)
 
 BOOST_FIXTURE_TEST_CASE(test_write_consistency, Fixture)
 {
-    Eigen::Matrix<float, 3, 2> bb;
+    Eigen::Matrix<float, 3, 2> bb = Eigen::Matrix<float, 3, 2>::Zero();
     BOOST_CHECK_NO_THROW(bb = mesh.getVertexPositionsBoundingBox());
 
     Eigen::Vector3f min = bb.col(0);

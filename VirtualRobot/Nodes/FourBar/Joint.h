@@ -5,7 +5,6 @@
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
-
 namespace VirtualRobot::four_bar
 {
 
@@ -17,7 +16,7 @@ namespace VirtualRobot::four_bar
 
         struct Dimensions;
 
-        Joint(double theta0, const Dimensions& dimensions);
+        Joint(const Dimensions& dimensions);
 
         struct Dimensions
         {
@@ -55,15 +54,31 @@ namespace VirtualRobot::four_bar
         // compute pose of actuated joint in passive joint frame
         Eigen::Isometry3d computeFk(double theta) const;
 
+        // compute pose of actuated joint in passive base frame (both active and passive rotations are being applied)
+        Eigen::Isometry3d computeFkCombined(double theta) const;
+
         Jacobian getJacobian(double theta, const Eigen::Vector3d& base_P_eef) const;
 
         // Eigen::Vector2d angleToPosition(const Eigen::Vector2d& alpha) const;
 
+        /**
+         * @brief Use this function to obtain the velocity induced by the ankle motion at the knee
+         * 
+         * Let theta be the knee joint and psi be the ankle joint. Then we assume that you have the velocity of the knee joint as dtheta/dt
+         * 
+         * This function provides you with dpsi/dtheta.
+         * 
+         * Then, it is:
+         * => dpsi/dt = dpsi/dtheta * dtheta/dt 
+         * 
+         * @param kneeAngle 
+         * @return double 
+         */
+        double calculate_dAnkle_dKnee(double kneeAngle);
 
-    // private:
-        const double theta0;
+
+        // private:
         const Dimensions dims;
-
     };
 
 } // namespace VirtualRobot::four_bar

@@ -1,35 +1,37 @@
 
 #include "RobotIO.h"
-#include "../RobotFactory.h"
-#include "../RobotNodeSet.h"
-#include "../VirtualRobotException.h"
+
+#include <fstream>
+#include <iostream>
+#include <vector>
+
+#include <SimoxUtility/algorithm/string/string_tools.h>
+#include <SimoxUtility/filesystem/remove_trailing_separator.h>
+#include <SimoxUtility/math/convert/deg_to_rad.h>
+#include <SimoxUtility/xml/rapidxml/rapidxml_print.hpp>
+#include <VirtualRobot/Import/RobotImporterFactory.h>
+#include <VirtualRobot/Nodes/FourBar/Joint.h>
+
 #include "../CollisionDetection/CollisionModel.h"
 #include "../EndEffector/EndEffector.h"
 #include "../EndEffector/EndEffectorActor.h"
 #include "../Nodes/RobotNodeFactory.h"
-#include "../Nodes/RobotNodeHemisphere.h"
 #include "../Nodes/RobotNodeFixedFactory.h"
+#include "../Nodes/RobotNodeHemisphere.h"
 #include "../Nodes/RobotNodePrismatic.h"
+#include "../RobotConfig.h"
+#include "../RobotFactory.h"
+#include "../RobotNodeSet.h"
+#include "../RuntimeEnvironment.h"
 #include "../Transformation/DHParameter.h"
+#include "../VirtualRobotException.h"
+#include "../Visualization/TriMeshModel.h"
 #include "../Visualization/VisualizationFactory.h"
 #include "../Visualization/VisualizationNode.h"
-#include "../Visualization/TriMeshModel.h"
-#include "../RobotConfig.h"
-#include "../RuntimeEnvironment.h"
 #include "Nodes/RobotNodeFourBar.h"
 #include "VirtualRobot.h"
-#include "rapidxml.hpp"
 #include "mujoco/RobotMjcf.h"
-#include <VirtualRobot/Import/URDF/SimoxURDFFactory.h>
-#include <VirtualRobot/Nodes/FourBar/Joint.h>
-#include <SimoxUtility/xml/rapidxml/rapidxml_print.hpp>
-#include <SimoxUtility/filesystem/remove_trailing_separator.h>
-#include <SimoxUtility/math/convert/deg_to_rad.h>
-#include <SimoxUtility/algorithm/string/string_tools.h>
-
-#include <vector>
-#include <fstream>
-#include <iostream>
+#include "rapidxml.hpp"
 
 namespace VirtualRobot
 {
@@ -37,15 +39,13 @@ namespace VirtualRobot
 
     std::map<std::string, int> RobotIO::robot_name_counter;
 
-    RobotIO::RobotIO()
-        = default;
+    RobotIO::RobotIO() = default;
 
-    RobotIO::~RobotIO()
-        = default;
+    RobotIO::~RobotIO() = default;
 
-
-
-    void RobotIO::processChildNode(rapidxml::xml_node<char>* childXMLNode, std::vector<std::string>& childrenNames)
+    void
+    RobotIO::processChildNode(rapidxml::xml_node<char>* childXMLNode,
+                              std::vector<std::string>& childrenNames)
     {
         THROW_VR_EXCEPTION_IF(!childXMLNode, "NULL data for childXMLNode in processChildNode()")
 
@@ -57,11 +57,15 @@ namespace VirtualRobot
         childrenNames.push_back(s);
     }
 
-    void RobotIO::processChildFromRobotNode(rapidxml::xml_node<char>* childXMLNode, const std::string& nodeName, std::vector< ChildFromRobotDef >& childrenFromRobot)
+    void
+    RobotIO::processChildFromRobotNode(rapidxml::xml_node<char>* childXMLNode,
+                                       const std::string& nodeName,
+                                       std::vector<ChildFromRobotDef>& childrenFromRobot)
     {
         rapidxml::xml_attribute<>* attr;
 
-        THROW_VR_EXCEPTION_IF(!childXMLNode, "NULL data for childXMLNode in processChildFromRobotNode()")
+        THROW_VR_EXCEPTION_IF(!childXMLNode,
+                              "NULL data for childXMLNode in processChildFromRobotNode()")
 
         ChildFromRobotDef d;
 
@@ -87,9 +91,10 @@ namespace VirtualRobot
             fileXMLNode = fileXMLNode->next_sibling("file", 0, false);
         }
 
-        THROW_VR_EXCEPTION_IF(((!counter) == 0), "Missing file for <ChildFromRobot> tag (in node '" << nodeName << "')." << endl);
+        THROW_VR_EXCEPTION_IF(((!counter) == 0),
+                              "Missing file for <ChildFromRobot> tag (in node '" << nodeName
+                                                                                 << "')." << endl);
     }
-
 
     /**
      * This method processes Limits tags.
@@ -98,7 +103,12 @@ namespace VirtualRobot
      *
      * The values are stored in \p jointLimitLo and \p jointLimitHi
      */
-    void RobotIO::processLimitsNode(rapidxml::xml_node<char>* limitsXMLNode, float& jointLimitLo, float& jointLimitHi, bool& limitless)
+    void
+    RobotIO::processLimitsNode(rapidxml::xml_node<char>* limitsXMLNode,
+                               float& jointLimitLo,
+                               float& jointLimitHi,
+                               bool& limitless,
+                               bool& allowJointLimitAvoidance)
     {
         THROW_VR_EXCEPTION_IF(!limitsXMLNode, "NULL data for limitsXMLNode in processLimitsNode()");
 
@@ -112,14 +122,16 @@ namespace VirtualRobot
         {
             if (unit.isLength())
             {
-                VR_WARNING << "No 'lo' attribute in <Limits> tag. Assuming -1000 [mm]." << std::endl;
+                VR_WARNING << "No 'lo' attribute in <Limits> tag. Assuming -1000 [mm]."
+                           << std::endl;
                 jointLimitLo = -1000.0f;
                 unit = Units("mm");
             }
             else
             {
-                VR_WARNING << "No 'lo' attribute in <Limits> tag. Assuming -180 [deg]." << std::endl;
-                jointLimitLo = float(-M_PI);
+                VR_WARNING << "No 'lo' attribute in <Limits> tag. Assuming -180 [deg]."
+                           << std::endl;
+                jointLimitLo = -M_PIf32;
                 unit = Units("rad");
             }
         }
@@ -139,7 +151,7 @@ namespace VirtualRobot
             else
             {
                 VR_WARNING << "No 'hi' attribute in <Limits> tag. Assuming 180 [deg]." << std::endl;
-                jointLimitHi = float(M_PI);
+                jointLimitHi = M_PIf32;
                 unit = Units("rad");
             }
         }
@@ -164,36 +176,50 @@ namespace VirtualRobot
         if (llAttr != nullptr)
         {
             limitless = isTrue(llAttr->value());
-            if (limitless && unit.isAngle() && (unit.toDegree(jointLimitHi) - unit.toDegree(jointLimitLo) != 360))
+            if (limitless && unit.isAngle() &&
+                (unit.toDegree(jointLimitHi) - unit.toDegree(jointLimitLo) != 360))
             {
-                VR_WARNING << "Limitless Joint: Angular distance between 'lo' and 'hi' attributes should equal 2*pi [rad] or 360 [deg]." << endl
+                VR_WARNING << "Limitless Joint: Angular distance between 'lo' and 'hi' attributes "
+                              "should equal 2*pi [rad] or 360 [deg]."
+                           << endl
                            << "Setting 'lo' to -pi and 'hi' to pi [rad]..." << std::endl;
-                jointLimitLo = float(-M_PI);
-                jointLimitHi = float(M_PI);
+                jointLimitLo = -M_PIf32;
+                jointLimitHi = M_PIf32;
             }
         }
 
+        rapidxml::xml_attribute<>* llAllowAvoidance =
+            limitsXMLNode->first_attribute("allowAvoidance");
+        if (llAllowAvoidance != nullptr)
+        {
+            allowJointLimitAvoidance = isTrue(llAllowAvoidance->value());
+        }
     }
 
-    RobotNodePtr RobotIO::processJointNode(rapidxml::xml_node<char>* jointXMLNode, const std::string& robotNodeName,
-                                           RobotPtr robot,
-                                           VisualizationNodePtr visualizationNode,
-                                           CollisionModelPtr collisionModel,
-                                           SceneObject::Physics& physics,
-                                           RobotNode::RobotNodeType rntype,
-                                           Eigen::Matrix4f& transformationMatrix
-                                          )
+    RobotNodePtr
+    RobotIO::processJointNode(rapidxml::xml_node<char>* jointXMLNode,
+                              const std::string& robotNodeName,
+                              RobotPtr robot,
+                              VisualizationNodePtr visualizationNode,
+                              CollisionModelPtr collisionModel,
+                              SceneObject::Physics& physics,
+                              RobotNode::RobotNodeType rntype,
+                              Eigen::Matrix4f& transformationMatrix)
     {
-        float jointLimitLow = float(- M_PI);
-        float jointLimitHigh = float(M_PI);
-        bool limitless = false;
+        static const float jointLimitLowDefault = -M_PIf32;
+        static const float jointLimitHighDefault = M_PIf32;
 
-        Eigen::Matrix4f preJointTransform = transformationMatrix;//Eigen::Matrix4f::Identity();
+        std::optional<float> jointLimitLow;
+        std::optional<float> jointLimitHigh;
+        bool limitless = false;
+        bool allowJointLimitAvoidance = true;
+
+        Eigen::Matrix4f preJointTransform = transformationMatrix; //Eigen::Matrix4f::Identity();
         Eigen::Vector3f axis = Eigen::Vector3f::Zero();
         Eigen::Vector3f translationDir = Eigen::Vector3f::Zero();
 
-        std::vector< std::string > propagateJVName;
-        std::vector< float > propagateJVFactor;
+        std::vector<std::string> propagateJVName;
+        std::vector<float> propagateJVFactor;
 
         rapidxml::xml_attribute<>* attr;
         float jointOffset = 0.0f;
@@ -203,14 +229,23 @@ namespace VirtualRobot
         {
             // no <Joint> tag -> fixed joint
             RobotNodePtr robotNode;
-            RobotNodeFactoryPtr fixedNodeFactory = RobotNodeFactory::fromName(RobotNodeFixedFactory::getName(), nullptr);
+            RobotNodeFactoryPtr fixedNodeFactory =
+                RobotNodeFactory::fromName(RobotNodeFixedFactory::getName(), nullptr);
             if (fixedNodeFactory)
             {
                 robotNode = fixedNodeFactory->createRobotNode(
-                            robot, robotNodeName, visualizationNode, collisionModel,
-                            jointLimitLow, jointLimitHigh, jointOffset,
-                            preJointTransform, axis, translationDir,
-                            physics, rntype);
+                    robot,
+                    robotNodeName,
+                    visualizationNode,
+                    collisionModel,
+                    jointLimitLow.value_or(jointLimitLowDefault),
+                    jointLimitHigh.value_or(jointLimitHighDefault),
+                    jointOffset,
+                    preJointTransform,
+                    axis,
+                    translationDir,
+                    physics,
+                    rntype);
             }
             return robotNode;
         }
@@ -224,7 +259,8 @@ namespace VirtualRobot
         else
         {
             VR_WARNING << "No 'type' attribute for <Joint> tag. "
-                       << "Assuming fixed joint for RobotNode " << robotNodeName << "!" << std::endl;
+                       << "Assuming fixed joint for RobotNode " << robotNodeName << "!"
+                       << std::endl;
             jointType = RobotNodeFixedFactory::getName();
         }
 
@@ -247,7 +283,9 @@ namespace VirtualRobot
 
         float maxVelocity = -1.0f; // m/s
         float maxAcceleration = -1.0f; // m/s^2
+        float maxDeceleration = -1.0f; // m/s^2
         float maxTorque = -1.0f; // Nm
+        float maxJerk = -1.0f;
         bool scaleVisu = false;
         Eigen::Vector3f scaleVisuFactor = Eigen::Vector3f::Zero();
 
@@ -261,37 +299,54 @@ namespace VirtualRobot
             if (nodeName == "dh")
             {
                 THROW_VR_EXCEPTION("DH specification in Joint tag is DEPRECATED! "
-                                   "Use <RobotNode><Transform><DH>...</DH></Transform><Joint>...</Joint></RobotNode> structure.")
+                                   "Use "
+                                   "<RobotNode><Transform><DH>...</DH></Transform><Joint>...</"
+                                   "Joint></RobotNode> structure.")
                 //THROW_VR_EXCEPTION_IF(dhXMLNode, "Multiple DH definitions in <Joint> tag of robot node <" << robotNodeName << ">." << endl);
                 //dhXMLNode = node;
             }
             else if (nodeName == "limits")
             {
-                THROW_VR_EXCEPTION_IF(limitsNode, "Multiple limits definitions in <Joint> tag of robot node <" << robotNodeName << ">." << endl);
+                THROW_VR_EXCEPTION_IF(limitsNode,
+                                      "Multiple limits definitions in <Joint> tag of robot node <"
+                                          << robotNodeName << ">." << endl);
                 limitsNode = node;
-                processLimitsNode(limitsNode, jointLimitLow, jointLimitHigh, limitless);
+                processLimitsNode(limitsNode,
+                                  jointLimitLow.emplace(),
+                                  jointLimitHigh.emplace(),
+                                  limitless,
+                                  allowJointLimitAvoidance);
             }
             else if (nodeName == "prejointtransform")
             {
-                THROW_VR_EXCEPTION("PreJointTransform is DEPRECATED! "
-                                   "Use <RobotNode><Transform>...</Transform><Joint>...</Joint></RobotNode> structure")
+                THROW_VR_EXCEPTION(
+                    "PreJointTransform is DEPRECATED! "
+                    "Use <RobotNode><Transform>...</Transform><Joint>...</Joint></RobotNode> "
+                    "structure")
                 //THROW_VR_EXCEPTION_IF(prejointTransformNode, "Multiple preJoint definitions in <Joint> tag of robot node <" << robotNodeName << ">." << endl);
                 //prejointTransformNode = node;
             }
             else if (nodeName == "axis")
             {
-                THROW_VR_EXCEPTION_IF(tmpXMLNodeAxis, "Multiple axis definitions in <Joint> tag of robot node <" << robotNodeName << ">." << endl);
+                THROW_VR_EXCEPTION_IF(tmpXMLNodeAxis,
+                                      "Multiple axis definitions in <Joint> tag of robot node <"
+                                          << robotNodeName << ">." << endl);
                 tmpXMLNodeAxis = node;
             }
             else if (nodeName == "translationdirection")
             {
-                THROW_VR_EXCEPTION_IF(tmpXMLNodeTranslation, "Multiple translation definitions in <Joint> tag of robot node <" << robotNodeName << ">." << endl);
+                THROW_VR_EXCEPTION_IF(
+                    tmpXMLNodeTranslation,
+                    "Multiple translation definitions in <Joint> tag of robot node <"
+                        << robotNodeName << ">." << endl);
                 tmpXMLNodeTranslation = node;
             }
             else if (nodeName == "postjointtransform")
             {
-                THROW_VR_EXCEPTION("postjointtransform is DEPRECATED and not longer allowed! "
-                                   "Use <RobotNode><Transform>...</Transform><Joint>...</Joint></RobotNode> structure")
+                THROW_VR_EXCEPTION(
+                    "postjointtransform is DEPRECATED and not longer allowed! "
+                    "Use <RobotNode><Transform>...</Transform><Joint>...</Joint></RobotNode> "
+                    "structure")
                 //THROW_VR_EXCEPTION_IF(postjointTransformNode, "Multiple postjointtransform definitions in <Joint> tag of robot node <" << robotNodeName << ">." << endl);
                 //postjointTransformNode = node;
             }
@@ -300,7 +355,7 @@ namespace VirtualRobot
                 maxVelocity = getFloatByAttributeName(node, "value");
 
                 // convert to m/s
-                std::vector< Units > unitsAttr = getUnitsAttributes(node);
+                std::vector<Units> unitsAttr = getUnitsAttributes(node);
                 Units uTime("sec");
                 Units uLength("m");
                 Units uAngle("rad");
@@ -346,14 +401,13 @@ namespace VirtualRobot
                 }
 
                 maxVelocity *= factor;
-
             }
             else if (nodeName == "maxacceleration")
             {
                 maxAcceleration = getFloatByAttributeName(node, "value");
 
                 // convert to m/s^2
-                std::vector< Units > unitsAttr = getUnitsAttributes(node);
+                std::vector<Units> unitsAttr = getUnitsAttributes(node);
                 Units uTime("sec");
                 Units uLength("m");
                 Units uAngle("rad");
@@ -399,13 +453,116 @@ namespace VirtualRobot
                 }
 
                 maxAcceleration *= factor;
+            }
+            else if (nodeName == "maxdeceleration")
+            {
+                maxDeceleration = getFloatByAttributeName(node, "value");
 
+                // convert to m/s^2
+                std::vector<Units> unitsAttr = getUnitsAttributes(node);
+                Units uTime("sec");
+                Units uLength("m");
+                Units uAngle("rad");
+
+                for (auto& i : unitsAttr)
+                {
+                    if (i.isTime())
+                    {
+                        uTime = i;
+                    }
+
+                    if (i.isLength())
+                    {
+                        uLength = i;
+                    }
+
+                    if (i.isAngle())
+                    {
+                        uAngle = i;
+                    }
+                }
+
+                float factor = 1.0f;
+
+                if (uTime.isMinute())
+                {
+                    factor /= 3600.0f;
+                }
+
+                if (uTime.isHour())
+                {
+                    factor /= 12960000.0f;
+                }
+
+                if (uLength.isMillimeter())
+                {
+                    factor *= 0.001f;
+                }
+
+                if (uAngle.isDegree())
+                {
+                    factor *= float(M_PI / 180.0);
+                }
+
+                maxDeceleration *= factor;
+            }
+            else if (nodeName == "maxjerk")
+            {
+                maxJerk = getFloatByAttributeName(node, "value");
+
+                // convert to m/s^3
+                std::vector<Units> unitsAttr = getUnitsAttributes(node);
+                Units uTime("sec");
+                Units uLength("m");
+                Units uAngle("rad");
+
+                for (auto& i : unitsAttr)
+                {
+                    if (i.isTime())
+                    {
+                        uTime = i;
+                    }
+
+                    if (i.isLength())
+                    {
+                        uLength = i;
+                    }
+
+                    if (i.isAngle())
+                    {
+                        uAngle = i;
+                    }
+                }
+
+                float factor = 1.0f;
+
+                if (uTime.isMinute())
+                {
+                    factor /= std::pow<float>(60.0f, 3.f);
+                }
+
+                if (uTime.isHour())
+                {
+                    factor /= std::pow<float>(3600.f, 3.f);
+                }
+
+                if (uLength.isMillimeter())
+                {
+                    factor *= 0.001f;
+                }
+
+                if (uAngle.isDegree())
+                {
+                    factor *= float(M_PI / 180.0);
+                }
+
+                maxJerk *= factor;
             }
             else if (nodeName == "maxtorque")
             {
                 maxTorque = getFloatByAttributeName(node, "value");
                 // convert to Nm
-                std::vector< Units > unitsAttr = getUnitsAttributes(node);
+                std::vector<Units> unitsAttr = getUnitsAttributes(node);
                 Units uLength("m");
 
                 for (auto& i : unitsAttr)
@@ -429,7 +586,9 @@ namespace VirtualRobot
             {
                 rapidxml::xml_attribute<>* attrPropa;
                 attrPropa = node->first_attribute("name", 0, false);
-                THROW_VR_EXCEPTION_IF(!attrPropa, "Expecting 'name' attribute in <PropagateJointValue> tag..." << endl);
+                THROW_VR_EXCEPTION_IF(!attrPropa,
+                                      "Expecting 'name' attribute in <PropagateJointValue> tag..."
+                                          << endl);
 
                 std::string s(attrPropa->value());
                 propagateJVName.push_back(s);
@@ -467,12 +626,13 @@ namespace VirtualRobot
 
                 switch (hemisphere->role)
                 {
-                case RobotNodeHemisphere::Role::FIRST:
-                    hemisphere->lever = getFloatByAttributeName(node, "lever");
-                    hemisphere->theta0Rad = simox::math::deg_to_rad(getFloatByAttributeName(node, "theta0"));
-                    break;
-                case RobotNodeHemisphere::Role::SECOND:
-                    break;
+                    case RobotNodeHemisphere::Role::FIRST:
+                        hemisphere->lever = getFloatByAttributeName(node, "lever");
+                        hemisphere->theta0Rad =
+                            simox::math::deg_to_rad(getFloatByAttributeName(node, "theta0"));
+                        break;
+                    case RobotNodeHemisphere::Role::SECOND:
+                        break;
                 }
             }
             else if (nodeName == "four_bar")
@@ -490,28 +650,28 @@ namespace VirtualRobot
                     THROW_VR_EXCEPTION("Invalid role in four_bar joint: " << e.what())
                 }
 
-                const rapidxml::xml_node<>* dimensionsNode = node->first_node("dimensions", 0, false);
+                const rapidxml::xml_node<>* dimensionsNode =
+                    node->first_node("dimensions", 0, false);
 
-                if(fourBarXmlInfo->role == RobotNodeFourBar::Role::ACTIVE)
+                if (fourBarXmlInfo->role == RobotNodeFourBar::Role::ACTIVE)
                 {
-                    if(dimensionsNode == nullptr)
+                    if (dimensionsNode == nullptr)
                     {
                         THROW_VR_EXCEPTION("Missing <dimensions> node for four_bar joint.");
                     }
-                
-                    fourBarXmlInfo->dimensions = four_bar::Joint::Dimensions
-                    {
+
+                    fourBarXmlInfo->dimensions = four_bar::Joint::Dimensions{
                         .shank = getFloatByAttributeName(dimensionsNode, "shank"),
                         .p1 = getFloatByAttributeName(dimensionsNode, "p1"),
                         .p2 = getFloatByAttributeName(dimensionsNode, "p2"),
-                        .p3 = getFloatByAttributeName(dimensionsNode, "p3")
-                    };
+                        .p3 = getFloatByAttributeName(dimensionsNode, "p3")};
                 }
-                
             }
             else
             {
-                THROW_VR_EXCEPTION("XML definition <" << nodeName << "> not supported in <Joint> tag of RobotNode <" << robotNodeName << ">." << endl);
+                THROW_VR_EXCEPTION("XML definition <"
+                                   << nodeName << "> not supported in <Joint> tag of RobotNode <"
+                                   << robotNodeName << ">." << endl);
             }
 
             node = node->next_sibling();
@@ -562,7 +722,10 @@ namespace VirtualRobot
             }
             else
             {
-                THROW_VR_EXCEPTION("Prismatic joint '" << robotNodeName << "' wrongly defined, expecting 'TranslationDirection' tag." << endl);
+                THROW_VR_EXCEPTION("Prismatic joint '"
+                                   << robotNodeName
+                                   << "' wrongly defined, expecting 'TranslationDirection' tag."
+                                   << endl);
             }
 
             if (scaleVisu)
@@ -586,12 +749,19 @@ namespace VirtualRobot
             } else
             {*/
             // create nodes that are not defined via DH parameters
-            robotNode = robotNodeFactory->createRobotNode(
-                        robot, robotNodeName, visualizationNode, collisionModel,
-                        jointLimitLow, jointLimitHigh, jointOffset,
-                        preJointTransform, axis, translationDir,
-                        physics, rntype
-                        );
+            robotNode =
+                robotNodeFactory->createRobotNode(robot,
+                                                  robotNodeName,
+                                                  visualizationNode,
+                                                  collisionModel,
+                                                  jointLimitLow.value_or(jointLimitLowDefault),
+                                                  jointLimitHigh.value_or(jointLimitHighDefault),
+                                                  jointOffset,
+                                                  preJointTransform,
+                                                  axis,
+                                                  translationDir,
+                                                  physics,
+                                                  rntype);
             //}
         }
         else
@@ -601,8 +771,11 @@ namespace VirtualRobot
 
         robotNode->setMaxVelocity(maxVelocity);
         robotNode->setMaxAcceleration(maxAcceleration);
+        robotNode->setMaxDeceleration(maxDeceleration);
         robotNode->setMaxTorque(maxTorque);
+        robotNode->setMaxJerk(maxJerk);
         robotNode->setLimitless(limitless);
+        robotNode->setAllowJointLimitAvoidance(allowJointLimitAvoidance);
 
         robotNode->jointValue = initialvalue;
 
@@ -620,10 +793,12 @@ namespace VirtualRobot
         if (robotNode->isHemisphereJoint() and hemisphere.has_value())
         {
             RobotNodeHemispherePtr node = std::dynamic_pointer_cast<RobotNodeHemisphere>(robotNode);
+            hemisphere->limitLoRadians = jointLimitLow;
+            hemisphere->limitHiRadians = jointLimitHigh;
             node->setXmlInfo(hemisphere.value());
         }
 
-        if(robotNode->isFourBarJoint() and fourBarXmlInfo.has_value())
+        if (robotNode->isFourBarJoint() and fourBarXmlInfo.has_value())
         {
             auto node = std::dynamic_pointer_cast<RobotNodeFourBar>(robotNode);
             node->setXmlInfo(fourBarXmlInfo.value());
@@ -648,16 +823,15 @@ namespace VirtualRobot
         return robotNode;
     }
 
-
-
-    RobotNodePtr RobotIO::processRobotNode(rapidxml::xml_node<char>* robotNodeXMLNode,
-                                           RobotPtr robo,
-                                           const std::string& basePath,
-                                           int& robotNodeCounter,
-                                           std::vector< std::string >& childrenNames,
-                                           std::vector< ChildFromRobotDef >& childrenFromRobot,
-                                           RobotDescription loadMode,
-                                           RobotNode::RobotNodeType rntype)
+    RobotNodePtr
+    RobotIO::processRobotNode(rapidxml::xml_node<char>* robotNodeXMLNode,
+                              RobotPtr robo,
+                              const std::string& basePath,
+                              int& robotNodeCounter,
+                              std::vector<std::string>& childrenNames,
+                              std::vector<ChildFromRobotDef>& childrenFromRobot,
+                              RobotDescription loadMode,
+                              RobotNode::RobotNodeType rntype)
     {
         childrenFromRobot.clear();
         THROW_VR_EXCEPTION_IF(!robotNodeXMLNode, "NULL data in processRobotNode");
@@ -671,7 +845,8 @@ namespace VirtualRobot
             ss << robo->getType() << "_Node_" << robotNodeCounter;
             robotNodeName = ss.str();
             robotNodeCounter++;
-            VR_WARNING << "RobotNode definition expects attribute 'name'. Setting name to " << robotNodeName << std::endl;
+            VR_WARNING << "RobotNode definition expects attribute 'name'. Setting name to "
+                       << robotNodeName << std::endl;
         }
 
 
@@ -696,7 +871,7 @@ namespace VirtualRobot
         rapidxml::xml_node<>* node = robotNodeXMLNode->first_node();
         rapidxml::xml_node<>* jointNodeXML = nullptr;
 
-        std::vector< rapidxml::xml_node<>* > sensorTags;
+        std::vector<rapidxml::xml_node<>*> sensorTags;
         std::vector<GraspSetPtr> graspSets;
 
         while (node)
@@ -707,34 +882,44 @@ namespace VirtualRobot
             {
                 if (loadMode == eFull || loadMode == eFullVisAsCol)
                 {
-                    THROW_VR_EXCEPTION_IF(visuProcessed, "Two visualization tags defined in RobotNode '" << robotNodeName << "'." << endl);
-                    visualizationNode = processVisualizationTag(node, robotNodeName, basePath, useAsColModel);
+                    THROW_VR_EXCEPTION_IF(visuProcessed,
+                                          "Two visualization tags defined in RobotNode '"
+                                              << robotNodeName << "'." << endl);
+                    visualizationNode =
+                        processVisualizationTag(node, robotNodeName, basePath, useAsColModel);
                     visuProcessed = true;
 
                     if (useAsColModel && visualizationNode)
                     {
-                        THROW_VR_EXCEPTION_IF(colProcessed, "Two collision tags defined in RobotNode '" << robotNodeName << "'." << endl);
+                        THROW_VR_EXCEPTION_IF(colProcessed,
+                                              "Two collision tags defined in RobotNode '"
+                                                  << robotNodeName << "'." << endl);
                         std::string colModelName = robotNodeName;
                         colModelName += "_VISU_ColModel";
                         // clone model
                         VisualizationNodePtr visualizationNodeClone = visualizationNode->clone();
                         // todo: ID?
-                        collisionModel.reset(new CollisionModel(visualizationNodeClone, colModelName, CollisionCheckerPtr()));
+                        collisionModel.reset(new CollisionModel(
+                            visualizationNodeClone, colModelName, CollisionCheckerPtr()));
                         colProcessed = true;
                     }
                 }
                 else if (loadMode == eCollisionModel)
                 {
-                    VisualizationNodePtr visualizationNodeCM = checkUseAsColModel(node, robotNodeName, basePath);
+                    VisualizationNodePtr visualizationNodeCM =
+                        checkUseAsColModel(node, robotNodeName, basePath);
 
                     if (visualizationNodeCM)
                     {
                         useAsColModel = true;
-                        THROW_VR_EXCEPTION_IF(colProcessed, "Two collision tags defined in RobotNode '" << robotNodeName << "'." << endl);
+                        THROW_VR_EXCEPTION_IF(colProcessed,
+                                              "Two collision tags defined in RobotNode '"
+                                                  << robotNodeName << "'." << endl);
                         std::string colModelName = robotNodeName;
                         colModelName += "_VISU_ColModel";
                         // todo: ID?
-                        collisionModel.reset(new CollisionModel(visualizationNodeCM, colModelName, CollisionCheckerPtr()));
+                        collisionModel.reset(new CollisionModel(
+                            visualizationNodeCM, colModelName, CollisionCheckerPtr()));
                         colProcessed = true;
                     }
                 }
@@ -750,7 +935,9 @@ namespace VirtualRobot
             {
                 if (loadMode == eFull || loadMode == eCollisionModel || loadMode == eFullVisAsCol)
                 {
-                    THROW_VR_EXCEPTION_IF(colProcessed, "Two collision tags defined in RobotNode '" << robotNodeName << "'." << endl);
+                    THROW_VR_EXCEPTION_IF(colProcessed,
+                                          "Two collision tags defined in RobotNode '"
+                                              << robotNodeName << "'." << endl);
                     collisionModel = processCollisionTag(node, robotNodeName, basePath);
                     colProcessed = true;
                 }
@@ -775,12 +962,16 @@ namespace VirtualRobot
             }
             else if (nodeName == "joint")
             {
-                THROW_VR_EXCEPTION_IF(jointNodeXML, "Two joint tags defined in RobotNode '" << robotNodeName << "'." << endl);
+                THROW_VR_EXCEPTION_IF(jointNodeXML,
+                                      "Two joint tags defined in RobotNode '" << robotNodeName
+                                                                              << "'." << endl);
                 jointNodeXML = node;
             }
             else if (nodeName == "physics")
             {
-                THROW_VR_EXCEPTION_IF(physicsDefined, "Two physics tags defined in RobotNode '" << robotNodeName << "'." << endl);
+                THROW_VR_EXCEPTION_IF(physicsDefined,
+                                      "Two physics tags defined in RobotNode '" << robotNodeName
+                                                                                << "'." << endl);
                 processPhysicsTag(node, robotNodeName, physics);
                 physicsDefined = true;
             }
@@ -795,13 +986,15 @@ namespace VirtualRobot
             else if (nodeName == "graspset")
             {
                 GraspSetPtr gs = processGraspSet(node, robotNodeName);
-                THROW_VR_EXCEPTION_IF(!gs, "Invalid grasp set in '" << robotNodeName << "'." << endl);
+                THROW_VR_EXCEPTION_IF(!gs,
+                                      "Invalid grasp set in '" << robotNodeName << "'." << endl);
                 graspSets.push_back(gs);
-
             }
             else
             {
-                THROW_VR_EXCEPTION("XML definition <" << nodeName << "> not supported in RobotNode <" << robotNodeName << ">." << endl);
+                THROW_VR_EXCEPTION("XML definition <"
+                                   << nodeName << "> not supported in RobotNode <" << robotNodeName
+                                   << ">." << endl);
             }
 
             node = node->next_sibling();
@@ -815,11 +1008,19 @@ namespace VirtualRobot
             // clone model
             VisualizationNodePtr visualizationNodeClone = visualizationNode->clone();
             // todo: ID?
-            collisionModel.reset(new CollisionModel(visualizationNodeClone, colModelName, CollisionCheckerPtr()));
+            collisionModel.reset(
+                new CollisionModel(visualizationNodeClone, colModelName, CollisionCheckerPtr()));
         }
 
         //create joint from xml data
-        robotNode = processJointNode(jointNodeXML, robotNodeName, robo, visualizationNode, collisionModel, physics, rntype, transformMatrix);
+        robotNode = processJointNode(jointNodeXML,
+                                     robotNodeName,
+                                     robo,
+                                     visualizationNode,
+                                     collisionModel,
+                                     physics,
+                                     rntype,
+                                     transformMatrix);
         robotNode->basePath = basePath;
         robotNode->visualizationModelXML = visualizationModelXML;
         robotNode->collisionModelXML = collisionModelXML;
@@ -840,8 +1041,10 @@ namespace VirtualRobot
         return robotNode;
     }
 
-
-    VisualizationNodePtr RobotIO::checkUseAsColModel(rapidxml::xml_node<>* visuXMLNode, const std::string& /*robotNodeName*/, const std::string& basePath)
+    VisualizationNodePtr
+    RobotIO::checkUseAsColModel(rapidxml::xml_node<>* visuXMLNode,
+                                const std::string& /*robotNodeName*/,
+                                const std::string& basePath)
     {
         bool enableVisu = true;
         //bool coordAxis = false;
@@ -872,17 +1075,20 @@ namespace VirtualRobot
             if (visuFileXMLNode)
             {
                 attr = visuFileXMLNode->first_attribute("type", 0, false);
-                THROW_VR_EXCEPTION_IF(!attr, "Missing 'type' attribute in <Visualization> tag." << endl);
+                THROW_VR_EXCEPTION_IF(!attr,
+                                      "Missing 'type' attribute in <Visualization> tag." << endl);
                 visuFileType = attr->value();
                 getLowerCase(visuFileType);
                 visuFile = processFileNode(visuFileXMLNode, basePath);
             }
 
-            rapidxml::xml_node<>* useColModel = visuXMLNode->first_node("useascollisionmodel", 0, false);
+            rapidxml::xml_node<>* useColModel =
+                visuXMLNode->first_node("useascollisionmodel", 0, false);
 
             if (useColModel && visuFile != "")
             {
-                VisualizationFactoryPtr visualizationFactory = VisualizationFactory::fromName(visuFileType, nullptr);
+                VisualizationFactoryPtr visualizationFactory =
+                    VisualizationFactory::fromName(visuFileType, nullptr);
 
                 if (visualizationFactory)
                 {
@@ -890,7 +1096,8 @@ namespace VirtualRobot
                 }
                 else
                 {
-                    VR_WARNING << "VisualizationFactory of type '" << visuFileType << "' not present. Ignoring Visualization data." << std::endl;
+                    VR_WARNING << "VisualizationFactory of type '" << visuFileType
+                               << "' not present. Ignoring Visualization data." << std::endl;
                 }
             }
         }
@@ -898,9 +1105,13 @@ namespace VirtualRobot
         return visualizationNode;
     }
 
-    RobotPtr RobotIO::processRobot(rapidxml::xml_node<char>* robotXMLNode, const std::string& basePath, RobotDescription loadMode)
+    RobotPtr
+    RobotIO::processRobot(rapidxml::xml_node<char>* robotXMLNode,
+                          const std::string& basePath,
+                          RobotDescription loadMode)
     {
-        THROW_VR_EXCEPTION_IF(!robotXMLNode, "No <Robot> tag in XML definition! base path = " << basePath);
+        THROW_VR_EXCEPTION_IF(!robotXMLNode,
+                              "No <Robot> tag in XML definition! base path = " << basePath);
 
         // process Attributes
         std::string robotRoot;
@@ -908,50 +1119,69 @@ namespace VirtualRobot
         robo = processRobotAttributes(robotXMLNode, robotRoot);
 
         // process xml nodes
-        std::map< RobotNodePtr, std::vector< ChildFromRobotDef > > childrenFromRobotFilesMap;
-        std::vector<rapidxml::xml_node<char>* > robotNodeSetNodes;
-        std::vector<rapidxml::xml_node<char>* > endeffectorNodes;
+        std::map<RobotNodePtr, std::vector<ChildFromRobotDef>> childrenFromRobotFilesMap;
+        std::vector<rapidxml::xml_node<char>*> robotNodeSetNodes;
+        std::vector<rapidxml::xml_node<char>*> endeffectorNodes;
 
         NodeMapping nodeMapping;
         std::optional<HumanMapping> humanMapping;
+        SceneObject::Affordances affordances;
+
+
+        std::map<std::string, std::map<std::string, float>> configurations;
 
         std::map<std::string, std::vector<std::string>> attachments;
 
-        processRobotChildNodes(robotXMLNode, robo, robotRoot, basePath, childrenFromRobotFilesMap, robotNodeSetNodes, endeffectorNodes, nodeMapping, humanMapping, attachments, loadMode);
+        processRobotChildNodes(robotXMLNode,
+                               robo,
+                               robotRoot,
+                               basePath,
+                               childrenFromRobotFilesMap,
+                               robotNodeSetNodes,
+                               endeffectorNodes,
+                               nodeMapping,
+                               humanMapping,
+                               affordances,
+                               attachments,
+                               configurations,
+                               loadMode);
 
         // process childfromrobot tags
-        std::map< RobotNodePtr, std::vector< ChildFromRobotDef > >::iterator iter = childrenFromRobotFilesMap.begin();
-
-        while (iter != childrenFromRobotFilesMap.end())
+        for (auto& [node, childrenFromRobot] : childrenFromRobotFilesMap)
         {
-            std::vector< ChildFromRobotDef > childrenFromRobot = iter->second;
-            RobotNodePtr node = iter->first;
-
-            for (auto& i : childrenFromRobot)
+            for (auto& child : childrenFromRobot)
             {
-                std::filesystem::path filenameNew(i.filename);
+                std::filesystem::path filenameNew(child.filename);
                 std::filesystem::path filenameBasePath(basePath);
 
                 std::filesystem::path filenameNewComplete = filenameBasePath / filenameNew;
-                VR_INFO << "Searching robot: " << filenameNewComplete.string() << std::endl;
 
                 try
                 {
-                    THROW_VR_EXCEPTION_IF(!std::filesystem::exists(filenameNewComplete), "File <" << filenameNewComplete.string() << "> does not exist." << endl);
+                    THROW_VR_EXCEPTION_IF(!std::filesystem::exists(filenameNewComplete),
+                                          "File <" << filenameNewComplete.string()
+                                                   << "> does not exist." << endl);
                 }
                 catch (...)
                 {
-                    THROW_VR_EXCEPTION("Error while processing file <" << filenameNewComplete.string() << ">." << endl);
-
+                    THROW_VR_EXCEPTION("Error while processing file <"
+                                       << filenameNewComplete.string() << ">." << endl);
                 }
 
                 RobotPtr r = loadRobot(filenameNewComplete.string(), loadMode);
-                THROW_VR_EXCEPTION_IF(!r, "Could not add child-from-robot due to failed loading of robot from file" << i.filename);
+                THROW_VR_EXCEPTION_IF(
+                    !r,
+                    "Could not add child-from-robot due to failed loading of robot from file"
+                        << child.filename);
                 RobotNodePtr root = r->getRootNode();
-                THROW_VR_EXCEPTION_IF(!root, "Could not add child-from-robot. No root node in file" << i.filename);
+                THROW_VR_EXCEPTION_IF(!root,
+                                      "Could not add child-from-robot. No root node in file"
+                                          << child.filename);
 
                 RobotNodePtr rootNew = root->clone(robo, true, node);
-                THROW_VR_EXCEPTION_IF(!rootNew, "Clone failed. Could not add child-from-robot from file " << i.filename);
+                THROW_VR_EXCEPTION_IF(!rootNew,
+                                      "Clone failed. Could not add child-from-robot from file "
+                                          << child.filename);
 
                 std::vector<EndEffectorPtr> eefs;
                 r->getEndEffectors(eefs);
@@ -972,8 +1202,6 @@ namespace VirtualRobot
                 // already performed in root->clone
                 //node->attachChild(rootNew);
             }
-
-            iter++;
         }
 
         { // handle attachments
@@ -981,29 +1209,32 @@ namespace VirtualRobot
             const auto robotNodes = robo->getRobotNodes();
 
             // extend children map with attachments
-            for(const auto& [parentNodeName, childrenNodeNames]: attachments)
+            for (const auto& [parentNodeName, childrenNodeNames] : attachments)
             {
                 // find parent node
-                const auto parentNodeIt = std::find_if(robotNodes.begin(), robotNodes.end(), [&](const auto& robotNode){
-                    return robotNode->getName() == parentNodeName;
-                });
+                const auto parentNodeIt = std::find_if(
+                    robotNodes.begin(),
+                    robotNodes.end(),
+                    [&](const auto& robotNode) { return robotNode->getName() == parentNodeName; });
 
-                if(parentNodeIt == robotNodes.end())
+                if (parentNodeIt == robotNodes.end())
                 {
-                    THROW_VR_EXCEPTION("Robot node `" << parentNodeName << "` was defined as as parent node but is is not known!" << std::endl);
+                    THROW_VR_EXCEPTION("Robot node `"
+                                       << parentNodeName
+                                       << "` was defined as as parent node but is is not known!"
+                                       << std::endl);
                 }
 
                 // add all children to the mapping
                 const auto& parentNode = *parentNodeIt;
 
-                for(const auto& childName : childrenNodeNames)
+                for (const auto& childName : childrenNodeNames)
                 {
                     robo->getRobotNode(childName)->initialize(parentNode);
                 }
             }
         }
 
-        //std::vector<RobotNodeSetPtr> robotNodeSets
         for (auto& endeffectorNode : endeffectorNodes)
         {
             EndEffectorPtr eef = processEndeffectorNode(endeffectorNode, robo);
@@ -1011,51 +1242,64 @@ namespace VirtualRobot
         }
 
         int rnsCounter = 0;
-
         for (auto& robotNodeSetNode : robotNodeSetNodes)
         {
-            RobotNodeSetPtr rns = processRobotNodeSet(robotNodeSetNode, robo, robotRoot, rnsCounter);
-            //nodeSets.push_back(rns);
+            RobotNodeSetPtr rns =
+                processRobotNodeSet(robotNodeSetNode, robo, robotRoot, rnsCounter);
+            (void)rns;
         }
 
-        std::vector<RobotNodePtr> nodes;
-        robo->getRobotNodes(nodes);
-        RobotNodePtr root = robo->getRootNode();
-
-        for (auto& node : nodes)
         {
-            if (node != root && !(node->getParent()))
+            std::vector<RobotNodePtr> nodes;
+            robo->getRobotNodes(nodes);
+            RobotNodePtr rootNode = robo->getRootNode();
+            for (RobotNodePtr& node : nodes)
             {
-                THROW_VR_EXCEPTION("Node without parent: " << node->getName());
+                if (not(node->getParent() or node == rootNode))
+                {
+                    VR_ERROR << "RobotNode '" << node->getName()
+                             << "' is not connected to kinematic structure." << std::endl;
+                }
             }
         }
 
         robo->registerNodeMapping(nodeMapping);
 
-        if(humanMapping.has_value())
+        if (humanMapping.has_value())
         {
             robo->registerHumanMapping(humanMapping.value());
         }
-        
+
+        robo->setAffordances(affordances);
+
+
+        for(const auto& [name, configuration]: configurations)
+        {
+            // VR_INFO << "Registering configuration `" << name << "`." << std::endl;
+            robo->registerConfiguration(name, configuration);
+        }
 
         return robo;
     }
 
-    inline bool toBool(const std::string& strRepr) noexcept
+    inline bool
+    toBool(const std::string& strRepr) noexcept
     {
-        try {
+        try
+        {
             const int passiveIntRepr = std::stoi(strRepr);
             return static_cast<bool>(passiveIntRepr);
-                
-        } catch (std::invalid_argument&) {
+        }
+        catch (std::invalid_argument&)
+        {
             // nothing to do here
         }
 
         return strRepr == "true";
     }
-    
 
-    RobotPtr RobotIO::processRobotAttributes(rapidxml::xml_node<char>* robotXMLNode, std::string& robotRoot)
+    RobotPtr
+    RobotIO::processRobotAttributes(rapidxml::xml_node<char>* robotXMLNode, std::string& robotRoot)
     {
         std::string robotName;
         std::string robotType;
@@ -1100,7 +1344,7 @@ namespace VirtualRobot
 
                 if (robot_name_counter[robotType] == 1)
                 {
-                    ss << robotType;    // first one
+                    ss << robotType; // first one
                 }
                 else
                 {
@@ -1122,12 +1366,12 @@ namespace VirtualRobot
 
         attr = robotXMLNode->first_attribute("passive", 0, false);
 
-        if(attr != nullptr)
+        if (attr != nullptr)
         {
             const std::string passiveStrRep = attr->value();
             passive = toBool(passiveStrRep);
-        
-            VR_INFO << "Robot is 'passive' according to config" << std::endl;
+
+            // VR_INFO << "Robot is 'passive' according to config" << std::endl;
         }
 
         // build robot
@@ -1138,7 +1382,8 @@ namespace VirtualRobot
             robo->setRadianToMMfactor(atof(attr->value()));
         }*/
 
-        if(passive){
+        if (passive)
+        {
             robo->setPassive();
         }
 
@@ -1146,22 +1391,24 @@ namespace VirtualRobot
         return robo;
     }
 
-
-    void RobotIO::processRobotChildNodes(rapidxml::xml_node<char>* robotXMLNode,
-                                         RobotPtr robo,
-                                         const std::string& robotRoot,
-                                         const std::string& basePath,
-                                         std::map < RobotNodePtr,
-                                         std::vector<ChildFromRobotDef> >& childrenFromRobotFilesMap,
-                                         std::vector<rapidxml::xml_node<char>* >& robotNodeSetNodes,
-                                         std::vector<rapidxml::xml_node<char>* >& endeffectorNodes,
-                                         NodeMapping& nodeMapping,
-                                         std::optional<HumanMapping>& humanMapping,
-                                         std::map<std::string, std::vector<std::string>>& attachments,
-                                         RobotDescription loadMode)
+    void
+    RobotIO::processRobotChildNodes(
+        rapidxml::xml_node<char>* robotXMLNode,
+        RobotPtr robo,
+        const std::string& robotRoot,
+        const std::string& basePath,
+        std::map<RobotNodePtr, std::vector<ChildFromRobotDef>>& childrenFromRobotFilesMap,
+        std::vector<rapidxml::xml_node<char>*>& robotNodeSetNodes,
+        std::vector<rapidxml::xml_node<char>*>& endeffectorNodes,
+        NodeMapping& nodeMapping,
+        std::optional<HumanMapping>& humanMapping,
+        SceneObject::Affordances& affordances,
+        std::map<std::string, std::vector<std::string>>& attachments,
+        std::map<std::string, std::map<std::string, float>>& configurations,
+        RobotDescription loadMode)
     {
         std::vector<RobotNodePtr> robotNodes;
-        std::map< RobotNodePtr, std::vector< std::string > > childrenMap;
+        std::map<RobotNodePtr, std::vector<std::string>> childrenMap;
         RobotNodePtr rootNode;
         int robotNodeCounter = 0; // used for robotnodes without names
 
@@ -1176,10 +1423,12 @@ namespace VirtualRobot
             std::string nodeName_ = XMLNode->name();
             std::string nodeName = getLowerCase(XMLNode->name());
 
-            if (nodeName == "robotnode" || nodeName == "jointnode" || nodeName == "transformationnode" || nodeName == "bodynode" || nodeName == "modelnode")
+            if (nodeName == "robotnode" || nodeName == "jointnode" ||
+                nodeName == "transformationnode" || nodeName == "bodynode" ||
+                nodeName == "modelnode")
             {
-                std::vector< ChildFromRobotDef > childrenFromRobot;
-                std::vector< std::string > childrenNames;
+                std::vector<ChildFromRobotDef> childrenFromRobot;
+                std::vector<std::string> childrenNames;
                 // check for type
                 RobotNode::RobotNodeType rntype = RobotNode::Generic;
 
@@ -1198,7 +1447,14 @@ namespace VirtualRobot
                     rntype = RobotNode::Transform;
                 }
 
-                RobotNodePtr n = processRobotNode(XMLNode, robo, basePath, robotNodeCounter, childrenNames, childrenFromRobot, loadMode, rntype);
+                RobotNodePtr n = processRobotNode(XMLNode,
+                                                  robo,
+                                                  basePath,
+                                                  robotNodeCounter,
+                                                  childrenNames,
+                                                  childrenFromRobot,
+                                                  loadMode,
+                                                  rntype);
 
                 if (!n)
                 {
@@ -1210,7 +1466,10 @@ namespace VirtualRobot
                     // double name check
                     for (auto& robotNode : robotNodes)
                     {
-                        THROW_VR_EXCEPTION_IF((robotNode->getName() == n->getName()), "At least two RobotNodes with name <" << n->getName() << "> defined in robot definition");
+                        THROW_VR_EXCEPTION_IF((robotNode->getName() == n->getName()),
+                                              "At least two RobotNodes with name <"
+                                                  << n->getName()
+                                                  << "> defined in robot definition");
                     }
 
                     childrenMap[n] = childrenNames;
@@ -1263,9 +1522,22 @@ namespace VirtualRobot
                 // implicit vector instantiation
                 attachments[parent].push_back(child);
             }
+            else if (nodeName == "configuration")
+            {
+                auto [name, configuration] = processConfigurationNode(XMLNode);
+
+                THROW_VR_EXCEPTION_IF(configurations.count(name)> 0, "Configuration `" << name << "` specified multiple times!");
+                configurations.emplace(name, configuration);
+            }
+            else if (nodeName == "affordances")
+            {
+                processAffordances(XMLNode, affordances);
+            }
             else
             {
-                THROW_VR_EXCEPTION("XML node of type <" << nodeName_ << "> is not supported. Ignoring contents..." << endl);
+                THROW_VR_EXCEPTION("XML node of type <"
+                                   << nodeName_ << "> is not supported. Ignoring contents..."
+                                   << endl);
             }
 
             XMLNode = XMLNode->next_sibling(nullptr, 0, false);
@@ -1278,9 +1550,7 @@ namespace VirtualRobot
         {
             THROW_VR_EXCEPTION("Error while initializing Robot" << endl);
         }
-
     }
-
 
     /**
      * This method parses the EndEffector which are child tags of the Robot tag.
@@ -1292,7 +1562,8 @@ namespace VirtualRobot
      *
      * \return instance of VirtualRobot::EndEffector
      */
-    EndEffectorPtr RobotIO::processEndeffectorNode(rapidxml::xml_node<char>* endeffectorXMLNode, RobotPtr robo)
+    EndEffectorPtr
+    RobotIO::processEndeffectorNode(rapidxml::xml_node<char>* endeffectorXMLNode, RobotPtr robo)
     {
         std::string endeffectorName("");
         std::string baseNodeName;
@@ -1311,37 +1582,60 @@ namespace VirtualRobot
 
             if ("name" == attributeName)
             {
-                THROW_VR_EXCEPTION_IF(!endeffectorName.empty(), "Endeffector tag has more than one <name> tag. Value of the first one is: " + endeffectorName);
+                THROW_VR_EXCEPTION_IF(
+                    !endeffectorName.empty(),
+                    "Endeffector tag has more than one <name> tag. Value of the first one is: " +
+                        endeffectorName);
                 endeffectorName = attr->value();
-                THROW_VR_EXCEPTION_IF(endeffectorName.empty(), "Endeffector tag does not specify a <name> tag.");
+                THROW_VR_EXCEPTION_IF(endeffectorName.empty(),
+                                      "Endeffector tag does not specify a <name> tag.");
             }
             else if ("base" == attributeName)
             {
-                THROW_VR_EXCEPTION_IF(!baseNodeName.empty(), "Endeffector tag has more than one <base> tag. Value of the first one is: " + baseNodeName);
+                THROW_VR_EXCEPTION_IF(
+                    !baseNodeName.empty(),
+                    "Endeffector tag has more than one <base> tag. Value of the first one is: " +
+                        baseNodeName);
                 baseNodeName = attr->value();
-                THROW_VR_EXCEPTION_IF(baseNodeName.empty(), "Endeffector tag does not specify a <base> tag.");
+                THROW_VR_EXCEPTION_IF(baseNodeName.empty(),
+                                      "Endeffector tag does not specify a <base> tag.");
                 baseNode = robo->getRobotNode(baseNodeName);
-                THROW_VR_EXCEPTION_IF(!baseNode, "base associated with <Endeffector> not available in the robot model.");
+                THROW_VR_EXCEPTION_IF(
+                    !baseNode,
+                    "base associated with <Endeffector> not available in the robot model.");
             }
             else if ("tcp" == attributeName)
             {
-                THROW_VR_EXCEPTION_IF(!tcpNodeName.empty(), "Endeffector tag has more than one <tcp> tag. Value of the first one is: " + tcpNodeName);
+                THROW_VR_EXCEPTION_IF(
+                    !tcpNodeName.empty(),
+                    "Endeffector tag has more than one <tcp> tag. Value of the first one is: " +
+                        tcpNodeName);
                 tcpNodeName = attr->value();
-                THROW_VR_EXCEPTION_IF(tcpNodeName.empty(), "Endeffector tag does not specify a <tcp> tag.");
+                THROW_VR_EXCEPTION_IF(tcpNodeName.empty(),
+                                      "Endeffector tag does not specify a <tcp> tag.");
                 tcpNode = robo->getRobotNode(tcpNodeName);
-                THROW_VR_EXCEPTION_IF(!tcpNode, "tcp associated with <Endeffector> not available in the robot model.");
+                THROW_VR_EXCEPTION_IF(
+                    !tcpNode,
+                    "tcp associated with <Endeffector> not available in the robot model.");
             }
             else if ("gcp" == attributeName)
             {
-                THROW_VR_EXCEPTION_IF(!gcpNodeName.empty(), "Endeffector tag has more than one <gcp> tag. Value of the first one is: " + gcpNodeName);
+                THROW_VR_EXCEPTION_IF(
+                    !gcpNodeName.empty(),
+                    "Endeffector tag has more than one <gcp> tag. Value of the first one is: " +
+                        gcpNodeName);
                 gcpNodeName = attr->value();
-                THROW_VR_EXCEPTION_IF(gcpNodeName.empty(), "Endeffector tag does not specify a <gcp> tag.");
+                THROW_VR_EXCEPTION_IF(gcpNodeName.empty(),
+                                      "Endeffector tag does not specify a <gcp> tag.");
                 gcpNode = robo->getRobotNode(gcpNodeName);
-                THROW_VR_EXCEPTION_IF(!gcpNode, "gcp associated with <Endeffector> not available in the robot model.");
+                THROW_VR_EXCEPTION_IF(
+                    !gcpNode,
+                    "gcp associated with <Endeffector> not available in the robot model.");
             }
             else
             {
-                VR_WARNING << "Ignoring unknown attribute in EEF <" << endeffectorName << "> definition:" << attributeName << std::endl;
+                VR_WARNING << "Ignoring unknown attribute in EEF <" << endeffectorName
+                           << "> definition:" << attributeName << std::endl;
             }
 
             attr = attr->next_attribute();
@@ -1349,9 +1643,13 @@ namespace VirtualRobot
 
         std::vector<RobotNodePtr> staticParts;
         std::vector<EndEffectorActorPtr> actors;
-        std::vector< std::vector< RobotConfig::Configuration > > configDefinitions;
-        std::vector< std::string > configNames;
-        std::vector< std::string > tcpNames;
+        std::vector<std::vector<RobotConfig::Configuration>> configDefinitions;
+        std::vector<std::string> configNames;
+        std::vector<std::string> tcpNames;
+
+        std::optional<ManipulationCapabilities> manipulationCapabilities;
+
+
         rapidxml::xml_node<>* node = endeffectorXMLNode->first_node();
 
         while (node)
@@ -1370,17 +1668,29 @@ namespace VirtualRobot
                 }
                 else
                 {
-                    VR_ERROR << "There should only be one <static> tag inside <endeffector> tags" << std::endl;
+                    VR_ERROR << "There should only be one <static> tag inside <endeffector> tags"
+                             << std::endl;
                 }
             }
             else if ("preshape" == nodeName)
             {
-                bool cOK = processConfigurationNodeList(node, configDefinitions, configNames, tcpNames);
-                THROW_VR_EXCEPTION_IF(!cOK, "Invalid Preshape defined in robot's eef tag '" << nodeName << "'." << endl);
+                bool cOK =
+                    processConfigurationNodeList(node, configDefinitions, configNames, tcpNames);
+                THROW_VR_EXCEPTION_IF(!cOK,
+                                      "Invalid Preshape defined in robot's eef tag '"
+                                          << nodeName << "'." << endl);
+            }
+            else if (nodeName == "manipulationcapabilities")
+            {
+                manipulationCapabilities.emplace();
+                processManipulationCapabilities(node, manipulationCapabilities.value());
+            
+                // VR_INFO << "End effector `" << endeffectorName << "` has " << manipulationCapabilities.value().capabilities.size() << " predefined manipulation capabilities." << std::endl;
             }
             else
             {
-                THROW_VR_EXCEPTION("XML tag <" << nodeName << "> not supported in endeffector <" << nodeName << ">");
+                THROW_VR_EXCEPTION("XML tag <" << nodeName << "> not supported in endeffector <"
+                                               << nodeName << ">");
             }
 
             node = node->next_sibling();
@@ -1396,10 +1706,12 @@ namespace VirtualRobot
             gcpNode = tcpNode;
         }
 
-        EndEffectorPtr endEffector(new EndEffector(endeffectorName, actors, staticParts, baseNode, tcpNode, gcpNode));
+        EndEffectorPtr endEffector(
+            new EndEffector(endeffectorName, actors, staticParts, baseNode, tcpNode, gcpNode, {}, manipulationCapabilities));
 
         // create & register configs
-        THROW_VR_EXCEPTION_IF(configDefinitions.size() != configNames.size(), "Invalid Preshape definitions " << endl);
+        THROW_VR_EXCEPTION_IF(configDefinitions.size() != configNames.size(),
+                              "Invalid Preshape definitions " << endl);
 
         for (size_t i = 0; i < configDefinitions.size(); i++)
         {
@@ -1414,17 +1726,20 @@ namespace VirtualRobot
         return endEffector;
     }
 
-
     /**
      * This method processes the attributes and the children of an actor tag which
      * itself is a child of the endeffector tag.
      * First the name attribute is retrieved and afterwards the child nodes are
      * processed which make up the actor.
      */
-    EndEffectorActorPtr RobotIO::processEndeffectorActorNode(rapidxml::xml_node<char>* endeffectorActorXMLNode, RobotPtr robo)
+    EndEffectorActorPtr
+    RobotIO::processEndeffectorActorNode(rapidxml::xml_node<char>* endeffectorActorXMLNode,
+                                         RobotPtr robo)
     {
         std::string actorName = processNameAttribute(endeffectorActorXMLNode);
-        THROW_VR_EXCEPTION_IF(actorName.empty(), "<Actor> tag inside <Endeffector> does not specify a <name> attribute.");
+        THROW_VR_EXCEPTION_IF(
+            actorName.empty(),
+            "<Actor> tag inside <Endeffector> does not specify a <name> attribute.");
         std::vector<EndEffectorActor::ActorDefinition> actors;
         processActorNodeList(endeffectorActorXMLNode, robo, actors);
 
@@ -1432,16 +1747,17 @@ namespace VirtualRobot
         return actor;
     }
 
-
     /**
      * This method processes the children of the static tag which
      * itself is a child of the endeffector tag.
      */
-    void RobotIO::processEndeffectorStaticNode(rapidxml::xml_node<char>* endeffectorStaticXMLNode, RobotPtr robo, std::vector<RobotNodePtr>& staticNodesList)
+    void
+    RobotIO::processEndeffectorStaticNode(rapidxml::xml_node<char>* endeffectorStaticXMLNode,
+                                          RobotPtr robo,
+                                          std::vector<RobotNodePtr>& staticNodesList)
     {
         processNodeList(endeffectorStaticXMLNode, robo, staticNodesList, false);
     }
-
 
     /**
      * This method processes the \p parentNode Tag and extracts a list of \<Node name="xyz" speed="0123" /\> tags.
@@ -1450,7 +1766,11 @@ namespace VirtualRobot
      *
      * If the parameter \p clearList is true all elements from \p nodeList are removed.
      */
-    void RobotIO::processActorNodeList(rapidxml::xml_node<char>* parentNode, RobotPtr robot, std::vector<EndEffectorActor::ActorDefinition>& actorList, bool clearList /*= true*/)
+    void
+    RobotIO::processActorNodeList(rapidxml::xml_node<char>* parentNode,
+                                  RobotPtr robot,
+                                  std::vector<EndEffectorActor::ActorDefinition>& actorList,
+                                  bool clearList /*= true*/)
     {
         if (clearList)
         {
@@ -1469,9 +1789,13 @@ namespace VirtualRobot
             {
                 EndEffectorActor::ActorDefinition actor;
                 std::string nodeNameAttr = processNameAttribute(node, true);
-                THROW_VR_EXCEPTION_IF(nodeNameAttr.empty(), "Missing name attribute for <Node> belonging to Robot node set " << parentName);
+                THROW_VR_EXCEPTION_IF(
+                    nodeNameAttr.empty(),
+                    "Missing name attribute for <Node> belonging to Robot node set " << parentName);
                 actor.robotNode = robot->getRobotNode(nodeNameAttr);
-                THROW_VR_EXCEPTION_IF(!actor.robotNode, "<node> tag with name '" << nodeNameAttr << "' not present in the current robot");
+                THROW_VR_EXCEPTION_IF(!actor.robotNode,
+                                      "<node> tag with name '"
+                                          << nodeNameAttr << "' not present in the current robot");
                 actor.directionAndSpeed = processFloatAttribute(speedname, node, true);
 
                 if (actor.directionAndSpeed == 0.0f)
@@ -1484,15 +1808,18 @@ namespace VirtualRobot
             }
             else
             {
-                THROW_VR_EXCEPTION("XML definition <" << nodeName << "> not supported in <Actor> with name " << parentName);
+                THROW_VR_EXCEPTION("XML definition <" << nodeName
+                                                      << "> not supported in <Actor> with name "
+                                                      << parentName);
             }
 
             node = node->next_sibling();
         }
     }
 
-
-    EndEffectorActor::CollisionMode RobotIO::processEEFColAttributes(rapidxml::xml_node<char>* node, bool allowOtherAttributes /* = false */)
+    EndEffectorActor::CollisionMode
+    RobotIO::processEEFColAttributes(rapidxml::xml_node<char>* node,
+                                     bool allowOtherAttributes /* = false */)
     {
         THROW_VR_EXCEPTION_IF(!node, "Can not process name attribute of NULL node" << endl);
 
@@ -1528,15 +1855,17 @@ namespace VirtualRobot
                 }
                 else
                 {
-                    THROW_VR_EXCEPTION("<" << node->name() << "> considerCollisions attribute is unknowne: " << name);
-
+                    THROW_VR_EXCEPTION("<"
+                                       << node->name()
+                                       << "> considerCollisions attribute is unknowne: " << name);
                 }
             }
             else
             {
                 if (!allowOtherAttributes)
                 {
-                    THROW_VR_EXCEPTION("<" << node->name() << "> tag contains unknown attribute: " << attr->name());
+                    THROW_VR_EXCEPTION("<" << node->name()
+                                           << "> tag contains unknown attribute: " << attr->name());
                 }
             }
 
@@ -1552,9 +1881,10 @@ namespace VirtualRobot
         return result;
     }
 
-
-
-    VirtualRobot::RobotPtr RobotIO::createRobotFromString(const std::string& xmlString, const std::string& basePath, RobotDescription loadMode)
+    VirtualRobot::RobotPtr
+    RobotIO::createRobotFromString(const std::string& xmlString,
+                                   const std::string& basePath,
+                                   RobotDescription loadMode)
     {
         // copy string content to char array
         char* y = new char[xmlString.size() + 1];
@@ -1564,8 +1894,8 @@ namespace VirtualRobot
 
         try
         {
-            rapidxml::xml_document<char> doc;    // character type defaults to char
-            doc.parse<0>(y);    // 0 means default parse flags
+            rapidxml::xml_document<char> doc; // character type defaults to char
+            doc.parse<0>(y); // 0 means default parse flags
             rapidxml::xml_node<char>* robotXMLNode = doc.first_node("robot", 0, false);
 
             if (!robotXMLNode)
@@ -1578,9 +1908,11 @@ namespace VirtualRobot
         catch (rapidxml::parse_error& e)
         {
             delete[] y;
-            THROW_VR_EXCEPTION("Could not parse data in xml definition" << endl
+            THROW_VR_EXCEPTION("Could not parse data in xml definition"
+                               << endl
                                << "Error message:" << e.what() << endl
-                               << "Position: " << endl << e.where<char>() << endl);
+                               << "Position: " << endl
+                               << e.where<char>() << endl);
             return RobotPtr();
         }
         catch (VirtualRobot::VirtualRobotException&)
@@ -1593,7 +1925,8 @@ namespace VirtualRobot
         {
             delete[] y;
             THROW_VR_EXCEPTION("Error while parsing xml definition" << endl
-                               << "Error code:" << e.what() << endl);
+                                                                    << "Error code:" << e.what()
+                                                                    << endl);
             return RobotPtr();
         }
         catch (...)
@@ -1614,8 +1947,8 @@ namespace VirtualRobot
         return robot;
     }
 
-
-    VirtualRobot::RobotPtr RobotIO::loadRobot(const std::string& modelFile, RobotDescription loadMode)
+    VirtualRobot::RobotPtr
+    RobotIO::loadRobot(const std::string& modelFile, RobotDescription loadMode)
     {
         std::string fullFile = modelFile;
 
@@ -1626,10 +1959,9 @@ namespace VirtualRobot
         {
             VR_ERROR << "Could not open " + fileType + " file:" << modelFile << std::endl;
             return RobotPtr();
-
         }
 
-        if(fileType == "xml")
+        if (fileType == "xml")
         {
             std::ifstream in(fullFile.c_str());
 
@@ -1659,13 +1991,17 @@ namespace VirtualRobot
             res->applyJointValues();
             res->setFilename(fullFile);
             return res;
-
         }
-        else if(fileType == "urdf")
+        else if (fileType == "urdf")
         {
 
-            SimoxURDFFactory f;
-
+            std::shared_ptr<RobotImporterFactory> factory =
+                RobotImporterFactory::fromName("SimoxURDF", nullptr);
+            if (!factory)
+            {
+                VR_ERROR << "Could not create RobotImporterFactory for SimoxURDF" << std::endl;
+                return RobotPtr();
+            }
             // to ensure that 3d model files can be loaded during converting we need to add the correct data path
             //#Question: Do we need this here as well? Is going up two directories still correct in the new context?
             std::filesystem::path tmppath = modelFile;
@@ -1675,20 +2011,26 @@ namespace VirtualRobot
             RuntimeEnvironment::addDataPath(modelsBasePath);
 
             //create VirtualRobot Object
-            VirtualRobot::RobotPtr r = f.loadFromFile(modelFile);
+            VirtualRobot::RobotPtr r = factory->loadFromFile(modelFile);
 
             return r;
-
         }
         else
         {
-            std::cout << "File does not have correct file Type!" << std::endl; 
+            std::cout << "File does not have correct file Type!" << std::endl;
             return RobotPtr();
         }
     }
 
-
-    bool RobotIO::saveXML(RobotPtr robot, const std::string& filename, const std::string& basePath, const std::string& modelDir, bool storeEEF, bool storeRNS, bool storeSensors, bool storeModelFiles)
+    bool
+    RobotIO::saveXML(RobotPtr robot,
+                     const std::string& filename,
+                     const std::string& basePath,
+                     const std::string& modelDir,
+                     bool storeEEF,
+                     bool storeRNS,
+                     bool storeSensors,
+                     bool storeModelFiles)
     {
         THROW_VR_EXCEPTION_IF(!robot, "NULL data");
 
@@ -1699,9 +2041,11 @@ namespace VirtualRobot
         std::filesystem::path fnComplete = p / fn;
         std::filesystem::path modelDirComplete = p / pModelDir;
 
-        if (std::filesystem::exists(modelDirComplete) && !std::filesystem::is_directory(modelDirComplete))
+        if (std::filesystem::exists(modelDirComplete) &&
+            !std::filesystem::is_directory(modelDirComplete))
         {
-            VR_ERROR << "Could not create model directory (existing & !dir)  " << pModelDir.string() << std::endl;
+            VR_ERROR << "Could not create model directory (existing & !dir)  " << pModelDir.string()
+                     << std::endl;
             return false;
         }
 
@@ -1709,7 +2053,8 @@ namespace VirtualRobot
         {
             if (!std::filesystem::create_directories(modelDirComplete))
             {
-                VR_ERROR << "Could not create model dir  " << modelDirComplete.string() << std::endl;
+                VR_ERROR << "Could not create model dir  " << modelDirComplete.string()
+                         << std::endl;
                 return false;
             }
         }
@@ -1722,7 +2067,8 @@ namespace VirtualRobot
             return false;
         }
 
-        std::string xmlRob = robot->toXML(basePath, modelDir, storeEEF, storeRNS, storeSensors, storeModelFiles);
+        std::string xmlRob =
+            robot->toXML(basePath, modelDir, storeEEF, storeRNS, storeSensors, storeModelFiles);
         f << xmlRob;
         f.close();
 
@@ -1739,8 +2085,11 @@ namespace VirtualRobot
         return true;
     }
 
-    void RobotIO::saveMJCF(RobotPtr robot, const std::string& filename,
-                           const std::string& basePath, const std::string& meshDir)
+    void
+    RobotIO::saveMJCF(RobotPtr robot,
+                      const std::string& filename,
+                      const std::string& basePath,
+                      const std::string& meshDir)
     {
         mujoco::RobotMjcf mjcf(robot);
         mjcf.setOutputPaths(std::filesystem::path(basePath) / filename, meshDir);

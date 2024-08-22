@@ -197,7 +197,7 @@ namespace VirtualRobot
         return result;
     }
 
-    bool RobotNodePrismatic::isTranslationalJoint() const
+    bool RobotNodePrismatic::isTranslationalJoint() const noexcept
     {
         return true;
     }

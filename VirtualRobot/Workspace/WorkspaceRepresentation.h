@@ -120,6 +120,17 @@ namespace VirtualRobot
         RobotNodeSetPtr getNodeSet();
 
         void invalidateBehindRobot(bool inverted = false);
+
+
+        /**
+         * @brief Reset / invalidate the workspace outside of the angular region defined by [-maxOpeningLeft, maxOpeningRight].
+         * 
+         * @param inverted For all known bimanual robots, it is 'false' for left arm, 'true' for right arm 
+         * @param maxOpeningLeft angle in [rad]. Positive angle to indicate accepted lower angle limit.
+         * @param maxOpeningRight angle in [rad]. Positive angle to indicate accepted lower angle limit.
+         *
+         */
+        void invalidateRegion(bool inverted = false, float maxOpeningLeft = M_PI_2, float maxOpeningRight = M_PI_2);
         
 
         /*!
@@ -330,7 +341,7 @@ namespace VirtualRobot
             Build all transformations from referenceNode to cutXY data.h Only entries>0 are considered.
             If referenceNode is set, the transformations are given in the corresponding coordinate system.
         */
-        std::vector<WorkspaceCut2DTransformationPtr> createCutTransformations(WorkspaceCut2DPtr cutXY, RobotNodePtr referenceNode = RobotNodePtr(), float maxAngle = M_PIf32);
+        std::vector<WorkspaceCut2DTransformation> createCutTransformations(WorkspaceCut2DPtr cutXY, RobotNodePtr referenceNode = RobotNodePtr(), float maxAngle = M_PIf32);
 
         /*!
             Computes the axis aligned bounding box of this object in global coordinate system.

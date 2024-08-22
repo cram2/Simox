@@ -24,7 +24,6 @@
 
 #include "../DynamicsRobot.h"
 #include "BulletObject.h"
-
 #include "btBulletDynamicsCommon.h"
 
 namespace SimDynamics
@@ -32,6 +31,7 @@ namespace SimDynamics
     class SIMDYNAMICS_IMPORT_EXPORT BulletRobot : public DynamicsRobot
     {
         friend class BulletEngine;
+
     public:
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
@@ -53,7 +53,7 @@ namespace SimDynamics
             //VirtualRobot::RobotNodePtr nodeJoint2; // joint2 (only used for hinge2/universal joints)
             BulletObjectPtr dynNode1; // parent
             BulletObjectPtr dynNode2; // child
-            std::vector< std::pair<DynamicsObjectPtr, DynamicsObjectPtr> > disabledCollisionPairs;
+            std::vector<std::pair<DynamicsObjectPtr, DynamicsObjectPtr>> disabledCollisionPairs;
             std::shared_ptr<btTypedConstraint> joint;
             double jointValueOffset; // offset simox -> bullet joint values
         };
@@ -216,9 +216,14 @@ namespace SimDynamics
         // fixed                (joint=fixed        !joint2)
         // hinge                (joint=revolute     !joint2)
         // universal (hinge2)   (joint=revolute     joint2=revolute) // experimental
-        void createLink(VirtualRobot::RobotNodePtr bodyA, VirtualRobot::RobotNodePtr joint, /*VirtualRobot::RobotNodePtr joint2,*/ VirtualRobot::RobotNodePtr bodyB, bool enableJointMotors);
+        void createLink(VirtualRobot::RobotNodePtr bodyA,
+                        VirtualRobot::RobotNodePtr joint,
+                        /*VirtualRobot::RobotNodePtr joint2,*/ VirtualRobot::RobotNodePtr bodyB,
+                        bool enableJointMotors);
 
-        void createLink(VirtualRobot::RobotNodePtr node1, VirtualRobot::RobotNodePtr node2, bool enableJointMotors);
+        void createLink(VirtualRobot::RobotNodePtr node1,
+                        VirtualRobot::RobotNodePtr node2,
+                        bool enableJointMotors);
 
         // ensure that all robot nodes, which are not actuated directly, are at the correct pose
         void setPoseNonActuatedRobotNodes();
@@ -232,9 +237,32 @@ namespace SimDynamics
         std::vector<LinkInfo> links;
 
         btScalar bulletMaxMotorImulse;
-        std::shared_ptr<btTypedConstraint> createFixedJoint(std::shared_ptr<btRigidBody> btBody1, std::shared_ptr<btRigidBody> btBody2, Eigen::Matrix4f& anchor_inNode1, Eigen::Matrix4f& anchor_inNode2);
-        std::shared_ptr<btTypedConstraint> createHingeJoint(std::shared_ptr<btRigidBody> btBody1, std::shared_ptr<btRigidBody> btBody2, Eigen::Matrix4f& coordSystemNode1, Eigen::Matrix4f& coordSystemNode2,  Eigen::Matrix4f& anchor_inNode1, Eigen::Matrix4f& anchor_inNode2, Eigen::Vector3f& axisGlobal, Eigen::Vector3f& axisLocal, Eigen::Matrix4f& coordSystemJoint, double limMinBT, double limMaxBT);
-        std::shared_ptr<btTypedConstraint> createTranslationalJoint(std::shared_ptr<btRigidBody> btBody1, std::shared_ptr<btRigidBody> btBody2, Eigen::Matrix4f& coordSystemNode1, Eigen::Matrix4f& coordSystemNode2, Eigen::Matrix4f& anchor_inNode1, Eigen::Matrix4f& anchor_inNode2, Eigen::Vector3f& directionLocal, Eigen::Matrix4f& coordSystemJoint, double limMinBT, double limMaxBT);
+        std::shared_ptr<btTypedConstraint> createFixedJoint(std::shared_ptr<btRigidBody> btBody1,
+                                                            std::shared_ptr<btRigidBody> btBody2,
+                                                            Eigen::Matrix4f& anchor_inNode1,
+                                                            Eigen::Matrix4f& anchor_inNode2);
+        std::shared_ptr<btTypedConstraint> createHingeJoint(std::shared_ptr<btRigidBody> btBody1,
+                                                            std::shared_ptr<btRigidBody> btBody2,
+                                                            Eigen::Matrix4f& coordSystemNode1,
+                                                            Eigen::Matrix4f& coordSystemNode2,
+                                                            Eigen::Matrix4f& anchor_inNode1,
+                                                            Eigen::Matrix4f& anchor_inNode2,
+                                                            Eigen::Vector3f& axisGlobal,
+                                                            Eigen::Vector3f& axisLocal,
+                                                            Eigen::Matrix4f& coordSystemJoint,
+                                                            double limMinBT,
+                                                            double limMaxBT);
+        std::shared_ptr<btTypedConstraint>
+        createTranslationalJoint(std::shared_ptr<btRigidBody> btBody1,
+                                 std::shared_ptr<btRigidBody> btBody2,
+                                 Eigen::Matrix4f& coordSystemNode1,
+                                 Eigen::Matrix4f& coordSystemNode2,
+                                 Eigen::Matrix4f& anchor_inNode1,
+                                 Eigen::Matrix4f& anchor_inNode2,
+                                 Eigen::Vector3f& directionLocal,
+                                 Eigen::Matrix4f& coordSystemJoint,
+                                 double limMinBT,
+                                 double limMaxBT);
 
 
         bool ignoreTranslationalJoints;
@@ -243,4 +271,3 @@ namespace SimDynamics
     typedef std::shared_ptr<BulletRobot> BulletRobotPtr;
 
 } // namespace SimDynamics
-

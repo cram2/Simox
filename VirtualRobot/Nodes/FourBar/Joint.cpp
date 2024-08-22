@@ -1,7 +1,6 @@
 #include "Joint.h"
 
 #include <cmath>
-#include <iostream>
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
@@ -9,14 +8,12 @@
 #include <SimoxUtility/math/convert/deg_to_rad.h>
 #include <SimoxUtility/math/pose/pose.h>
 
-
 namespace VirtualRobot::four_bar
 {
 
-    Joint::Joint(double theta0, const Dimensions& dimensions) : theta0(theta0), dims(dimensions)
+    Joint::Joint(const Dimensions& dimensions) : dims(dimensions)
     {
     }
-
 
     Eigen::Isometry3d
     Joint::computeFk(const double theta) const
@@ -25,11 +22,25 @@ namespace VirtualRobot::four_bar
         const Eigen::Translation3d passive_T_active_base(Eigen::Vector3d::UnitX() * dims.shank);
 
         // apply rotation of this active joint
-        const Eigen::AngleAxisd active_base_T_eef{theta0 + theta, Eigen::Vector3d::UnitZ()};
+        const Eigen::AngleAxisd active_base_T_eef{theta, Eigen::Vector3d::UnitZ()};
 
         return passive_T_active_base * active_base_T_eef;
     }
 
+    Eigen::Isometry3d
+    Joint::computeFkCombined(const double theta) const
+    {
+        // apply rotation of passive joint
+        const Eigen::AngleAxisd passive_base_T_passive{psi(theta), -Eigen::Vector3d::UnitZ()};
+
+        // move from passive to active joint
+        const Eigen::Translation3d passive_T_active_base(Eigen::Vector3d::UnitX() * dims.shank);
+
+        // apply rotation of this active joint
+        const Eigen::AngleAxisd active_base_T_eef{theta, Eigen::Vector3d::UnitZ()};
+
+        return passive_base_T_passive * passive_T_active_base * active_base_T_eef;
+    }
 
     Joint::Jacobian
     Joint::getJacobian(const double theta, const Eigen::Vector3d& base_P_eef) const
@@ -53,8 +64,7 @@ namespace VirtualRobot::four_bar
         const double cosPsi = std::cos(psi);
         const double sinPsi = std::sin(psi);
 
-        //
-        const Eigen::Isometry3d base_T_active = computeFk(theta);
+        const Eigen::Isometry3d base_T_active = computeFkCombined(theta);
 
         const Eigen::Vector3d active_P_eef = base_T_active.inverse() * base_P_eef;
 
@@ -115,5 +125,39 @@ namespace VirtualRobot::four_bar
         const double psi = 2 * std::atan((-B + D) / (2 * A)); // C.39
 
         return psi;
+    }
+
+    double
+    Joint::calculate_dAnkle_dKnee(double kneeAngle)
+    {
+        constexpr auto squared = [](const double t) { return t * t; };
+
+        const double k1 = dims.k1();
+        const double k2 = dims.k2();
+        const double k3 = dims.k3();
+
+        const double theta = kneeAngle;
+
+        const double sinTheta = sin(theta);
+        const double cosTheta = cos(theta);
+
+        double T_fkt = sinTheta * (((squared(k1) + k1 + 1) * k2 - k1 * k3) * cosTheta -
+                                   squared(k3) + (k1 - 1) * k2 * k3 + k1 * squared(k2) + k1 + 1) +
+                       ((k3 + k2) * cosTheta + k1 + 1) *
+                           sqrt(-squared(k1) * squared(cosTheta) -
+                                (2 * k1 * k3 - 2 * k2) * cosTheta - squared(k3) + squared(k2) + 1);
+
+
+        double B_fkt =
+            sqrt(-squared(k1) * squared(cosTheta) - (2 * k1 * k3 - 2 * k2) * cosTheta -
+                 squared(k3) + squared(k2) + 1) *
+            (sinTheta * sqrt(-squared(k1) * squared(cosTheta) - (2 * k1 * k3 - 2 * k2) * cosTheta -
+                             squared(k3) + squared(k2) + 1) +
+             k1 * squared(cosTheta) + (k3 + (k1 + 2) * k2) * cosTheta + k2 * k3 + squared(k2) + 1);
+
+
+        double dAnkle_dKnee = T_fkt / B_fkt;
+
+        return dAnkle_dKnee;
     }
 } // namespace VirtualRobot::four_bar

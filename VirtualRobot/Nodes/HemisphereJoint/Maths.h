@@ -1,9 +1,10 @@
 #pragma once
 
+#include <optional>
+
 #include <Eigen/Core>
 
 #include "Expressions.h"
-
 
 namespace VirtualRobot::hemisphere
 {
@@ -18,19 +19,18 @@ namespace VirtualRobot::hemisphere
     class Maths
     {
     public:
-
         using ActuatorPosition = Eigen::Vector2d;
         using ActuatorAngle = Eigen::Vector2d;
         using Jacobian = Eigen::Matrix<double, 6, 2>;
 
     public:
-
         Maths();
         Maths(double lever, double theta0);
 
-
-        void setConstants(double lever, double theta0);
-
+        void setConstants(double lever,
+                          double theta0,
+                          std::optional<double> limitLoRadians,
+                          std::optional<double> limitHiRadians);
 
         void computeFkOfAngle(const ActuatorAngle& alpha12);
 
@@ -48,17 +48,15 @@ namespace VirtualRobot::hemisphere
 
 
     public:
-
         double lever = 0;
         double theta0Rad = 0;
-        double radius = 0;
+        double radiusOfRollingSpheres = 0;
 
         double limitLo = 0;
         double limitHi = 0;
 
 
         Expressions expressions;
-
     };
 
-}
+} // namespace VirtualRobot::hemisphere

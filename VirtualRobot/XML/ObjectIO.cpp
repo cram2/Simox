@@ -16,8 +16,6 @@ using namespace std;
 namespace VirtualRobot
 {
 
-
-
     ObjectIO::ObjectIO()
         = default;
 
@@ -252,8 +250,10 @@ namespace VirtualRobot
     {
         // copy string content to char array
         std::vector<char> y(xmlString.size() + 1);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-truncation"
         strncpy(y.data(), xmlString.c_str(), xmlString.size() + 1);
-
+#pragma GCC diagnostic pop
         VirtualRobot::ManipulationObjectPtr obj;
 
         try
@@ -307,6 +307,7 @@ namespace VirtualRobot
         Eigen::Matrix4f globalPose = Eigen::Matrix4f::Identity();
         std::vector< rapidxml::xml_node<>* > sensorTags;
         SceneObject::PrimitiveApproximation primitiveApproximation;
+        SceneObject::Affordances affordances;
 
         // get name
         std::string objName = processNameAttribute(objectXMLNode);
@@ -398,6 +399,10 @@ namespace VirtualRobot
             {
                 processTransformNode(node, objName, globalPose);
             }
+            else if (nodeName == "affordances")
+            {
+                processAffordances(node, affordances);
+            }
             else
             {
                 THROW_VR_EXCEPTION("XML definition <" << nodeName << "> not supported in ManipulationObject <" << objName << ">." << endl);
@@ -424,6 +429,8 @@ namespace VirtualRobot
 
         object->setGlobalPose(globalPose);
         object->setPrimitiveApproximation(primitiveApproximation);
+
+        object->setAffordances(affordances);
 
         return object;
     }

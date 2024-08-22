@@ -1,0 +1,34 @@
+FROM git.h2t.iar.kit.edu:5050/sw/armarx/meta/axii:latest-jammy
+
+# Setup environment.
+SHELL ["/bin/bash", "-c"]
+
+# Setup apt environment.
+RUN apt-get -qq update
+
+# Temporary fix until Axii is updated
+# Simulate install_axii.sh.
+ENV _AXII_INSTALL_DIR /axii
+ENV PATH /axii/bin:$PATH
+ENV _axii_installed true
+# Temporary fix - end.
+
+# Setup workspace in Docker.
+RUN axii workspace create /workspace workspace
+RUN axii workspace activate workspace
+
+# Simulate activating the workspace.
+ENV ARMARX_WORKSPACE=/workspace
+
+# Setup repo in Docker.
+WORKDIR $ARMARX_WORKSPACE/simox
+COPY --chmod=755 . .
+
+# Use workspace config.
+COPY docker/armarx-workspace.json $ARMARX_WORKSPACE/armarx-workspace.json
+
+# Run the upgrade.
+RUN axii workspace system --accept-apt-install
+# ToDo: Prevent this from updating Simox itself.
+RUN axii workspace update --prefer-https
+RUN axii workspace upgrade

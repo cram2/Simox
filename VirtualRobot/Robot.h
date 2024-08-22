@@ -95,6 +95,7 @@ namespace VirtualRobot
         ArmDescription rightArm;
     };
 
+
     /*!
         This is the main object defining the kinematic structure of a robot.
 
@@ -506,6 +507,15 @@ namespace VirtualRobot
         /*! Removes all sensors (for faster forward kinematics) */
         void removeAllSensors();
 
+
+        void registerConfiguration(const std::string& name, const std::map<std::string, float>& configuration);
+
+        bool hasConfiguration(const std::string& name) const;
+        std::optional<std::map<std::string, float>> getConfiguration(const std::string& name) const;
+        std::map<std::string, std::map<std::string, float>> getConfigurations() const;
+
+        [[nodiscard]] bool setToConfiguration(const std::string& name);
+
     protected:
         Robot();
 
@@ -539,6 +549,8 @@ namespace VirtualRobot
     private:
         NodeMapping nodeMapping;
         std::optional<HumanMapping> humanMapping;
+
+        std::map<std::string, std::map<std::string, float>> configurations;
 
     };
 

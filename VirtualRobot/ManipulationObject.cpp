@@ -24,14 +24,14 @@ namespace VirtualRobot
 
     ManipulationObject::~ManipulationObject() = default;
 
-    void ManipulationObject::print(bool printDecoration)
+    void ManipulationObject::print(bool printChildren, bool printDecoration) const
     {
         if (printDecoration)
         {
             std::cout << "**** Manipulation Object ****" << std::endl;
         }
 
-        Obstacle::print(false);
+        Obstacle::print(printChildren, false);
 
         if (printDecoration)
         {

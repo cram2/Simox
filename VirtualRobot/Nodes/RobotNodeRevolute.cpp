@@ -93,7 +93,7 @@ namespace VirtualRobot
         //Eigen::Affine3f tmpT(Eigen::AngleAxisf(jointValue + jointValueOffset, jointRotationAxis));
         //MathTools::axisangle2eigen4f(jointRotationAxis, jointValue + jointValueOffset, tmpRotMat);
         tmpRotMat.block(0, 0, 3, 3) = Eigen::AngleAxisf(jointValue + jointValueOffset, jointRotationAxis).matrix();
-        globalPose = parentPose * localTransformation /*getLocalTransformation()*/ * tmpRotMat;
+        globalPose.noalias() = parentPose * localTransformation /*getLocalTransformation()*/ * tmpRotMat;
     }
 
     void RobotNodeRevolute::print(bool printChildren, bool printDecoration) const
@@ -144,7 +144,7 @@ namespace VirtualRobot
         return result;
     }
 
-    bool RobotNodeRevolute::isRotationalJoint() const
+    bool RobotNodeRevolute::isRotationalJoint() const noexcept
     {
         return true;
     }

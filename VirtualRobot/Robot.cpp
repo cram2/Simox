@@ -1,5 +1,6 @@
 
 #include "Robot.h"
+#include <optional>
 #include "RobotConfig.h"
 #include "Trajectory.h"
 #include "VirtualRobot.h"
@@ -919,6 +920,8 @@ namespace VirtualRobot
         result->type = type;
         //result->radianToMMfactor = radianToMMfactor;
 
+        result->nodeMapping = getNodeMapping();
+
         if(getHumanMapping().has_value())
         {
             result->registerHumanMapping(getHumanMapping().value());
@@ -1303,6 +1306,53 @@ namespace VirtualRobot
     const std::optional<HumanMapping>& Robot::getHumanMapping() const
     {
         return humanMapping;
+    }
+
+    void Robot::registerConfiguration(const std::string& name, const std::map<std::string, float>& configuration)
+    {
+        if(hasConfiguration(name))
+        {
+            VR_WARNING << "You are registering a configuration with name `" << name 
+                       << "` which has already been registered. The new configuration will replace the old one." << std::endl;
+            
+            // only works if 'name' is not already existing
+            configurations.emplace(name, configuration);
+            return;
+        }
+
+        configurations[name] = configuration; 
+    }
+
+    bool Robot::hasConfiguration(const std::string& name) const
+    {
+        return configurations.count(name) > 0;
+    }
+
+    std::optional<std::map<std::string, float>> Robot::getConfiguration(const std::string& name) const
+    {
+        if(not hasConfiguration(name))
+        {
+            return std::nullopt;
+        }
+
+        return configurations.at(name);
+    }
+
+    std::map<std::string, std::map<std::string, float>> Robot::getConfigurations() const
+    {
+        return configurations;
+    }
+
+    bool Robot::setToConfiguration(const std::string& name)
+    {
+        if(not hasConfiguration(name))
+        {
+            return false;
+        }
+
+        const auto& configuration = configurations.at(name);
+        setJointValues(configuration);
+        return true;
     }
 
     

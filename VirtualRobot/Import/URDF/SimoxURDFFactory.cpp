@@ -153,15 +153,17 @@ namespace VirtualRobot
     Eigen::Matrix4f SimoxURDFFactory::convertPose(const urdf::Pose& p) const
     {
         const float scale = 1000.0f; // mm
-        Eigen::Matrix4f res;
-        res.setIdentity();
-        double qx, qy, qz, qw;
-        p.rotation.getQuaternion(qx, qy, qz, qw);
-        res = MathTools::quat2eigen4f(qx, qy, qz, qw);
-        res(0, 3) = p.position.x * scale;
-        res(1, 3) = p.position.y * scale;
-        res(2, 3) = p.position.z * scale;
-        return res;
+        
+        Eigen::Quaterniond q = Eigen::Quaterniond::Identity();
+        p.rotation.getQuaternion(q.x(), q.y(), q.z(), q.w());
+        
+        Eigen::Isometry3d res = Eigen::Isometry3d::Identity();
+        res.linear() = q.toRotationMatrix();
+        res.translation().x() = p.position.x * scale;
+        res.translation().y() = p.position.y * scale;
+        res.translation().z() = p.position.z * scale;
+
+        return res.cast<float>().matrix();
     }
 
     std::string SimoxURDFFactory::getFilename(const std::string& f, const string& basePath)
@@ -461,10 +463,8 @@ namespace VirtualRobot
         Eigen::Matrix4f preJointTransform = Eigen::Matrix4f::Identity();
 
         VirtualRobot::VisualizationNodePtr rnVisu;
-        VirtualRobot::CollisionModelPtr rnCol;
 
         std::vector<Primitive::PrimitivePtr> visuPrimitives;
-        std::vector<Primitive::PrimitivePtr> colPrimitives;
 
         if (urdfBody->visual && urdfBody->visual)
         {
@@ -481,6 +481,8 @@ namespace VirtualRobot
             }
         }
 
+        VirtualRobot::CollisionModelPtr rnCol;
+        std::vector<Primitive::PrimitivePtr> colPrimitives;
         if (urdfBody->collision && urdfBody->collision)
         {
             VisualizationNodePtr v;
@@ -598,7 +600,7 @@ namespace VirtualRobot
 
             case urdf::Joint::FIXED:
                 // here, we need to convert [m] to [mm] for joint limits
-                result = prismaticNodeFactory->createRobotNode(robo, name, rnVisu, rnCol, limitLo * 1000, limitHi * 1000, 0, preJointTransform, axis, idVec3, physics);
+                result = fixedNodeFactory->createRobotNode(robo, name, rnVisu, rnCol, limitLo * 1000, limitHi * 1000, 0, preJointTransform, axis, idVec3, physics);
                 break;
 
             default:

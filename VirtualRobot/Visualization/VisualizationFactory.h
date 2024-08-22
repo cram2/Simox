@@ -75,7 +75,7 @@ namespace VirtualRobot
                 return Color(0.0f, 0.0f, 0.0f, 1.0f);
             }
 
-            Color(const simox::Color& sc): Color(sc.r / 255., sc.g / 255., sc.b / 255., sc.a / 255.){}
+            Color(const simox::Color& sc): Color(sc.r / 255., sc.g / 255., sc.b / 255., 1. - sc.a / 255.){}
         };
 
         struct PhongMaterial
