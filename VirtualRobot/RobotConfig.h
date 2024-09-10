@@ -124,6 +124,10 @@ namespace VirtualRobot
         std::map < std::string, float > getRobotNodeJointValueMap();
 
         /*!
+            Returns a vector with corresponding joint values.
+        */
+        std::vector<float> getRobotNodeJointValueVec();
+        /*!
             Create an XML string that defines this object.
         */
         std::string toXML(int tabs = 0);
