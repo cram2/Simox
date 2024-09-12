@@ -486,7 +486,7 @@ namespace VirtualRobot
             }
             else
             {
-                VR_ERROR << "Ignoring unknown tag " << nodeName << std::endl;
+                VR_ERROR << "Ignoring unknown tag `" << nodeName << "`" << std::endl;
             }
 
             node = node->next_sibling();
