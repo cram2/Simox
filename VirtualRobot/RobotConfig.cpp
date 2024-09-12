@@ -259,6 +259,20 @@ namespace VirtualRobot
         return result;
     }
 
+    std::vector<float>
+    RobotConfig::getRobotNodeJointValueVec()
+    {
+        std::vector<float> result;
+        std::map<RobotNodePtr, float>::const_iterator i = configs.begin();
+
+        while (i != configs.end())
+        {
+            result.push_back(i->second);
+            i++;
+        }
+
+        return result;
+    }
     bool RobotConfig::setJointValues(RobotPtr r)
     {
         if (!r)
