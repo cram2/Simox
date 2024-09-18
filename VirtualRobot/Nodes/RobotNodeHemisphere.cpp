@@ -340,6 +340,20 @@ namespace VirtualRobot
         return secondData.has_value();
     }
 
+    const RobotNodeHemisphere::FirstData&
+    RobotNodeHemisphere::getFirstData() const
+    {
+        VR_ASSERT(firstData.has_value());
+        return firstData.value();
+    }
+
+    RobotNodeHemisphere::FirstData&
+    RobotNodeHemisphere::getFirstData()
+    {
+        VR_ASSERT(firstData.has_value());
+        return firstData.value();
+    }
+
     const RobotNodeHemisphere::SecondData&
     RobotNodeHemisphere::getSecondData() const
     {
