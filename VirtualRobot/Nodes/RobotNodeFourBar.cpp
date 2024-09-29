@@ -177,8 +177,7 @@ namespace VirtualRobot
     RobotNodeFourBar::setXmlInfo(const XmlInfo& info)
     {
         this->xmlInfo = info;
-
-        VR_ASSERT(active.has_value());
+        
         switch (info.role)
         {
             case Role::PASSIVE:
