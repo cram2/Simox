@@ -343,28 +343,44 @@ namespace VirtualRobot
     const RobotNodeHemisphere::FirstData&
     RobotNodeHemisphere::getFirstData() const
     {
-        VR_ASSERT(firstData.has_value());
+        if (not firstData)
+        {
+            throw VirtualRobotException("No first data");
+        }
+
         return firstData.value();
     }
 
     RobotNodeHemisphere::FirstData&
     RobotNodeHemisphere::getFirstData()
     {
-        VR_ASSERT(firstData.has_value());
+        if (not firstData)
+        {
+            throw VirtualRobotException("No first data");
+        }
+
         return firstData.value();
     }
 
     const RobotNodeHemisphere::SecondData&
     RobotNodeHemisphere::getSecondData() const
     {
-        VR_ASSERT(secondData.has_value());
+        if (not secondData)
+        {
+            throw VirtualRobotException("No second data");
+        }
+
         return secondData.value();
     }
 
     RobotNodeHemisphere::SecondData&
     RobotNodeHemisphere::getSecondData()
     {
-        VR_ASSERT(secondData.has_value());
+        if (not secondData)
+        {
+            throw VirtualRobotException("No second data");
+        }
+        
         return secondData.value();
     }
 

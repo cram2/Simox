@@ -177,7 +177,7 @@ namespace VirtualRobot
     RobotNodeFourBar::setXmlInfo(const XmlInfo& info)
     {
         this->xmlInfo = info;
-        
+
         switch (info.role)
         {
             case Role::PASSIVE:
@@ -563,14 +563,22 @@ namespace VirtualRobot
     RobotNodeFourBar::Second& 
     RobotNodeFourBar::getActiveData()
     {
-        VR_ASSERT(active);
+        if (not active)
+        {
+            throw VirtualRobotException("No active data");
+        }
+        
         return active.value();
     }
 
     const RobotNodeFourBar::Second& 
     RobotNodeFourBar::getActiveData() const
     {
-        VR_ASSERT(active);
+        if (not active)
+        {
+            throw VirtualRobotException("No active data");
+        }
+
         return active.value();
     }
 

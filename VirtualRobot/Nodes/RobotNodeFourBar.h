@@ -44,7 +44,7 @@ namespace VirtualRobot
         enum class Role
         {
             PASSIVE,
-            ACTIVE,
+            ACTIVE
         };
         static Role RoleFromString(const std::string& string);
 
@@ -181,7 +181,7 @@ namespace VirtualRobot
          * @brief Get the data held by the active node.
          * May only be called if `isActive()`;
          */
-        const Second&  getActiveData() const;
+        const Second& getActiveData() const;
 
         const std::optional<XmlInfo>& getXmlInfo() const;
 
