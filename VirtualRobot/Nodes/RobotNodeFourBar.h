@@ -50,6 +50,10 @@ namespace VirtualRobot
 
         struct XmlInfo
         {
+            XmlInfo(Role role) : role(role)
+            {
+            }
+
             Role role;
 
             // Only set for first:
