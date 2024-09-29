@@ -568,4 +568,31 @@ namespace VirtualRobot
         }
     }
 
+    bool
+    RobotNodeFourBar::isActive() const
+    {
+        return active.has_value();
+    }
+
+    RobotNodeFourBar::Second& 
+    RobotNodeFourBar::getActiveData()
+    {
+        VR_ASSERT(active);
+        return active.value();
+    }
+
+    const RobotNodeFourBar::Second& 
+    RobotNodeFourBar::getActiveData() const
+    {
+        VR_ASSERT(active);
+        return active.value();
+    }
+
+    const std::optional<RobotNodeFourBar::XmlInfo>& 
+    RobotNodeFourBar::getXmlInfo() const
+    {
+        return xmlInfo;
+    }
+
+
 } // namespace VirtualRobot

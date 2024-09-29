@@ -176,11 +176,21 @@ namespace VirtualRobot
             // }
         };
 
-        inline bool
-        isActive() const
-        {
-            return active.has_value();
-        }
+        bool isActive() const;
+
+        /**
+         * @brief Get the data held by the active node.
+         * May only be called if `isActive()`;
+         */
+        Second& getActiveData();
+
+        /**
+         * @brief Get the data held by the active node.
+         * May only be called if `isActive()`;
+         */
+        const Second&  getActiveData() const;
+
+        const std::optional<XmlInfo>& getXmlInfo() const;
 
     private:
         std::optional<First> first;
