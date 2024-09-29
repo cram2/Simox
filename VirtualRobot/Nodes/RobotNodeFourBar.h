@@ -53,10 +53,7 @@ namespace VirtualRobot
             Role role;
 
             // Only set for first:
-            double theta0 = -1;
-            // double lever = -1;
-
-            std::optional<four_bar::Joint::Dimensions> dimensions;
+            std::optional<four_bar::Joint::Dimensions> dimensions = std::nullopt;
         };
 
         friend class RobotFactory;
@@ -146,12 +143,8 @@ namespace VirtualRobot
     public:
         struct JointMath
         {
-            /// The actuator values that were used to compute the joint math.
-            // Eigen::Vector2f actuators = Eigen::Vector2f::Constant(std::numeric_limits<float>::min());
             /// The joint math.
             four_bar::Joint joint;
-
-            void update(float theta);
         };
 
         struct First

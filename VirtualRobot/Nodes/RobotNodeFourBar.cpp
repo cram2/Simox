@@ -183,7 +183,6 @@ namespace VirtualRobot
             case Role::PASSIVE:
                 // std::cout << "Role: passive" << std::endl;
                 first.emplace(First{});
-                // first->math.joint.setConstants(0, info.theta0);
                 break;
 
             case Role::ACTIVE:
@@ -273,16 +272,6 @@ namespace VirtualRobot
 
 
     void
-    RobotNodeFourBar::JointMath::update(const float /*theta*/)
-    {
-        // if (actuators != this->actuators)
-        // {
-        // joint.computeFk(theta);
-        // }
-    }
-
-
-    void
     RobotNodeFourBar::updateTransformationMatrices(const Eigen::Matrix4f& parentPose)
     {
         VR_ASSERT_MESSAGE(first.has_value() xor active.has_value(),
@@ -297,8 +286,6 @@ namespace VirtualRobot
         {
             // std::cout << "active: joint value " << jV << std::endl;
             const float theta = this->getJointValue() + jointValueOffset;
-
-            active->math.update(theta);
             tmp = active->math.joint.computeFk(theta).matrix().cast<float>();
         }
         else // passive
