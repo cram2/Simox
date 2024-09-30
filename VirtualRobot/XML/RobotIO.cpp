@@ -637,13 +637,11 @@ namespace VirtualRobot
             }
             else if (nodeName == "four_bar")
             {
-                fourBarXmlInfo.emplace();
-
                 std::string roleString = processStringAttribute("role", node, true);
                 roleString = simox::alg::to_lower(roleString);
                 try
                 {
-                    fourBarXmlInfo->role = RobotNodeFourBar::RoleFromString(roleString);
+                    fourBarXmlInfo.emplace(RobotNodeFourBar::RoleFromString(roleString));
                 }
                 catch (const std::out_of_range& e)
                 {

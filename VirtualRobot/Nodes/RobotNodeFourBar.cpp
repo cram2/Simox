@@ -178,13 +178,11 @@ namespace VirtualRobot
     {
         this->xmlInfo = info;
 
-        VR_ASSERT(active.has_value());
         switch (info.role)
         {
             case Role::PASSIVE:
                 // std::cout << "Role: passive" << std::endl;
                 first.emplace(First{});
-                // first->math.joint.setConstants(0, info.theta0);
                 break;
 
             case Role::ACTIVE:
@@ -274,16 +272,6 @@ namespace VirtualRobot
 
 
     void
-    RobotNodeFourBar::JointMath::update(const float /*theta*/)
-    {
-        // if (actuators != this->actuators)
-        // {
-        // joint.computeFk(theta);
-        // }
-    }
-
-
-    void
     RobotNodeFourBar::updateTransformationMatrices(const Eigen::Matrix4f& parentPose)
     {
         VR_ASSERT_MESSAGE(first.has_value() xor active.has_value(),
@@ -298,8 +286,6 @@ namespace VirtualRobot
         {
             // std::cout << "active: joint value " << jV << std::endl;
             const float theta = this->getJointValue() + jointValueOffset;
-
-            active->math.update(theta);
             tmp = active->math.joint.computeFk(theta).matrix().cast<float>();
         }
         else // passive
@@ -567,5 +553,40 @@ namespace VirtualRobot
             return ss.str();
         }
     }
+
+    bool
+    RobotNodeFourBar::isActive() const
+    {
+        return active.has_value();
+    }
+
+    RobotNodeFourBar::Second& 
+    RobotNodeFourBar::getActiveData()
+    {
+        if (not active)
+        {
+            throw VirtualRobotException("No active data");
+        }
+        
+        return active.value();
+    }
+
+    const RobotNodeFourBar::Second& 
+    RobotNodeFourBar::getActiveData() const
+    {
+        if (not active)
+        {
+            throw VirtualRobotException("No active data");
+        }
+
+        return active.value();
+    }
+
+    const std::optional<RobotNodeFourBar::XmlInfo>& 
+    RobotNodeFourBar::getXmlInfo() const
+    {
+        return xmlInfo;
+    }
+
 
 } // namespace VirtualRobot
