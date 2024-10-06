@@ -207,8 +207,6 @@ namespace VirtualRobot
         {
             // std::cout << "Initializing active four bar joint" << std::endl;
 
-            VR_ASSERT_MESSAGE(not active->passive, "Second must not be initialized yet.");
-
             VirtualRobot::SceneObjectPtr currentParent = parent;
 
             while (currentParent != nullptr)

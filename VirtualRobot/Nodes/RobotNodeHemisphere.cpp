@@ -114,7 +114,6 @@ namespace VirtualRobot
     void
     RobotNodeHemisphere::setXmlInfo(const XmlInfo& info)
     {
-        VR_ASSERT(secondData.has_value());
         switch (info.role)
         {
             case Role::FIRST:
@@ -140,8 +139,6 @@ namespace VirtualRobot
         // The second node needs to store a reference to the first node.
         if (secondData)
         {
-            VR_ASSERT_MESSAGE(not secondData->firstNode, "Second must not be initialized yet.");
-
             RobotNodeHemisphere* firstNode = dynamic_cast<RobotNodeHemisphere*>(parent.get());
             RobotNodeHemisphere* secondNode = this;
 

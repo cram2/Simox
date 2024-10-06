@@ -219,7 +219,7 @@ namespace VirtualRobot
     void
     RobotNode::setJointValueNoUpdate(float q)
     {
-        VR_ASSERT_MESSAGE(initialized, "Not initialized");
+        // VR_ASSERT_MESSAGE(initialized, "Not initialized"); // Throws in FourBarJoint::initialize
         VR_ASSERT_MESSAGE((!std::isnan(q) && !std::isinf(q)), "Not a valid number...");
 
         if (limitless and enforceJointLimits)
