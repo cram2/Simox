@@ -121,6 +121,15 @@ namespace RigidBodyDynamics {
 struct RBDL_DLLAPI Model {
   Model();
 
+  ~Model()
+  {
+      for (CustomJoint* joint : mCustomJoints)
+      {
+          delete joint;
+      }
+      mCustomJoints.clear();
+  }
+
   // Structural information
 
   /// \brief The id of the parents body
