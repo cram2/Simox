@@ -1307,11 +1307,7 @@ namespace VirtualRobot
             else if (not primitives.empty())
             {
                 VisualizationFactoryPtr visualizationFactory = VisualizationFactory::first(NULL);
-
-                const auto color = simox::Color::kit_green(128);
-
-                visualizationNode =
-                    visualizationFactory->getVisualizationFromPrimitives(primitives, false, color);
+                visualizationNode = visualizationFactory->getVisualizationFromPrimitives(primitives);
             }
 
 
