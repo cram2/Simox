@@ -116,7 +116,7 @@ std::vector<std::string> alg::split_check_size(const std::string& str, unsigned 
 }
 
 
-std::string alg::join(const std::vector<std::string> vec, const std::string& delimiter, bool trimElements, bool ignoreEmptyElements, const std::locale& locale) {
+std::string alg::join(const std::vector<std::string>& vec, const std::string& delimiter, bool trimElements, bool ignoreEmptyElements, const std::locale& locale) {
     std::ostringstream ss;
     ss.imbue(locale);
     for (size_t index = 0; index < vec.size(); index++)
