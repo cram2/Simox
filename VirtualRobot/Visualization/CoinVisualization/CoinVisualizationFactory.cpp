@@ -4044,13 +4044,17 @@ namespace VirtualRobot
 
     VirtualRobot::VisualizationNodePtr CoinVisualizationFactory::createUnitedVisualization(const std::vector<VisualizationNodePtr>& visualizations) const
     {
-        if (visualizations.size() == 0)
+        if (visualizations.empty())
         {
             return VisualizationNodePtr();
         }
 
         SoSeparator* s = new SoSeparator;
         s->ref();
+
+        // auto* u = new SoUnits(); 
+        // u->units = SoUnits::MILLIMETERS;
+        // s->addChild(u);
 
         for (size_t i = 0; i < visualizations.size(); i++)
         {
@@ -4076,12 +4080,15 @@ namespace VirtualRobot
                 {
                     SoSeparator* ss = new SoSeparator();
 
+                    // Not clear why but we have to scale the translation by 1000.
+                    constexpr float scaleHack = 1000;
 
                     const Eigen::Isometry3f localPose(visualizations[i]->getLocalPose());
+                    VR_INFO << "Local pose " << localPose.translation() << std::endl;
                     const Eigen::Vector3f& translation = localPose.translation();
 
                     SoTransform* t = new SoTransform;
-                    t->translation.setValue(translation.x(), translation.y(), translation.z());
+                    t->translation.setValue(translation.x() / scaleHack, translation.y() / scaleHack, translation.z() / scaleHack);
                     const Eigen::Quaternionf q = simox::math::mat3f_to_quat(localPose.linear());
                     t->rotation.setValue(q.x(), q.y(), q.z(), q.w());
 

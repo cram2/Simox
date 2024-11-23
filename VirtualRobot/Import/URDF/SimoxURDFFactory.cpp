@@ -416,9 +416,9 @@ namespace VirtualRobot
         }
 
         std::vector< VisualizationNodePtr > visus;
-        for (auto & visu : col_array)
+        for (auto & col : col_array)
         {
-            VirtualRobot::VisualizationNodePtr v = convertVisu(visu->geometry, visu->origin, basePath);
+            VirtualRobot::VisualizationNodePtr v = convertVisu(col->geometry, col->origin, basePath);
             if (v)
             {
                 visus.push_back(v);
@@ -483,7 +483,7 @@ namespace VirtualRobot
 
         VirtualRobot::CollisionModelPtr rnCol;
         std::vector<Primitive::PrimitivePtr> colPrimitives;
-        if (urdfBody->collision && urdfBody->collision)
+        if (urdfBody->collision)
         {
             VisualizationNodePtr v;
             if (urdfBody->collision_array.size() > 1)
@@ -544,6 +544,7 @@ namespace VirtualRobot
 
         if(not colPrimitives.empty())
         {
+            VR_INFO << "Adding col primitives: " << colPrimitives.size() << std::endl;
             node->getPrimitiveApproximation().addModel(colPrimitives, "urdf_col");
         }
 
