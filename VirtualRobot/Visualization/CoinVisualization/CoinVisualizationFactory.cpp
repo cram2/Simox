@@ -4081,10 +4081,10 @@ namespace VirtualRobot
                     SoSeparator* ss = new SoSeparator();
 
                     // Not clear why but we have to scale the translation by 1000.
-                    constexpr float scaleHack = 1000;
+                    constexpr float scaleHack = 1'000;
 
                     const Eigen::Isometry3f localPose(visualizations[i]->getLocalPose());
-                    VR_INFO << "Local pose " << localPose.translation() << std::endl;
+                    // VR_INFO << "Local pose " << localPose.translation() << std::endl;
                     const Eigen::Vector3f& translation = localPose.translation();
 
                     SoTransform* t = new SoTransform;
