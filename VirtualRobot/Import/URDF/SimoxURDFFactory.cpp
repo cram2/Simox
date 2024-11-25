@@ -544,7 +544,7 @@ namespace VirtualRobot
 
         if(not colPrimitives.empty())
         {
-            VR_INFO << "Adding col primitives: " << colPrimitives.size() << std::endl;
+            // VR_INFO << "Adding col primitives: " << colPrimitives.size() << std::endl;
             node->getPrimitiveApproximation().addModel(colPrimitives, "urdf_col");
         }
 
