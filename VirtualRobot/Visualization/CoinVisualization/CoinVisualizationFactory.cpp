@@ -4052,10 +4052,6 @@ namespace VirtualRobot
         SoSeparator* s = new SoSeparator;
         s->ref();
 
-        // auto* u = new SoUnits(); 
-        // u->units = SoUnits::MILLIMETERS;
-        // s->addChild(u);
-
         for (size_t i = 0; i < visualizations.size(); i++)
         {
             if (visualizations[i]->getType() == VisualizationFactory::getName())
@@ -4084,7 +4080,6 @@ namespace VirtualRobot
                     constexpr float scaleHack = 1'000;
 
                     const Eigen::Isometry3f localPose(visualizations[i]->getLocalPose());
-                    // VR_INFO << "Local pose " << localPose.translation() << std::endl;
                     const Eigen::Vector3f& translation = localPose.translation();
 
                     SoTransform* t = new SoTransform;
