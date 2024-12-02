@@ -39,7 +39,7 @@ namespace VirtualRobot
         struct Capability
         {
             std::string affordance;
-            std::string tcp;
+            std::optional<std::string> tcp;
             std::optional<std::string> type;
             std::optional<std::string> shape;
         };
