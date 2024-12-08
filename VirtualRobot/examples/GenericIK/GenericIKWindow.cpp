@@ -1,5 +1,6 @@
 
 #include "GenericIKWindow.h"
+#include "VirtualRobot/MathTools.h"
 #include "VirtualRobot/Visualization/CoinVisualization/CoinVisualizationNode.h"
 #include "VirtualRobot/EndEffector/EndEffector.h"
 
@@ -194,7 +195,7 @@ void GenericIKWindow::collisionModel()
     useColModel = UI.checkBoxColModel->checkState() == Qt::Checked;
     SceneObject::VisualizationType colModel = useColModel ? SceneObject::Collision : SceneObject::Full;
 
-    std::shared_ptr<CoinVisualization> visualization = robot->getVisualization<CoinVisualization>(colModel);
+    std::shared_ptr<CoinVisualization> visualization = robot->getVisualization(colModel);
     SoNode* visualisationNode = nullptr;
 
     if (visualization)
@@ -499,4 +500,3 @@ void GenericIKWindow::loadRobot()
     exViewer->viewAll();
     exViewer->render();
 }
-

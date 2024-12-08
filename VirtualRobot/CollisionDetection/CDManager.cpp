@@ -6,6 +6,8 @@
 #include <cfloat>
 #include "../Robot.h"
 
+#include "VirtualRobot/Nodes/RobotNode.h"
+#include "CollisionChecker.h"
 
 using namespace std;
 

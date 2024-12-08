@@ -7,6 +7,7 @@
 #include <functional>
 #include <iomanip>
 #include <iterator>
+#include <iostream>
 
 #include <Eigen/Dense>
 
@@ -17,6 +18,7 @@
 #include "CollisionDetection/CollisionChecker.h"
 #include "CollisionDetection/CollisionModel.h"
 #include "Robot.h"
+#include "VirtualRobotException.h"
 #include "Visualization/TriMeshModel.h"
 #include "Visualization/Visualization.h"
 #include "Visualization/VisualizationFactory.h"

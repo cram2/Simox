@@ -4,6 +4,7 @@
 
 #include <Eigen/Geometry>
 
+#include <VirtualRobot/VirtualRobot.h>
 #include <GeometricPlanning/path_primitives/PathPrimitive.h>
 #include <GeometricPlanning/types.h>
 

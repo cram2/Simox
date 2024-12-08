@@ -26,6 +26,10 @@
 
 #include <nlopt.hpp>
 
+#include "RobotNodeSet.h"
+#include "Nodes/RobotNode.h"
+#include "VirtualRobotException.h"
+
 using namespace VirtualRobot;
 
 ConstrainedOptimizationIK::ConstrainedOptimizationIK(RobotPtr& robot, const RobotNodeSetPtr& nodeSet, float timeout, float globalTolerance) :
@@ -373,4 +377,3 @@ double ConstrainedOptimizationIK::optimizationConstraintWrapper(const std::vecto
     return (static_cast<std::pair<OptimizationFunctionSetup, ConstrainedOptimizationIK *> *>(data)->second)->optimizationConstraint(
                 x, gradient, static_cast<std::pair<OptimizationFunctionSetup, ConstrainedOptimizationIK *> *>(data)->first);
 }
-

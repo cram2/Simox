@@ -24,6 +24,8 @@
 #include "BalanceConstraint.h"
 
 #include <VirtualRobot/MathTools.h>
+#include "Robot.h"
+#include "VirtualRobotException.h"
 
 using namespace VirtualRobot;
 

@@ -3,6 +3,7 @@
 #include <VirtualRobot/CollisionDetection/CollisionModel.h>
 #include <VirtualRobot/CollisionDetection/CollisionChecker.h>
 #include <VirtualRobot/Nodes/RobotNode.h>
+#include <VirtualRobot/Grasping/Grasp.h>
 #include <VirtualRobot/Visualization/VisualizationFactory.h>
 #include <vector>
 #include <VirtualRobot/VirtualRobotException.h>
@@ -238,5 +239,3 @@ namespace VirtualRobot
 
 
 } //  namespace
-
-

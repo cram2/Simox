@@ -6,7 +6,10 @@
 #include "RobotNodeSet.h"
 #include "Obstacle.h"
 #include "ManipulationObject.h"
+#include "VirtualRobot/Nodes/RobotNode.h"
 
+
+#include <iostream>
 
 namespace VirtualRobot
 {

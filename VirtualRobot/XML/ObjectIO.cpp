@@ -8,6 +8,7 @@
 #include "RobotIO.h"
 #include "../ManipulationObject.h"
 #include "../Visualization/TriMeshModel.h"
+#include "../CollisionDetection/CollisionModel.h"
 
 #include <iostream>
 

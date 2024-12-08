@@ -22,10 +22,9 @@
 */
 #pragma once
 
-#include "VirtualRobot.h"
+#include "VirtualRobotImportExport.h"
 
 #include <map>
-#include <set>
 #include <string>
 #include <vector>
 #include <iostream>
@@ -158,4 +157,3 @@ namespace VirtualRobot
     };
 
 } // namespace
-

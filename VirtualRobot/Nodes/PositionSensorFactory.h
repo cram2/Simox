@@ -23,10 +23,7 @@
 #pragma once
 
 #include "../VirtualRobot.h"
-#include "../SceneObject.h"
 #include "SensorFactory.h"
-
-
 
 
 namespace VirtualRobot

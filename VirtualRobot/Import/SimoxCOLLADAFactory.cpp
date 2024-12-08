@@ -2,6 +2,7 @@
 
 #include "SimoxCOLLADAFactory.h"
 #include "COLLADA-light/ColladaSimox.h"
+#include "VirtualRobotException.h"
 
 
 namespace VirtualRobot

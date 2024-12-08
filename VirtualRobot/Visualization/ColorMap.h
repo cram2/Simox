@@ -25,8 +25,6 @@
 #include "../VirtualRobot.h"
 #include "VisualizationFactory.h"
 
-#include <string>
-
 namespace VirtualRobot
 {
 
@@ -76,4 +74,3 @@ namespace VirtualRobot
     };
 
 } // namespace VirtualRobot
-

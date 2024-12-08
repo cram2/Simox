@@ -25,6 +25,8 @@
 
 #include "AbstractManipulability.h"
 
+#include <VirtualRobot/VirtualRobot.h>
+
 namespace VirtualRobot
 {
 

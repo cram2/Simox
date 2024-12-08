@@ -1,6 +1,5 @@
 #pragma once
 
-#include <functional>
 #include <map>
 #include <string>
 
@@ -67,4 +66,3 @@ namespace simox::color::cmaps
     }
 
 }
-

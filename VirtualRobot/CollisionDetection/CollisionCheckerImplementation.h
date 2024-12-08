@@ -24,7 +24,6 @@
 
 #include "../VirtualRobot.h"
 
-#include <string>
 #include <vector>
 
 #include <Eigen/Core>
@@ -80,4 +79,3 @@ namespace VirtualRobot
     };
 
 } // namespace
-

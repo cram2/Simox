@@ -25,10 +25,10 @@
 #include "../../VirtualRobot.h"
 #include "../Visualization.h"
 
-#include <Inventor/nodes/SoSelection.h>
-#include <Inventor/nodes/SoMaterial.h>
-
 class SoNode;
+class SoMaterial;
+class SoSeparator;
+class SoSelection;
 
 namespace VirtualRobot
 {
@@ -78,7 +78,6 @@ namespace VirtualRobot
         SoMaterial *color;
     };
 
-    typedef std::shared_ptr<CoinVisualization> CoinVisualizationPtr;
+    using CoinVisualizationPtr = std::shared_ptr<CoinVisualization>;
 
 } // namespace VirtualRobot
-

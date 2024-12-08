@@ -3,7 +3,7 @@
 #include <VirtualRobot/math/Helpers.h>
 
 #include <SimoxUtility/algorithm/string/string_tools.h>
-
+#include "VirtualRobot/Nodes/RobotNode.h"
 
 namespace VirtualRobot::mujoco
 {

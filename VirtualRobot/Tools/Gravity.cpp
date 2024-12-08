@@ -4,6 +4,7 @@
 #include "../Nodes/RobotNodeRevolute.h"
 #include "../RobotNodeSet.h"
 #include "../Robot.h"
+#include "VirtualRobotException.h"
 #include <VirtualRobot/MathTools.h>
 
 #include <Eigen/Geometry>

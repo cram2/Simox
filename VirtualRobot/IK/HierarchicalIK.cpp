@@ -1,6 +1,7 @@
 #include "HierarchicalIK.h"
 
 #include <VirtualRobot/MathTools.h>
+#include "VirtualRobotException.h"
 
 using namespace VirtualRobot;
 using namespace std;

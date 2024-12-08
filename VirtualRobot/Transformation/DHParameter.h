@@ -24,6 +24,7 @@
 #pragma once
 
 #include "../VirtualRobot.h"
+
 #include <Eigen/Core>
 
 namespace VirtualRobot
@@ -181,4 +182,3 @@ namespace VirtualRobot
     };
 
 } // namespace VirtualRobot
-

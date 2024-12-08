@@ -8,6 +8,10 @@
 #include "ObjectIO.h"
 #include "../Trajectory.h"
 #include "../SceneObjectSet.h"
+#include "../Obstacle.h"
+#include "../Scene.h"
+#include "../SceneObject.h"
+#include "../ManipulationObject.h"
 
 namespace VirtualRobot
 {

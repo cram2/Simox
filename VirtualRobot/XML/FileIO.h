@@ -27,7 +27,6 @@
 #include <vector>
 #include <fstream>
 #include <iostream>
-#include <stdint.h>
 
 namespace VirtualRobot
 {
@@ -125,4 +124,3 @@ namespace VirtualRobot
     }
 
 } // namespace VirtualRobot
-

@@ -164,7 +164,7 @@ void ConstrainedIKWindow::collisionModel()
 
     robotSep->removeAllChildren();
 
-    std::shared_ptr<CoinVisualization> visualization = robot->getVisualization<CoinVisualization>(SceneObject::Full);
+    std::shared_ptr<CoinVisualization> visualization = robot->getVisualization(SceneObject::Full);
     SoNode* visualisationNode = nullptr;
 
     if (visualization)
@@ -703,4 +703,3 @@ void ConstrainedIKWindow::loadRobot()
     exViewer->viewAll();
     exViewer->render();
 }
-

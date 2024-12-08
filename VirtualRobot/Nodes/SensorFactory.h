@@ -23,7 +23,6 @@
 #pragma once
 
 #include "../VirtualRobot.h"
-#include "../VirtualRobot.h"
 #include "../AbstractFactoryMethod.h"
 #include "Sensor.h"
 #include "GraspableSensorizedObject.h"

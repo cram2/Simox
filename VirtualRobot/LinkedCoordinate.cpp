@@ -1,5 +1,7 @@
 #include "LinkedCoordinate.h"
 #include "Robot.h"
+#include "VirtualRobotException.h"
+#include "Nodes/RobotNode.h"
 
 #include <Eigen/Dense>
 

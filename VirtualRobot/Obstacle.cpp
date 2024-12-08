@@ -3,8 +3,10 @@
 #include "CollisionDetection/CollisionModel.h"
 #include "CollisionDetection/CollisionChecker.h"
 #include "Nodes/RobotNode.h"
+#include "VirtualRobotException.h"
 #include "Visualization/VisualizationFactory.h"
 #include "Visualization/VisualizationNode.h"
+#include <iostream>
 #include <vector>
 
 namespace VirtualRobot

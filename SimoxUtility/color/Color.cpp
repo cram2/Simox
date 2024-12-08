@@ -27,4 +27,22 @@ namespace simox::color
         return { to_float(r), to_float(g), to_float(b), to_float(a) };
     }
 
-}
+    bool
+    operator==(const Color& lhs, const Color& rhs)
+    {
+        return lhs.r == rhs.r && lhs.g == rhs.g && lhs.b == rhs.b && lhs.a == rhs.a;
+    }
+
+    std::ostream&
+    operator<<(std::ostream& os, const Color& c)
+    {
+        return os << "(" << int(c.r) << " " << int(c.g) << " " << int(c.b) << " | " << int(c.a)
+                  << ")";
+    }
+
+    bool
+    operator!=(const Color& lhs, const Color& rhs)
+    {
+        return !(lhs == rhs);
+    }
+} // namespace simox::color

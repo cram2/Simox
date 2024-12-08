@@ -1,6 +1,7 @@
 #pragma once
 
 #ifdef __cplusplus
+
 #include <stdexcept>
 
 #undef eigen_assert

@@ -21,10 +21,7 @@
 
 #pragma once
 
-#include "../VirtualRobot.h"
 #include "SimpleAbstractFunctionR2R3.h"
-
-
 
 namespace math
 {
@@ -70,4 +67,3 @@ namespace math
         // void Step(Eigen::Vector3f pos, float u0, float v0, float& u1,  float& v1);
     };
 }
-

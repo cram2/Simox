@@ -190,10 +190,12 @@ SET(SOURCES
     VirtualRobot.cpp
     VirtualRobotChecks.cpp
     VirtualRobotException.cpp
+    Units.cpp
 
     CollisionDetection/CDManager.cpp
     CollisionDetection/CollisionChecker.cpp
     CollisionDetection/CollisionModel.cpp
+    CollisionDetection/CollisionModelImplementation.cpp
 
     Compression/CompressionBZip2.cpp
     Compression/CompressionRLE.cpp

@@ -23,10 +23,10 @@
 #pragma once
 
 #include "../VirtualRobot.h"
-#include "VirtualRobot/EndEffector/EndEffector.h"
 
 #include <string>
-#include <vector>
+#include <map>
+
 #include <Eigen/Core>
 
 namespace VirtualRobot
@@ -134,4 +134,3 @@ namespace VirtualRobot
     };
 
 } // namespace
-

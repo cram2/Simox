@@ -1,6 +1,8 @@
 
 #include "RobotConfig.h"
+#include <iostream>
 #include "Robot.h"
+#include "Nodes/RobotNode.h"
 #include "VirtualRobotException.h"
 
 

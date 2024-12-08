@@ -24,9 +24,6 @@
 #include "MathForwardDefinitions.h"
 
 
-
-
-
 namespace math
 {
 
@@ -56,4 +53,3 @@ private:
 
 };
 }
-

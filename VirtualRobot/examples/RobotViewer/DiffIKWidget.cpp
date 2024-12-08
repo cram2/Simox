@@ -1,9 +1,12 @@
 ﻿#include "DiffIKWidget.h"
+#include "VirtualRobot/Nodes/RobotNode.h"
+#include "VirtualRobot/RobotNodeSet.h"
 #include "ui_DiffIKWidget.h"
 
 #include <QDialog>
 #include <QVBoxLayout>
 #include <QRegExp>
+#include <Inventor/nodes/SoMaterial.h>
 #include <Inventor/nodes/SoMatrixTransform.h>
 #include <Inventor/nodes/SoUnits.h>
 #include <SimoxUtility/algorithm/string/string_conversion.h>

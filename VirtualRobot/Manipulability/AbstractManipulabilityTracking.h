@@ -24,6 +24,7 @@
 #pragma once
 
 #include <unsupported/Eigen/CXX11/Tensor>
+#include <map>
 #include <memory>
 #include "AbstractManipulability.h"
 

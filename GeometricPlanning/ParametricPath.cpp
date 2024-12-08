@@ -4,6 +4,7 @@
 #include <Eigen/Geometry>
 
 #include <VirtualRobot/RobotNodeSet.h>
+#include "VirtualRobot/Nodes/RobotNode.h"
 
 namespace simox::geometric_planning
 {

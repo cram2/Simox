@@ -1,6 +1,9 @@
 #include "ConstrainedIK.h"
+#include <iostream>
 
 #include "../RobotFactory.h"
+#include "RobotNodeSet.h"
+#include "VirtualRobot/Nodes/RobotNode.h"
 
 using namespace VirtualRobot;
 
@@ -221,5 +224,3 @@ RobotPtr ConstrainedIK::buildReducedRobot(const RobotPtr &original)
 
     return RobotFactory::cloneUniteSubsets(original, "ConstrainedIK_Reduced_Robot", unitable);
 }
-
-

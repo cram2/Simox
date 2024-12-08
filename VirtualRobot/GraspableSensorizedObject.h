@@ -30,7 +30,7 @@ namespace VirtualRobot
 
 class GraspableSensorizedObject;
 
-typedef std::shared_ptr<GraspableSensorizedObject> GraspableSensorizedObjectPtr;
+using GraspableSensorizedObjectPtr = std::shared_ptr<GraspableSensorizedObject>;
 
 class GraspableSensorizedObject : public SceneObject
 {

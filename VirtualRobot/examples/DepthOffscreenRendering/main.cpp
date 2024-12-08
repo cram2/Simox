@@ -1,6 +1,7 @@
 #include <VirtualRobot/RuntimeEnvironment.h>
 
 #include "DepthOffscreenRendering.h"
+#include "VirtualRobot/VirtualRobot.h"
 
 int main(int argc, char* argv[])
 {

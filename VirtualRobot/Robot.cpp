@@ -1,17 +1,20 @@
 
 #include "Robot.h"
+#include <iostream>
 #include <optional>
 #include "RobotConfig.h"
-#include "Trajectory.h"
+#include "RobotNodeSet.h"
 #include "VirtualRobot.h"
 #include "VirtualRobotException.h"
 #include "Nodes/Sensor.h"
-#include "Visualization/VisualizationNode.h"
+#include "Trajectory.h"
+#include "Nodes/RobotNode.h"
+#include "EndEffector/EndEffector.h"
 #include "CollisionDetection/CollisionChecker.h"
 #include "CollisionDetection/CollisionModel.h"
-#include "EndEffector/EndEffector.h"
-#include "Grasping/GraspSet.h"
+#include "Visualization/CoinVisualization/CoinVisualization.h"
 #include "math/Helpers.h"
+#include "Visualization/VisualizationNode.h"
 
 
 namespace VirtualRobot
@@ -1354,6 +1357,42 @@ namespace VirtualRobot
         setJointValues(configuration);
         return true;
     }
+
+
+    /**
+     * This method collects all visualization nodes and creates a new Visualization
+     * subclass which is given by the template parameter T.
+     * T must be a subclass of VirtualRobot::Visualization.
+     * A compile time error is thrown if a different class type is used as template argument.
+     */
+    // template <typename T>
+    std::shared_ptr<CoinVisualization> Robot::getVisualization(SceneObject::VisualizationType visuType, bool sensors)
+    {
+        // static_assert(::std::is_base_of_v<Visualization, T>,
+                    //   "TEMPLATE_PARAMETER_FOR_VirtualRobot_getVisualization_MUST_BT_A_SUBCLASS_OF_VirtualRobot__Visualization");
+        std::vector<RobotNodePtr> collectedRobotNodes;
+        getRobotNodes(collectedRobotNodes);
+        std::vector<VisualizationNodePtr> collectedVisualizationNodes;
+
+        for (size_t i = 0; i < collectedRobotNodes.size(); i++)
+        {
+            collectedVisualizationNodes.push_back(collectedRobotNodes[i]->getVisualization(visuType));
+        }
+
+        if (sensors)
+        {
+            std::vector<SensorPtr> sn = getSensors();
+
+            for (size_t i = 0; i < sn.size(); i++)
+            {
+                collectedVisualizationNodes.push_back(sn[i]->getVisualization(visuType));
+            }
+        }
+
+        std::shared_ptr<CoinVisualization> visualization(new CoinVisualization(collectedVisualizationNodes));
+        return visualization;
+    }
+
 
     
 

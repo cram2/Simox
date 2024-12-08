@@ -2,6 +2,7 @@
 #include "ElasticBandProcessor.h"
 #include "MotionPlanning/CSpace/CSpaceSampled.h"
 #include "MotionPlanning/CSpace/CSpacePath.h"
+#include "VirtualRobot/CollisionDetection/CollisionChecker.h"
 #include <vector>
 #include <ctime>
 #include <cmath>

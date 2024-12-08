@@ -23,7 +23,6 @@
 #pragma once
 
 #include "../VirtualRobot.h"
-#include "../VirtualRobotException.h"
 
 #include "../SceneObject.h"
 
@@ -101,10 +100,9 @@ namespace VirtualRobot
 
 
         //! Forbid cloning method from SceneObject. We need to know the new parent node for cloning
-        SceneObjectPtr clone(const std::string& /*name*/, CollisionCheckerPtr /*colChecker*/ = CollisionCheckerPtr(), float /*scaling*/ = 1.0f) const
-        {
-            THROW_VR_EXCEPTION("Cloning not allowed this way...");
-        }
+        SceneObjectPtr clone(const std::string& /*name*/,
+                             CollisionCheckerPtr /*colChecker*/ = CollisionCheckerPtr(),
+                             float /*scaling*/ = 1.0f) const;
 
         /*!
             Compute/Update the transformations of this sensor. Therefore the parent is queried for its pose.
@@ -136,12 +134,9 @@ namespace VirtualRobot
         */
         virtual SensorPtr _clone(const GraspableSensorizedObjectPtr newNode, const VisualizationNodePtr visualizationModel, float scaling) = 0;
 
-        SceneObject* _clone(const std::string& /*name*/, CollisionCheckerPtr /*colChecker*/ = CollisionCheckerPtr(), float /*scaling*/ = 1.0f) const override
-        {
-            THROW_VR_EXCEPTION("Cloning not allowed this way...");
-        }
-
+        SceneObject* _clone(const std::string& /*name*/,
+                            CollisionCheckerPtr /*colChecker*/ = CollisionCheckerPtr(),
+                            float /*scaling*/ = 1.0f) const override;
     };
 
 } // namespace VirtualRobot
-

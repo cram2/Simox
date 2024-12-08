@@ -1,6 +1,8 @@
 
 #include "IKRRTWindow.h"
 #include "VirtualRobot/EndEffector/EndEffector.h"
+#include "VirtualRobot/MathTools.h"
+#include "VirtualRobot/Scene.h"
 #include "VirtualRobot/Workspace/Reachability.h"
 #include "VirtualRobot/ManipulationObject.h"
 #include "VirtualRobot/Grasping/Grasp.h"
@@ -284,7 +286,7 @@ void IKRRTWindow::buildVisu()
 
     if (robot)
     {
-        visualizationRobot = robot->getVisualization<CoinVisualization>(colModel);
+        visualizationRobot = robot->getVisualization(colModel);
         SoNode* visualisationNode = visualizationRobot->getCoinVisualization();
 
         if (visualisationNode)
@@ -793,5 +795,3 @@ void IKRRTWindow::redraw()
     this->update();
     viewer->scheduleRedraw();
 }
-
-

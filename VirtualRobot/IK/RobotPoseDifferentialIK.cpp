@@ -4,6 +4,9 @@
 #include <Eigen/Geometry>
 
 #include <VirtualRobot/Robot.h>
+#include "../Nodes/RobotNode.h"
+#include "../RobotNodeSet.h"
+#include "../Robot.h"
 
 #include <algorithm>
 #include <cfloat>
@@ -555,4 +558,3 @@ namespace VirtualRobot
     }
 
 }
-

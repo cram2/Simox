@@ -22,14 +22,11 @@
 */
 #pragma once
 
-#include "../VirtualRobot.h"
-#include "../MathTools.h"
-#include "../BoundingBox.h"
+#include "VirtualRobot/VirtualRobot.h"
+#include "VirtualRobot/BoundingBox.h"
 
 #include <string>
 #include <vector>
-#include <map>
-#include <set>
 
 #if defined(VR_COLLISION_DETECTION_PQP)
 #include "PQP/CollisionModelPQP.h"

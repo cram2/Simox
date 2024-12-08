@@ -22,8 +22,9 @@
 */
 #pragma once
 
-#include "../VirtualRobot.h"
-#include "VisualizationFactory.h"
+#include "VirtualRobot/VirtualRobot.h"
+#include "VirtualRobot/Primitive.h"
+#include "VirtualRobot/Visualization/VisualizationFactory.h"
 
 #include <Eigen/Core>
 
@@ -183,4 +184,3 @@ namespace VirtualRobot
     };
 
 } // namespace VirtualRobot
-

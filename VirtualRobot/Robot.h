@@ -24,11 +24,10 @@
 
 #include "VirtualRobot.h"
 #include "SceneObject.h"
-#include "Nodes/RobotNode.h"
 #include "Nodes/ConditionedLock.h"
 #include "BoundingBox.h"
+#include "Visualization/CoinVisualization/CoinVisualization.h"
 
-#include <type_traits>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -148,7 +147,8 @@ namespace VirtualRobot
              if (visualization)
                  visualisationNode = visualization->getCoinVisualization();
         */
-        template <typename T> std::shared_ptr<T> getVisualization(SceneObject::VisualizationType visuType = SceneObject::Full, bool sensors = true);
+        // template <typename T> std::shared_ptr<T> getVisualization(SceneObject::VisualizationType visuType = SceneObject::Full, bool sensors = true);
+        std::shared_ptr<CoinVisualization> getVisualization(SceneObject::VisualizationType visuType = SceneObject::Full, bool sensors = true);
         /*!
             Shows the structure of the robot
         */
@@ -553,40 +553,6 @@ namespace VirtualRobot
         std::map<std::string, std::map<std::string, float>> configurations;
 
     };
-
-    /**
-     * This method collects all visualization nodes and creates a new Visualization
-     * subclass which is given by the template parameter T.
-     * T must be a subclass of VirtualRobot::Visualization.
-     * A compile time error is thrown if a different class type is used as template argument.
-     */
-    template <typename T>
-    std::shared_ptr<T> Robot::getVisualization(SceneObject::VisualizationType visuType, bool sensors)
-    {
-        static_assert(::std::is_base_of_v<Visualization, T>,
-                      "TEMPLATE_PARAMETER_FOR_VirtualRobot_getVisualization_MUST_BT_A_SUBCLASS_OF_VirtualRobot__Visualization");
-        std::vector<RobotNodePtr> collectedRobotNodes;
-        getRobotNodes(collectedRobotNodes);
-        std::vector<VisualizationNodePtr> collectedVisualizationNodes;
-
-        for (size_t i = 0; i < collectedRobotNodes.size(); i++)
-        {
-            collectedVisualizationNodes.push_back(collectedRobotNodes[i]->getVisualization(visuType));
-        }
-
-        if (sensors)
-        {
-            std::vector<SensorPtr> sn = getSensors();
-
-            for (size_t i = 0; i < sn.size(); i++)
-            {
-                collectedVisualizationNodes.push_back(sn[i]->getVisualization(visuType));
-            }
-        }
-
-        std::shared_ptr<T> visualization(new T(collectedVisualizationNodes));
-        return visualization;
-    }
 
     class VIRTUAL_ROBOT_IMPORT_EXPORT LocalRobot : public Robot
     {

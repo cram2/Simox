@@ -4,6 +4,12 @@
 #include <Eigen/Geometry>
 #include <Eigen/Dense>
 
+#include "../Robot.h"
+#include "../VirtualRobotException.h"
+#include "../Nodes/RobotNode.h"
+#include "../RobotNodeSet.h"
+#include "../IK/DifferentialIK.h"
+
 using namespace std;
 
 namespace VirtualRobot

@@ -23,6 +23,7 @@
 #include "RobotImporterFactory.h"
 
 #include <SimoxUtility/algorithm/string/string_tools.h>
+#include "VirtualRobotException.h"
 
 using namespace std;
 
@@ -67,4 +68,3 @@ namespace VirtualRobot
 
 
 } // namespace VirtualRobot
-

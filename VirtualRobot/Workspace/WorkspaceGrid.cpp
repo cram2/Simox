@@ -4,6 +4,7 @@
 #include "../ManipulationObject.h"
 #include "../Nodes/RobotNode.h"
 #include "../Robot.h"
+#include "Grasping/Grasp.h"
 #include "VirtualRobot.h"
 #include "Workspace/WorkspaceData.h"
 #include <cmath>

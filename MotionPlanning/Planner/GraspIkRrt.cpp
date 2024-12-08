@@ -4,6 +4,7 @@
 #include "../CSpace/CSpaceNode.h"
 #include "../CSpace/CSpaceTree.h"
 #include "../CSpace/CSpacePath.h"
+#include "VirtualRobot/Grasping/Grasp.h"
 #include <VirtualRobot/Robot.h>
 #include <VirtualRobot/RobotNodeSet.h>
 #include <VirtualRobot/Grasping/GraspSet.h>

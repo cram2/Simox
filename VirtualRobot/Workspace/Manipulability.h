@@ -24,8 +24,6 @@
 
 #include <VirtualRobot/VirtualRobot.h>
 #include <VirtualRobot/Workspace/WorkspaceRepresentation.h>
-#include <VirtualRobot/IK/PoseQualityMeasurement.h>
-#include <VirtualRobot/Grasping/GraspSet.h>
 
 
 namespace VirtualRobot
@@ -207,5 +205,3 @@ namespace VirtualRobot
     typedef std::shared_ptr<Manipulability> ManipulabilityPtr;
 
 } // namespace VirtualRobot
-
-

@@ -236,7 +236,7 @@ namespace VirtualRobot
 
         if (robotEEF)
         {
-            visualizationAll = robotEEF->getVisualization<CoinVisualization>(colModel);
+            visualizationAll = robotEEF->getVisualization(colModel);
             SoNode* visualisationNode = visualizationAll->getCoinVisualization();
 
             if (visualisationNode)
@@ -246,7 +246,7 @@ namespace VirtualRobot
             }
 
             for (auto hand : hands) {
-                auto visHand = hand->getVisualization<CoinVisualization>(colModel);
+                auto visHand = hand->getVisualization(colModel);
                 SoNode* visHandNode = visHand->getCoinVisualization();
                 visHand->setTransparency(0.8);
 

@@ -23,6 +23,7 @@
 
 
 #include "AbstractFunctionR1R3.h"
+#include "math/MathForwardDefinitions.h"
 
 
 namespace math
@@ -40,4 +41,3 @@ namespace math
         const AbstractFunctionR1R3Ptr func;
     };
 }
-

@@ -24,6 +24,7 @@
 
 #include "Affordances.h"
 #include "VirtualRobot.h"
+#include "Primitive.h"
 
 #include <Eigen/Core>
 
@@ -33,7 +34,6 @@
 #include <filesystem>
 #include <map>
 #include <set>
-#include "Primitive.h"
 
 
 namespace VirtualRobot

@@ -3,7 +3,9 @@
 #include "../RobotConfig.h"
 #include "..//Robot.h"
 #include "../VirtualRobotException.h"
+#include "EndEffector/EndEffector.h"
 #include <VirtualRobot/MathTools.h>
+#include "VirtualRobot/Nodes/RobotNode.h"
 
 #include <Eigen/Dense>
 
@@ -211,5 +213,3 @@ namespace VirtualRobot
 
 
 } //  namespace
-
-

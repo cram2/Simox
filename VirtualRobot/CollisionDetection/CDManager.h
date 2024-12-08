@@ -26,13 +26,10 @@
 
 #pragma once
 
-#include "../VirtualRobot.h"
-#include "CollisionModel.h"
-#include "../SceneObjectSet.h"
-#include "CollisionChecker.h"
+#include "VirtualRobot/VirtualRobot.h"
+#include "VirtualRobot/SceneObjectSet.h"
 
 #include <vector>
-#include <set>
 #include <string>
 
 
@@ -144,5 +141,3 @@ namespace VirtualRobot
     };
 
 }
-
-

@@ -20,6 +20,8 @@
  */
 
 #pragma once
+
+
 #include "MathForwardDefinitions.h"
 
 #include "SimpleAbstractFunctionR1R3.h"
@@ -49,4 +51,3 @@ namespace math
 
     };
 }
-

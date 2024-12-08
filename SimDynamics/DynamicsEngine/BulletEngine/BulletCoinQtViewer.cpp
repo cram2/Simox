@@ -1,5 +1,6 @@
 #include "BulletCoinQtViewer.h"
 
+#include <Inventor/nodes/SoCamera.h>
 #include <Inventor/sensors/SoTimerSensor.h>
 #include <Inventor/nodes/SoEventCallback.h>
 #include <Inventor/nodes/SoDrawStyle.h>
@@ -243,7 +244,7 @@ namespace SimDynamics
         //VR_ASSERT(so);
         removeVisualization(robot);
 
-        std::shared_ptr<VirtualRobot::CoinVisualization> visualization = robot->getVisualization<CoinVisualization>(visuType);
+        std::shared_ptr<VirtualRobot::CoinVisualization> visualization = robot->getVisualization(visuType);
         SoNode* n = visualization->getCoinVisualization();
 
         if (n)
@@ -506,4 +507,3 @@ namespace SimDynamics
     }
 
 }
-

@@ -4,6 +4,7 @@
 #include <cmath>
 #include <cfloat>
 #include <climits>
+#include "Compression/CompressionBZip2.h"
 
 namespace VirtualRobot
 {

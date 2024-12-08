@@ -1,5 +1,6 @@
 
 #include "MTPlanningWindow.h"
+#include "VirtualRobot/CollisionDetection/CollisionChecker.h"
 
 
 #include <cstring>

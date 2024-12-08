@@ -23,8 +23,6 @@
 #pragma once
 
 #include "VirtualRobot.h"
-#include "MathTools.h"
-#include "RobotNodeSet.h"
 
 #include <Eigen/Core>
 #include <vector>
@@ -171,4 +169,3 @@ namespace VirtualRobot
 
 
 } // namespace VirtualRobot
-

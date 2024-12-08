@@ -25,6 +25,9 @@
 
 #include <VirtualRobot/MathTools.h>
 
+#include "Nodes/RobotNode.h"
+#include "RobotNodeSet.h"
+
 #include <Eigen/Dense>
 
 using namespace VirtualRobot;

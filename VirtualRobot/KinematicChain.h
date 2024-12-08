@@ -1,7 +1,6 @@
 #pragma once
 
 #include "VirtualRobot.h"
-#include "Nodes/RobotNode.h"
 #include "RobotNodeSet.h"
 
 #include <string>
@@ -47,4 +46,3 @@ namespace VirtualRobot
     };
 
 } // namespace VirtualRobot
-

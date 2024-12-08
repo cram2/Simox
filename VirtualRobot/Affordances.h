@@ -1,10 +1,12 @@
 
 #pragma once
 
-#include <vector>
-#include <Eigen/Geometry>
 #include "Primitive.h"
 #include "VirtualRobot.h"
+
+#include <Eigen/Geometry>
+
+#include <vector>
 
 namespace VirtualRobot::affordances
 {

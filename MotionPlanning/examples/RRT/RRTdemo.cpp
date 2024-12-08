@@ -4,6 +4,7 @@
 #include <VirtualRobot/RuntimeEnvironment.h>
 #include <VirtualRobot/SceneObjectSet.h>
 #include <VirtualRobot/Nodes/RobotNode.h>
+#include <VirtualRobot/RobotNodeSet.h>
 #include <VirtualRobot/XML/RobotIO.h>
 #include <VirtualRobot/Visualization/VisualizationFactory.h>
 #include <VirtualRobot/Visualization/CoinVisualization/CoinVisualization.h>
@@ -174,7 +175,7 @@ void startRRTVisualization()
     SoSeparator* sep = new SoSeparator();
     SceneObject::VisualizationType colModel = SceneObject::Full;
 
-    std::shared_ptr<CoinVisualization> visualization = robot->getVisualization<CoinVisualization>(colModel);
+    std::shared_ptr<CoinVisualization> visualization = robot->getVisualization(colModel);
     SoNode* visualisationNode = nullptr;
 
     if (visualization)

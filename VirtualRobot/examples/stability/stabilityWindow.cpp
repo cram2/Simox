@@ -201,7 +201,7 @@ void stabilityWindow::buildVisu()
     robotVisuSep->removeAllChildren();
     useColModel = UI.checkBoxColModel->checkState() == Qt::Checked;
     SceneObject::VisualizationType colModel = (UI.checkBoxColModel->isChecked()) ? SceneObject::Collision : SceneObject::Full;
-    visualization = robot->getVisualization<CoinVisualization>(colModel);
+    visualization = robot->getVisualization(colModel);
     SoNode* visualisationNode = nullptr;
 
     if (visualization)

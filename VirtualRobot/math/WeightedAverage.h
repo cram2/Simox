@@ -22,7 +22,7 @@
 #pragma once
 
 
-#include "MathForwardDefinitions.h"
+#include <Eigen/Core>
 
 namespace math
 {
@@ -49,4 +49,3 @@ namespace math
         float weightSum = 0;
     };
 }
-

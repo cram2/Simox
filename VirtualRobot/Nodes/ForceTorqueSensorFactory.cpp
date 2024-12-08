@@ -5,6 +5,7 @@
 #include "../XML/BaseIO.h"
 #include "../XML/rapidxml.hpp"
 #include "ForceTorqueSensor.h"
+#include "VirtualRobotException.h"
 
 
 namespace VirtualRobot

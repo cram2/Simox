@@ -22,6 +22,7 @@
 
 #include <VirtualRobot/Nodes/RobotNode.h>
 #include <VirtualRobot/Robot.h>
+#include "RobotNodeSet.h"
 
 #include "MathTools.h"
 #include "Soechting.h"

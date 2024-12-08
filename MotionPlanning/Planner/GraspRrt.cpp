@@ -8,6 +8,9 @@
 #include <VirtualRobot/Grasping/GraspSet.h>
 #include <VirtualRobot/Grasping/BasicGraspQualityMeasure.h>
 #include <VirtualRobot/Random.h>
+#include "VirtualRobot/CollisionDetection/CollisionChecker.h"
+#include "VirtualRobot/Nodes/RobotNode.h"
+#include "VirtualRobot/RobotNodeSet.h"
 #include <algorithm>
 #include <cfloat>
 #include <ctime>

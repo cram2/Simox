@@ -19,6 +19,7 @@
 #include "CartesianPositionController.h"
 
 #include "VirtualRobot/math/Helpers.h"
+#include "../Nodes/RobotNode.h"
 #include <Eigen/Dense>
 
 namespace VirtualRobot

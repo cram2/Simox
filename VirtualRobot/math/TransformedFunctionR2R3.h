@@ -23,8 +23,6 @@
 
 #include "AbstractFunctionR2R3.h"
 
-
-
 namespace math
 {
     class TransformedFunctionR2R3 :
@@ -45,4 +43,3 @@ namespace math
 
     };
 }
-

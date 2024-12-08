@@ -9,6 +9,8 @@
 #include <VirtualRobot/Nodes/RobotNodeHemisphere.h>
 #include <VirtualRobot/Nodes/RobotNodeFourBar.h>
 #include <VirtualRobot/Nodes/RobotNodeHemisphere.h>
+#include "VirtualRobot/Nodes/RobotNode.h"
+#include "VirtualRobot/RobotNodeSet.h"
 
 #include <Eigen/Geometry>
 #include <Eigen/src/Core/Matrix.h>

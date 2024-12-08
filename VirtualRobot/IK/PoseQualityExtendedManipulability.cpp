@@ -2,6 +2,11 @@
 #include "PoseQualityExtendedManipulability.h"
 
 #include <VirtualRobot/MathTools.h>
+#include "../Nodes/RobotNode.h"
+#include "../RobotNodeSet.h"
+#include "../Robot.h"
+#include "IK/IKSolver.h"
+#include "IK/DifferentialIK.h"
 
 #include <Eigen/Geometry>
 #include <Eigen/Dense>

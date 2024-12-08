@@ -1,6 +1,8 @@
 
 #include "ManipulationObject.h"
+#include "MathTools.h"
 #include "VirtualRobotException.h"
+#include "CollisionDetection/CollisionModel.h"
 #include "Visualization/VisualizationNode.h"
 #include "GraspableSensorizedObject.h"
 #include "XML/BaseIO.h"
@@ -167,5 +169,3 @@ namespace VirtualRobot
 
 
 } //  namespace
-
-

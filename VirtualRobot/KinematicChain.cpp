@@ -2,6 +2,7 @@
 #include "KinematicChain.h"
 #include "Robot.h"
 #include "VirtualRobotException.h"
+#include "Nodes/RobotNode.h"
 
 
 #include <algorithm>

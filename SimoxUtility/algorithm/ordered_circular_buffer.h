@@ -3,7 +3,6 @@
 #include <boost/circular_buffer.hpp>
 
 #include <algorithm>
-#include <vector>
 
 
 namespace simox

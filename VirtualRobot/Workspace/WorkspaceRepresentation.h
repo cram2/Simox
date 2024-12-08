@@ -23,10 +23,6 @@
 #pragma once
 
 #include "../VirtualRobot.h"
-#include "WorkspaceData.h"
-#include "WorkspaceDataArray.h"
-#include "../MathTools.h"
-#include "../XML/FileIO.h"
 
 #include <cmath>
 #include <vector>

@@ -23,7 +23,6 @@
 #pragma once
 
 #include "VirtualRobot.h"
-#include "MathTools.h"
 #include "Nodes/Sensor.h"
 
 #include <string>
@@ -186,4 +185,3 @@ namespace VirtualRobot
         virtual ~RobotFactory();
     };
 }
-

@@ -1,10 +1,6 @@
 #pragma once
 
 
-// STD/STL
-#include <exception>
-
-// Eigen
 #include <Eigen/Core>
 
 

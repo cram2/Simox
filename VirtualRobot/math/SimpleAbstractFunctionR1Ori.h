@@ -21,9 +21,9 @@
 
 #pragma once
 
-#include "../VirtualRobot.h"
-#include "MathForwardDefinitions.h"
+#include <VirtualRobot/VirtualRobotImportExport.h>
 
+#include <Eigen/Core>
 #include <Eigen/Geometry>
 
 namespace math

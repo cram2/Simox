@@ -1,9 +1,12 @@
 
 #include "simDynamicsWindow.h"
 #include "VirtualRobot/EndEffector/EndEffector.h"
+#include "VirtualRobot/ManipulationObject.h"
 #include "VirtualRobot/Workspace/Reachability.h"
 #include <VirtualRobot/RuntimeEnvironment.h>
 #include <VirtualRobot/Nodes/RobotNodeRevolute.h>
+#include <VirtualRobot/Visualization/VisualizationFactory.h>
+#include <VirtualRobot/Visualization/CoinVisualization/CoinVisualizationFactory.h>
 #include <SimDynamics/DynamicsEngine/BulletEngine/BulletEngine.h>
 #include <VirtualRobot/XML/ObjectIO.h>
 #include <VirtualRobot/CollisionDetection/CollisionChecker.h>
@@ -18,6 +21,7 @@
 #include "Inventor/actions/SoLineHighlightRenderAction.h"
 #include <Inventor/nodes/SoShapeHints.h>
 #include <Inventor/nodes/SoLightModel.h>
+#include <Inventor/nodes/SoMatrixTransform.h>
 #include <Inventor/nodes/SoCube.h>
 #include <Inventor/nodes/SoUnits.h>
 

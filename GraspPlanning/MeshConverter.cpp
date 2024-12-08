@@ -22,6 +22,7 @@
 */
 #include "MeshConverter.h"
 #include <VirtualRobot/Visualization/VisualizationFactory.h>
+#include "VirtualRobot/CollisionDetection/CollisionModel.h"
 #include <GraspPlanning/ConvexHullGenerator.h>
 
 using namespace std;

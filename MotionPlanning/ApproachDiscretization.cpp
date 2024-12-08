@@ -3,6 +3,7 @@
 #include <ctime>
 #include <algorithm>
 #include <climits>
+#include "VirtualRobot/MathTools.h"
 
 using namespace std;
 

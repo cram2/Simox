@@ -1,6 +1,7 @@
 
 #include "CameraSensor.h"
 #include "CameraSensorFactory.h"
+#include "VirtualRobotException.h"
 
 #include <VirtualRobot/Visualization/VisualizationNode.h>
 

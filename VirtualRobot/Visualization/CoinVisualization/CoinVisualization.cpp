@@ -8,6 +8,7 @@
 #include "CoinVisualization.h"
 #include "CoinVisualizationNode.h"
 
+#include <Inventor/nodes/SoSelection.h>
 #include <Inventor/nodes/SoSeparator.h>
 #include <Inventor/nodes/SoMatrixTransform.h>
 #include <Inventor/nodes/SoUnits.h>
@@ -19,6 +20,7 @@
 #include <Inventor/actions/SoToVRML2Action.h>
 #include <Inventor/VRMLnodes/SoVRMLGroup.h>
 #include <Inventor/nodes/SoRotation.h>
+#include <Inventor/nodes/SoMaterial.h>
 
 namespace VirtualRobot
 {

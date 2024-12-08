@@ -21,8 +21,9 @@
 
 #pragma once
 
-#include "../VirtualRobot.h"
-#include "MathForwardDefinitions.h"
+#include <Eigen/Core>
+
+#include <VirtualRobot/VirtualRobotImportExport.h>
 
 namespace math
 {
@@ -35,4 +36,3 @@ namespace math
     private:
     };
 }
-

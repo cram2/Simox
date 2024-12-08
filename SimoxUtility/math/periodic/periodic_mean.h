@@ -7,8 +7,6 @@
 
 #include <SimoxUtility/math/rescale.h>
 
-#include "periodic_clamp.h"
-
 
 namespace simox::math
 {
@@ -47,4 +45,3 @@ namespace simox::math
     double periodic_mean(const std::vector<double>& samples, double periodLo, double periodHi);
 
 }
-

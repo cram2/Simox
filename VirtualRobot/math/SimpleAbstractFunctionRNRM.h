@@ -21,9 +21,9 @@
 
 #pragma once
 
-#include "../VirtualRobot.h"
-#include "MathForwardDefinitions.h"
+#include <Eigen/Core>
 
+#include <VirtualRobot/VirtualRobotImportExport.h>
 namespace math
 {
     template<int N, int M>
@@ -49,4 +49,3 @@ namespace math
     template<int M>
     using SimpleAbstractFunctionR1RM = SimpleAbstractFunctionRNRM<1, M>;
 }
-

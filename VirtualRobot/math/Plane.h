@@ -26,10 +26,6 @@
 #include "Line.h"
 #include "ImplicitPlane.h"
 
-
-
-
-
 namespace math
 {
 
@@ -70,4 +66,3 @@ private:
 
 };
 }
-

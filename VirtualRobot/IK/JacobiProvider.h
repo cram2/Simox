@@ -23,12 +23,9 @@
 #pragma once
 
 #include "../VirtualRobot.h"
-#include "../Nodes/RobotNode.h"
-#include "../RobotNodeSet.h"
 #include "IKSolver.h"
 
 #include <string>
-#include <vector>
 
 namespace VirtualRobot
 {
@@ -123,4 +120,3 @@ namespace VirtualRobot
 
     typedef std::shared_ptr<JacobiProvider> JacobiProviderPtr;
 } // namespace VirtualRobot
-

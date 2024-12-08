@@ -1,9 +1,13 @@
 #include "ChainedGrasp.h"
 
+#include "Nodes/RobotNodeFixed.h"
 #include "VirtualRobot/MathTools.h"
 #include "VirtualRobot/EndEffector/EndEffector.h"
 #include "VirtualRobot/Robot.h"
 #include "VirtualRobot/RobotNodeSet.h"
+#include "VirtualRobot/Nodes/RobotNode.h"
+#include "VirtualRobot/Nodes/RobotNodeRevolute.h"
+#include "VirtualRobot/Nodes/RobotNodePrismatic.h"
 
 namespace VirtualRobot
 {

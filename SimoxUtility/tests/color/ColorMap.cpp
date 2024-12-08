@@ -26,8 +26,8 @@
 
 #include <SimoxUtility/color/ColorMap.h>
 #include <SimoxUtility/color/cmaps.h>
+#include <SimoxUtility/color/interpolation.h>
 
-#include <iostream>
 
 
 namespace ColorMapTest

@@ -22,7 +22,8 @@
 */
 #pragma once
 
-#include "VirtualRobot.h"
+#include "VirtualRobotImportExport.h"
+
 #include <random>
 
 namespace VirtualRobot
@@ -43,4 +44,3 @@ namespace VirtualRobot
         return std::uniform_real_distribution<float>{min, max}(PRNG64Bit());
     }
 }
-

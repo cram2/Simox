@@ -24,6 +24,7 @@
 #include "StackedIK.h"
 
 #include <VirtualRobot/MathTools.h>
+#include "VirtualRobotException.h"
 
 using namespace VirtualRobot;
 
@@ -106,4 +107,3 @@ namespace VirtualRobot
     }
 
 } // namespace VirtualRobot
-

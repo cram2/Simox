@@ -24,6 +24,8 @@
 #include "PositionConstraint.h"
 
 #include <VirtualRobot/Robot.h>
+#include "Nodes/RobotNode.h"
+#include "RobotNodeSet.h"
 
 using namespace VirtualRobot;
 

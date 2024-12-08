@@ -16,9 +16,12 @@
 #include <cmath>
 
 #include "Inventor/actions/SoLineHighlightRenderAction.h"
+#include "VirtualRobot/ManipulationObject.h"
 #include "VirtualRobot/Workspace/NaturalPosture.h"
 #include <Inventor/nodes/SoShapeHints.h>
 #include <Inventor/nodes/SoLightModel.h>
+#include <Inventor/nodes/SoMatrixTransform.h>
+#include <Inventor/nodes/SoNode.h>
 
 
 #include <sstream>
@@ -338,7 +341,7 @@ void ReachabilityMapWindow::buildRobotVisu()
         return;
     }
 
-    std::shared_ptr<VirtualRobot::CoinVisualization> visualization = robot->getVisualization<CoinVisualization>();
+    std::shared_ptr<VirtualRobot::CoinVisualization> visualization = robot->getVisualization();
     SoNode* visualisationNode = nullptr;
 
     if (visualization)
