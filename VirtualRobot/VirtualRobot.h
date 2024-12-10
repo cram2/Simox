@@ -22,7 +22,6 @@
 */
 #pragma once
 
-#include "BoundingBox.h"
 #include "VirtualRobotImportExport.h"
 
 /*! \defgroup VirtualRobot The VirtualRobot Library
@@ -141,6 +140,9 @@ namespace VirtualRobot
     class DHParameter;
     class RobotNode;
     class RobotNodeRevolute;
+    class RobotNodePrismatic;
+    class RobotNodeFixed;    
+
     class RobotNodeFactory;
     class RobotNodeSet;
     class KinematicChain;
@@ -180,6 +182,7 @@ namespace VirtualRobot
     class LocalRobot;
     class Color;
     class BoundingBox;
+    class GazeIK;
 
     using CoMIKPtr = std::shared_ptr<CoMIK>;
     using HierarchicalIKPtr = std::shared_ptr<HierarchicalIK>;
@@ -193,6 +196,7 @@ namespace VirtualRobot
     using RobotNodePtr = std::shared_ptr<RobotNode>;
     using SupportPolygonPtr = std::shared_ptr<SupportPolygon>;
     using RobotNodeRevolutePtr = std::shared_ptr<RobotNodeRevolute>;
+    using RobotNodePrismaticPtr = std::shared_ptr<RobotNodePrismatic>;
     using RobotNodeSetPtr = std::shared_ptr<RobotNodeSet>;
     using KinematicChainPtr = std::shared_ptr<KinematicChain>;
     using RobotNodeWeakPtr = std::weak_ptr<RobotNode>;
