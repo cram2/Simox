@@ -282,7 +282,7 @@ std::string ChainedGrasp::getTransformationXML(const std::string &tabs) const {
 
 GraspPtr ChainedGrasp::clone() const {
     // TODO
-    VR_INFO << "Cloning chained grasp not yet implemented. Calling Grasp::clone()" << std::endl;
+    // VR_INFO << "Cloning chained grasp not yet implemented. Calling Grasp::clone()" << std::endl;
     return Grasp::clone();
 }
 
