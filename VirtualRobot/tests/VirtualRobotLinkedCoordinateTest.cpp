@@ -4,6 +4,7 @@
 * @copyright  2010,2011 Stefan Ulbrich, Nikolaus Vahrenkamp
 */
 
+#include "VirtualRobotException.h"
 #define BOOST_TEST_MODULE VirtualRobot_CoordinatesTest
 
 #include <VirtualRobot/VirtualRobotTest.h>
