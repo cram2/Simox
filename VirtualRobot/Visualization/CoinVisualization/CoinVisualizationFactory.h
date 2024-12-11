@@ -33,6 +33,7 @@
 
 #include "VirtualRobot/Visualization/ColorMap.h"
 #include <Inventor/SbMatrix.h>
+#include <Inventor/nodes/SoSeparator.h>
 
 #include <fstream>
 #include <string>
