@@ -191,6 +191,8 @@ SET(SOURCES
     VirtualRobotChecks.cpp
     VirtualRobotException.cpp
     Units.cpp
+    Assert.cpp
+    Logging.cpp
 
     CollisionDetection/CDManager.cpp
     CollisionDetection/CollisionChecker.cpp
