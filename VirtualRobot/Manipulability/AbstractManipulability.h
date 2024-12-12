@@ -25,6 +25,7 @@
 
 #include <Eigen/Core>
 #include <Eigen/Dense>
+#include "VirtualRobot/VirtualRobot.h"
 #include <unsupported/Eigen/CXX11/Tensor>
 #include "VirtualRobot/IK/IKSolver.h"
 

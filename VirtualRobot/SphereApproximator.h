@@ -24,10 +24,10 @@
 #pragma once
 
 #include "VirtualRobot.h"
-#include "MathTools.h"
+
 #include <vector>
 #include <map>
-#include <float.h>
+
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
@@ -105,4 +105,3 @@ namespace VirtualRobot
     };
 
 }
-

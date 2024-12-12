@@ -6,6 +6,7 @@
 #include "CSpaceTree.h"
 #include "CSpacePath.h"
 #include "ConfigurationConstraint.h"
+#include "VirtualRobot/RobotNodeSet.h"
 #include <VirtualRobot/CollisionDetection/CDManager.h>
 #include <VirtualRobot/CollisionDetection/CollisionChecker.h>
 #include <cfloat>

@@ -1,6 +1,7 @@
 #include "ColorMap.h"
 
 #include <SimoxUtility/math/rescale.h>
+#include "SimoxUtility/color/interpolation.h"
 
 
 namespace simox::color

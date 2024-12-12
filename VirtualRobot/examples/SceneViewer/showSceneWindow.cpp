@@ -1,6 +1,9 @@
 
 #include "showSceneWindow.h"
 #include "VirtualRobot/EndEffector/EndEffector.h"
+#include "VirtualRobot/Grasping/Grasp.h"
+#include "VirtualRobot/Scene.h"
+#include "VirtualRobot/Trajectory.h"
 #include "VirtualRobot/Workspace/Reachability.h"
 #include "VirtualRobot/ManipulationObject.h"
 #include "VirtualRobot/XML/ObjectIO.h"
@@ -18,6 +21,7 @@
 #include "Inventor/actions/SoLineHighlightRenderAction.h"
 #include <Inventor/nodes/SoShapeHints.h>
 #include <Inventor/nodes/SoLightModel.h>
+#include <Inventor/nodes/SoMatrixTransform.h>
 
 #include <sstream>
 using namespace std;
@@ -171,7 +175,7 @@ void showSceneWindow::buildVisu()
         visuType = SceneObject::Collision;
     }
 
-    visualization = scene->getVisualization<CoinVisualization>(visuType);
+    visualization = scene->getVisualization(visuType);
     SoNode* visualisationNode = nullptr;
 
     if (visualization)
@@ -643,4 +647,3 @@ void showSceneWindow::openHand()
 
     currentEEF->openActors();
 }
-

@@ -24,7 +24,7 @@
 #include <type_traits>
 #include <iomanip>
 
-#include "SimoxUtility/error.h"
+#include "SimoxUtility/error/SimoxError.h"
 #include "string_tools.h"
 
 namespace simox::alg {

@@ -4,6 +4,7 @@
 #include "../CollisionChecker.h"
 #include "CollisionCheckerPQP.h"
 #include "../../Visualization/TriMeshModel.h"
+#include "PQP.h"
 
 namespace VirtualRobot
 {

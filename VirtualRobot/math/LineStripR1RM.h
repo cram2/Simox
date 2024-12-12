@@ -20,7 +20,7 @@
  */
 
 #pragma once
-#include "MathForwardDefinitions.h"
+
 #include "Helpers.h"
 #include "SimpleAbstractFunctionRNRM.h"
 
@@ -91,4 +91,3 @@ namespace math
     using LineStripR1R6 = LineStripR1RM<6>;
     using LineStripR1RX = LineStripR1RM < -1 >;
 }
-

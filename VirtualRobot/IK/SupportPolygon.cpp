@@ -1,5 +1,10 @@
 #include "CollisionDetection/CollisionChecker.h"
 #include "SupportPolygon.h"
+#include "SceneObject.h"
+#include "SceneObjectSet.h"
+#include "CollisionDetection/CollisionModel.h"
+#include "RobotNodeSet.h"
+#include "VirtualRobotException.h"
 
 using namespace std;
 

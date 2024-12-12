@@ -3,7 +3,6 @@
 
 // STD/STL
 #include <iterator>
-#include <type_traits>
 
 // Simox
 #include <SimoxUtility/math/sum.h>

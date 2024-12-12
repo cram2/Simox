@@ -13,7 +13,8 @@
 #include "../SceneObject.h"
 #include "../RobotConfig.h"
 #include "../CollisionDetection/CollisionChecker.h"
-
+#include "Nodes/RobotNode.h"
+#include "VirtualRobot/CollisionDetection/CollisionModel.h"
 
 
 namespace VirtualRobot

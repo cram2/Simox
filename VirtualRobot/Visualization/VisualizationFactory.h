@@ -22,11 +22,10 @@
 */
 #pragma once
 
-#include "../VirtualRobot.h"
-#include "../AbstractFactoryMethod.h"
-#include "../MathTools.h"
-#include "../BoundingBox.h"
-#include "../Primitive.h"
+#include "VirtualRobot/VirtualRobot.h"
+#include "VirtualRobot/AbstractFactoryMethod.h"
+#include "VirtualRobot/BoundingBox.h"
+#include "VirtualRobot/Primitive.h"
 #include "SimoxUtility/color/Color.h"
 
 #include <Eigen/Core>
@@ -244,6 +243,7 @@ namespace VirtualRobot
         virtual void cleanup() {}
 
     };
-    typedef std::shared_ptr<VisualizationFactory::Color> ColorPtr;
+    
+    using ColorPtr = std::shared_ptr<VisualizationFactory::Color>;
 
 } // namespace VirtualRobot

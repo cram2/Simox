@@ -21,8 +21,6 @@
 
 #pragma once
 
-#include "../VirtualRobot.h"
-#include "MathForwardDefinitions.h"
 #include "SimpleAbstractFunctionR1R6.h"
 
 namespace math

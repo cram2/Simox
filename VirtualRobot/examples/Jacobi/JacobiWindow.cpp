@@ -1,7 +1,10 @@
 
 #include "JacobiWindow.h"
+#include "VirtualRobot/MathTools.h"
+#include "VirtualRobot/RobotNodeSet.h"
 #include "VirtualRobot/Visualization/CoinVisualization/CoinVisualizationNode.h"
 #include "VirtualRobot/EndEffector/EndEffector.h"
+#include "VirtualRobot/Nodes/RobotNode.h"
 #include "VirtualRobot/IK/DifferentialIK.h"
 
 #include <ctime>
@@ -278,7 +281,7 @@ void JacobiWindow::collisionModel()
     useColModel = UI.checkBoxColModel->checkState() == Qt::Checked;
     SceneObject::VisualizationType colModel = useColModel ? SceneObject::Collision : SceneObject::Full;
 
-    std::shared_ptr<CoinVisualization> visualization = robot->getVisualization<CoinVisualization>(colModel);
+    std::shared_ptr<CoinVisualization> visualization = robot->getVisualization(colModel);
     SoNode* visualisationNode = nullptr;
 
     if (visualization)
@@ -590,4 +593,3 @@ void JacobiWindow::loadRobot()
     exViewer->viewAll();
     exViewer->render();
 }
-

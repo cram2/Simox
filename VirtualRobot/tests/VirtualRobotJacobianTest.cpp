@@ -4,6 +4,7 @@
 * @copyright  2010 Nikolaus Vahrenkamp
 */
 
+#include "RobotNodeSet.h"
 #define BOOST_TEST_MODULE VirtualRobot_VirtualRobotJacobianTest
 
 #include <VirtualRobot/VirtualRobotTest.h>

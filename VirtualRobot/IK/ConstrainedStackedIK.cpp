@@ -1,4 +1,5 @@
 #include "ConstrainedStackedIK.h"
+#include "VirtualRobotException.h"
 
 using namespace VirtualRobot;
 

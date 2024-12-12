@@ -26,11 +26,10 @@
 #include <string>
 #include <vector>
 
-#include "../EndEffector/EndEffectorActor.h"
-#include "../Nodes/RobotNode.h"
-#include "../Robot.h"
-#include "../VirtualRobot.h"
-#include "BaseIO.h"
+#include <VirtualRobot/VirtualRobot.h>
+#include <VirtualRobot/Nodes/RobotNode.h>
+#include "VirtualRobot/EndEffector/EndEffectorActor.h"
+#include "VirtualRobot/XML/BaseIO.h"
 
 // using forward declarations here, so that the rapidXML header does not have to be parsed when this file is included
 namespace rapidxml

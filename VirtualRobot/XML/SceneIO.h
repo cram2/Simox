@@ -24,7 +24,6 @@
 
 #include "../VirtualRobot.h"
 #include "BaseIO.h"
-#include "../Scene.h"
 
 // using forward declarations here, so that the rapidXML header does not have to be parsed when this file is included
 namespace rapidxml
@@ -77,4 +76,3 @@ namespace VirtualRobot
     };
 
 }
-

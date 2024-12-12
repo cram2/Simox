@@ -23,10 +23,10 @@
 #pragma once
 
 #include "../VirtualRobot.h"
-#include <string>
-#include <vector>
 #include "WorkspaceRepresentation.h"
-#include "../Grasping/Grasp.h"
+
+#include <vector>
+
 
 namespace VirtualRobot
 {

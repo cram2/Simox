@@ -4,6 +4,8 @@
 #include "MotionPlanning/CSpace/CSpaceTree.h"
 #include "MotionPlanning/CSpace/CSpaceNode.h"
 
+#include "VirtualRobot/Nodes/RobotNode.h"
+#include "VirtualRobot/RobotNodeSet.h"
 #include <Inventor/SoPrimitiveVertex.h>
 #include <Inventor/SbLinear.h>
 #include <Inventor/nodes/SoShape.h>

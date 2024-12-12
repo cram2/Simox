@@ -4,9 +4,9 @@
 #include <cfloat>
 #include <cstring>
 #include <cmath>
-#include <fstream>
 #include <iomanip>
 #include <algorithm>
+#include <iostream>
 
 #include <VirtualRobot/Random.h>
 

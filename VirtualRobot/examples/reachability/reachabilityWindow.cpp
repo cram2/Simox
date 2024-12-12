@@ -1,6 +1,7 @@
 
 #include "reachabilityWindow.h"
 #include "VirtualRobot/EndEffector/EndEffector.h"
+#include "VirtualRobot/RobotNodeSet.h"
 #include "VirtualRobot/VirtualRobot.h"
 #include "VirtualRobot/Workspace/Reachability.h"
 #include "VirtualRobot/Workspace/Manipulability.h"
@@ -270,7 +271,7 @@ void reachabilityWindow::buildVisu()
     useColModel = UI.checkBoxColModel->checkState() == Qt::Checked;
     SceneObject::VisualizationType colModel = (UI.checkBoxColModel->isChecked()) ? SceneObject::Collision : SceneObject::Full;
 
-    visualization = robot->getVisualization<CoinVisualization>(colModel);
+    visualization = robot->getVisualization(colModel);
     SoNode* visualisationNode = nullptr;
 
     if (visualization)

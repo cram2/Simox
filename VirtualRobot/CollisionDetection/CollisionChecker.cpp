@@ -5,6 +5,7 @@
 #include "../SceneObject.h"
 #include "../Robot.h"
 #include "../VirtualRobotException.h"
+#include "VirtualRobot/Nodes/RobotNode.h"
 
 #include <cfloat>
 
@@ -801,4 +802,3 @@ namespace VirtualRobot
     */
 
 } // namespace VirtualRobot
-

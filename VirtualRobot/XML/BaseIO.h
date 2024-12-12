@@ -22,16 +22,17 @@
 */
 #pragma once
 
-#include "../VirtualRobot.h"
-#include "../Units.h"
-#include "../RobotConfig.h"
-#include "../Nodes/RobotNode.h"
-#include "../Primitive.h"
 
 #include <string>
 #include <vector>
 #include <map>
 
+#include "../VirtualRobot.h"
+#include "../Units.h"
+#include "../SceneObject.h"
+#include "../RobotConfig.h"
+#include "../Primitive.h"
+#include "../Robot.h"
 
 
 // using forward declarations here, so that the rapidXML header does not have to be parsed when this file is included

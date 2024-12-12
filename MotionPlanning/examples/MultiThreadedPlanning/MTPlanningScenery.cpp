@@ -637,7 +637,7 @@ void MTPlanningScenery::loadRobotMTPlanning(bool bMultiCollisionCheckers)
 
     if ((int)robots.size() == 1)
     {
-        std::shared_ptr<CoinVisualization> visualization = robots[0]->getVisualization<CoinVisualization>(robotModelVisuColModel ? SceneObject::Full : SceneObject::Collision);
+        std::shared_ptr<CoinVisualization> visualization = robots[0]->getVisualization(robotModelVisuColModel ? SceneObject::Full : SceneObject::Collision);
         //SoNode* visualisationNode = NULL;
         robotSep = new SoSeparator();
 
@@ -762,7 +762,7 @@ void MTPlanningScenery::setRobotModelShape(bool collisionModel)
     //sceneSep->removeChild(robotSep);
     if (robots.size() > 0)
     {
-        std::shared_ptr<CoinVisualization> visualization = robots[0]->getVisualization<CoinVisualization>(robotModelVisuColModel ? SceneObject::Full : SceneObject::Collision);
+        std::shared_ptr<CoinVisualization> visualization = robots[0]->getVisualization(robotModelVisuColModel ? SceneObject::Full : SceneObject::Collision);
         //SoNode* visualisationNode = NULL;
         robotSep = new SoSeparator();
 

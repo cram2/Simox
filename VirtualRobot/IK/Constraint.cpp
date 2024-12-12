@@ -1,4 +1,5 @@
 #include "Constraint.h"
+#include "VirtualRobotException.h"
 
 using namespace VirtualRobot;
 

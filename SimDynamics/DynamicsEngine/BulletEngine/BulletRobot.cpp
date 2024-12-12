@@ -16,6 +16,7 @@
 #include "BulletEngine.h"
 #include "BulletEngineFactory.h"
 #include "DetectBulletVersion.h"
+#include "VirtualRobot/MathTools.h"
 #include <unordered_set>
 
 //#define DEBUG_FIXED_OBJECTS

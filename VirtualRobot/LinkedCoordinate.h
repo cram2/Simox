@@ -24,10 +24,11 @@
 #pragma once
 
 #include "VirtualRobotImportExport.h"
-#include "Nodes/RobotNode.h"
+#include "VirtualRobot.h"
+
+#include <Eigen/Core>
+
 #include <string>
-#include <vector>
-#include "VirtualRobotException.h"
 
 
 namespace VirtualRobot
@@ -171,4 +172,3 @@ namespace VirtualRobot
     };
 
 } // namespace VirtualRobot
-

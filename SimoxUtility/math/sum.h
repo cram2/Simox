@@ -4,7 +4,6 @@
 // STD/STL
 #include <iterator>
 #include <numeric>
-#include <type_traits>
 
 // Simox
 #include <SimoxUtility/math/zero.h>

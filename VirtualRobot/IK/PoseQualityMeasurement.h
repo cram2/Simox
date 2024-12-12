@@ -23,14 +23,7 @@
 #pragma once
 
 #include "../VirtualRobot.h"
-#include "../Robot.h"
-#include "../VirtualRobotException.h"
-#include "../Nodes/RobotNode.h"
-#include "../RobotNodeSet.h"
-#include "../IK/DifferentialIK.h"
 
-#include <string.h>
-#include <vector>
 #include <Eigen/Core>
 
 namespace VirtualRobot

@@ -22,7 +22,9 @@
 */
 #pragma once
 
-#include "VirtualRobotImportExport.h"
+#include <VirtualRobot/VirtualRobotImportExport.h>
+#include <VirtualRobot/Logging.h> // convenience include for logging. Will be removed in the future.
+#include <VirtualRobot/Assert.h> // convenience include for assertions. Will be removed in the future.
 
 /*! \defgroup VirtualRobot The VirtualRobot Library
 * With the VirtualRobot library you can define complex robot structures,
@@ -120,9 +122,6 @@
 
 
 #include <memory>
-#include <vector>
-#include <deque>
-#include <queue>
 
 #include <Eigen/Core>
 
@@ -280,26 +279,3 @@ namespace VirtualRobot
     VIRTUAL_ROBOT_IMPORT_EXPORT extern std::string globalAppName;
 
 } // namespace
-
-#define VR_INFO std::cout <<__FILE__ << ":" << __LINE__ << ": "
-#define VR_WARNING std::cerr <<__FILE__ << ":" << __LINE__ << " -Warning- "
-#define VR_ERROR std::cerr <<__FILE__ << ":" << __LINE__ << " - ERROR - "
-
-
-#ifdef NDEBUG
-
-#define VR_ASSERT(a) do{}while(false)
-#define VR_ASSERT_MESSAGE(a,b) do{}while(false)
-
-#else
-
-#include <cassert>
-
-/*!
-This assert macro does nothing on RELEASE builds.
-*/
-#define VR_ASSERT( expr )  assert(expr)
-
-#define VR_ASSERT_MESSAGE(expr, msg) assert((expr)&&(msg))
-
-#endif

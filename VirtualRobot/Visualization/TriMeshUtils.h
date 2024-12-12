@@ -24,9 +24,8 @@
 #pragma once
 
 #include <optional>
-#include "TriMeshModel.h"
 
-#include <optional>
+#include "TriMeshModel.h"
 
 namespace VirtualRobot {
 

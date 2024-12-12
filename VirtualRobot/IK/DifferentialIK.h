@@ -25,15 +25,13 @@
 
 #include "../VirtualRobot.h"
 
-#include "../Nodes/RobotNode.h"
-#include "../RobotNodeSet.h"
 #include "JacobiProvider.h"
 #include "IKSolver.h"
 
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
 
-#include <string>
+#include <map>
 #include <vector>
 
 
@@ -340,4 +338,3 @@ namespace VirtualRobot
 
     typedef std::shared_ptr<DifferentialIK> DifferentialIKPtr;
 } // namespace VirtualRobot
-

@@ -26,13 +26,13 @@
 
 #include "../CollisionModelImplementation.h"
 
-#include <string>
-#include <vector>
-#include <map>
-#include <set>
+// #include "PQP++/PQP_Compile.h"
+// #include "PQP++/PQP.h"
 
-#include "PQP++/PQP_Compile.h"
-#include "PQP++/PQP.h"
+namespace PQP
+{
+    class PQP_Model;
+}
 
 namespace VirtualRobot
 {
@@ -76,4 +76,3 @@ namespace VirtualRobot
     };
 
 } // namespace
-

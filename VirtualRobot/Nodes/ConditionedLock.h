@@ -27,9 +27,8 @@ public:
     }
 };
 
-typedef ConditionedLock<std::unique_lock<std::recursive_mutex> > ReadLock;
-typedef ConditionedLock<std::unique_lock<std::recursive_mutex> > WriteLock;
+using ReadLock = ConditionedLock<std::unique_lock<std::recursive_mutex>>;
+using WriteLock = ConditionedLock<std::unique_lock<std::recursive_mutex>>;
 
-typedef std::shared_ptr< ReadLock > ReadLockPtr;
-typedef std::shared_ptr< WriteLock > WriteLockPtr;
-
+using ReadLockPtr = std::shared_ptr<ReadLock>;
+using WriteLockPtr = std::shared_ptr<WriteLock>;

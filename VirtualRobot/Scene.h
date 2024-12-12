@@ -24,19 +24,15 @@
 
 #include "VirtualRobot.h"
 #include "SceneObject.h"
-#include "Robot.h"
-#include "RobotConfig.h"
-#include "Nodes/RobotNode.h"
-#include "Obstacle.h"
-#include "Trajectory.h"
-#include "ManipulationObject.h"
-#include "RobotConfig.h"
-#include <string>
+// #include "Visualization/CoinVisualization/CoinVisualization.h"
+
 #include <vector>
 #include <Eigen/Core>
 
 namespace VirtualRobot
 {
+
+    class CoinVisualization;
 
     class VIRTUAL_ROBOT_IMPORT_EXPORT Scene
     {
@@ -183,7 +179,8 @@ namespace VirtualRobot
              if (visualization)
                  visualisationNode = visualization->getCoinVisualization();
         */
-        template <typename T> std::shared_ptr<T> getVisualization(SceneObject::VisualizationType visuType = SceneObject::Full, bool addRobots = true, bool addObstacles = true, bool addManipulationObjects = true, bool addTrajectories = true, bool addSceneObjectSets = true);
+        // template <typename T> std::shared_ptr<T> getVisualization(SceneObject::VisualizationType visuType = SceneObject::Full, bool addRobots = true, bool addObstacles = true, bool addManipulationObjects = true, bool addTrajectories = true, bool addSceneObjectSets = true);
+        std::shared_ptr<CoinVisualization> getVisualization(SceneObject::VisualizationType visuType = SceneObject::Full, bool addRobots = true, bool addObstacles = true, bool addManipulationObjects = true, bool addTrajectories = true, bool addSceneObjectSets = true);
 
 
 
@@ -206,84 +203,5 @@ namespace VirtualRobot
 
     };
 
-    /**
-     * This method collects all visualization nodes and creates a new Visualization
-     * subclass which is given by the template parameter T.
-     * T must be a subclass of VirtualRobot::Visualization.
-     * A compile time error is thrown if a different class type is used as template argument.
-     */
-    template <typename T>
-    std::shared_ptr<T> Scene::getVisualization(SceneObject::VisualizationType visuType, bool addRobots, bool addObstacles, bool addManipulationObjects, bool addTrajectories, bool addSceneObjectSets)
-    {
-        static_assert(::std::is_base_of_v<Visualization, T>,
-                "TEMPLATE_PARAMETER_FOR_VirtualRobot_getVisualization_MUST_BT_A_SUBCLASS_OF_VirtualRobot__Visualization");
-        std::vector<VisualizationNodePtr> collectedVisualizationNodes;
-
-        if (addRobots)
-        {
-            std::vector<VirtualRobot::RobotPtr> collectedRobots = getRobots();
-            // collect all robotnodes
-            std::vector<VirtualRobot::RobotNodePtr> collectedRobotNodes;
-
-            for (size_t i = 0; i < collectedRobots.size(); i++)
-            {
-                collectedRobots[i]->getRobotNodes(collectedRobotNodes, false);
-            }
-
-            for (size_t i = 0; i < collectedRobotNodes.size(); i++)
-            {
-                collectedVisualizationNodes.push_back(collectedRobotNodes[i]->getVisualization(visuType));
-            }
-        }
-
-        if (addObstacles)
-        {
-            std::vector<VirtualRobot::ObstaclePtr> collectedObstacles = getObstacles();
-
-            for (size_t i = 0; i < collectedObstacles.size(); i++)
-            {
-                collectedVisualizationNodes.push_back(collectedObstacles[i]->getVisualization(visuType));
-            }
-        }
-
-        if (addManipulationObjects)
-        {
-            std::vector<VirtualRobot::ManipulationObjectPtr> collectedManipulationObjects = getManipulationObjects();
-
-            for (size_t i = 0; i < collectedManipulationObjects.size(); i++)
-            {
-                collectedVisualizationNodes.push_back(collectedManipulationObjects[i]->getVisualization(visuType));
-            }
-        }
-
-        if (addTrajectories)
-        {
-            std::vector<VirtualRobot::TrajectoryPtr> collectedTrajectories = getTrajectories();
-
-            for (size_t i = 0; i < collectedTrajectories.size(); i++)
-            {
-                collectedVisualizationNodes.push_back(collectedTrajectories[i]->getVisualization(T::getFactoryName()));
-            }
-        }
-
-        if (addSceneObjectSets)
-        {
-            std::vector<VirtualRobot::SceneObjectSetPtr> collectedSceneObjectSets = getSceneObjectSets();
-
-            for (size_t i = 0; i < collectedSceneObjectSets.size(); i++)
-            {
-                std::vector< SceneObjectPtr > sos = collectedSceneObjectSets[i]->getSceneObjects();
-
-                for (size_t j = 0; j < sos.size(); j++)
-                {
-                    collectedVisualizationNodes.push_back(sos[j]->getVisualization(visuType));
-                }
-            }
-        }
-
-        std::shared_ptr<T> visualization(new T(collectedVisualizationNodes));
-        return visualization;
-    }
 
 } // namespace
-

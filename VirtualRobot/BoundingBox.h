@@ -25,6 +25,7 @@
 #include <VirtualRobot/VirtualRobotImportExport.h>
 
 #include <Eigen/Core>
+
 #include <vector>
 
 namespace VirtualRobot
@@ -110,4 +111,3 @@ namespace VirtualRobot
     };
 
 } // namespace VirtualRobot
-

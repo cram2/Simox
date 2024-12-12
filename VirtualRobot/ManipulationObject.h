@@ -24,10 +24,8 @@
 
 #include "VirtualRobot.h"
 #include "Obstacle.h"
-#include "EndEffector/EndEffector.h"
 
 #include <string>
-#include <vector>
 #include <Eigen/Core>
 
 namespace VirtualRobot
@@ -72,4 +70,3 @@ namespace VirtualRobot
     };
 
 } // namespace
-

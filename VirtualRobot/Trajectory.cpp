@@ -2,6 +2,9 @@
 #include "Robot.h"
 #include "VirtualRobotException.h"
 #include <VirtualRobot/Visualization/VisualizationFactory.h>
+#include "VirtualRobot/Nodes/RobotNode.h"
+#include "VirtualRobot/RobotNodeSet.h"
+
 #include <iostream>
 #include <sstream>
 

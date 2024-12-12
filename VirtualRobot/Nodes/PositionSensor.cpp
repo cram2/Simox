@@ -2,6 +2,7 @@
 #include "PositionSensor.h"
 #include "PositionSensorFactory.h"
 #include "../XML/BaseIO.h"
+#include "VirtualRobotException.h"
 
 #include <VirtualRobot/Visualization/VisualizationNode.h>
 

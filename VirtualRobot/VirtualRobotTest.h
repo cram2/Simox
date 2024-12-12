@@ -24,7 +24,6 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "VirtualRobot.h"
 #include <string>
 #include <fstream>
 #include <iostream>
@@ -61,4 +60,3 @@ struct OutputConfiguration
     BOOST_GLOBAL_FIXTURE(OutputConfiguration);
 #endif
 #endif
-

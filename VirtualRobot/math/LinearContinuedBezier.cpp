@@ -20,6 +20,7 @@
  */
 
 #include "LinearContinuedBezier.h"
+#include "math/Bezier.h"
 
 namespace math
 {

@@ -3,6 +3,7 @@
 #include "VirtualRobotException.h"
 #include "Nodes/Sensor.h"
 #include "Grasping/GraspSet.h"
+#include "EndEffector/EndEffector.h"
 
 namespace VirtualRobot
 {

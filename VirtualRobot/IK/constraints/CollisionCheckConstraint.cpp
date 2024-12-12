@@ -24,6 +24,9 @@
 #include "CollisionCheckConstraint.h"
 #include "../../CollisionDetection/CDManager.h"
 
+#include "Nodes/RobotNode.h"
+#include "RobotNodeSet.h"
+
 namespace VirtualRobot {
 
 CollisionCheckConstraint::CollisionCheckConstraint(const RobotNodeSetPtr &rns, const CDManagerPtr &cdm) :

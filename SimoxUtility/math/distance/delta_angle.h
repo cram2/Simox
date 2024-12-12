@@ -3,7 +3,8 @@
 #include <Eigen/Geometry>
 
 #include "../../meta/eigen/enable_if_compile_time_size.h"
-#include "../periodic_clamp.h"
+
+#include "SimoxUtility/math/periodic/periodic_clamp.h"
 
 
 //3f

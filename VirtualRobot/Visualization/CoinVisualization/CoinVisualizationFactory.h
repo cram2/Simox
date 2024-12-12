@@ -25,25 +25,29 @@
 
 #include "../../VirtualRobot.h"
 #include "../VisualizationFactory.h"
-#include "../../BoundingBox.h"
+// #include "../../BoundingBox.h"
 #include "../../SceneObject.h"
 #include "../../EndEffector/EndEffector.h"
-#include "../ColorMap.h"
+// #include "../ColorMap.h"
 #include "../../Workspace/WorkspaceRepresentation.h"
 
-#include "SimoxUtility/color/Color.h"
-#include <Inventor/SoInput.h>
-#include <Inventor/nodes/SoMatrixTransform.h>
-#include <Inventor/nodes/SoMaterial.h>
-#include <Inventor/SoOffscreenRenderer.h>
-#include <Inventor/nodes/SoPerspectiveCamera.h>
-#include <Inventor/nodes/SoCamera.h>
-
+#include "VirtualRobot/Visualization/ColorMap.h"
+#include <Inventor/SbMatrix.h>
+#include <Inventor/nodes/SoSeparator.h>
 
 #include <fstream>
 #include <string>
 #include <cmath>
 #include <mutex>
+
+class SoNode;
+class SoSeparator;
+class SoMatrixTransform;
+class SoMaterial;
+class SoOffscreenRenderer;
+class SoPerspectiveCamera;
+class SoGroup;
+class SoInput;
 
 namespace VirtualRobot
 {

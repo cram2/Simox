@@ -24,8 +24,6 @@
 
 #include "VirtualRobot.h"
 
-#include "Robot.h"
-
 #include <string>
 #include <vector>
 #include <map>
@@ -144,4 +142,3 @@ namespace VirtualRobot
 
 
 } // namespace VirtualRobot
-

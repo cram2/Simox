@@ -1,5 +1,10 @@
 #include "PoseQualityManipulability.h"
 
+#include "../Nodes/RobotNode.h"
+#include "../RobotNodeSet.h"
+#include "../Robot.h"
+#include "../IK/DifferentialIK.h"
+
 #include <Eigen/Geometry>
 #include <Eigen/Dense>
 

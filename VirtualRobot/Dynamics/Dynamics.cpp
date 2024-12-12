@@ -16,6 +16,7 @@
 #include <VirtualRobot/Units.h>
 #include <VirtualRobot/XML/RobotIO.h>
 
+#include "VirtualRobotException.h"
 #include <rbdl/rbdl.h>
 #include <rbdl/rbdl_utils.h>
 

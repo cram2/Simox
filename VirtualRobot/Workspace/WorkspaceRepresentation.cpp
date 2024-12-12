@@ -13,9 +13,12 @@
 #include "../ManipulationObject.h"
 #include "../Grasping/Grasp.h"
 #include "../Grasping/GraspSet.h"
+#include "WorkspaceData.h"
+#include "WorkspaceDataArray.h"
 #include "MathTools.h"
 #include "SimoxUtility/math/periodic/periodic_clamp.h"
 #include "VirtualRobot.h"
+#include "XML/FileIO.h"
 #include <VirtualRobot/Random.h>
 #include <cstddef>
 #include <fstream>

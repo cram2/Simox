@@ -14,6 +14,7 @@
 #include <cmath>
 
 #include "Inventor/actions/SoLineHighlightRenderAction.h"
+#include <Inventor/SoOffscreenRenderer.h>
 #include <Inventor/nodes/SoShapeHints.h>
 #include <Inventor/nodes/SoLightModel.h>
 #include <Inventor/nodes/SoUnits.h>
@@ -211,7 +212,7 @@ void showCamWindow::rebuildVisualization()
     //bool sensors = UI.checkBoxRobotSensors->checkState() == Qt::Checked;
     SceneObject::VisualizationType colModel = useColModel ? SceneObject::Collision : SceneObject::Full;
 
-    visualization = robot->getVisualization<CoinVisualization>(colModel);
+    visualization = robot->getVisualization(colModel);
     SoNode* visualisationNode = nullptr;
 
     if (visualization)
@@ -641,4 +642,3 @@ void showCamWindow::getDepthImage(void *userdata)
     DepthRenderData* ud = reinterpret_cast<DepthRenderData*>(userdata);
     glReadPixels(0, 0, ud->w, ud->h, GL_DEPTH_COMPONENT, GL_FLOAT, ud->buffer);
 }
-

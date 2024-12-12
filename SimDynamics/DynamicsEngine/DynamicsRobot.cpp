@@ -1,5 +1,6 @@
 #include "DynamicsRobot.h"
 #include "../DynamicsWorld.h"
+#include "VirtualRobot/Nodes/RobotNode.h"
 
 #include <VirtualRobot/SceneObject.h>
 

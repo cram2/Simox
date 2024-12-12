@@ -5,6 +5,7 @@
 #include <VirtualRobot/RuntimeEnvironment.h>
 #include <chrono>
 #include <VirtualRobot/Tools/Gravity.h>
+#include "VirtualRobot/VirtualRobotException.h"
 #include <rbdl/Kinematics.h>
 using std::cout;
 using namespace VirtualRobot;
@@ -117,6 +118,3 @@ int main(int argc, char* argv[])
         std::cout << " ERROR while creating robobt" << std::endl;
     }
 }
-
-
-

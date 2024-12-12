@@ -1,4 +1,5 @@
 #include "ConstrainedHierarchicalIK.h"
+#include "VirtualRobotException.h"
 
 using namespace VirtualRobot;
 

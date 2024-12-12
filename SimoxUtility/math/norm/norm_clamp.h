@@ -4,10 +4,6 @@
 // Eigen
 #include <Eigen/Core>
 
-// Simox
-#include <SimoxUtility/math/norm/norm_max.h>
-#include <SimoxUtility/math/norm/norm_min.h>
-
 
 namespace simox::math
 {

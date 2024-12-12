@@ -3,7 +3,9 @@
 
 #include <algorithm>
 #include <cassert>
+#include <queue>
 #include <deque>
+#include <iostream>
 
 #include <SimoxUtility/math/pose/invert.h>
 

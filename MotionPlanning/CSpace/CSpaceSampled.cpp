@@ -3,6 +3,7 @@
 #include "CSpaceNode.h"
 #include "CSpacePath.h"
 #include "CSpaceTree.h"
+#include "VirtualRobot/Nodes/RobotNode.h"
 #include "VirtualRobot/Robot.h"
 //#include "MathHelpers.h"
 #include <cmath>

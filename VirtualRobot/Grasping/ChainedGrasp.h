@@ -25,10 +25,6 @@
 
 #include "VirtualRobot/VirtualRobot.h"
 
-#include "VirtualRobot/Nodes/RobotNodeRevolute.h"
-#include "VirtualRobot/Nodes/RobotNodePrismatic.h"
-#include "VirtualRobot/Nodes/RobotNodeFixed.h"
-
 #include <SimoxUtility/math/convert.h>
 
 #include "Grasp.h"

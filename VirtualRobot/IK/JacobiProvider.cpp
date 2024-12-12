@@ -2,6 +2,9 @@
 #include "JacobiProvider.h"
 
 #include <VirtualRobot/MathTools.h>
+#include "VirtualRobotException.h"
+#include "../Nodes/RobotNode.h"
+#include "../RobotNodeSet.h"
 
 #include <Eigen/Dense>
 

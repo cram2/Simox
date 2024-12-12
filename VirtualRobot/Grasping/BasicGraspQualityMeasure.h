@@ -25,7 +25,9 @@
 #include "../VirtualRobot.h"
 #include "../EndEffector/EndEffector.h"
 #include "../MathTools.h"
+
 #include <vector>
+
 #include <Eigen/Core>
 
 namespace VirtualRobot
@@ -94,4 +96,3 @@ namespace VirtualRobot
     };
 
 } // namespace
-

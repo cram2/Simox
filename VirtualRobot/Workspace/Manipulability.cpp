@@ -10,6 +10,9 @@
 #include <VirtualRobot/XML/RobotIO.h>
 #include <VirtualRobot/Random.h>
 
+#include "WorkspaceData.h"
+#include "XML/FileIO.h"
+
 #include <fstream>
 #include <cmath>
 #include <cfloat>

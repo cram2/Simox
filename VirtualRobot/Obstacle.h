@@ -23,12 +23,10 @@
 #pragma once
 
 #include "VirtualRobot.h"
-#include "CollisionDetection/CollisionModel.h"
 #include "Visualization/VisualizationFactory.h"
 #include "GraspableSensorizedObject.h"
 
 #include <string>
-#include <vector>
 
 
 namespace VirtualRobot
@@ -124,4 +122,3 @@ namespace VirtualRobot
     };
 
 } // namespace
-

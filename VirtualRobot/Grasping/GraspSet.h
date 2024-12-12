@@ -23,15 +23,9 @@
 #pragma once
 
 #include "../VirtualRobot.h"
-#include "VirtualRobot/CollisionDetection/CollisionModel.h"
-#include "Grasp.h"
 
 #include <string>
 #include <vector>
-
-
-#include <VirtualRobot/CollisionDetection/CollisionModel.h>
-#include "Grasp.h"
 
 #include <Eigen/Core>
 

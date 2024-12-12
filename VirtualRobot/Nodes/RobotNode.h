@@ -22,20 +22,17 @@
 */
 #pragma once
 
-#include <map>
 #include <optional>
 #include <string>
-#include <vector>
 
 #include <Eigen/Core>
 
 #include <SimoxUtility/math/scale_value.h>
 
-#include "../GraspableSensorizedObject.h"
-#include "../Transformation/DHParameter.h"
-#include "../VirtualRobot.h"
-#include "../VirtualRobotException.h"
-#include "Sensor.h"
+#include "VirtualRobot/VirtualRobot.h"
+#include "VirtualRobot/GraspableSensorizedObject.h"
+#include "VirtualRobot/Transformation/DHParameter.h"
+
 
 namespace VirtualRobot
 {
@@ -386,13 +383,9 @@ namespace VirtualRobot
         RobotNodeType getType() const noexcept;
 
         //! Forbid cloning method from SceneObject. We need to know the new robot for cloning
-        SceneObjectPtr
-        clone(const std::string& /*name*/,
-              CollisionCheckerPtr /*colChecker*/ = CollisionCheckerPtr(),
-              float /*scaling*/ = 1.0f) const
-        {
-            THROW_VR_EXCEPTION("Cloning not allowed this way...");
-        }
+        SceneObjectPtr clone(const std::string& /*name*/,
+                             CollisionCheckerPtr /*colChecker*/ = CollisionCheckerPtr(),
+                             float /*scaling*/ = 1.0f) const;
 
         /*!
             When joint was created via DH parameters, they can be accessed here.
@@ -521,13 +514,9 @@ namespace VirtualRobot
                                     CollisionCheckerPtr colChecker,
                                     float scaling) = 0;
 
-        SceneObject*
-        _clone(const std::string& /*name*/,
-               CollisionCheckerPtr /*colChecker*/ = CollisionCheckerPtr(),
-               float /*scaling*/ = 1.0f) const override
-        {
-            THROW_VR_EXCEPTION("Cloning not allowed this way...");
-        }
+        SceneObject* _clone(const std::string& /*name*/,
+                            CollisionCheckerPtr /*colChecker*/ = CollisionCheckerPtr(),
+                            float /*scaling*/ = 1.0f) const override;
 
         /*!
             Derived classes add custom XML tags here

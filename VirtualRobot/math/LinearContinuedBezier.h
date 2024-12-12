@@ -22,7 +22,6 @@
 #pragma once
 
 #include "MathForwardDefinitions.h"
-#include "Bezier.h"
 #include "AbstractFunctionR1R3.h"
 
 namespace math
@@ -50,4 +49,3 @@ namespace math
 
     };
 }
-

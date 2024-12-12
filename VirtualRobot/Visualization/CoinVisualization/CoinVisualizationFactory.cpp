@@ -9,6 +9,7 @@
 #include "CoinVisualizationNode.h"
 #include "../../VirtualRobotException.h"
 #include "../../RuntimeEnvironment.h"
+#include "VirtualRobot/Robot.h"
 #include "CoinVisualization.h"
 #include "../../Robot.h"
 #include "../../Grasping/Grasp.h"
@@ -26,6 +27,7 @@
 #include "../../Workspace/WorkspaceGrid.h"
 #include "../../XML/BaseIO.h"
 #include "../../Import/MeshImport/AssimpReader.h"
+#include "Workspace/WorkspaceData.h"
 #include "SimoxUtility/math/convert/mat3f_to_quat.h"
 #include <Inventor/SoDB.h>
 #include <Inventor/nodes/SoFile.h>
@@ -37,6 +39,7 @@
 #include <Inventor/nodes/SoSphere.h>
 #include <Inventor/nodes/SoCylinder.h>
 #include <Inventor/nodes/SoMatrixTransform.h>
+#include <Inventor/SoOffscreenRenderer.h>
 #include <Inventor/nodes/SoMaterial.h>
 #include <Inventor/nodes/SoCone.h>
 #include <Inventor/nodes/SoRotationXYZ.h>
@@ -60,10 +63,13 @@
 #include <Inventor/nodes/SoNormal.h>
 #include <Inventor/nodes/SoFaceSet.h>
 #include <Inventor/nodes/SoCylinder.h>
+#include <Inventor/nodes/SoSelection.h>
+#include <Inventor/SoInput.h>
 #include <Inventor/nodes/SoLightModel.h>
 #include <Inventor/VRMLnodes/SoVRMLBillboard.h>
 #include <Inventor/nodes/SoShapeHints.h>
 #include <Inventor/nodes/SoLightModel.h>
+#include <Inventor/nodes/SoPerspectiveCamera.h>
 #include <Inventor/actions/SoSearchAction.h>
 #include <Inventor/actions/SoGLRenderAction.h>
 #include <Inventor/SbTime.h>
@@ -1391,7 +1397,7 @@ namespace VirtualRobot
             return new SoSeparator;
         }
 
-        std::shared_ptr<VirtualRobot::CoinVisualization> visualizationRobot = robot->getVisualization<CoinVisualization>(visuType);
+        std::shared_ptr<VirtualRobot::CoinVisualization> visualizationRobot = robot->getVisualization(visuType);
 
         if (visualizationRobot)
         {

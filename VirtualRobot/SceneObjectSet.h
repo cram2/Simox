@@ -23,6 +23,7 @@
 #pragma once
 
 #include "VirtualRobot.h"
+
 #include <Eigen/Core>
 
 #include <string>

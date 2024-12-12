@@ -23,6 +23,10 @@
 
 #include "ReferenceConfigurationConstraint.h"
 
+#include "Nodes/RobotNode.h"
+#include "RobotNodeSet.h"
+#include "VirtualRobotException.h"
+
 using namespace VirtualRobot;
 
 ReferenceConfigurationConstraint::ReferenceConfigurationConstraint(const RobotPtr& robot, const RobotNodeSetPtr& nodeSet) :

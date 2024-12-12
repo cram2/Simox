@@ -6,7 +6,9 @@
 
 #include <Eigen/Geometry>
 
+#include "MathTools.h"
 #include "Primitive.h"
+#include "VirtualRobotException.h"
 #include <urdf_model/link.h>
 #include <urdf_model/model.h>
 #include <urdf_model/pose.h>

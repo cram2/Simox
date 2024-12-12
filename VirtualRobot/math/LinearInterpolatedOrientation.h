@@ -22,7 +22,6 @@
 #pragma once
 
 #include "AbstractFunctionR1Ori.h"
-#include "AbstractFunctionR1Ori.h"
 #include "MathForwardDefinitions.h"
 
 

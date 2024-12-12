@@ -22,14 +22,9 @@
 */
 #pragma once
 
-#include "../VirtualRobot.h"
-#include "../Nodes/RobotNode.h"
-#include "../RobotNodeSet.h"
+#include <memory>
 
-#include <string>
-#include <vector>
-
-
+#include "VirtualRobot/VirtualRobotImportExport.h"
 
 namespace VirtualRobot
 {
@@ -57,7 +52,6 @@ namespace VirtualRobot
         IKSolver();
     };
 
-    typedef std::shared_ptr<IKSolver> IKSolverPtr;
+    using IKSolverPtr = std::shared_ptr<IKSolver>;
 
 } // namespace VirtualRobot
-

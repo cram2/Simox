@@ -24,7 +24,6 @@
 
 #include "../VirtualRobot.h"
 
-#include <string>
 #include <vector>
 #include <map>
 //#define VoxelTreeNDElement_DEBUG_OUTPUT
@@ -695,4 +694,3 @@ namespace VirtualRobot
 
 
 } // namespace
-

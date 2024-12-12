@@ -23,6 +23,10 @@
 
 #include "JointLimitAvoidanceConstraint.h"
 
+#include "Nodes/RobotNode.h"
+#include "RobotNodeSet.h"
+#include "Robot.h"
+
 using namespace VirtualRobot;
 
 JointLimitAvoidanceConstraint::JointLimitAvoidanceConstraint(const RobotPtr &robot, const RobotNodeSetPtr &nodeSet) :

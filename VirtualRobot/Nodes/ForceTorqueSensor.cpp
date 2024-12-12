@@ -2,6 +2,7 @@
 #include "ForceTorqueSensor.h"
 #include "ForceTorqueSensorFactory.h"
 #include "../XML/BaseIO.h"
+#include "VirtualRobotException.h"
 
 namespace VirtualRobot
 {

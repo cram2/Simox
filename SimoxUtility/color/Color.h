@@ -1,6 +1,7 @@
 #pragma once
 
 #include <type_traits>
+#include <iosfwd>
 
 #include <Eigen/Core>
 
@@ -122,26 +123,12 @@ namespace simox::color
         static inline Color kit_red(int a = 255)        { return Color(162,  34,  35, a); }
         static inline Color kit_purple(int a = 255)     { return Color(163,  16, 124, a); }
         static inline Color kit_cyan(int a = 255)       { return Color( 35, 161, 224, a); }
-
     };
 
+    std::ostream& operator<<(std::ostream& os, const Color& c);
 
-    inline std::ostream& operator<<(std::ostream& os, const Color& c)
-    {
-        return os << "(" << int(c.r) << " " << int(c.g) << " " << int(c.b)
-               << " | " << int(c.a) << ")";
-    }
-
-    inline bool operator==(const Color& lhs, const Color& rhs)
-    {
-        return lhs.r == rhs.r && lhs.g == rhs.g && lhs.b == rhs.b && lhs.a == rhs.a;
-    }
-
-    inline bool operator!=(const Color& lhs, const Color& rhs)
-    {
-        return !(lhs == rhs);
-    }
-
+    bool operator==(const Color& lhs, const Color& rhs);
+    bool operator!=(const Color& lhs, const Color& rhs);
 }
 
 

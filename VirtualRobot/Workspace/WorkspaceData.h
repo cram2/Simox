@@ -25,12 +25,6 @@
 #include "../VirtualRobot.h"
 #include "WorkspaceRepresentation.h"
 
-
-
-
-
-#include <vector>
-
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
@@ -144,4 +138,3 @@ namespace VirtualRobot
     };
 
 } // namespace VirtualRobot
-

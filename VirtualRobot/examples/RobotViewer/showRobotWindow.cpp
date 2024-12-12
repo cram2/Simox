@@ -279,7 +279,7 @@ showRobotWindow::rebuildVisualization()
 
     if (UI.checkBoxColModel->checkState() == Qt::Checked)
     {
-        visualization = robot->getVisualization<CoinVisualization>(SceneObject::Collision);
+        visualization = robot->getVisualization(SceneObject::Collision);
         SoNode* visualisationNode = nullptr;
 
         if (visualization)
@@ -298,7 +298,7 @@ showRobotWindow::rebuildVisualization()
         UI.checkBoxRobotSensors->checkState() == Qt::Checked ||
         UI.checkBoxRobotCoordSystems->checkState() == Qt::Checked)
     {
-        visualization = robot->getVisualization<CoinVisualization>(SceneObject::Full);
+        visualization = robot->getVisualization(SceneObject::Full);
         SoNode* visualisationNode = nullptr;
 
         if (visualization)
@@ -393,7 +393,7 @@ showRobotWindow::exportVRML()
 
     robot->setPropagatingJointValuesEnabled(true);
 
-    visualization = robot->getVisualization<CoinVisualization>(colModel);
+    visualization = robot->getVisualization(colModel);
     visualization->exportToVRML2(s);
 }
 

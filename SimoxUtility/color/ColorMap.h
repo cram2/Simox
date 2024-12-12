@@ -11,7 +11,6 @@
 #include <SimoxUtility/algorithm/minmax.h>
 
 #include "Color.h"
-#include "interpolation.h"
 
 
 namespace simox::color

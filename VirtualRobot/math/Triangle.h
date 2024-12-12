@@ -21,8 +21,9 @@
 
 #pragma once
 
-#include "MathForwardDefinitions.h"
 
+
+#include <Eigen/Core>
 
 namespace math
 {
@@ -55,4 +56,3 @@ namespace math
         Eigen::Vector3f p3;
     };
 }
-

@@ -29,6 +29,7 @@
 #include "OrientationConstraint.h"
 
 #include <VirtualRobot/Robot.h>
+#include "RobotNodeSet.h"
 
 using namespace VirtualRobot;
 

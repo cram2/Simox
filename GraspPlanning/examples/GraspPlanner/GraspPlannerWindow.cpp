@@ -3,6 +3,7 @@
 #include "GraspPlanning/Visualization/CoinVisualization/CoinConvexHullVisualization.h"
 #include "GraspPlanning/ContactConeGenerator.h"
 #include "GraspPlanning/MeshConverter.h"
+#include "VirtualRobot/CollisionDetection/CollisionModel.h"
 #include <GraspPlanning/GraspQuality/GraspEvaluationPoseUncertainty.h>
 
 #include "VirtualRobot/EndEffector/EndEffector.h"
@@ -186,7 +187,7 @@ void GraspPlannerWindow::buildVisu()
 
     if (eefCloned)
     {
-        visualizationRobot = eefCloned->getVisualization<CoinVisualization>(colModel);
+        visualizationRobot = eefCloned->getVisualization(colModel);
         SoNode* visualisationNode = visualizationRobot->getCoinVisualization();
 
         if (visualisationNode)

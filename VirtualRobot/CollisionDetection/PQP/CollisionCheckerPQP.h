@@ -26,15 +26,18 @@
 
 #include "../CollisionCheckerImplementation.h"
 
-
-#include <string>
-#include <vector>
-
-#include "PQP++/PQP_Compile.h"
-#include "PQP++/PQP.h"
+// #include "PQP++/PQP_Compile.h"
+// #include "PQP++/PQP.h"
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
+
+namespace PQP
+{
+    class PQP_Model;
+    class PQP_Checker;
+    class PQP_DistanceResult;
+}
 
 namespace VirtualRobot
 {
@@ -118,5 +121,3 @@ namespace VirtualRobot
     };
 
 } // namespace
-
-

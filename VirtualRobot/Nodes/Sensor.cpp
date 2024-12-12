@@ -6,6 +6,8 @@
 #include "../Visualization/TriMeshModel.h"
 #include <VirtualRobot/Visualization/VisualizationNode.h>
 #include "Grasping/GraspSet.h"
+#include "GraspableSensorizedObject.h"
+#include "Nodes/RobotNode.h"
 
 #include <Eigen/Core>
 
@@ -215,5 +217,19 @@ namespace VirtualRobot
         return ss.str();
     }
 
+    SceneObjectPtr
+    Sensor::clone(const std::string& /*name*/,
+                  CollisionCheckerPtr /*colChecker*/,
+                  float /*scaling*/) const
+    {
+        THROW_VR_EXCEPTION("Cloning not allowed this way...");
+    }
 
+    SceneObject*
+    Sensor::_clone(const std::string& /*name*/,
+                   CollisionCheckerPtr /*colChecker*/,
+                   float /*scaling*/) const
+    {
+        THROW_VR_EXCEPTION("Cloning not allowed this way...");
+    }
 } // namespace VirtualRobot

@@ -177,7 +177,7 @@ SET(SOURCES
     Primitive.cpp
     Random.cpp
     Robot.cpp
-    # Safety.cpp
+    Safety.cpp
     RobotConfig.cpp
     RobotFactory.cpp
     RobotNodeSet.cpp
@@ -190,10 +190,14 @@ SET(SOURCES
     VirtualRobot.cpp
     VirtualRobotChecks.cpp
     VirtualRobotException.cpp
+    Units.cpp
+    Assert.cpp
+    Logging.cpp
 
     CollisionDetection/CDManager.cpp
     CollisionDetection/CollisionChecker.cpp
     CollisionDetection/CollisionModel.cpp
+    CollisionDetection/CollisionModelImplementation.cpp
 
     Compression/CompressionBZip2.cpp
     Compression/CompressionRLE.cpp

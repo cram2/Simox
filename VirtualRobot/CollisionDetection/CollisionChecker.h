@@ -22,10 +22,9 @@
 */
 #pragma once
 
-#include "../VirtualRobot.h"
-#include "../MathTools.h"
+#include "VirtualRobot/VirtualRobot.h"
+#include "VirtualRobot/MathTools.h"
 
-#include <string>
 #include <vector>
 
 #if defined(VR_COLLISION_DETECTION_PQP)
@@ -225,4 +224,3 @@ namespace VirtualRobot
 #endif
     };
 } // namespace VirtualRobot
-

@@ -11,6 +11,7 @@
 #include <VirtualRobot/IK/CompositeDiffIK/Soechting.h>
 #include <VirtualRobot/IK/CompositeDiffIK/SoechtingNullspaceGradient.h>
 
+#include "../Nodes/RobotNode.h"
 #include "../Grasping/Grasp.h"
 #include "../Grasping/GraspSet.h"
 #include "../ManipulationObject.h"
@@ -21,6 +22,7 @@
 #include "IK/CompositeDiffIK/SoechtingNullspaceGradient.h"
 #include "IK/CompositeDiffIK/SoechtingNullspaceGradientWithWrist.h"
 #include "VirtualRobot.h"
+#include "WorkspaceData.h"
 
 namespace VirtualRobot
 {

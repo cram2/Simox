@@ -26,6 +26,7 @@
 #include <VirtualRobot/Workspace/WorkspaceRepresentation.h>
 #include <VirtualRobot/Workspace/Manipulability.h>
 #include <VirtualRobot/IK/PoseQualityMeasurement.h>
+#include "VirtualRobot/MathTools.h"
 
 
 
@@ -76,4 +77,3 @@ namespace VirtualRobot
     typedef std::shared_ptr<SupportPolygon> SupportPolygonPtr;
 
 } // namespace VirtualRobot
-

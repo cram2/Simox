@@ -21,6 +21,8 @@
 #include <VirtualRobot/Robot.h>
 #include <VirtualRobot/Nodes/RobotNode.h>
 
+#include "RobotNodeSet.h"
+
 namespace VirtualRobot
 {
 SoechtingNullspaceGradient::SoechtingNullspaceGradient(const CompositeDiffIK::TargetPtr& target, const std::string& shoulderName, const Soechting::ArmType &arm, const ArmJoints& joints) :

@@ -1,11 +1,11 @@
 #include "Reachability.h"
+
 #include "../VirtualRobotException.h"
-#include "../Robot.h"
-#include "../RobotNodeSet.h"
-#include "../ManipulationObject.h"
-#include "../Grasping/Grasp.h"
 #include "../Grasping/GraspSet.h"
-#include <fstream>
+#include "../Grasping/Grasp.h"
+#include "WorkspaceData.h"
+#include "../ManipulationObject.h"
+
 #include <cmath>
 #include <cfloat>
 #include <climits>

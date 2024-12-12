@@ -1,6 +1,7 @@
 
 #include "RrtGuiWindow.h"
 #include "VirtualRobot/EndEffector/EndEffector.h"
+#include "VirtualRobot/Scene.h"
 #include "VirtualRobot/Workspace/Reachability.h"
 #include "VirtualRobot/ManipulationObject.h"
 #include "VirtualRobot/Grasping/Grasp.h"
@@ -187,7 +188,7 @@ void RrtGuiWindow::buildVisu()
 
     if (scene)
     {
-        visualization = scene->getVisualization<CoinVisualization>(colModel);
+        visualization = scene->getVisualization(colModel);
         SoNode* visualisationNode = nullptr;
 
         if (visualization)
@@ -760,5 +761,3 @@ void RrtGuiWindow::redraw()
     this->update();
     viewer->scheduleRedraw();
 }
-
-

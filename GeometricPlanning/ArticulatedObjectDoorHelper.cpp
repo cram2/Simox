@@ -5,6 +5,7 @@
 #include <VirtualRobot/Robot.h>
 #include <VirtualRobot/RobotNodeSet.h>
 
+#include "VirtualRobot/Nodes/RobotNode.h"
 #include <GeometricPlanning/assert/assert.h>
 
 namespace simox::geometric_planning

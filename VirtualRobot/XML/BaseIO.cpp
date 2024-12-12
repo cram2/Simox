@@ -30,6 +30,7 @@
 #include "../Visualization/VisualizationFactory.h"
 #include "../Visualization/VisualizationNode.h"
 #include "Affordances.h"
+#include "MathTools.h"
 #include "SimoxUtility/algorithm/string/string_tools.h"
 #include "SimoxUtility/color/Color.h"
 #include "VirtualRobot.h"

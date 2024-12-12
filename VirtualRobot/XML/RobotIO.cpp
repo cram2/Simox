@@ -12,6 +12,12 @@
 #include <VirtualRobot/Import/RobotImporterFactory.h>
 #include <VirtualRobot/Nodes/FourBar/Joint.h>
 
+#include "VirtualRobot/EndEffector/EndEffectorActor.h"
+#include "VirtualRobot/VirtualRobot.h"
+#include "VirtualRobot/XML/BaseIO.h"
+#include "VirtualRobot/Robot.h"
+#include "VirtualRobot/Nodes/RobotNode.h"
+
 #include "../CollisionDetection/CollisionModel.h"
 #include "../EndEffector/EndEffector.h"
 #include "../EndEffector/EndEffectorActor.h"

@@ -21,9 +21,11 @@
 
 #include "CartesianVelocityController.h"
 
+#include "RobotNodeSet.h"
 #include "VirtualRobot/Robot.h"
 #include "VirtualRobot/math/Helpers.h"
 #include "VirtualRobot/IK/DifferentialIK.h"
+#include "VirtualRobot/Nodes/RobotNode.h"
 
 namespace VirtualRobot
 {
@@ -284,4 +286,3 @@ void CartesianVelocityController::setJointCosts(const std::vector<float>& jointC
 }
 
 }
-

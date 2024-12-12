@@ -26,7 +26,9 @@
 #include "../Visualization/VisualizationFactory.h"
 #include "../MathTools.h"
 #include "../BoundingBox.h"
+
 #include <Eigen/Core>
+
 #include <vector>
 #include <utility>
 
@@ -201,4 +203,3 @@ namespace VirtualRobot
         BoundingBox boundingBox;
     };
 } // namespace VirtualRobot
-

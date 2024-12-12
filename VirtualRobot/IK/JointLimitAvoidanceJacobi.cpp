@@ -3,6 +3,7 @@
 #include <VirtualRobot/Robot.h>
 #include <VirtualRobot/RobotNodeSet.h>
 #include <VirtualRobot/VirtualRobotException.h>
+#include "VirtualRobot/Nodes/RobotNode.h"
 
 using namespace VirtualRobot;
 using namespace std;

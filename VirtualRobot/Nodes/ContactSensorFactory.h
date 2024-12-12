@@ -23,7 +23,6 @@
 #pragma once
 
 #include "../VirtualRobotImportExport.h"
-#include "../SceneObject.h"
 #include "SensorFactory.h"
 
 

@@ -23,8 +23,8 @@
 #pragma once
 
 #include "VirtualRobot.h"
-#include "Nodes/RobotNode.h"
 #include "SceneObjectSet.h"
+
 #include <string>
 #include <vector>
 

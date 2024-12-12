@@ -1,6 +1,7 @@
 #pragma once
 
-#include "orthogonal_vector.h"
+
+#include <Eigen/Core>
 
 namespace simox::math
 {

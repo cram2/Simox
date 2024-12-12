@@ -6,8 +6,10 @@
 #include "VirtualRobot.h"
 #include "VirtualRobotException.h"
 #include "CollisionDetection/CollisionChecker.h"
+#include "Nodes/RobotNode.h"
 
 #include <algorithm>
+#include <iostream>
 #include <set>
 
 namespace VirtualRobot

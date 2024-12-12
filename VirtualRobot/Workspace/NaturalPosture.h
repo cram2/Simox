@@ -25,8 +25,6 @@
 #include "../VirtualRobot.h"
 #include "WorkspaceRepresentation.h"
 
-#include <VirtualRobot/IK/CompositeDiffIK/SoechtingNullspaceGradient.h>
-
 namespace VirtualRobot
 {
 
@@ -75,4 +73,3 @@ namespace VirtualRobot
 
 
 } // namespace VirtualRobot
-

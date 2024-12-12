@@ -24,13 +24,6 @@
 
 #include "WorkspaceData.h"
 #include "../VirtualRobot.h"
-#include "../Compression/CompressionBZip2.h"
-
-
-
-
-
-#include <vector>
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
@@ -150,4 +143,3 @@ namespace VirtualRobot
 
 
 } // namespace VirtualRobot
-

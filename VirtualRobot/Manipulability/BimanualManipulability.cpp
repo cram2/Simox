@@ -24,6 +24,7 @@
 
 #include "BimanualManipulability.h"
 
+#include "VirtualRobotException.h"
 #include <Visualization/VisualizationFactory.h>
 #include <Visualization/VisualizationNode.h>
 #include "../IK/DifferentialIK.h"
@@ -33,6 +34,9 @@
 #include <Eigen/Dense>
 #include <unsupported/Eigen/CXX11/Tensor>
 #include <SimoxUtility/math/convert/pos_quat_to_mat4f.h>
+
+#include "Nodes/RobotNode.h"
+#include "RobotNodeSet.h"
 
 namespace VirtualRobot
 {
