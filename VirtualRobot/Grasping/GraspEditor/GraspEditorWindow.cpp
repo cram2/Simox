@@ -565,6 +565,10 @@ namespace VirtualRobot
             UI->labelQuality->setText(QString::number(currentGrasp->getQuality()));
 
             setCurrentGrasp(gp);
+
+            // Ensure correct visualization at start time
+            float x[6] = {0, 0, 0, 0, 0, 0};
+            updateEEF(x);
         }
 
         buildVisu();
@@ -741,20 +745,71 @@ namespace VirtualRobot
         buildVisu();
     }
 
+    Eigen::Matrix4f
+    makeValidRigidTransformation(const Eigen::Matrix4f& matrix)
+    {
+        Eigen::Matrix4f corrected = matrix;
+
+        Eigen::Matrix3f R = corrected.block<3, 3>(0, 0);
+        Eigen::Vector3f t = corrected.block<3, 1>(0, 3);
+
+        // Fix the rotation matrix (orthonormalize and fix determinant)
+        Eigen::JacobiSVD<Eigen::Matrix3f> svd(R, Eigen::ComputeFullU | Eigen::ComputeFullV);
+        Eigen::Matrix3f corrected_R = svd.matrixU() * svd.matrixV().transpose();
+
+        if (corrected_R.determinant() < 0)
+        {
+            corrected_R.col(2) *= -1.0f; // Flip last column if determinant is negative
+        }
+
+        corrected.block<3, 3>(0, 0) = corrected_R;
+        corrected.block<3, 1>(0, 3) = t;
+
+        corrected.row(3) = Eigen::Vector4f(0, 0, 0, 1);
+
+        return corrected;
+    }
+
     void GraspEditorWindow::updateEEF(float x[6])
     {
         if (currentGrasp && robotEEF)
         {
             auto virtual_object = currentGrasp->getObjectNode(robotEEF);
-            //cout << "getGlobalPose robot:" << endl << robotEEF->getGlobalPose() << std::endl;
-            //cout << "getGlobalPose TCP:" << endl <<  robotEEF_EEF->getTcp()->getGlobalPose() << std::endl;
             if (virtual_object) {
                 Eigen::Matrix4f m;
                 MathTools::posrpy2eigen4f(x, m);
-                Eigen::Matrix4f transformation = virtual_object->getLocalTransformation() * m;
-                virtual_object->setLocalTransformation(transformation);
-                currentGrasp->setObjectTransformation(transformation);
+
+                Eigen::Matrix4f localTransformation = virtual_object->getLocalTransformation();
+                Eigen::Matrix4f newLocalTransformation = localTransformation * m;
+
+                virtual_object->setLocalTransformation(newLocalTransformation);
+                currentGrasp->setObjectTransformation(newLocalTransformation);
                 virtual_object->updatePose(false);
+
+
+                const Eigen::Matrix4f global_T_object =
+                    makeValidRigidTransformation(virtual_object->getGlobalPose());
+                const Eigen::Matrix4f global_T_hand = robotEEF->getGlobalPose();
+
+                const Eigen::Matrix4f hand_T_object =
+                    Eigen::Isometry3f{global_T_hand}.inverse() * global_T_object;
+
+
+                // global_T_object = global_T_hand * grasp_T_object;
+                // I = global_T_hand * grasp_T_object;
+
+                const Eigen::Matrix4f global_T_hand_desired =
+                    Eigen::Isometry3f{hand_T_object}.inverse().matrix();
+
+
+                robotEEF->setGlobalPose(global_T_hand_desired);
+
+                cout << "m:" << endl << m << std::endl;
+                //cout << "newLocalTransformation:" << endl << newLocalTransformation << std::endl;
+                //cout << "global_T_object:" << endl << global_T_object << std::endl;
+                //cout << "grasp_T_object:" << endl << hand_T_object << std::endl;
+                //cout << "global_T_hand:" << endl << global_T_hand << std::endl;
+                //cout << "global_T_hand_desired:" << endl << global_T_hand_desired << std::endl;
             }
         }
 
