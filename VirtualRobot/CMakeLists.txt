@@ -34,6 +34,14 @@ if (Simox_USE_NLOPT)
 endif ()
 
 ##########################################
+#### Spacemouse
+
+find_package(SPNAV REQUIRED)
+
+target_include_directories(VirtualRobot PUBLIC ${spnav_INCLUDE_DIR})
+target_link_libraries(VirtualRobot PRIVATE ${spnav_LIBRARY})
+
+##########################################
 #### VISUALIZATION Coin3D+Qt+SoQt / OSG+Qt
 
 find_package(assimp REQUIRED)

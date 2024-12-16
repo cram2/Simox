@@ -20,6 +20,7 @@
 #include <Eigen/Geometry>
 
 #include <ctime>
+#include <ostream>
 #include <vector>
 #include <iostream>
 #include <cmath>
@@ -32,6 +33,8 @@
 
 #include <sstream>
 
+#include "spnav.h"
+
 #include "ui_GraspEditor.h"
 
 
@@ -39,6 +42,11 @@ using namespace std;
 using namespace VirtualRobot;
 
 float TIMER_MS = 30.0f;
+
+bool spacenav_is_open = false;
+spnav_event sev;
+double translation_scaling = 200.0;
+double rotation_scaling = 15000.0;
 
 namespace VirtualRobot
 {
@@ -116,6 +124,63 @@ namespace VirtualRobot
         {
             ikWindow->updateEEF(x);
         }
+
+        if (!spacenav_is_open)
+        {
+            if (spnav_open() == -1)
+            {
+                cout << "Could not open the space navigator device. "
+                        "Did you remember to run spacenavd (as root)?"
+                     << std::endl;
+                return;
+            }
+            else
+            {
+                spacenav_is_open = true;
+            }
+        }
+
+        switch (spnav_poll_event(&sev))
+        {
+            case 0:
+                // No event in queue
+                break;
+
+            case SPNAV_EVENT_MOTION:
+
+                x[0] = -sev.motion.z / translation_scaling;
+                x[1] = sev.motion.x / translation_scaling;
+                x[2] = -sev.motion.y / translation_scaling;
+
+                x[3] = -sev.motion.rz / rotation_scaling;
+                x[4] = sev.motion.rx / rotation_scaling;
+                x[5] = -sev.motion.ry / rotation_scaling;
+
+                //cout << "x: " << x[0] << " " << x[1] << " " << x[2] << " " << x[3] << " "<< x[4] << " "<< x[5] << std::endl;
+
+                ikWindow->updateEEF(x);
+
+                break;
+
+            case SPNAV_EVENT_BUTTON:
+
+                if (sev.button.bnum < 0)
+                {
+                    cout << "Negative spacenav buttons not supported." << endl;
+                    break;
+                }
+
+                cout << "Registered button event: " << sev.button.bnum << " " << sev.button.press
+                     << std::endl;
+                break;
+
+            default:
+                cout << "Unknown message type in spacenav. This should never happen." << std::endl;
+                break;
+        }
+
+        // Get rid of remaining motion events to prevent queue from growing
+        spnav_remove_events(SPNAV_EVENT_MOTION);
     }
 
 
@@ -804,7 +869,7 @@ namespace VirtualRobot
 
                 robotEEF->setGlobalPose(global_T_hand_desired);
 
-                cout << "m:" << endl << m << std::endl;
+                //cout << "m:" << endl << m << std::endl;
                 //cout << "newLocalTransformation:" << endl << newLocalTransformation << std::endl;
                 //cout << "global_T_object:" << endl << global_T_object << std::endl;
                 //cout << "grasp_T_object:" << endl << hand_T_object << std::endl;
