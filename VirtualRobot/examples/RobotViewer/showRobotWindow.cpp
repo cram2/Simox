@@ -3,12 +3,13 @@
 
 #include <cmath>
 #include <ctime>
-#include <filesystem>
 #include <iostream>
-#include <sstream>
 #include <vector>
 
 #include <QFileDialog>
+
+// Bug in Qt: <filesystem must come after Qt includes
+#include <filesystem>
 
 #include <Eigen/Geometry>
 
