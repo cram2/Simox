@@ -22,11 +22,10 @@
 */
 #pragma once
 
-#include "../Saba.h"
-#include "CSpace.h"
 #include <string>
 
-
+#include "../Saba.h"
+#include "CSpace.h"
 
 namespace Saba
 {
@@ -68,7 +67,11 @@ namespace Saba
             c-space is related to the number of joints in robotNodes.
             The boundaries of this c-space are set according to definitions in robotNodes.
         */
-        CSpaceSampled(VirtualRobot::RobotPtr robot, VirtualRobot::CDManagerPtr collisionManager, VirtualRobot::RobotNodeSetPtr robotNodes, unsigned int maxConfigs = 50000, unsigned int randomSeed = 0);
+        CSpaceSampled(VirtualRobot::RobotPtr robot,
+                      VirtualRobot::CDManagerPtr collisionManager,
+                      VirtualRobot::RobotNodeSetPtr robotNodes,
+                      unsigned int maxConfigs = 50000,
+                      unsigned int randomSeed = 0);
 
         ~CSpaceSampled() override;
 
@@ -77,19 +80,22 @@ namespace Saba
         //! sets sampling step size used for discrete collision checking
         void setSamplingSizeDCD(float fSize);
 
-
-        float getSamplingSize()
+        float
+        getSamplingSize()
         {
             return samplingSizePaths;
         };
-        float getSamplingSizeDCD()
+
+        float
+        getSamplingSizeDCD()
         {
             return samplingSizeDCD;
         };
 
-
-
-        CSpacePtr clone(VirtualRobot::CollisionCheckerPtr newColChecker, VirtualRobot::RobotPtr newRobot, VirtualRobot::CDManagerPtr newCDM, unsigned int newRandomSeed = 0) override;
+        CSpacePtr clone(VirtualRobot::CollisionCheckerPtr newColChecker,
+                        VirtualRobot::RobotPtr newRobot,
+                        VirtualRobot::CDManagerPtr newCDM,
+                        unsigned int newRandomSeed = 0) override;
 
         /*!
             Checks the middle configuration and when it is not invalid (in collision or constraints are violated) the path is split
@@ -103,7 +109,8 @@ namespace Saba
         Create a path from start to goal without any checks.
         Intermediate configurations are added according to the current implementation of the cspace.
         */
-        CSpacePathPtr createPath(const Eigen::VectorXf& start, const Eigen::VectorXf& goal) override;
+        CSpacePathPtr createPath(const Eigen::VectorXf& start,
+                                 const Eigen::VectorXf& goal) override;
 
         /*!
             Create a path from start to the goal configuration.
@@ -112,13 +119,14 @@ namespace Saba
             \param goal The goal
             \param storeAddedLength The length of the valid path is stored here (1.0 means the complete path from start to goal was valid)
         */
-        CSpacePathPtr createPathUntilInvalid(const Eigen::VectorXf& start, const Eigen::VectorXf& goal, float& storeAddedLength) override;
+        CSpacePathPtr createPathUntilInvalid(const Eigen::VectorXf& start,
+                                             const Eigen::VectorXf& goal,
+                                             float& storeAddedLength) override;
 
 
     protected:
-
-        float samplingSizePaths;                //!< euclidean sample size
-        float samplingSizeDCD;                  //!< euclidean sample size for collision check
+        float samplingSizePaths; //!< euclidean sample size
+        float samplingSizeDCD; //!< euclidean sample size for collision check
         Eigen::VectorXf checkPathConfig;
 
         int recursiveTmpValuesIndex;
@@ -128,5 +136,4 @@ namespace Saba
         const int recursionMaxDepth;
     };
 
-}
-
+} // namespace Saba

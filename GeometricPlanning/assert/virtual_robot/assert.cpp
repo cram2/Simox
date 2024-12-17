@@ -1,10 +1,9 @@
 #include "assert.h"
 
+#include <experimental/source_location>
 #include <sstream>
 
 #include <VirtualRobot/VirtualRobotException.h>
-
-#include <experimental/source_location>
 
 namespace simox::geometric_planning::assert::virtual_robot::detail
 {

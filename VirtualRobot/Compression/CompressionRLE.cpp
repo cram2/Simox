@@ -82,8 +82,12 @@ namespace VirtualRobot
     * times.
     *************************************************************************/
 
-    void CompressionRLE::_RLE_WriteRep(unsigned char* out, unsigned int* outpos,
-                                       unsigned char marker, unsigned char symbol, unsigned int count)
+    void
+    CompressionRLE::_RLE_WriteRep(unsigned char* out,
+                                  unsigned int* outpos,
+                                  unsigned char marker,
+                                  unsigned char symbol,
+                                  unsigned int count)
     {
         unsigned int i, idx;
 
@@ -93,34 +97,33 @@ namespace VirtualRobot
         {
             if (symbol == marker)
             {
-                out[ idx ++ ] = marker;
-                out[ idx ++ ] = count - 1;
+                out[idx++] = marker;
+                out[idx++] = count - 1;
             }
             else
             {
-                for (i = 0; i < count; ++ i)
+                for (i = 0; i < count; ++i)
                 {
-                    out[ idx ++ ] = symbol;
+                    out[idx++] = symbol;
                 }
             }
         }
         else
         {
-            out[ idx ++ ] = marker;
-            -- count;
+            out[idx++] = marker;
+            --count;
 
             if (count >= 128)
             {
-                out[ idx ++ ] = (count >> 8) | 0x80;
+                out[idx++] = (count >> 8) | 0x80;
             }
 
-            out[ idx ++ ] = count & 0xff;
-            out[ idx ++ ] = symbol;
+            out[idx++] = count & 0xff;
+            out[idx++] = symbol;
         }
 
         *outpos = idx;
     }
-
 
     /*************************************************************************
     * _RLE_WriteNonRep() - Encode a non-repeating symbol, 'symbol'. 'marker'
@@ -128,8 +131,11 @@ namespace VirtualRobot
     * when 'symbol' == 'marker'.
     *************************************************************************/
 
-    void CompressionRLE::_RLE_WriteNonRep(unsigned char* out, unsigned int* outpos,
-                                          unsigned char marker, unsigned char symbol)
+    void
+    CompressionRLE::_RLE_WriteNonRep(unsigned char* out,
+                                     unsigned int* outpos,
+                                     unsigned char marker,
+                                     unsigned char symbol)
     {
         unsigned int idx;
 
@@ -137,18 +143,16 @@ namespace VirtualRobot
 
         if (symbol == marker)
         {
-            out[ idx ++ ] = marker;
-            out[ idx ++ ] = 0;
+            out[idx++] = marker;
+            out[idx++] = 0;
         }
         else
         {
-            out[ idx ++ ] = symbol;
+            out[idx++] = symbol;
         }
 
         *outpos = idx;
     }
-
-
 
     /*************************************************************************
     *                            PUBLIC FUNCTIONS                            *
@@ -164,14 +168,14 @@ namespace VirtualRobot
     * The function returns the size of the compressed data.
     *************************************************************************/
 
-    int CompressionRLE::RLE_Compress(const unsigned char* in, unsigned char* out,
-                                     unsigned int insize)
+    int
+    CompressionRLE::RLE_Compress(const unsigned char* in, unsigned char* out, unsigned int insize)
     {
         // lock our mutex as long we are in the scope of this method
         std::scoped_lock lock(mutex);
 
         unsigned char byte1, byte2, marker;
-        unsigned int  inpos, outpos, count, i, histogram[ 256 ];
+        unsigned int inpos, outpos, count, i, histogram[256];
 
 
         /* Do we have anything to compress? */
@@ -181,40 +185,40 @@ namespace VirtualRobot
         }
 
         /* Create histogram */
-        for (i = 0; i < 256; ++ i)
+        for (i = 0; i < 256; ++i)
         {
-            histogram[ i ] = 0;
+            histogram[i] = 0;
         }
 
-        for (i = 0; i < insize; ++ i)
+        for (i = 0; i < insize; ++i)
         {
-            ++ histogram[ in[ i ] ];
+            ++histogram[in[i]];
         }
 
         /* Find the least common byte, and use it as the repetition marker */
         marker = 0;
 
-        for (i = 1; i < 256; ++ i)
+        for (i = 1; i < 256; ++i)
         {
-            if (histogram[ i ] < histogram[ marker ])
+            if (histogram[i] < histogram[marker])
             {
                 marker = i;
             }
         }
 
         /* Remember the repetition marker for the decoder */
-        out[ 0 ] = marker;
+        out[0] = marker;
         outpos = 1;
 
         /* Start of compression */
-        byte1 = in[ 0 ];
+        byte1 = in[0];
         inpos = 1;
         count = 1;
 
         /* Are there at least two bytes? */
         if (insize >= 2)
         {
-            byte2 = in[ inpos ++ ];
+            byte2 = in[inpos++];
             count = 2;
 
             /* Main compression loop */
@@ -223,11 +227,10 @@ namespace VirtualRobot
                 if (byte1 == byte2)
                 {
                     /* Do we meet only a sequence of identical bytes? */
-                    while ((inpos < insize) && (byte1 == byte2) &&
-                           (count < 32768))
+                    while ((inpos < insize) && (byte1 == byte2) && (count < 32768))
                     {
-                        byte2 = in[ inpos ++ ];
-                        ++ count;
+                        byte2 = in[inpos++];
+                        ++count;
                     }
 
                     if (byte1 == byte2)
@@ -236,7 +239,7 @@ namespace VirtualRobot
 
                         if (inpos < insize)
                         {
-                            byte1 = in[ inpos ++ ];
+                            byte1 = in[inpos++];
                             count = 1;
                         }
                         else
@@ -261,11 +264,10 @@ namespace VirtualRobot
 
                 if (inpos < insize)
                 {
-                    byte2 = in[ inpos ++ ];
+                    byte2 = in[inpos++];
                     count = 2;
                 }
-            }
-            while ((inpos < insize) || (count >= 2));
+            } while ((inpos < insize) || (count >= 2));
         }
 
         /* One byte left? */
@@ -277,7 +279,6 @@ namespace VirtualRobot
         return outpos;
     }
 
-
     /*************************************************************************
     * RLE_Uncompress() - Uncompress a block of data using an RLE decoder.
     *  in      - Input (compressed) buffer.
@@ -286,14 +287,14 @@ namespace VirtualRobot
     *  insize  - Number of input bytes.
     *************************************************************************/
 
-    void CompressionRLE::RLE_Uncompress(const unsigned char* in, unsigned char* out,
-                                        unsigned int insize)
+    void
+    CompressionRLE::RLE_Uncompress(const unsigned char* in, unsigned char* out, unsigned int insize)
     {
         // lock our mutex as long we are in the scope of this method
         std::scoped_lock lock(mutex);
 
         unsigned char marker, symbol;
-        unsigned int  i, inpos, outpos, count;
+        unsigned int i, inpos, outpos, count;
 
         /* Do we have anything to uncompress? */
         if (insize < 1)
@@ -303,51 +304,50 @@ namespace VirtualRobot
 
         /* Get marker symbol from input stream */
         inpos = 0;
-        marker = in[ inpos ++ ];
+        marker = in[inpos++];
 
         /* Main decompression loop */
         outpos = 0;
 
         do
         {
-            symbol = in[ inpos ++ ];
+            symbol = in[inpos++];
 
             if (symbol == marker)
             {
                 /* We had a marker byte */
-                count = in[ inpos ++ ];
+                count = in[inpos++];
 
                 if (count <= 2)
                 {
                     /* Counts 0, 1 and 2 are used for marker byte repetition
                        only */
-                    for (i = 0; i <= count; ++ i)
+                    for (i = 0; i <= count; ++i)
                     {
-                        out[ outpos ++ ] = marker;
+                        out[outpos++] = marker;
                     }
                 }
                 else
                 {
                     if (count & 0x80)
                     {
-                        count = ((count & 0x7f) << 8) + in[ inpos ++ ];
+                        count = ((count & 0x7f) << 8) + in[inpos++];
                     }
 
-                    symbol = in[ inpos ++ ];
+                    symbol = in[inpos++];
 
-                    for (i = 0; i <= count; ++ i)
+                    for (i = 0; i <= count; ++i)
                     {
-                        out[ outpos ++ ] = symbol;
+                        out[outpos++] = symbol;
                     }
                 }
             }
             else
             {
                 /* No marker, plain copy */
-                out[ outpos ++ ] = symbol;
+                out[outpos++] = symbol;
             }
-        }
-        while (inpos < insize);
+        } while (inpos < insize);
     }
 
-}
+} // namespace VirtualRobot

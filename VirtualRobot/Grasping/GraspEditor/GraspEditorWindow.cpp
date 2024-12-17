@@ -1,38 +1,38 @@
 
 #include "GraspEditorWindow.h"
-#include "VirtualRobot/EndEffector/EndEffector.h"
-#include "VirtualRobot/Workspace/Reachability.h"
-#include "VirtualRobot/ManipulationObject.h"
-#include "VirtualRobot/Grasping/ChainedGrasp.h"
-#include "VirtualRobot/Grasping/GraspSet.h"
-#include "VirtualRobot/XML/ObjectIO.h"
-#include "VirtualRobot/XML/RobotIO.h"
-#include "VirtualRobot/Visualization/CoinVisualization/CoinVisualizationFactory.h"
-#include "VirtualRobot/SphereApproximator.h"
-#include "VirtualRobot/Visualization/TriMeshModel.h"
-#include "VirtualRobot/Nodes/RobotNodeRevolute.h"
-#include "VirtualRobot/Nodes/RobotNodePrismatic.h"
-#include "VirtualRobot/RobotFactory.h"
-#include "Visualization/CoinVisualization/CoinVisualizationNode.h"
-#include <SimoxUtility/math/convert.h>
+
+#include <cmath>
+#include <ctime>
+#include <iostream>
+#include <sstream>
+#include <vector>
 
 #include <QFileDialog>
+
 #include <Eigen/Geometry>
 
-#include <ctime>
-#include <vector>
-#include <iostream>
-#include <cmath>
+#include <SimoxUtility/math/convert.h>
 
 #include "Inventor/actions/SoLineHighlightRenderAction.h"
-#include <Inventor/nodes/SoShapeHints.h>
-#include <Inventor/nodes/SoLightModel.h>
-#include <Inventor/sensors/SoTimerSensor.h>
-#include <Inventor/nodes/SoEventCallback.h>
-
-#include <sstream>
-
+#include "VirtualRobot/EndEffector/EndEffector.h"
+#include "VirtualRobot/Grasping/ChainedGrasp.h"
+#include "VirtualRobot/Grasping/GraspSet.h"
+#include "VirtualRobot/ManipulationObject.h"
+#include "VirtualRobot/Nodes/RobotNodePrismatic.h"
+#include "VirtualRobot/Nodes/RobotNodeRevolute.h"
+#include "VirtualRobot/RobotFactory.h"
+#include "VirtualRobot/SphereApproximator.h"
+#include "VirtualRobot/Visualization/CoinVisualization/CoinVisualizationFactory.h"
+#include "VirtualRobot/Visualization/TriMeshModel.h"
+#include "VirtualRobot/Workspace/Reachability.h"
+#include "VirtualRobot/XML/ObjectIO.h"
+#include "VirtualRobot/XML/RobotIO.h"
+#include "Visualization/CoinVisualization/CoinVisualizationNode.h"
 #include "ui_GraspEditor.h"
+#include <Inventor/nodes/SoEventCallback.h>
+#include <Inventor/nodes/SoLightModel.h>
+#include <Inventor/nodes/SoShapeHints.h>
+#include <Inventor/sensors/SoTimerSensor.h>
 
 
 using namespace std;
@@ -43,9 +43,10 @@ float TIMER_MS = 30.0f;
 namespace VirtualRobot
 {
 
-    GraspEditorWindow::GraspEditorWindow(std::string& objFile, std::string& robotFile,
-                                         bool embeddedGraspEditor)
-        : QMainWindow(nullptr), UI(new Ui::MainWindowGraspEditor)
+    GraspEditorWindow::GraspEditorWindow(std::string& objFile,
+                                         std::string& robotFile,
+                                         bool embeddedGraspEditor) :
+        QMainWindow(nullptr), UI(new Ui::MainWindowGraspEditor)
     {
         VR_INFO << " start " << std::endl;
 
@@ -85,7 +86,6 @@ namespace VirtualRobot
         sensor_mgr->insertTimerSensor(timer);
     }
 
-
     GraspEditorWindow::~GraspEditorWindow()
     {
         timer->unschedule();
@@ -94,8 +94,8 @@ namespace VirtualRobot
         sceneSep->unref();
     }
 
-
-    void GraspEditorWindow::timerCB(void* data, SoSensor* /*sensor*/)
+    void
+    GraspEditorWindow::timerCB(void* data, SoSensor* /*sensor*/)
     {
         GraspEditorWindow* ikWindow = static_cast<GraspEditorWindow*>(data);
         float x[6];
@@ -118,11 +118,12 @@ namespace VirtualRobot
         }
     }
 
-
-    void GraspEditorWindow::setupUI()
+    void
+    GraspEditorWindow::setupUI()
     {
         UI->setupUi(this);
-        m_pExViewer = new SoQtExaminerViewer(UI->frameViewer, "", TRUE, SoQtExaminerViewer::BUILD_POPUP);
+        m_pExViewer =
+            new SoQtExaminerViewer(UI->frameViewer, "", TRUE, SoQtExaminerViewer::BUILD_POPUP);
 
         // setup
         m_pExViewer->setBackgroundColor(SbColor(1.0f, 1.0f, 1.0f));
@@ -149,12 +150,18 @@ namespace VirtualRobot
         connect(UI->pushButtonRenameGrasp, SIGNAL(clicked()), this, SLOT(renameGrasp()));
         connect(UI->checkBoxTCP, SIGNAL(clicked()), this, SLOT(buildVisu()));
 
-        connect(UI->horizontalSliderX, SIGNAL(sliderReleased()), this, SLOT(sliderReleased_ObjectX()));
-        connect(UI->horizontalSliderY, SIGNAL(sliderReleased()), this, SLOT(sliderReleased_ObjectY()));
-        connect(UI->horizontalSliderZ, SIGNAL(sliderReleased()), this, SLOT(sliderReleased_ObjectZ()));
-        connect(UI->horizontalSliderRo, SIGNAL(sliderReleased()), this, SLOT(sliderReleased_ObjectA()));
-        connect(UI->horizontalSliderPi, SIGNAL(sliderReleased()), this, SLOT(sliderReleased_ObjectB()));
-        connect(UI->horizontalSliderYa, SIGNAL(sliderReleased()), this, SLOT(sliderReleased_ObjectG()));
+        connect(
+            UI->horizontalSliderX, SIGNAL(sliderReleased()), this, SLOT(sliderReleased_ObjectX()));
+        connect(
+            UI->horizontalSliderY, SIGNAL(sliderReleased()), this, SLOT(sliderReleased_ObjectY()));
+        connect(
+            UI->horizontalSliderZ, SIGNAL(sliderReleased()), this, SLOT(sliderReleased_ObjectZ()));
+        connect(
+            UI->horizontalSliderRo, SIGNAL(sliderReleased()), this, SLOT(sliderReleased_ObjectA()));
+        connect(
+            UI->horizontalSliderPi, SIGNAL(sliderReleased()), this, SLOT(sliderReleased_ObjectB()));
+        connect(
+            UI->horizontalSliderYa, SIGNAL(sliderReleased()), this, SLOT(sliderReleased_ObjectG()));
         connect(UI->minX, SIGNAL(valueChanged(double)), this, SLOT(virtualJointValueChanged()));
         connect(UI->maxX, SIGNAL(valueChanged(double)), this, SLOT(virtualJointValueChanged()));
         connect(UI->minY, SIGNAL(valueChanged(double)), this, SLOT(virtualJointValueChanged()));
@@ -179,7 +186,8 @@ namespace VirtualRobot
         }
     }
 
-    QString GraspEditorWindow::formatString(const char* s, float f)
+    QString
+    GraspEditorWindow::formatString(const char* s, float f)
     {
         QString str1(s);
 
@@ -209,20 +217,20 @@ namespace VirtualRobot
         return str1;
     }
 
-
-    void GraspEditorWindow::resetSceneryAll()
+    void
+    GraspEditorWindow::resetSceneryAll()
     {
-
     }
 
-
-    void GraspEditorWindow::closeEvent(QCloseEvent* event)
+    void
+    GraspEditorWindow::closeEvent(QCloseEvent* event)
     {
         quit();
         QMainWindow::closeEvent(event);
     }
 
-    void GraspEditorWindow::buildVisu()
+    void
+    GraspEditorWindow::buildVisu()
     {
         if (visualizationAll)
         {
@@ -232,7 +240,8 @@ namespace VirtualRobot
         eefVisu->removeAllChildren();
 
         showCoordSystem();
-        SceneObject::VisualizationType colModel = (UI->checkBoxColModel->isChecked()) ? SceneObject::Collision : SceneObject::Full;
+        SceneObject::VisualizationType colModel =
+            (UI->checkBoxColModel->isChecked()) ? SceneObject::Collision : SceneObject::Full;
 
         if (robotEEF)
         {
@@ -245,7 +254,8 @@ namespace VirtualRobot
                 //visualizationRobot->highlight(true);
             }
 
-            for (auto hand : hands) {
+            for (auto hand : hands)
+            {
                 auto visHand = hand->getVisualization(colModel);
                 SoNode* visHandNode = visHand->getCoinVisualization();
                 visHand->setTransparency(0.8);
@@ -261,7 +271,8 @@ namespace VirtualRobot
         if (object)
         {
             SoNode* visualisationNode = nullptr;
-            std::shared_ptr<VirtualRobot::CoinVisualization> visualizationObject = object->getVisualization<CoinVisualization>(colModel);
+            std::shared_ptr<VirtualRobot::CoinVisualization> visualizationObject =
+                object->getVisualization<CoinVisualization>(colModel);
             if (visualizationObject)
             {
                 visualisationNode = visualizationObject->getCoinVisualization();
@@ -276,7 +287,8 @@ namespace VirtualRobot
         buildGraspSetVisu();
     }
 
-    int GraspEditorWindow::main()
+    int
+    GraspEditorWindow::main()
     {
         // initialize QCoreApp
         QCoreApplication::setOrganizationName("H2T");
@@ -290,16 +302,19 @@ namespace VirtualRobot
         return 0;
     }
 
-    void GraspEditorWindow::quit()
+    void
+    GraspEditorWindow::quit()
     {
         std::cout << "GraspEditorWindow: Closing" << std::endl;
         this->close();
         SoQt::exitMainLoop();
     }
 
-    void GraspEditorWindow::selectRobot()
+    void
+    GraspEditorWindow::selectRobot()
     {
-        QString fi = QFileDialog::getOpenFileName(this, tr("Open Robot File"), QString(), tr("XML Files (*.xml)"));
+        QString fi = QFileDialog::getOpenFileName(
+            this, tr("Open Robot File"), QString(), tr("XML Files (*.xml)"));
         if (fi.isEmpty())
         {
             return;
@@ -310,7 +325,8 @@ namespace VirtualRobot
         loadRobot();
     }
 
-    void GraspEditorWindow::selectObject(std::string file)
+    void
+    GraspEditorWindow::selectObject(std::string file)
     {
         std::string s;
 
@@ -356,7 +372,8 @@ namespace VirtualRobot
         }
     }
 
-    void GraspEditorWindow::saveObject()
+    void
+    GraspEditorWindow::saveObject()
     {
         if (!object)
         {
@@ -408,13 +425,20 @@ namespace VirtualRobot
         {
             if (robotObject)
             {
-                ok = RobotIO::saveXML(robotObject, objectFile.filename(), objectFile.parent_path(), "", true, true, true, false);
+                ok = RobotIO::saveXML(robotObject,
+                                      objectFile.filename(),
+                                      objectFile.parent_path(),
+                                      "",
+                                      true,
+                                      true,
+                                      true,
+                                      false);
             }
             else
             {
-                ok = ObjectIO::saveManipulationObject(std::dynamic_pointer_cast<ManipulationObject>(object), objectFile);
+                ok = ObjectIO::saveManipulationObject(
+                    std::dynamic_pointer_cast<ManipulationObject>(object), objectFile);
             }
-
         }
         catch (VirtualRobotException& e)
         {
@@ -434,16 +458,18 @@ namespace VirtualRobot
             {
                 std::cout << "Changes successful saved to " << objectFile << std::endl;
                 QMessageBox msgBox;
-                msgBox.setText(QString::fromStdString("Changes successful saved to " + objectFile.string()));
+                msgBox.setText(
+                    QString::fromStdString("Changes successful saved to " + objectFile.string()));
                 msgBox.setIcon(QMessageBox::Information);
                 msgBox.setStandardButtons(QMessageBox::Ok);
                 msgBox.setDefaultButton(QMessageBox::Ok);
                 msgBox.exec();
             }
         }
-
     }
-    void GraspEditorWindow::loadRobot()
+
+    void
+    GraspEditorWindow::loadRobot()
     {
         robotSep->removeAllChildren();
         std::cout << "Loading Robot from " << robotFile << std::endl;
@@ -482,7 +508,8 @@ namespace VirtualRobot
         m_pExViewer->viewAll();
     }
 
-    void GraspEditorWindow::selectEEF(int n)
+    void
+    GraspEditorWindow::selectEEF(int n)
     {
         hands.clear();
         currentEEF.reset();
@@ -523,22 +550,26 @@ namespace VirtualRobot
 
         updateGraspBox();
         selectGrasp(0);
-        if (object && currentGrasp) {
+        if (object && currentGrasp)
+        {
             currentGrasp->attachChain(robotEEF, object, true);
         }
         sampleGrasps();
     }
 
-    void GraspEditorWindow::selectRobotObject(int n)
+    void
+    GraspEditorWindow::selectRobotObject(int n)
     {
-        if (!robotObject) return;
+        if (!robotObject)
+            return;
 
         object = robotObject->getRobotNode(UI->comboBoxObject->itemText(n).toStdString());
 
         selectEEF(0);
     }
 
-    void GraspEditorWindow::selectGrasp(int n)
+    void
+    GraspEditorWindow::selectGrasp(int n)
     {
         currentGrasp.reset();
 
@@ -571,7 +602,8 @@ namespace VirtualRobot
         m_pExViewer->scheduleRedraw();
     }
 
-    void GraspEditorWindow::loadObject()
+    void
+    GraspEditorWindow::loadObject()
     {
         std::cout << "Loading Object from " << objectFile << std::endl;
 
@@ -583,7 +615,8 @@ namespace VirtualRobot
         catch (VirtualRobotException& e)
         {
             // TODO: not pretty!
-            try {
+            try
+            {
                 robotObject = RobotIO::loadRobot(objectFile, RobotIO::eFullVisAsCol);
                 object = nullptr;
             }
@@ -609,9 +642,12 @@ namespace VirtualRobot
 
         UI->comboBoxObject->clear();
 
-        if (robotObject) {
-            for (auto robotNode : robotObject->getRobotNodes()) {
-                if (robotNode->getVisualization()) {
+        if (robotObject)
+        {
+            for (auto robotNode : robotObject->getRobotNodes())
+            {
+                if (robotNode->getVisualization())
+                {
                     if (!object)
                         object = robotNode;
                     UI->comboBoxObject->addItem(QString::fromStdString(robotNode->getName()));
@@ -633,7 +669,8 @@ namespace VirtualRobot
         buildVisu();
     }
 
-    void GraspEditorWindow::updateEEFBox()
+    void
+    GraspEditorWindow::updateEEFBox()
     {
         UI->comboBoxEEF->clear();
 
@@ -643,7 +680,8 @@ namespace VirtualRobot
         }
     }
 
-    void GraspEditorWindow::updateGraspBox()
+    void
+    GraspEditorWindow::updateGraspBox()
     {
         UI->comboBoxGrasp->clear();
 
@@ -658,13 +696,15 @@ namespace VirtualRobot
         }
     }
 
-    void GraspEditorWindow::closeEEF()
+    void
+    GraspEditorWindow::closeEEF()
     {
         if (currentGrasp && robotEEF)
         {
             auto virtual_object = currentGrasp->getObjectNode(robotEEF);
             robotEEF_EEF->closeActors(virtual_object);
-            for (auto hand : hands) {
+            for (auto hand : hands)
+            {
                 hand->getEndEffector(currentEEF->getName())->closeActors(virtual_object);
             }
         }
@@ -672,12 +712,14 @@ namespace VirtualRobot
         m_pExViewer->scheduleRedraw();
     }
 
-    void GraspEditorWindow::openEEF()
+    void
+    GraspEditorWindow::openEEF()
     {
         if (robotEEF_EEF)
         {
             robotEEF_EEF->openActors();
-            for (auto hand : hands) {
+            for (auto hand : hands)
+            {
                 hand->getEndEffector(currentEEF->getName())->openActors();
             }
         }
@@ -685,14 +727,19 @@ namespace VirtualRobot
         m_pExViewer->scheduleRedraw();
     }
 
-    void GraspEditorWindow::renameGrasp()
+    void
+    GraspEditorWindow::renameGrasp()
     {
-        if (!currentGrasp) return;
+        if (!currentGrasp)
+            return;
 
         bool ok;
-        QString text = QInputDialog::getText(this, tr("Rename Grasp"),
-                                             tr("New name:"), QLineEdit::Normal,
-                                             tr(currentGrasp->getName().c_str()), &ok);
+        QString text = QInputDialog::getText(this,
+                                             tr("Rename Grasp"),
+                                             tr("New name:"),
+                                             QLineEdit::Normal,
+                                             tr(currentGrasp->getName().c_str()),
+                                             &ok);
 
 
         if (ok && !text.isEmpty())
@@ -704,7 +751,8 @@ namespace VirtualRobot
         }
     }
 
-    void GraspEditorWindow::addGrasp()
+    void
+    GraspEditorWindow::addGrasp()
     {
         if (!object || !robot)
         {
@@ -713,7 +761,8 @@ namespace VirtualRobot
 
         if (!currentGraspSet)
         {
-            currentGraspSet.reset(new GraspSet(currentEEF->getName(), robot->getType(), currentEEF->getName()));
+            currentGraspSet.reset(
+                new GraspSet(currentEEF->getName(), robot->getType(), currentEEF->getName()));
             object->addGraspSet(currentGraspSet);
         }
 
@@ -725,14 +774,16 @@ namespace VirtualRobot
         if (currentGrasp)
         {
             pose = currentGrasp->getTransformation();
-            if (robotEEF) currentGrasp->detachChain(robotEEF);
+            if (robotEEF)
+                currentGrasp->detachChain(robotEEF);
         }
         else
         {
             pose = Eigen::Matrix4f::Identity();
         }
 
-        ChainedGraspPtr g(new ChainedGrasp(name, robot->getType(), currentEEF->getName(), pose, std::string("GraspEditor")));
+        ChainedGraspPtr g(new ChainedGrasp(
+            name, robot->getType(), currentEEF->getName(), pose, std::string("GraspEditor")));
 
         currentGraspSet->addGrasp(g);
         updateGraspBox();
@@ -741,14 +792,16 @@ namespace VirtualRobot
         buildVisu();
     }
 
-    void GraspEditorWindow::updateEEF(float x[6])
+    void
+    GraspEditorWindow::updateEEF(float x[6])
     {
         if (currentGrasp && robotEEF)
         {
             auto virtual_object = currentGrasp->getObjectNode(robotEEF);
             //cout << "getGlobalPose robot:" << endl << robotEEF->getGlobalPose() << std::endl;
             //cout << "getGlobalPose TCP:" << endl <<  robotEEF_EEF->getTcp()->getGlobalPose() << std::endl;
-            if (virtual_object) {
+            if (virtual_object)
+            {
                 Eigen::Matrix4f m;
                 MathTools::posrpy2eigen4f(x, m);
                 Eigen::Matrix4f transformation = virtual_object->getLocalTransformation() * m;
@@ -761,44 +814,51 @@ namespace VirtualRobot
         m_pExViewer->scheduleRedraw();
     }
 
-    void GraspEditorWindow::sliderReleased_ObjectX()
+    void
+    GraspEditorWindow::sliderReleased_ObjectX()
     {
         UI->horizontalSliderX->setValue(0);
     }
 
-    void GraspEditorWindow::sliderReleased_ObjectY()
+    void
+    GraspEditorWindow::sliderReleased_ObjectY()
     {
         UI->horizontalSliderY->setValue(0);
     }
 
-    void GraspEditorWindow::sliderReleased_ObjectZ()
+    void
+    GraspEditorWindow::sliderReleased_ObjectZ()
     {
         UI->horizontalSliderZ->setValue(0);
     }
 
-    void GraspEditorWindow::sliderReleased_ObjectA()
+    void
+    GraspEditorWindow::sliderReleased_ObjectA()
     {
         UI->horizontalSliderRo->setValue(0);
     }
 
-    void GraspEditorWindow::sliderReleased_ObjectB()
+    void
+    GraspEditorWindow::sliderReleased_ObjectB()
     {
         UI->horizontalSliderPi->setValue(0);
     }
 
-    void GraspEditorWindow::sliderReleased_ObjectG()
+    void
+    GraspEditorWindow::sliderReleased_ObjectG()
     {
         UI->horizontalSliderYa->setValue(0);
     }
 
-
-    void GraspEditorWindow::setCurrentGrasp(Eigen::Matrix4f& p)
+    void
+    GraspEditorWindow::setCurrentGrasp(Eigen::Matrix4f& p)
     {
         if (currentGrasp && robotEEF)
         {
             currentGrasp->attachChain(robotEEF, object, true);
             auto virtual_object = currentGrasp->getObjectNode(robotEEF);
-            if (virtual_object) {
+            if (virtual_object)
+            {
                 virtual_object->setLocalTransformation(p);
                 virtual_object->updatePose(false);
             }
@@ -808,7 +868,8 @@ namespace VirtualRobot
         m_pExViewer->scheduleRedraw();
     }
 
-    void GraspEditorWindow::showCoordSystem()
+    void
+    GraspEditorWindow::showCoordSystem()
     {
         if (robotEEF)
         {
@@ -826,16 +887,18 @@ namespace VirtualRobot
         }
     }
 
-
-    void GraspEditorWindow::buildGraspSetVisu()
+    void
+    GraspEditorWindow::buildGraspSetVisu()
     {
         graspSetVisu->removeAllChildren();
 
-        if (UI->checkBoxGraspSet->isChecked() && robotEEF && robotEEF_EEF && currentGraspSet && object)
+        if (UI->checkBoxGraspSet->isChecked() && robotEEF && robotEEF_EEF && currentGraspSet &&
+            object)
         {
             GraspSetPtr gs = currentGraspSet->clone();
             gs->removeGrasp(currentGrasp);
-            SoSeparator* visu = CoinVisualizationFactory::CreateGraspSetVisualization(gs, robotEEF_EEF, object->getGlobalPose());
+            SoSeparator* visu = CoinVisualizationFactory::CreateGraspSetVisualization(
+                gs, robotEEF_EEF, object->getGlobalPose());
 
             if (visu)
             {
@@ -844,8 +907,11 @@ namespace VirtualRobot
         }
     }
 
-    void GraspEditorWindow::virtualJointValueChanged() {
-        if (currentGrasp) {
+    void
+    GraspEditorWindow::virtualJointValueChanged()
+    {
+        if (currentGrasp)
+        {
             currentGrasp->x.setLimitsValue(UI->minX->value(), UI->maxX->value());
             currentGrasp->y.setLimitsValue(UI->minY->value(), UI->maxY->value());
             currentGrasp->z.setLimitsValue(UI->minZ->value(), UI->maxZ->value());
@@ -857,15 +923,18 @@ namespace VirtualRobot
         }
     }
 
-    void GraspEditorWindow::sampleGrasps()
+    void
+    GraspEditorWindow::sampleGrasps()
     {
         if (currentGrasp && robot)
         {
             int grid = UI->grid->value();
-            if (grid > 1) hands = currentGrasp->sampleHandsUniform(robotEEF, grid);
-            else hands.clear();
+            if (grid > 1)
+                hands = currentGrasp->sampleHandsUniform(robotEEF, grid);
+            else
+                hands.clear();
             buildVisu();
         }
     }
 
-}
+} // namespace VirtualRobot

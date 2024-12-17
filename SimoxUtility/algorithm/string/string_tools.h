@@ -22,10 +22,9 @@
 #pragma once
 
 #include <cstring>
+#include <locale>
 #include <sstream>
 #include <vector>
-#include <locale>
-
 
 namespace simox::alg
 {
@@ -54,62 +53,68 @@ namespace simox::alg
     std::string trim_copy_if(const std::string& str, const std::string& trim = "\t ");
 
 
-    std::vector<std::string>
-    split(const std::string& str,
-          const std::string& splitBy = "\t ",
-          bool trimElements = true,
-          bool removeEmptyElements = true,
-          const std::locale& locale = DEFAULT_LOCALE);
+    std::vector<std::string> split(const std::string& str,
+                                   const std::string& splitBy = "\t ",
+                                   bool trimElements = true,
+                                   bool removeEmptyElements = true,
+                                   const std::locale& locale = DEFAULT_LOCALE);
 
 
     /// @param expectedSize throws SimoxError if split not matches expectedSize
-    std::vector<std::string>
-    split_check_size(
-            const std::string& str,
-            unsigned int expectedSize,
-            const std::string& splitBy = "\t ",
-            bool trimElements = true,
-            bool removeEmptyElements = true,
-            const std::locale& locale = DEFAULT_LOCALE);
+    std::vector<std::string> split_check_size(const std::string& str,
+                                              unsigned int expectedSize,
+                                              const std::string& splitBy = "\t ",
+                                              bool trimElements = true,
+                                              bool removeEmptyElements = true,
+                                              const std::locale& locale = DEFAULT_LOCALE);
+
+    std::string join(const std::vector<std::string> vec,
+                     const std::string& delimiter = " ",
+                     bool trimElements = false,
+                     bool ignoreEmptyElements = false,
+                     const std::locale& locale = DEFAULT_LOCALE);
+
 
     std::string
-    join(const std::vector<std::string> vec,
-         const std::string& delimiter = " ",
-         bool trimElements = false,
-         bool ignoreEmptyElements = false,
-         const std::locale& locale = DEFAULT_LOCALE);
+    replace_first(std::string const& input, std::string const& search, std::string const& replace);
 
+    std::string
+    replace_last(std::string const& input, std::string const& search, std::string const& replace);
 
-    std::string replace_first(std::string const& input, std::string const& search, std::string const& replace);
-
-    std::string replace_last(std::string const& input, std::string const& search, std::string const& replace);
-
-    std::string replace_all(std::string const& input, std::string const& search, std::string const& replace);
+    std::string
+    replace_all(std::string const& input, std::string const& search, std::string const& replace);
 
 
     bool starts_with(std::string const& input, std::string const& search);
     bool ends_with(std::string const& input, std::string const& search);
 
     bool contains(const std::string& haystack, const std::string& needle);
-    inline bool contains(const std::string& haystack, const char* needle)
+
+    inline bool
+    contains(const std::string& haystack, const char* needle)
     {
         return contains(haystack, std::string(needle));
     }
-    inline bool contains(const std::string& string, const char character)
+
+    inline bool
+    contains(const std::string& string, const char character)
     {
         return string.find(character) != std::string::npos;
     }
 
     unsigned long count(const std::string& input, const std::string& search);
-    inline unsigned long count(const std::string& input, const char* search)
+
+    inline unsigned long
+    count(const std::string& input, const char* search)
     {
         return count(input, std::string(search));
     }
-    inline unsigned long count(const std::string& input, const char search)
+
+    inline unsigned long
+    count(const std::string& input, const char search)
     {
         return count(input, std::to_string(search));
     }
-
 
     /**
      * @brief If `string` begins with `prefix`, return `string` without the
@@ -123,10 +128,9 @@ namespace simox::alg
      */
     std::string remove_suffix(const std::string& string, const std::string& suffix);
 
-
-
     template <typename IterT>
-    std::vector<std::string> multi_to_string(IterT begin, IterT end)
+    std::vector<std::string>
+    multi_to_string(IterT begin, IterT end)
     {
         std::vector<std::string> result;
         for (auto it = begin; it != end; ++it)
@@ -140,12 +144,13 @@ namespace simox::alg
     }
 
     template <typename T>
-    std::vector<std::string> multi_to_string(const std::vector<T>& vector)
+    std::vector<std::string>
+    multi_to_string(const std::vector<T>& vector)
     {
         return multi_to_string(vector.begin(), vector.end());
     }
 
-    time_t to_time_t(const std::string &time, const std::string &time_format);
+    time_t to_time_t(const std::string& time, const std::string& time_format);
 
-    std::string to_string(time_t t, const std::string &time_format);
-}
+    std::string to_string(time_t t, const std::string& time_format);
+} // namespace simox::alg

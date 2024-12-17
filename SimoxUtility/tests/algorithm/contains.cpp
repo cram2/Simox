@@ -4,12 +4,7 @@
 * @copyright  2021 Rainer Kartmann
 */
 
-#define BOOST_TEST_MODULE SimoxUtility/algorithm/contains
-
-#include <boost/test/included/unit_test.hpp>
-
-#include <SimoxUtility/algorithm/contains.h>
-#include <SimoxUtility/algorithm/string/string_tools.h>
+#define BOOST_TEST_MODULE SimoxUtility / algorithm / contains
 
 #include <map>
 #include <set>
@@ -17,16 +12,20 @@
 #include <unordered_map>
 #include <vector>
 
+#include <boost/test/included/unit_test.hpp>
+
+#include <SimoxUtility/algorithm/contains.h>
+#include <SimoxUtility/algorithm/string/string_tools.h>
 
 namespace contains_test
 {
     struct Fixture
     {
-        const std::vector<std::string> string_vec { "one", "two", "three" };
-        const std::vector<int> int_vec { 0, -1, 10 };
+        const std::vector<std::string> string_vec{"one", "two", "three"};
+        const std::vector<int> int_vec{0, -1, 10};
 
-        const std::set<std::string> string_set { string_vec.begin(), string_vec.end() };
-        const std::set<int> int_set { int_vec.begin(), int_vec.end() };
+        const std::set<std::string> string_set{string_vec.begin(), string_vec.end()};
+        const std::set<int> int_set{int_vec.begin(), int_vec.end()};
 
         const std::string string = "my/string";
 
@@ -52,19 +51,23 @@ namespace contains_test
             fillMap(um_is);
             fillMap(um_ii);
         }
+
         ~Fixture()
         {
         }
 
-        template <class K, class V, template<class...> class MapT = std::map, class...Ts>
-        static MapT<K, V, Ts...> makeMap()
+        template <class K, class V, template <class...> class MapT = std::map, class... Ts>
+        static MapT<K, V, Ts...>
+        makeMap()
         {
             MapT<K, V, Ts...> map;
             fillMap(map);
             return map;
         }
-        template <class K, class V, template<class...> class MapT = std::map, class...Ts>
-        static void fillMap(MapT<K, V, Ts...>& map)
+
+        template <class K, class V, template <class...> class MapT = std::map, class... Ts>
+        static void
+        fillMap(MapT<K, V, Ts...>& map)
         {
             for (int i = 1; i <= 3; ++i)
             {
@@ -73,23 +76,23 @@ namespace contains_test
         }
 
         template <class T>
-        static T as(int i)
+        static T
+        as(int i)
         {
-            if constexpr(std::is_same_v<T, int>)
+            if constexpr (std::is_same_v<T, int>)
             {
                 return i;
             }
-            else if constexpr(std::is_same_v<T, std::string>)
+            else if constexpr (std::is_same_v<T, std::string>)
             {
                 return std::to_string(i);
             }
         }
     };
-}
+} // namespace contains_test
 
 
 BOOST_FIXTURE_TEST_SUITE(contains_test, contains_test::Fixture)
-
 
 BOOST_AUTO_TEST_CASE(test_contains)
 {
@@ -106,7 +109,6 @@ BOOST_AUTO_TEST_CASE(test_contains)
     BOOST_CHECK_EQUAL(simox::alg::contains(string_set, "something"), false);
 }
 
-
 BOOST_AUTO_TEST_CASE(test_string_contains)
 {
     // Uses string_tools.h
@@ -122,7 +124,6 @@ BOOST_AUTO_TEST_CASE(test_string_contains)
     BOOST_CHECK_EQUAL(simox::alg::contains(string, "my"), true);
     BOOST_CHECK_EQUAL(simox::alg::contains(string, "your"), false);
 }
-
 
 BOOST_AUTO_TEST_CASE(test_map_contains)
 {

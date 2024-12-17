@@ -23,6 +23,7 @@
 #include "RobotImporterFactory.h"
 
 #include <SimoxUtility/algorithm/string/string_tools.h>
+
 #include "VirtualRobotException.h"
 
 using namespace std;
@@ -30,7 +31,8 @@ using namespace std;
 namespace VirtualRobot
 {
 
-    string RobotImporterFactory::getAllFileFilters()
+    string
+    RobotImporterFactory::getAllFileFilters()
     {
         vector<string> filter;
         for (string const& subclass : RobotImporterFactory::getSubclassList())
@@ -40,7 +42,8 @@ namespace VirtualRobot
         return simox::alg::join(filter, ";;");
     }
 
-    string RobotImporterFactory::getAllExtensions()
+    string
+    RobotImporterFactory::getAllExtensions()
     {
         vector<string> filter;
         for (string const& subclass : RobotImporterFactory::getSubclassList())
@@ -51,11 +54,13 @@ namespace VirtualRobot
         return simox::alg::join(filter, " ");
     }
 
-    RobotImporterFactoryPtr RobotImporterFactory::fromFileExtension(string type, void* params)
+    RobotImporterFactoryPtr
+    RobotImporterFactory::fromFileExtension(string type, void* params)
     {
         for (string const& subclass : RobotImporterFactory::getSubclassList())
         {
-            string subclassType = RobotImporterFactory::fromName(subclass, NULL)->getFileExtension();
+            string subclassType =
+                RobotImporterFactory::fromName(subclass, NULL)->getFileExtension();
 
             if (type.compare(subclassType) == 0)
             {

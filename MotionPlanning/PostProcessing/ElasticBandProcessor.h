@@ -24,9 +24,9 @@
 
 #include "../Saba.h"
 #include "PathProcessor.h"
-#include "VirtualRobot/Nodes/RobotNode.h"
 #include "VirtualRobot/CollisionDetection/CDManager.h"
 #include "VirtualRobot/IK/GenericIKSolver.h"
+#include "VirtualRobot/Nodes/RobotNode.h"
 
 namespace Saba
 {
@@ -38,33 +38,35 @@ namespace Saba
     class SABA_IMPORT_EXPORT ElasticBandProcessor : public PathProcessor
     {
     public:
-
-        ElasticBandProcessor(CSpacePathPtr path,                            // implicitly defines rns to operate on (path->cspace->rns)
-                             CSpaceSampledPtr cspace,
-                             VirtualRobot::RobotNodePtr node,               // the distance for this node is considered
-                             VirtualRobot::SceneObjectSetPtr obstacles,     // these obstacles are considered for path smoothing
-                             bool verbose = false);
+        ElasticBandProcessor(
+            CSpacePathPtr path, // implicitly defines rns to operate on (path->cspace->rns)
+            CSpaceSampledPtr cspace,
+            VirtualRobot::RobotNodePtr node, // the distance for this node is considered
+            VirtualRobot::SceneObjectSetPtr
+                obstacles, // these obstacles are considered for path smoothing
+            bool verbose = false);
         ~ElasticBandProcessor() override;
 
         //! A wrapper to the standard interface.
         CSpacePathPtr optimize(int optimizeSteps) override;
 
         //! could also be used to disable specific dimensions
-        void setWeights (Eigen::VectorXf w);
+        void setWeights(Eigen::VectorXf w);
 
 
-		/*!
+        /*!
 		 * Writes ext and int forces of point i to given variables.
 		 */
-		void getForces(unsigned int i, Eigen::Vector3f &internalForce, Eigen::Vector3f &externalForce);
+        void
+        getForces(unsigned int i, Eigen::Vector3f& internalForce, Eigen::Vector3f& externalForce);
 
-		Eigen::Vector3f getWSpacePoint(const Eigen::VectorXf& fc);
+        Eigen::Vector3f getWSpacePoint(const Eigen::VectorXf& fc);
 
     protected:
+        bool
+        getCSpaceForce(const Eigen::Vector3f& f, Eigen::VectorXf& fc, float factor, float maxForce);
 
-        bool getCSpaceForce(const Eigen::Vector3f &f, Eigen::VectorXf &fc, float factor, float maxForce);
-
-		bool getWSpaceForce(const Eigen::VectorXf& fc, Eigen::Vector3f &f);
+        bool getWSpaceForce(const Eigen::VectorXf& fc, Eigen::Vector3f& f);
 
         bool getObstacleForce(Eigen::Vector3f& f);
         bool initSolution();
@@ -76,8 +78,10 @@ namespace Saba
         Eigen::VectorXf weights;
 
         CSpaceSampledPtr cspace;
-        VirtualRobot::RobotNodePtr node; // this is the node to move around (e.g. platform, tcp, ...)
-        VirtualRobot::SceneObjectSetPtr obstacles; // this cdm is used to calculate the distance between robot and environment
+        VirtualRobot::RobotNodePtr
+            node; // this is the node to move around (e.g. platform, tcp, ...)
+        VirtualRobot::SceneObjectSetPtr
+            obstacles; // this cdm is used to calculate the distance between robot and environment
         VirtualRobot::RobotNodeSetPtr rns;
         VirtualRobot::CollisionCheckerPtr colChecker;
         VirtualRobot::GenericIKSolverPtr ik;
@@ -87,8 +91,10 @@ namespace Saba
         float maxCSpaceNeighborForce;
         float maxCSpaceObstacleForce;
         float minObstacleDistance;
-        bool getNeighborCForce(const Eigen::VectorXf &before, const Eigen::VectorXf &act, const Eigen::VectorXf &next, Eigen::VectorXf &fc);
+        bool getNeighborCForce(const Eigen::VectorXf& before,
+                               const Eigen::VectorXf& act,
+                               const Eigen::VectorXf& next,
+                               Eigen::VectorXf& fc);
     };
 
-}// namespace
-
+} // namespace Saba

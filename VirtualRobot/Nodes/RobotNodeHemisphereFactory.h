@@ -21,16 +21,15 @@
 */
 #pragma once
 
-#include "../VirtualRobot.h"
 #include "../SceneObject.h"
+#include "../VirtualRobot.h"
 #include "RobotNodeFactory.h"
-
 
 namespace VirtualRobot
 {
     class RobotNode;
 
-    class VIRTUAL_ROBOT_IMPORT_EXPORT RobotNodeHemisphereFactory  : public RobotNodeFactory
+    class VIRTUAL_ROBOT_IMPORT_EXPORT RobotNodeHemisphereFactory : public RobotNodeFactory
     {
     public:
         RobotNodeHemisphereFactory();
@@ -41,38 +40,36 @@ namespace VirtualRobot
          *
          * \return instance of VirtualRobot::RobotNodeHemisphere.
          */
-        RobotNodePtr createRobotNode(
-                RobotPtr robot,
-                const std::string& nodeName,
-                VisualizationNodePtr visualizationModel,
-                CollisionModelPtr collisionModel,
-                float limitLow,
-                float limitHigh,
-                float jointValueOffset,
-                const Eigen::Matrix4f& preJointTransform,
-                const Eigen::Vector3f& axis,
-                const Eigen::Vector3f& translationDirection,
-                const SceneObject::Physics& p = SceneObject::Physics(),
-                RobotNode::RobotNodeType rntype = RobotNode::Generic
-                ) const override;
+        RobotNodePtr
+        createRobotNode(RobotPtr robot,
+                        const std::string& nodeName,
+                        VisualizationNodePtr visualizationModel,
+                        CollisionModelPtr collisionModel,
+                        float limitLow,
+                        float limitHigh,
+                        float jointValueOffset,
+                        const Eigen::Matrix4f& preJointTransform,
+                        const Eigen::Vector3f& axis,
+                        const Eigen::Vector3f& translationDirection,
+                        const SceneObject::Physics& p = SceneObject::Physics(),
+                        RobotNode::RobotNodeType rntype = RobotNode::Generic) const override;
 
         /**
          * Create a VirtualRobot::RobotNodeHemisphere from DH parameters.
          *
          * \return instance of VirtualRobot::RobotNodeHemisphere.
          */
-        RobotNodePtr createRobotNodeDH(
-                RobotPtr robot,
-                const std::string& nodeName,
-                VisualizationNodePtr visualizationModel,
-                CollisionModelPtr collisionModel,
-                float limitLow,
-                float limitHigh,
-                float jointValueOffset,
-                const DHParameter& dhParameters,
-                const SceneObject::Physics& p = SceneObject::Physics(),
-                RobotNode::RobotNodeType rntype = RobotNode::Generic
-                ) const override;
+        RobotNodePtr
+        createRobotNodeDH(RobotPtr robot,
+                          const std::string& nodeName,
+                          VisualizationNodePtr visualizationModel,
+                          CollisionModelPtr collisionModel,
+                          float limitLow,
+                          float limitHigh,
+                          float jointValueOffset,
+                          const DHParameter& dhParameters,
+                          const SceneObject::Physics& p = SceneObject::Physics(),
+                          RobotNode::RobotNodeType rntype = RobotNode::Generic) const override;
 
         // AbstractFactoryMethod
     public:
@@ -81,8 +78,6 @@ namespace VirtualRobot
 
     private:
         static SubClassRegistry registry;
-
     };
 
 } // namespace VirtualRobot
-

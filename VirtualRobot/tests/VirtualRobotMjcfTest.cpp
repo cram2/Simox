@@ -6,35 +6,37 @@
 
 #define BOOST_TEST_MODULE VirtualRobot_VirtualRobotMjcfTest
 
-#include <VirtualRobot/VirtualRobotTest.h>
-
 #include <Eigen/Core>
 #include <Eigen/Geometry>
-#include <VirtualRobot/MJCF/Document.h>
 
+#include <VirtualRobot/MJCF/Document.h>
+#include <VirtualRobot/VirtualRobotTest.h>
 
 namespace Eigen
 {
-    std::ostream& operator<<(std::ostream& os, const Eigen::Vector3f& rhs)
+    std::ostream&
+    operator<<(std::ostream& os, const Eigen::Vector3f& rhs)
     {
         static const IOFormat iof(4, 0, " ", " ", "", "", "[", "]");
         os << rhs.format(iof);
         return os;
     }
 
-    bool operator==(const Eigen::Quaternionf& lhs, const Eigen::Quaternionf& rhs)
+    bool
+    operator==(const Eigen::Quaternionf& lhs, const Eigen::Quaternionf& rhs)
     {
         return lhs.isApprox(rhs);
     }
 
-    std::ostream& operator<<(std::ostream& os, const Eigen::Quaternionf& rhs)
+    std::ostream&
+    operator<<(std::ostream& os, const Eigen::Quaternionf& rhs)
     {
         os << "[ " << rhs.w() << " | " << rhs.x() << " " << rhs.y() << " " << rhs.z() << " ]";
         return os;
     }
-}
+} // namespace Eigen
 
-#define MSG_CONVERSION(in, string, out) \
+#define MSG_CONVERSION(in, string, out)                                                            \
     BOOST_TEST_MESSAGE(in << " -> '" << string << "' -> " << out)
 
 BOOST_AUTO_TEST_SUITE(VirtualRobotMjcfTest)
@@ -68,7 +70,6 @@ BOOST_AUTO_TEST_CASE(test_parseCoeffs)
     BOOST_CHECK_EQUAL(coeffs[2], vector.z());
 }
 
-
 BOOST_AUTO_TEST_CASE(test_attrib_conversion_vector3f)
 {
     Eigen::Vector3f in(1, -3, 2.4f), out;
@@ -90,9 +91,6 @@ BOOST_AUTO_TEST_CASE(test_attrib_conversion_quaternionf)
 
     BOOST_CHECK_EQUAL(in, out);
 }
-
-
-
 
 struct Fixture
 {

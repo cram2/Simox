@@ -29,10 +29,9 @@
 
 #include <SimoxUtility/math/scale_value.h>
 
-#include "VirtualRobot/VirtualRobot.h"
 #include "VirtualRobot/GraspableSensorizedObject.h"
 #include "VirtualRobot/Transformation/DHParameter.h"
-
+#include "VirtualRobot/VirtualRobot.h"
 
 namespace VirtualRobot
 {

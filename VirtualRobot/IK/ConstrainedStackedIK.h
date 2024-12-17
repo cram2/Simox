@@ -22,17 +22,22 @@
 */
 #pragma once
 
-#include "VirtualRobot/VirtualRobot.h"
 #include "VirtualRobot/IK/ConstrainedIK.h"
 #include "VirtualRobot/IK/JacobiProvider.h"
 #include "VirtualRobot/IK/StackedIK.h"
+#include "VirtualRobot/VirtualRobot.h"
 
 namespace VirtualRobot
 {
-    class VIRTUAL_ROBOT_IMPORT_EXPORT ConstrainedStackedIK : public ConstrainedIK, public std::enable_shared_from_this<ConstrainedStackedIK>
+    class VIRTUAL_ROBOT_IMPORT_EXPORT ConstrainedStackedIK :
+        public ConstrainedIK,
+        public std::enable_shared_from_this<ConstrainedStackedIK>
     {
     public:
-        ConstrainedStackedIK(RobotPtr& robot, const RobotNodeSetPtr& nodeSet, float stepSize = 0.2f, int maxIterations = 1000,
+        ConstrainedStackedIK(RobotPtr& robot,
+                             const RobotNodeSetPtr& nodeSet,
+                             float stepSize = 0.2f,
+                             int maxIterations = 1000,
                              JacobiProvider::InverseJacobiMethod method = JacobiProvider::eSVD);
 
         bool initialize() override;
@@ -51,5 +56,4 @@ namespace VirtualRobot
     };
 
     typedef std::shared_ptr<ConstrainedStackedIK> ConstrainedStackedIKPtr;
-}
-
+} // namespace VirtualRobot

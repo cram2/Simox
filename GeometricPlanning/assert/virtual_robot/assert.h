@@ -1,10 +1,9 @@
 #pragma once
 
+#include <experimental/source_location>
 #include <sstream>
 
 #include <VirtualRobot/VirtualRobot.h>
-
-#include <experimental/source_location>
 
 #define REQUIRE(a) VR_ASSERT(a)
 #define REQUIRE_MESSAGE(a, b) VR_ASSERT_MESSAGE(a, b)
@@ -34,7 +33,6 @@ namespace simox::geometric_planning::assert::virtual_robot::detail
             return stream.str();
         };
     }
-
 
     void checkMessage(bool expressionResult,
                       const std::string& expression,

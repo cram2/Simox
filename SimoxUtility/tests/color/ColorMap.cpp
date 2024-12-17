@@ -20,15 +20,13 @@
  *             GNU General Public License
  */
 
-#define BOOST_TEST_MODULE SimoxUtility/color/ColorMap
+#define BOOST_TEST_MODULE SimoxUtility / color / ColorMap
 
 #include <boost/test/included/unit_test.hpp>
 
 #include <SimoxUtility/color/ColorMap.h>
 #include <SimoxUtility/color/cmaps.h>
 #include <SimoxUtility/color/interpolation.h>
-
-
 
 namespace ColorMapTest
 {
@@ -37,7 +35,6 @@ namespace ColorMapTest
 
 
 BOOST_AUTO_TEST_SUITE(ColorMapTest)
-
 
 BOOST_AUTO_TEST_CASE(test_at_empty)
 {
@@ -49,23 +46,21 @@ BOOST_AUTO_TEST_CASE(test_at_empty)
     BOOST_CHECK_EQUAL(cmap.at(-100), simox::Color::black());
 }
 
-
 BOOST_AUTO_TEST_CASE(test_at_constant)
 {
     const simox::Color color(0.0, 0.5, 1.0);
-    const simox::color::ColorMap cmap1 { color };
-    const simox::color::ColorMap cmap2 { { 0, color} };
+    const simox::color::ColorMap cmap1{color};
+    const simox::color::ColorMap cmap2{{0, color}};
 
-    for (const auto& cmap : { cmap1, cmap2 })
+    for (const auto& cmap : {cmap1, cmap2})
     {
         BOOST_CHECK_EQUAL(cmap.size(), 1);
 
         BOOST_CHECK_EQUAL(cmap.at(-1), color);
-        BOOST_CHECK_EQUAL(cmap.at( 0), color);
-        BOOST_CHECK_EQUAL(cmap.at( 1), color);
+        BOOST_CHECK_EQUAL(cmap.at(0), color);
+        BOOST_CHECK_EQUAL(cmap.at(1), color);
     }
 }
-
 
 BOOST_AUTO_TEST_CASE(test_interpolate_linear)
 {
@@ -82,21 +77,20 @@ BOOST_AUTO_TEST_CASE(test_interpolate_linear)
     BOOST_CHECK_EQUAL(linear(0.75, colorA, colorB), simox::Color(0.25, 0.5, 0.75));
 }
 
-
 BOOST_AUTO_TEST_CASE(test_two_elements)
 {
     const simox::Color colorA(1.0, 0.5, 0.0);
     const simox::Color colorB(0.0, 0.5, 1.0);
 
-    const simox::color::ColorMap cmap1 { colorA, colorB };
-    const simox::color::ColorMap cmap2 { { 0, colorA }, { 1, colorB } };
+    const simox::color::ColorMap cmap1{colorA, colorB};
+    const simox::color::ColorMap cmap2{{0, colorA}, {1, colorB}};
 
-    for (const auto& cmap : { cmap1, cmap2 })
+    for (const auto& cmap : {cmap1, cmap2})
     {
         BOOST_CHECK_EQUAL(cmap.at(-1), colorA);
-        BOOST_CHECK_EQUAL(cmap.at( 0), colorA);
-        BOOST_CHECK_EQUAL(cmap.at( 1), colorB);
-        BOOST_CHECK_EQUAL(cmap.at( 2), colorB);
+        BOOST_CHECK_EQUAL(cmap.at(0), colorA);
+        BOOST_CHECK_EQUAL(cmap.at(1), colorB);
+        BOOST_CHECK_EQUAL(cmap.at(2), colorB);
 
         BOOST_CHECK_EQUAL(cmap.at(0.25), simox::Color(0.75, 0.5, 0.25));
         BOOST_CHECK_EQUAL(cmap.at(0.50), simox::Color(0.50, 0.5, 0.50));
@@ -104,22 +98,19 @@ BOOST_AUTO_TEST_CASE(test_two_elements)
     }
 }
 
-
 BOOST_AUTO_TEST_CASE(test_three_elements)
 {
     const simox::Color colorA(1.0, 0.5, 0.0);
     const simox::Color colorB(0.5, 0.5, 0.5);
     const simox::Color colorC(0.0, 0.5, 1.0);
 
-    const simox::color::ColorMap cmap {
-        { -1, colorA }, { 0, colorB }, { 2, colorC }
-    };
+    const simox::color::ColorMap cmap{{-1, colorA}, {0, colorB}, {2, colorC}};
 
     BOOST_CHECK_EQUAL(cmap.at(-2), colorA);
     BOOST_CHECK_EQUAL(cmap.at(-1), colorA);
-    BOOST_CHECK_EQUAL(cmap.at( 0), colorB);
-    BOOST_CHECK_EQUAL(cmap.at( 2), colorC);
-    BOOST_CHECK_EQUAL(cmap.at( 3), colorC);
+    BOOST_CHECK_EQUAL(cmap.at(0), colorB);
+    BOOST_CHECK_EQUAL(cmap.at(2), colorC);
+    BOOST_CHECK_EQUAL(cmap.at(3), colorC);
 
     BOOST_CHECK_EQUAL(cmap.at(-0.75), simox::Color(0.875, 0.5, 0.125));
     BOOST_CHECK_EQUAL(cmap.at(-0.50), simox::Color(0.750, 0.5, 0.250));
@@ -130,66 +121,62 @@ BOOST_AUTO_TEST_CASE(test_three_elements)
     BOOST_CHECK_EQUAL(cmap.at(1.5), simox::Color(0.125, 0.5, 0.875));
 }
 
-
 BOOST_AUTO_TEST_CASE(test_vmin)
 {
     const simox::Color colorA(1.0, 0.5, 0.0);
     const simox::Color colorB(0.0, 0.5, 1.0);
 
-    simox::color::ColorMap cmap { { 1, colorA }, { 2, colorB } };
+    simox::color::ColorMap cmap{{1, colorA}, {2, colorB}};
     cmap.set_vmin(0);
 
     BOOST_CHECK_EQUAL(cmap.at(-1), colorA);
-    BOOST_CHECK_EQUAL(cmap.at( 0), colorA);
+    BOOST_CHECK_EQUAL(cmap.at(0), colorA);
 
-    BOOST_CHECK_EQUAL(cmap.at( 0.5), simox::Color(0.75, 0.5, 0.25));
-    BOOST_CHECK_EQUAL(cmap.at( 1.0), simox::Color(0.50, 0.5, 0.50));
-    BOOST_CHECK_EQUAL(cmap.at( 1.5), simox::Color(0.25, 0.5, 0.75));
+    BOOST_CHECK_EQUAL(cmap.at(0.5), simox::Color(0.75, 0.5, 0.25));
+    BOOST_CHECK_EQUAL(cmap.at(1.0), simox::Color(0.50, 0.5, 0.50));
+    BOOST_CHECK_EQUAL(cmap.at(1.5), simox::Color(0.25, 0.5, 0.75));
 
-    BOOST_CHECK_EQUAL(cmap.at( 2), colorB);
-    BOOST_CHECK_EQUAL(cmap.at( 3), colorB);
+    BOOST_CHECK_EQUAL(cmap.at(2), colorB);
+    BOOST_CHECK_EQUAL(cmap.at(3), colorB);
 }
-
 
 BOOST_AUTO_TEST_CASE(test_vmax)
 {
     const simox::Color colorA(1.0, 0.5, 0.0);
     const simox::Color colorB(0.0, 0.5, 1.0);
 
-    simox::color::ColorMap cmap { { 1, colorA }, { 2, colorB } };
+    simox::color::ColorMap cmap{{1, colorA}, {2, colorB}};
     cmap.set_vmax(3);
 
-    BOOST_CHECK_EQUAL(cmap.at( 0), colorA);
-    BOOST_CHECK_EQUAL(cmap.at( 1), colorA);
+    BOOST_CHECK_EQUAL(cmap.at(0), colorA);
+    BOOST_CHECK_EQUAL(cmap.at(1), colorA);
 
-    BOOST_CHECK_EQUAL(cmap.at( 1.5), simox::Color(0.75, 0.5, 0.25));
-    BOOST_CHECK_EQUAL(cmap.at( 2.0), simox::Color(0.50, 0.5, 0.50));
-    BOOST_CHECK_EQUAL(cmap.at( 2.5), simox::Color(0.25, 0.5, 0.75));
+    BOOST_CHECK_EQUAL(cmap.at(1.5), simox::Color(0.75, 0.5, 0.25));
+    BOOST_CHECK_EQUAL(cmap.at(2.0), simox::Color(0.50, 0.5, 0.50));
+    BOOST_CHECK_EQUAL(cmap.at(2.5), simox::Color(0.25, 0.5, 0.75));
 
-    BOOST_CHECK_EQUAL(cmap.at( 3), colorB);
-    BOOST_CHECK_EQUAL(cmap.at( 4), colorB);
+    BOOST_CHECK_EQUAL(cmap.at(3), colorB);
+    BOOST_CHECK_EQUAL(cmap.at(4), colorB);
 }
-
 
 BOOST_AUTO_TEST_CASE(test_vlimits)
 {
     const simox::Color colorA(1.0, 0.5, 0.0);
     const simox::Color colorB(0.0, 0.5, 1.0);
 
-    simox::color::ColorMap cmap { { 1, colorA }, { 2, colorB } };
+    simox::color::ColorMap cmap{{1, colorA}, {2, colorB}};
     cmap.set_vlimits(100, 200);
 
-    BOOST_CHECK_EQUAL(cmap.at(  99), colorA);
-    BOOST_CHECK_EQUAL(cmap.at( 100), colorA);
+    BOOST_CHECK_EQUAL(cmap.at(99), colorA);
+    BOOST_CHECK_EQUAL(cmap.at(100), colorA);
 
-    BOOST_CHECK_EQUAL(cmap.at( 125), simox::Color(0.75, 0.5, 0.25));
-    BOOST_CHECK_EQUAL(cmap.at( 150), simox::Color(0.50, 0.5, 0.50));
-    BOOST_CHECK_EQUAL(cmap.at( 175), simox::Color(0.25, 0.5, 0.75));
+    BOOST_CHECK_EQUAL(cmap.at(125), simox::Color(0.75, 0.5, 0.25));
+    BOOST_CHECK_EQUAL(cmap.at(150), simox::Color(0.50, 0.5, 0.50));
+    BOOST_CHECK_EQUAL(cmap.at(175), simox::Color(0.25, 0.5, 0.75));
 
-    BOOST_CHECK_EQUAL(cmap.at( 200), colorB);
-    BOOST_CHECK_EQUAL(cmap.at( 201), colorB);
+    BOOST_CHECK_EQUAL(cmap.at(200), colorB);
+    BOOST_CHECK_EQUAL(cmap.at(201), colorB);
 }
-
 
 BOOST_AUTO_TEST_CASE(test_named_colormaps)
 {
@@ -212,7 +199,6 @@ BOOST_AUTO_TEST_CASE(test_named_colormaps)
     }
 }
 
-
 BOOST_AUTO_TEST_CASE(test_apply_vector)
 {
     const simox::ColorMap cmap = simox::color::cmaps::viridis();
@@ -228,12 +214,11 @@ BOOST_AUTO_TEST_CASE(test_apply_vector)
     }
 }
 
-
 BOOST_AUTO_TEST_CASE(test_apply_map)
 {
     const simox::ColorMap colormap = simox::color::cmaps::viridis();
 
-    const std::map<std::string, float> map = { {"0", 0.0} , {"1", 1.0}, {"2", 2.0} };
+    const std::map<std::string, float> map = {{"0", 0.0}, {"1", 1.0}, {"2", 2.0}};
     const std::map<std::string, simox::Color> cmap = colormap(map);
 
     BOOST_CHECK_EQUAL(map.size(), cmap.size());
@@ -245,24 +230,21 @@ BOOST_AUTO_TEST_CASE(test_apply_map)
     }
 }
 
-
 BOOST_AUTO_TEST_CASE(test_reversed)
 {
     const simox::Color colorA(1.0, 0.5, 0.0);
     const simox::Color colorB(0.5, 0.5, 0.5);
     const simox::Color colorC(0.0, 0.5, 1.0);
 
-    const simox::color::ColorMap cmap {
-        { -1, colorC }, { 0, colorB }, { 2, colorA }
-    };
+    const simox::color::ColorMap cmap{{-1, colorC}, {0, colorB}, {2, colorA}};
 
     const simox::color::ColorMap rev = cmap.reversed();
 
     BOOST_CHECK_EQUAL(rev.at(-2), colorA);
     BOOST_CHECK_EQUAL(rev.at(-1), colorA);
-    BOOST_CHECK_EQUAL(rev.at( 0), colorB);
-    BOOST_CHECK_EQUAL(rev.at( 2), colorC);
-    BOOST_CHECK_EQUAL(rev.at( 3), colorC);
+    BOOST_CHECK_EQUAL(rev.at(0), colorB);
+    BOOST_CHECK_EQUAL(rev.at(2), colorC);
+    BOOST_CHECK_EQUAL(rev.at(3), colorC);
 
     BOOST_CHECK_EQUAL(rev.at(-0.75), simox::Color(0.875, 0.5, 0.125));
     BOOST_CHECK_EQUAL(rev.at(-0.50), simox::Color(0.750, 0.5, 0.250));

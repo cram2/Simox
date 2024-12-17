@@ -1,5 +1,6 @@
 
 #include "SimoxCollisionDispatcher.h"
+
 #include "BulletEngine.h"
 
 
@@ -9,17 +10,23 @@ namespace SimDynamics
 {
 
 
-    SimoxCollisionDispatcher::SimoxCollisionDispatcher(BulletEngine* engine, btCollisionConfiguration* collisionConfiguration)
-        : btCollisionDispatcher(collisionConfiguration), engine(engine)
+    SimoxCollisionDispatcher::SimoxCollisionDispatcher(
+        BulletEngine* engine,
+        btCollisionConfiguration* collisionConfiguration) :
+        btCollisionDispatcher(collisionConfiguration), engine(engine)
     {
     }
 
-    SimoxCollisionDispatcher::~SimoxCollisionDispatcher()
-    = default;
-    bool SimoxCollisionDispatcher::needsCollision(const btCollisionObject* body0, const btCollisionObject* body1)
+    SimoxCollisionDispatcher::~SimoxCollisionDispatcher() = default;
+
+    bool
+    SimoxCollisionDispatcher::needsCollision(const btCollisionObject* body0,
+                                             const btCollisionObject* body1)
     {
-        SimDynamics::BulletObject* o0 = static_cast<SimDynamics::BulletObject*>(body0->getUserPointer());
-        SimDynamics::BulletObject* o1 = static_cast<SimDynamics::BulletObject*>(body1->getUserPointer());
+        SimDynamics::BulletObject* o0 =
+            static_cast<SimDynamics::BulletObject*>(body0->getUserPointer());
+        SimDynamics::BulletObject* o1 =
+            static_cast<SimDynamics::BulletObject*>(body1->getUserPointer());
 
         if (!engine || engine->checkCollisionEnabled(o0, o1))
         {
@@ -29,10 +36,14 @@ namespace SimDynamics
         return false;
     }
 
-    bool SimoxCollisionDispatcher::needsResponse(const btCollisionObject *body0, const btCollisionObject *body1)
+    bool
+    SimoxCollisionDispatcher::needsResponse(const btCollisionObject* body0,
+                                            const btCollisionObject* body1)
     {
-        SimDynamics::BulletObject* o0 = static_cast<SimDynamics::BulletObject*>(body0->getUserPointer());
-        SimDynamics::BulletObject* o1 = static_cast<SimDynamics::BulletObject*>(body1->getUserPointer());
+        SimDynamics::BulletObject* o0 =
+            static_cast<SimDynamics::BulletObject*>(body0->getUserPointer());
+        SimDynamics::BulletObject* o1 =
+            static_cast<SimDynamics::BulletObject*>(body1->getUserPointer());
 
         if (!engine || engine->checkCollisionEnabled(o0, o1))
         {
@@ -43,4 +54,4 @@ namespace SimDynamics
     }
 
 
-}
+} // namespace SimDynamics

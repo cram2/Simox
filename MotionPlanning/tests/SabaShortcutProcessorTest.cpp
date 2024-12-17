@@ -6,25 +6,26 @@
 
 #define BOOST_TEST_MODULE Saba_SabaShortcutProcessorTest
 
-#include <VirtualRobot/VirtualRobotTest.h>
-#include <VirtualRobot/XML/RobotIO.h>
-#include <VirtualRobot/Robot.h>
-#include <VirtualRobot/RobotNodeSet.h>
-#include <VirtualRobot/CollisionDetection/CollisionChecker.h>
-#include <VirtualRobot/CollisionDetection/CollisionModel.h>
-#include <VirtualRobot/Obstacle.h>
-#include <CSpace/CSpaceSampled.h>
-#include <CSpace/CSpacePath.h>
-#include <PostProcessing/ShortcutProcessor.h>
-#include <VirtualRobot/CollisionDetection/CDManager.h>
 #include <string>
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
+#include <VirtualRobot/CollisionDetection/CDManager.h>
+#include <VirtualRobot/CollisionDetection/CollisionChecker.h>
+#include <VirtualRobot/CollisionDetection/CollisionModel.h>
+#include <VirtualRobot/Obstacle.h>
+#include <VirtualRobot/Robot.h>
+#include <VirtualRobot/RobotNodeSet.h>
+#include <VirtualRobot/VirtualRobotTest.h>
+#include <VirtualRobot/XML/RobotIO.h>
+
+#include <CSpace/CSpacePath.h>
+#include <CSpace/CSpaceSampled.h>
+#include <PostProcessing/ShortcutProcessor.h>
+
 
 BOOST_AUTO_TEST_SUITE(CSpaceShortcutProcessor)
-
 
 BOOST_AUTO_TEST_CASE(testShortcutProcessor)
 {
@@ -124,8 +125,6 @@ BOOST_AUTO_TEST_CASE(testShortcutProcessor)
     BOOST_REQUIRE(o3);
     float l3 = o3->getLength();
     BOOST_CHECK_LE(l3, l);
-
-
 }
 
 BOOST_AUTO_TEST_SUITE_END()

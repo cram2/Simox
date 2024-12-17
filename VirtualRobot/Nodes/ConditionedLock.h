@@ -9,8 +9,9 @@ class ConditionedLock
 private:
     T _lock;
     bool _enabled;
+
 public:
-    ConditionedLock(std::recursive_mutex&   mutex, bool enabled) :
+    ConditionedLock(std::recursive_mutex& mutex, bool enabled) :
         _lock(mutex, std::defer_lock), _enabled(enabled)
     {
         if (_enabled)
@@ -18,6 +19,7 @@ public:
             _lock.lock();
         }
     }
+
     ~ConditionedLock()
     {
         if (_enabled)

@@ -1,15 +1,17 @@
 
 #include "FileIO.h"
+
 #include "../VirtualRobotException.h"
 #include "Logging.h"
 
-std::vector< Eigen::Vector3f > VirtualRobot::FileIO::readPts(const std::string& filename, const char separator)
+std::vector<Eigen::Vector3f>
+VirtualRobot::FileIO::readPts(const std::string& filename, const char separator)
 {
     std::ifstream file(filename.c_str());
     THROW_VR_EXCEPTION_IF(!file.good(), "Could not open file" << filename);
     char tmp;
     float a, b, c;
-    std::vector< Eigen::Vector3f > res;
+    std::vector<Eigen::Vector3f> res;
     Eigen::Vector3f v;
     bool needToReadSep = true;
 

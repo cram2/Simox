@@ -20,11 +20,12 @@
  */
 
 #include "GridCacheFloat3.h"
+
 #include "Array3D.h"
 
 namespace math
 {
-    GridCacheFloat3::GridCacheFloat3(int size, std::function<float (Index3)>& getData)
+    GridCacheFloat3::GridCacheFloat3(int size, std::function<float(Index3)>& getData)
     {
         this->size = size;
         this->getData = getData;
@@ -43,7 +44,8 @@ namespace math
         }
     }
 
-    float GridCacheFloat3::Get(int x, int y, int z)
+    float
+    GridCacheFloat3::Get(int x, int y, int z)
     {
         if (valid->Get(x, y, z))
         {
@@ -57,4 +59,4 @@ namespace math
             return val;
         }
     }
-}
+} // namespace math

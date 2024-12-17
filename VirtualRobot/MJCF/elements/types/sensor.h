@@ -2,7 +2,6 @@
 
 #include "../core/Attribute.h"
 
-
 namespace mjcf
 {
 
@@ -14,11 +13,10 @@ namespace mjcf
         mjcf_ElementDerivedConstructors(SensorSection)
     };
 
-
-#define mjcf_SensorAttributes(Derived) \
-    mjcf_NameAttribute(Derived);                \
-    mjcf_FloatAttributeDef(Derived, noise, 0);  \
-    mjcf_FloatAttributeDef(Derived, cutoff, 0); \
+#define mjcf_SensorAttributes(Derived)                                                             \
+    mjcf_NameAttribute(Derived);                                                                   \
+    mjcf_FloatAttributeDef(Derived, noise, 0);                                                     \
+    mjcf_FloatAttributeDef(Derived, cutoff, 0);
 
     // noise:
     /**
@@ -34,7 +32,6 @@ namespace mjcf
      * Sensor noise respects the sensor data type: quaternions and unit
      * vectors remain normalized, non-negative quantities remain non-negative.
      */
-
 
 
     /**
@@ -60,15 +57,13 @@ namespace mjcf
         static const std::string tag;
         mjcf_ElementDerivedConstructors(TouchSensor)
 
-        mjcf_SensorAttributes(TouchSensor)
+            mjcf_SensorAttributes(TouchSensor)
 
-        /**
+            /**
          * @brief Site defining the active sensor zone.
          */
-        mjcf_StringAttributeReq(TouchSensor, site);
-
+            mjcf_StringAttributeReq(TouchSensor, site);
     };
-
 
     /**
      * @brief A AccelerometerSensor element.
@@ -85,17 +80,15 @@ namespace mjcf
         static const std::string tag;
         mjcf_ElementDerivedConstructors(AccelerometerSensor)
 
-        mjcf_SensorAttributes(AccelerometerSensor)
+            mjcf_SensorAttributes(AccelerometerSensor)
 
-        /**
+            /**
          * @brief Site where the sensor is mounted.
          *
          * The accelerometer is centered and aligned with the site local frame.
          */
-        mjcf_StringAttributeReq(AccelerometerSensor, site);
-
+            mjcf_StringAttributeReq(AccelerometerSensor, site);
     };
-
 
     /**
      * @brief A VelocimeterSensor element.
@@ -112,17 +105,15 @@ namespace mjcf
         static const std::string tag;
         mjcf_ElementDerivedConstructors(VelocimeterSensor)
 
-        mjcf_SensorAttributes(VelocimeterSensor)
+            mjcf_SensorAttributes(VelocimeterSensor)
 
-        /**
+            /**
          * @brief Site where the sensor is mounted.
          *
          * The velocimeter is centered and aligned with the site local frame.
          */
-        mjcf_StringAttributeReq(VelocimeterSensor, site);
-
+            mjcf_StringAttributeReq(VelocimeterSensor, site);
     };
-
 
     /**
      * @brief A GyroSensor element.
@@ -141,17 +132,15 @@ namespace mjcf
         static const std::string tag;
         mjcf_ElementDerivedConstructors(GyroSensor)
 
-        mjcf_SensorAttributes(GyroSensor)
+            mjcf_SensorAttributes(GyroSensor)
 
-        /**
+            /**
          * @brief Site where the sensor is mounted.
          *
          * The gyroscope is centered and aligned with the site local frame.
          */
-        mjcf_StringAttributeReq(GyroSensor, site);
-
+            mjcf_StringAttributeReq(GyroSensor, site);
     };
-
 
     /**
      * @brief A ForceSensor element.
@@ -173,9 +162,9 @@ namespace mjcf
         static const std::string tag;
         mjcf_ElementDerivedConstructors(ForceSensor)
 
-        mjcf_SensorAttributes(ForceSensor)
+            mjcf_SensorAttributes(ForceSensor)
 
-        /**
+            /**
          * @brief Site where the sensor is mounted.
          *
          * The measured interaction force is between the body where the site is
@@ -186,10 +175,8 @@ namespace mjcf
          * multiple children, which is why we define this sensor through the
          * child rather than the parent body in the pair.
          */
-        mjcf_StringAttributeReq(ForceSensor, site);
-
+            mjcf_StringAttributeReq(ForceSensor, site);
     };
-
 
     /**
      * @brief A TorqueSensor element.
@@ -204,18 +191,16 @@ namespace mjcf
         static const std::string tag;
         mjcf_ElementDerivedConstructors(TorqueSensor)
 
-        mjcf_SensorAttributes(TorqueSensor)
+            mjcf_SensorAttributes(TorqueSensor)
 
-        /**
+            /**
          * @brief Site where the sensor is mounted.
          *
          * The measured interaction torque is between the body where the site is
          * defined and its parent body.
          */
-        mjcf_StringAttributeReq(TorqueSensor, site);
-
+            mjcf_StringAttributeReq(TorqueSensor, site);
     };
-
 
     /**
      * @brief A MagnetometerSensor element.
@@ -231,15 +216,13 @@ namespace mjcf
         static const std::string tag;
         mjcf_ElementDerivedConstructors(MagnetometerSensor)
 
-        mjcf_SensorAttributes(MagnetometerSensor)
+            mjcf_SensorAttributes(MagnetometerSensor)
 
-        /**
+            /**
          * @brief The site where the sensor is attached.
          */
-        mjcf_StringAttributeReq(MagnetometerSensor, site);
-
+            mjcf_StringAttributeReq(MagnetometerSensor, site);
     };
-
 
     /**
      * @brief A RangeFinderSensor element.
@@ -262,15 +245,13 @@ namespace mjcf
         static const std::string tag;
         mjcf_ElementDerivedConstructors(RangeFinderSensor)
 
-        mjcf_SensorAttributes(RangeFinderSensor)
+            mjcf_SensorAttributes(RangeFinderSensor)
 
-        /**
+            /**
          * @brief The site where the sensor is attached.
          */
-        mjcf_StringAttributeReq(RangeFinderSensor, site);
-
+            mjcf_StringAttributeReq(RangeFinderSensor, site);
     };
-
 
     /**
      * @brief A JointPositionSensor element.
@@ -288,18 +269,16 @@ namespace mjcf
         static const std::string tag;
         mjcf_ElementDerivedConstructors(JointPositionSensor)
 
-        mjcf_SensorAttributes(JointPositionSensor)
+            mjcf_SensorAttributes(JointPositionSensor)
 
-        /**
+            /**
          * @brief The joint whose position or angle will be sensed.
          *
          * Only scalar joints can be referenced here. The sensor output is copied
          * from mjData.qpos.
          */
-        mjcf_StringAttributeReq(JointPositionSensor, joint);
-
+            mjcf_StringAttributeReq(JointPositionSensor, joint);
     };
-
 
     /**
      * @brief A JointVelocitySensor element.
@@ -314,18 +293,16 @@ namespace mjcf
         static const std::string tag;
         mjcf_ElementDerivedConstructors(JointVelocitySensor)
 
-        mjcf_SensorAttributes(JointVelocitySensor)
+            mjcf_SensorAttributes(JointVelocitySensor)
 
-        /**
+            /**
          * @brief The joint whose velocity will be sensed.
          *
          * Only scalar joints can be referenced here. The sensor output is copied
          * from mjData.qvel.
          */
-        mjcf_StringAttributeReq(JointVelocitySensor, joint);
-
+            mjcf_StringAttributeReq(JointVelocitySensor, joint);
     };
-
 
     /**
      * @brief A TendonPositionSensor element.
@@ -340,17 +317,15 @@ namespace mjcf
         static const std::string tag;
         mjcf_ElementDerivedConstructors(TendonPositionSensor)
 
-        mjcf_SensorAttributes(TendonPositionSensor)
+            mjcf_SensorAttributes(TendonPositionSensor)
 
-        /**
+            /**
          * @brief The tendon whose length will be sensed.
          *
          * The sensor output is copied from mjData.ten_length.
          */
-        mjcf_StringAttributeReq(TendonPositionSensor, tendon);
-
+            mjcf_StringAttributeReq(TendonPositionSensor, tendon);
     };
-
 
     /**
      * @brief A TendonVelocitySensor element.
@@ -365,17 +340,15 @@ namespace mjcf
         static const std::string tag;
         mjcf_ElementDerivedConstructors(TendonVelocitySensor)
 
-        mjcf_SensorAttributes(TendonVelocitySensor)
+            mjcf_SensorAttributes(TendonVelocitySensor)
 
-        /**
+            /**
          * @brief The tendon whose velocity will be sensed.
          *
          * The sensor output is copied from mjData.ten_velocity.
          */
-        mjcf_StringAttributeReq(TendonVelocitySensor, tendon);
-
+            mjcf_StringAttributeReq(TendonVelocitySensor, tendon);
     };
-
 
     /**
      * @brief A ActuatorPositionSensor element.
@@ -391,17 +364,15 @@ namespace mjcf
         static const std::string tag;
         mjcf_ElementDerivedConstructors(ActuatorPositionSensor)
 
-        mjcf_SensorAttributes(ActuatorPositionSensor)
+            mjcf_SensorAttributes(ActuatorPositionSensor)
 
-        /**
+            /**
          * @brief The actuator whose transmission's length will be sensed.
          *
          * The sensor output is copied from mjData.actuator_length.
          */
-        mjcf_StringAttributeReq(ActuatorPositionSensor, actuator);
-
+            mjcf_StringAttributeReq(ActuatorPositionSensor, actuator);
     };
-
 
     /**
      * @brief A ActuatorVelocitySensor element.
@@ -416,17 +387,15 @@ namespace mjcf
         static const std::string tag;
         mjcf_ElementDerivedConstructors(ActuatorVelocitySensor)
 
-        mjcf_SensorAttributes(ActuatorVelocitySensor)
+            mjcf_SensorAttributes(ActuatorVelocitySensor)
 
-        /**
+            /**
          * @brief The actuator whose transmission's velocity will be sensed.
          *
          * The sensor output is copied from mjData.actuator_velocity.
          */
-        mjcf_StringAttributeReq(ActuatorVelocitySensor, actuator);
-
+            mjcf_StringAttributeReq(ActuatorVelocitySensor, actuator);
     };
-
 
     /**
      * @brief A ActuatorForceSensor element.
@@ -444,17 +413,15 @@ namespace mjcf
         static const std::string tag;
         mjcf_ElementDerivedConstructors(ActuatorForceSensor)
 
-        mjcf_SensorAttributes(ActuatorForceSensor)
+            mjcf_SensorAttributes(ActuatorForceSensor)
 
-        /**
+            /**
          * @brief The actuator whose scalar force output will be sensed.
          *
          * The sensor output is copied from mjData.actuator_force.
          */
-        mjcf_StringAttributeReq(ActuatorForceSensor, actuator);
-
+            mjcf_StringAttributeReq(ActuatorForceSensor, actuator);
     };
-
 
     /**
      * @brief A BallJointValueSensor element.
@@ -469,17 +436,15 @@ namespace mjcf
         static const std::string tag;
         mjcf_ElementDerivedConstructors(BallJointValueSensor)
 
-        mjcf_SensorAttributes(BallJointValueSensor)
+            mjcf_SensorAttributes(BallJointValueSensor)
 
-        /**
+            /**
          * @brief The ball joint whose quaternion is sensed.
          *
          * The sensor output is copied from mjData.qpos.
          */
-        mjcf_StringAttributeReq(BallJointValueSensor, joint);
-
+            mjcf_StringAttributeReq(BallJointValueSensor, joint);
     };
-
 
     /**
      * @brief A BallAngularVelocitySensor element.
@@ -496,17 +461,15 @@ namespace mjcf
         static const std::string tag;
         mjcf_ElementDerivedConstructors(BallAngularVelocitySensor)
 
-        mjcf_SensorAttributes(BallAngularVelocitySensor)
+            mjcf_SensorAttributes(BallAngularVelocitySensor)
 
-        /**
+            /**
          * @brief The ball joint whose angular velocity is sensed.
          *
          * The sensor output is copied from mjData.qvel.
          */
-        mjcf_StringAttributeReq(BallAngularVelocitySensor, joint);
-
+            mjcf_StringAttributeReq(BallAngularVelocitySensor, joint);
     };
-
 
     /**
      * @brief A JointLimitPositionSensor element.
@@ -520,9 +483,9 @@ namespace mjcf
         static const std::string tag;
         mjcf_ElementDerivedConstructors(JointLimitPositionSensor)
 
-        mjcf_SensorAttributes(JointLimitPositionSensor)
+            mjcf_SensorAttributes(JointLimitPositionSensor)
 
-        /**
+            /**
          * @brief The joint whose limit is sensed.
          *
          * The sensor output equals mjData.efc_pos - mjData.efc_margin for the
@@ -532,10 +495,8 @@ namespace mjcf
          * the first component is returned. If there is no violation, the result
          * is 0.
          */
-        mjcf_StringAttributeReq(JointLimitPositionSensor, joint);
-
+            mjcf_StringAttributeReq(JointLimitPositionSensor, joint);
     };
-
 
     /**
      * @brief A JointLimitVelocitySensor element.
@@ -549,18 +510,16 @@ namespace mjcf
         static const std::string tag;
         mjcf_ElementDerivedConstructors(JointLimitVelocitySensor)
 
-        mjcf_SensorAttributes(JointLimitVelocitySensor)
+            mjcf_SensorAttributes(JointLimitVelocitySensor)
 
-        /**
+            /**
          * @brief The joint whose limit is sensed.
          *
          * The sensor output is copied from mjData.efc_vel. If the joint limit is
          * not violated, the result is 0.
          */
-        mjcf_StringAttributeReq(JointLimitVelocitySensor, joint);
-
+            mjcf_StringAttributeReq(JointLimitVelocitySensor, joint);
     };
-
 
     /**
      * @brief A JointLimitForceSensor element.
@@ -574,18 +533,16 @@ namespace mjcf
         static const std::string tag;
         mjcf_ElementDerivedConstructors(JointLimitForceSensor)
 
-        mjcf_SensorAttributes(JointLimitForceSensor)
+            mjcf_SensorAttributes(JointLimitForceSensor)
 
-        /**
+            /**
          * @brief The joint whose limit is sensed.
          *
          * The sensor output is copied from mjData.efc_force. If the joint limit
          * is not violated, the result is 0.
          */
-        mjcf_StringAttributeReq(JointLimitForceSensor, joint);
-
+            mjcf_StringAttributeReq(JointLimitForceSensor, joint);
     };
-
 
     /**
      * @brief A TendonLimitPositionSensor element.
@@ -599,19 +556,17 @@ namespace mjcf
         static const std::string tag;
         mjcf_ElementDerivedConstructors(TendonLimitPositionSensor)
 
-        mjcf_SensorAttributes(TendonLimitPositionSensor)
+            mjcf_SensorAttributes(TendonLimitPositionSensor)
 
-        /**
+            /**
          * @brief The tendon whose limit is sensed.
          *
          * The sensor output equals mjData.efc_pos - mjData.efc_margin for the
          * corresponding limit constraint. If the tendon limit is not violated,
          * the result is 0.
          */
-        mjcf_StringAttributeReq(TendonLimitPositionSensor, tendon);
-
+            mjcf_StringAttributeReq(TendonLimitPositionSensor, tendon);
     };
-
 
     /**
      * @brief A TendonLimitVelocitySensor element.
@@ -625,18 +580,16 @@ namespace mjcf
         static const std::string tag;
         mjcf_ElementDerivedConstructors(TendonLimitVelocitySensor)
 
-        mjcf_SensorAttributes(TendonLimitVelocitySensor)
+            mjcf_SensorAttributes(TendonLimitVelocitySensor)
 
-        /**
+            /**
          * @brief The tendon whose limit is sensed.
          *
          * The sensor output is copied from mjData.efc_vel. If the tendon limit
          * is not violated, the result is 0.
          */
-        mjcf_StringAttributeReq(TendonLimitVelocitySensor, tendon);
-
+            mjcf_StringAttributeReq(TendonLimitVelocitySensor, tendon);
     };
-
 
     /**
      * @brief A TendonLimitForceSensor element.
@@ -650,18 +603,16 @@ namespace mjcf
         static const std::string tag;
         mjcf_ElementDerivedConstructors(TendonLimitForceSensor)
 
-        mjcf_SensorAttributes(TendonLimitForceSensor)
+            mjcf_SensorAttributes(TendonLimitForceSensor)
 
-        /**
+            /**
          * @brief The tendon whose limit is sensed.
          *
          * The sensor output is copied from mjData.efc_force. If the tendon limit
          * is not violated, the result is 0.
          */
-        mjcf_StringAttributeReq(TendonLimitForceSensor, tendon);
-
+            mjcf_StringAttributeReq(TendonLimitForceSensor, tendon);
     };
-
 
     /**
      * @brief A FramePositionSensor element.
@@ -676,9 +627,9 @@ namespace mjcf
         static const std::string tag;
         mjcf_ElementDerivedConstructors(FramePositionSensor)
 
-        mjcf_SensorAttributes(FramePositionSensor)
+            mjcf_SensorAttributes(FramePositionSensor)
 
-        /**
+            /**
          * @brief The type of object to which the sensor is attached.
          *
          * This must be an object type that has a spatial frame. "body" refers to
@@ -686,15 +637,13 @@ namespace mjcf
          * frame of the body (usually centered at the joint with the parent
          * body).
          */
-        mjcf_StringAttributeReq(FramePositionSensor, objtype);
+            mjcf_StringAttributeReq(FramePositionSensor, objtype);
 
         /**
          * @brief The name of the object to which the sensor is attached.
          */
         mjcf_StringAttributeReq(FramePositionSensor, objname);
-
     };
-
 
     /**
      * @brief A FrameOrientationSensor element.
@@ -710,9 +659,9 @@ namespace mjcf
         static const std::string tag;
         mjcf_ElementDerivedConstructors(FrameOrientationSensor)
 
-        mjcf_SensorAttributes(FrameOrientationSensor)
+            mjcf_SensorAttributes(FrameOrientationSensor)
 
-        /**
+            /**
          * @brief The type of object to which the sensor is attached.
          *
          * This must be an object type that has a spatial frame. "body" refers to
@@ -720,15 +669,13 @@ namespace mjcf
          * frame of the body (usually centered at the joint with the parent
          * body).
          */
-        mjcf_StringAttributeReq(FrameOrientationSensor, objtype);
+            mjcf_StringAttributeReq(FrameOrientationSensor, objtype);
 
         /**
          * @brief The name of the object to which the sensor is attached.
          */
         mjcf_StringAttributeReq(FrameOrientationSensor, objname);
-
     };
-
 
     /**
      * @brief A FrameXAxisSensor element.
@@ -744,9 +691,9 @@ namespace mjcf
         static const std::string tag;
         mjcf_ElementDerivedConstructors(FrameXAxisSensor)
 
-        mjcf_SensorAttributes(FrameXAxisSensor)
+            mjcf_SensorAttributes(FrameXAxisSensor)
 
-        /**
+            /**
          * @brief The type of object to which the sensor is attached.
          *
          * This must be an object type that has a spatial frame. "body" refers to
@@ -754,15 +701,13 @@ namespace mjcf
          * frame of the body (usually centered at the joint with the parent
          * body).
          */
-        mjcf_StringAttributeReq(FrameXAxisSensor, objtype);
+            mjcf_StringAttributeReq(FrameXAxisSensor, objtype);
 
         /**
          * @brief The name of the object to which the sensor is attached.
          */
         mjcf_StringAttributeReq(FrameXAxisSensor, objname);
-
     };
-
 
     /**
      * @brief A FrameYAxisSensor element.
@@ -778,9 +723,9 @@ namespace mjcf
         static const std::string tag;
         mjcf_ElementDerivedConstructors(FrameYAxisSensor)
 
-        mjcf_SensorAttributes(FrameYAxisSensor)
+            mjcf_SensorAttributes(FrameYAxisSensor)
 
-        /**
+            /**
          * @brief The type of object to which the sensor is attached.
          *
          * This must be an object type that has a spatial frame. "body" refers to
@@ -788,15 +733,13 @@ namespace mjcf
          * frame of the body (usually centered at the joint with the parent
          * body).
          */
-        mjcf_StringAttributeReq(FrameYAxisSensor, objtype);
+            mjcf_StringAttributeReq(FrameYAxisSensor, objtype);
 
         /**
          * @brief The name of the object to which the sensor is attached.
          */
         mjcf_StringAttributeReq(FrameYAxisSensor, objname);
-
     };
-
 
     /**
      * @brief A FrameZAxisSensor element.
@@ -812,9 +755,9 @@ namespace mjcf
         static const std::string tag;
         mjcf_ElementDerivedConstructors(FrameZAxisSensor)
 
-        mjcf_SensorAttributes(FrameZAxisSensor)
+            mjcf_SensorAttributes(FrameZAxisSensor)
 
-        /**
+            /**
          * @brief The type of object to which the sensor is attached.
          *
          * This must be an object type that has a spatial frame. "body" refers to
@@ -822,15 +765,13 @@ namespace mjcf
          * frame of the body (usually centered at the joint with the parent
          * body).
          */
-        mjcf_StringAttributeReq(FrameZAxisSensor, objtype);
+            mjcf_StringAttributeReq(FrameZAxisSensor, objtype);
 
         /**
          * @brief The name of the object to which the sensor is attached.
          */
         mjcf_StringAttributeReq(FrameZAxisSensor, objname);
-
     };
-
 
     /**
      * @brief A FrameLinearVelocitySensor element.
@@ -845,9 +786,9 @@ namespace mjcf
         static const std::string tag;
         mjcf_ElementDerivedConstructors(FrameLinearVelocitySensor)
 
-        mjcf_SensorAttributes(FrameLinearVelocitySensor)
+            mjcf_SensorAttributes(FrameLinearVelocitySensor)
 
-        /**
+            /**
          * @brief The type of object to which the sensor is attached.
          *
          * This must be an object type that has a spatial frame. "body" refers to
@@ -855,15 +796,13 @@ namespace mjcf
          * frame of the body (usually centered at the joint with the parent
          * body).
          */
-        mjcf_StringAttributeReq(FrameLinearVelocitySensor, objtype);
+            mjcf_StringAttributeReq(FrameLinearVelocitySensor, objtype);
 
         /**
          * @brief The name of the object to which the sensor is attached.
          */
         mjcf_StringAttributeReq(FrameLinearVelocitySensor, objname);
-
     };
-
 
     /**
      * @brief A FrameAngularVelocitySensor element.
@@ -878,9 +817,9 @@ namespace mjcf
         static const std::string tag;
         mjcf_ElementDerivedConstructors(FrameAngularVelocitySensor)
 
-        mjcf_SensorAttributes(FrameAngularVelocitySensor)
+            mjcf_SensorAttributes(FrameAngularVelocitySensor)
 
-        /**
+            /**
          * @brief The type of object to which the sensor is attached.
          *
          * This must be an object type that has a spatial frame. "body" refers to
@@ -888,15 +827,13 @@ namespace mjcf
          * frame of the body (usually centered at the joint with the parent
          * body).
          */
-        mjcf_StringAttributeReq(FrameAngularVelocitySensor, objtype);
+            mjcf_StringAttributeReq(FrameAngularVelocitySensor, objtype);
 
         /**
          * @brief The name of the object to which the sensor is attached.
          */
         mjcf_StringAttributeReq(FrameAngularVelocitySensor, objname);
-
     };
-
 
     /**
      * @brief A FrameLinearAccelerationSensor element.
@@ -911,9 +848,9 @@ namespace mjcf
         static const std::string tag;
         mjcf_ElementDerivedConstructors(FrameLinearAccelerationSensor)
 
-        mjcf_SensorAttributes(FrameLinearAccelerationSensor)
+            mjcf_SensorAttributes(FrameLinearAccelerationSensor)
 
-        /**
+            /**
          * @brief The type of object to which the sensor is attached.
          *
          * This must be an object type that has a spatial frame. "body" refers to
@@ -921,15 +858,13 @@ namespace mjcf
          * frame of the body (usually centered at the joint with the parent
          * body).
          */
-        mjcf_StringAttributeReq(FrameLinearAccelerationSensor, objtype);
+            mjcf_StringAttributeReq(FrameLinearAccelerationSensor, objtype);
 
         /**
          * @brief The name of the object to which the sensor is attached.
          */
         mjcf_StringAttributeReq(FrameLinearAccelerationSensor, objname);
-
     };
-
 
     /**
      * @brief A FrameAngularAccelerationSensor element.
@@ -944,9 +879,9 @@ namespace mjcf
         static const std::string tag;
         mjcf_ElementDerivedConstructors(FrameAngularAccelerationSensor)
 
-        mjcf_SensorAttributes(FrameAngularAccelerationSensor)
+            mjcf_SensorAttributes(FrameAngularAccelerationSensor)
 
-        /**
+            /**
          * @brief The type of object to which the sensor is attached.
          *
          * This must be an object type that has a spatial frame. "body" refers to
@@ -954,15 +889,13 @@ namespace mjcf
          * frame of the body (usually centered at the joint with the parent
          * body).
          */
-        mjcf_StringAttributeReq(FrameAngularAccelerationSensor, objtype);
+            mjcf_StringAttributeReq(FrameAngularAccelerationSensor, objtype);
 
         /**
          * @brief The name of the object to which the sensor is attached.
          */
         mjcf_StringAttributeReq(FrameAngularAccelerationSensor, objname);
-
     };
-
 
     /**
      * @brief A SubtreeCenterOfMassSensor element.
@@ -977,15 +910,13 @@ namespace mjcf
         static const std::string tag;
         mjcf_ElementDerivedConstructors(SubtreeCenterOfMassSensor)
 
-        mjcf_SensorAttributes(SubtreeCenterOfMassSensor)
+            mjcf_SensorAttributes(SubtreeCenterOfMassSensor)
 
-        /**
+            /**
          * @brief Name of the body where the kinematic subtree is rooted.
          */
-        mjcf_StringAttributeReq(SubtreeCenterOfMassSensor, body);
-
+            mjcf_StringAttributeReq(SubtreeCenterOfMassSensor, body);
     };
-
 
     /**
      * @brief A SubtreeLinearVelocitySensor element.
@@ -1001,15 +932,13 @@ namespace mjcf
         static const std::string tag;
         mjcf_ElementDerivedConstructors(SubtreeLinearVelocitySensor)
 
-        mjcf_SensorAttributes(SubtreeLinearVelocitySensor)
+            mjcf_SensorAttributes(SubtreeLinearVelocitySensor)
 
-        /**
+            /**
          * @brief Name of the body where the kinematic subtree is rooted.
          */
-        mjcf_StringAttributeReq(SubtreeLinearVelocitySensor, body);
-
+            mjcf_StringAttributeReq(SubtreeLinearVelocitySensor, body);
     };
-
 
     /**
      * @brief A SubtreeAngularMomentumSensor element.
@@ -1025,16 +954,13 @@ namespace mjcf
         static const std::string tag;
         mjcf_ElementDerivedConstructors(SubtreeAngularMomentumSensor)
 
-        mjcf_SensorAttributes(SubtreeAngularMomentumSensor)
+            mjcf_SensorAttributes(SubtreeAngularMomentumSensor)
 
-        /**
+            /**
          * @brief Name of the body where the kinematic subtree is rooted.
          */
-        mjcf_StringAttributeReq(SubtreeAngularMomentumSensor, body);
-
+            mjcf_StringAttributeReq(SubtreeAngularMomentumSensor, body);
     };
 
-
-
 #undef mjcf_SensorAttributes
-}
+} // namespace mjcf

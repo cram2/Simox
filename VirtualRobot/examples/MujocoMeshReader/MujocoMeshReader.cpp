@@ -20,11 +20,11 @@
  *             GNU General Public License
  */
 
+#include <filesystem>
 #include <iomanip>
 #include <iostream>
 #include <string>
 
-#include <filesystem>
 #include <boost/program_options.hpp>
 
 #include <VirtualRobot/XML/mujoco/Mesh.h>
@@ -38,10 +38,11 @@ using namespace VirtualRobot;
 
 static po::variables_map parseOptions(int argc, char** argv);
 
-static std::string printN(int32_t n, int32_t mult)
+static std::string
+printN(int32_t n, int32_t mult)
 {
     std::stringstream ss;
-    ss << n << " (x" << mult << " = " << mult* n << ")";
+    ss << n << " (x" << mult << " = " << mult * n << ")";
     return ss.str();
 }
 
@@ -50,9 +51,8 @@ static void printVector(const std::vector<ValueT>& vector, const std::string& na
 
 static void printFaces(const mujoco::Mesh& mesh);
 
-
-
-int main(int argc, char** argv)
+int
+main(int argc, char** argv)
 {
     po::variables_map opt = parseOptions(argc, argv);
     fs::path file = opt["file"].as<std::string>();
@@ -68,20 +68,17 @@ int main(int argc, char** argv)
         return 2;
     }
 
-    std::cout << "File: " << file
-              << std::endl;
+    std::cout << "File: " << file << std::endl;
 
     std::cout << "\n- nvertex:   " << printN(mesh.nvertex(), 3)
               << "\n- nnormal:   " << printN(mesh.nnormal(), 3)
               << "\n- ntexcoord: " << printN(mesh.ntexcoord(), 2)
-              << "\n- nface:     " << printN(mesh.nface(), 3)
-              << std::endl;
+              << "\n- nface:     " << printN(mesh.nface(), 3) << std::endl;
 
     std::cout << "\n- #Vertex Positions:    " << mesh.vertexPositions().size()
               << "\n- #Vertex Normals:      " << mesh.vertexNormals().size()
               << "\n- #Vertex Texcoords:    " << mesh.vertexTexcoords().size()
-              << "\n- #Face vertex indices: " << mesh.faceVertexIndices().size()
-              << std::endl;
+              << "\n- #Face vertex indices: " << mesh.faceVertexIndices().size() << std::endl;
 
     if (opt.count("pos") || opt.count("all"))
     {
@@ -107,31 +104,26 @@ int main(int argc, char** argv)
     return 0;
 }
 
-
-po::variables_map parseOptions(int argc, char** argv)
+po::variables_map
+parseOptions(int argc, char** argv)
 {
     po::positional_options_description posOpts;
     posOpts.add("file", -1);
 
     po::options_description opts("Allowed options");
-    opts.add_options()
-    ("help,h",      "Show this help message")
-    ("file",      po::value<std::string>(), "the mesh file to read")
-    ("pos,p",     "Print vertex positions")
-    ("normal,n",  "Print vertex normals")
-    ("tex,t",     "Print vertex texcoords")
-    ("indices,i", "Print face vertex indices")
-    ("all,a",     "pos, normal, tex and indices")
-    ("faces,f",   "Print faces with vertex positions and normals")
-    ;
+    opts.add_options()("help,h", "Show this help message")(
+        "file", po::value<std::string>(), "the mesh file to read")(
+        "pos,p", "Print vertex positions")("normal,n", "Print vertex normals")(
+        "tex,t", "Print vertex texcoords")("indices,i", "Print face vertex indices")(
+        "all,a", "pos, normal, tex and indices")("faces,f",
+                                                 "Print faces with vertex positions and normals");
 
     bool doPrintHelp = false;
     po::variables_map vm;
 
     try
     {
-        po::store(po::command_line_parser(argc, argv)
-                  .options(opts).positional(posOpts).run(), vm);
+        po::store(po::command_line_parser(argc, argv).options(opts).positional(posOpts).run(), vm);
         po::notify(vm);
     }
     catch (const po::multiple_occurrences& e)
@@ -150,9 +142,9 @@ po::variables_map parseOptions(int argc, char** argv)
     return vm;
 }
 
-
 template <int stepSize, typename ValueT>
-void printVector(const std::vector<ValueT>& vector, const std::string& name)
+void
+printVector(const std::vector<ValueT>& vector, const std::string& name)
 {
     static const Eigen::IOFormat iof(4, 0, "\t", "\t", "", "", "[ ", " ]");
 
@@ -172,14 +164,13 @@ void printVector(const std::vector<ValueT>& vector, const std::string& name)
     for (std::size_t i = 0; i < vector.size(); i += stepSize)
     {
         Eigen::Matrix<ValueT, stepSize, 1> pos(vector.data() + i);
-        std::cout << std::right << "(" << setw << i << ") "
-                  << pos.format(iof)
-                  << std::endl;
+        std::cout << std::right << "(" << setw << i << ") " << pos.format(iof) << std::endl;
     }
 }
 
 template <typename Derived>
-std::string printVector(const Eigen::MatrixBase<Derived>& matrix)
+std::string
+printVector(const Eigen::MatrixBase<Derived>& matrix)
 {
     std::stringstream os;
     os << "[ ";
@@ -195,13 +186,14 @@ std::string printVector(const Eigen::MatrixBase<Derived>& matrix)
     return os.str();
 }
 
-
-int width(int size)
+int
+width(int size)
 {
     return static_cast<int>(std::ceil(std::log10(size)));
 }
 
-void printFaces(const mujoco::Mesh& mesh)
+void
+printFaces(const mujoco::Mesh& mesh)
 {
     static const Eigen::IOFormat iof(4, 0, "\t", "\t", "", "", "[ ", " ]");
 
@@ -231,12 +223,11 @@ void printFaces(const mujoco::Mesh& mesh)
             std::cout << "- vertex (" << std::right << setwV << index << "):";
 
             std::cout << "  -  "
-                      << "pos " << std::left << std::setw(31) << printVector(mesh.vertexPosition(index))
-                      << "  -  "
+                      << "pos " << std::left << std::setw(31)
+                      << printVector(mesh.vertexPosition(index)) << "  -  "
                       << "nrm " << printVector(mesh.vertexNormal(index));
 
             std::cout << std::endl;
         }
     }
-
 }

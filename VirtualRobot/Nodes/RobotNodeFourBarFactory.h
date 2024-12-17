@@ -25,7 +25,6 @@
 #include "../VirtualRobot.h"
 #include "RobotNodeFactory.h"
 
-
 namespace VirtualRobot
 {
     class RobotNode;

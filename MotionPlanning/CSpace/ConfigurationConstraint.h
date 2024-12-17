@@ -22,9 +22,10 @@
 */
 #pragma once
 
-#include "../Saba.h"
-#include "../CSpace/CSpace.h"
 #include <vector>
+
+#include "../CSpace/CSpace.h"
+#include "../Saba.h"
 
 namespace Saba
 {
@@ -50,9 +51,7 @@ namespace Saba
 
 
     protected:
-
         unsigned int dimension;
     };
 
-}
-
+} // namespace Saba

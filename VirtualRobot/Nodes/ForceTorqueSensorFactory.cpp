@@ -1,39 +1,43 @@
 
 
 #include "ForceTorqueSensorFactory.h"
-#include "Sensor.h"
+
 #include "../XML/BaseIO.h"
 #include "../XML/rapidxml.hpp"
 #include "ForceTorqueSensor.h"
+#include "Sensor.h"
 #include "VirtualRobotException.h"
-
 
 namespace VirtualRobot
 {
     using std::endl;
 
-    ForceTorqueSensorFactory::ForceTorqueSensorFactory()
-    = default;
+    ForceTorqueSensorFactory::ForceTorqueSensorFactory() = default;
 
 
-    ForceTorqueSensorFactory::~ForceTorqueSensorFactory()
-    = default;
-
+    ForceTorqueSensorFactory::~ForceTorqueSensorFactory() = default;
 
     /**
      * This method creates a VirtualRobot::ForceTorqueSensor.
      *
      * \return instance of VirtualRobot::ForceTorqueSensor.
      */
-    SensorPtr ForceTorqueSensorFactory::createSensor(GraspableSensorizedObjectPtr node, const std::string& name, VisualizationNodePtr /*visualization*/,
-            const Eigen::Matrix4f& rnTrafo) const
+    SensorPtr
+    ForceTorqueSensorFactory::createSensor(GraspableSensorizedObjectPtr node,
+                                           const std::string& name,
+                                           VisualizationNodePtr /*visualization*/,
+                                           const Eigen::Matrix4f& rnTrafo) const
     {
         SensorPtr Sensor(new ForceTorqueSensor(node, name, rnTrafo));
 
         return Sensor;
     }
 
-    SensorPtr ForceTorqueSensorFactory::createSensor(GraspableSensorizedObjectPtr node, const rapidxml::xml_node<char>* sensorXMLNode, BaseIO::RobotDescription /*loadMode*/, const std::string /*basePath*/) const
+    SensorPtr
+    ForceTorqueSensorFactory::createSensor(GraspableSensorizedObjectPtr node,
+                                           const rapidxml::xml_node<char>* sensorXMLNode,
+                                           BaseIO::RobotDescription /*loadMode*/,
+                                           const std::string /*basePath*/) const
     {
         THROW_VR_EXCEPTION_IF(!sensorXMLNode, "NULL data");
         THROW_VR_EXCEPTION_IF(!node, "NULL data");
@@ -80,12 +84,12 @@ namespace VirtualRobot
             }
             else
             {
-                THROW_VR_EXCEPTION("XML definition <" << nodeName << "> not supported in Sensor <" << sensorName << ">." << endl);
+                THROW_VR_EXCEPTION("XML definition <" << nodeName << "> not supported in Sensor <"
+                                                      << sensorName << ">." << endl);
             }
 
             nodeXML = nodeXML->next_sibling();
         }
-
 
 
         SensorPtr Sensor(new ForceTorqueSensor(node, sensorName, transformMatrix));
@@ -93,26 +97,27 @@ namespace VirtualRobot
         return Sensor;
     }
 
-
     /**
      * register this class in the super class factory
      */
-    SensorFactory::SubClassRegistry ForceTorqueSensorFactory::registry(ForceTorqueSensorFactory::getName(), &ForceTorqueSensorFactory::createInstance);
-
+    SensorFactory::SubClassRegistry
+        ForceTorqueSensorFactory::registry(ForceTorqueSensorFactory::getName(),
+                                           &ForceTorqueSensorFactory::createInstance);
 
     /**
      * \return "position"
      */
-    std::string ForceTorqueSensorFactory::getName()
+    std::string
+    ForceTorqueSensorFactory::getName()
     {
         return "forcetorque";
     }
 
-
     /**
      * \return new instance of ForceTorqueSensorFactory.
      */
-    std::shared_ptr<SensorFactory> ForceTorqueSensorFactory::createInstance(void*)
+    std::shared_ptr<SensorFactory>
+    ForceTorqueSensorFactory::createInstance(void*)
     {
         std::shared_ptr<ForceTorqueSensorFactory> psFactory(new ForceTorqueSensorFactory());
         return psFactory;

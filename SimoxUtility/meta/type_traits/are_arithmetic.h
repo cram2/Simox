@@ -4,7 +4,6 @@
 
 namespace simox::meta
 {
-    template<class...Ts>
+    template <class... Ts>
     static constexpr bool are_arithmetic_v = (std::is_arithmetic_v<Ts> && ...);
 }
-

@@ -4,14 +4,14 @@
 
 #include "colormaps.h"
 
-
 namespace simox::color::cmaps
 {
 
     std::map<std::string, ColorMap> Named::_named;
     Named Named::_instance;
 
-    ColorMap Named::get(const std::string& name)
+    ColorMap
+    Named::get(const std::string& name)
     {
         if (auto it = _named.find(name); it != _named.end())
         {
@@ -23,8 +23,8 @@ namespace simox::color::cmaps
         }
     }
 
-
-    void Named::_register(const ColorMap& cmap)
+    void
+    Named::_register(const ColorMap& cmap)
     {
         if (cmap.name().empty())
         {
@@ -33,7 +33,8 @@ namespace simox::color::cmaps
         _named[cmap.name()] = cmap;
     }
 
-    void Named::_register(const std::string& name, const ColorMap& cmap)
+    void
+    Named::_register(const std::string& name, const ColorMap& cmap)
     {
         _named[name] = cmap;
         _named[name].setName(name);
@@ -44,7 +45,8 @@ namespace simox::color::cmaps
         _register_builtin();
     }
 
-    void Named::_register_builtin()
+    void
+    Named::_register_builtin()
     {
         // Perceptually Uniform Sequential
         _register(viridis());
@@ -120,4 +122,4 @@ namespace simox::color::cmaps
         _register(tab20b());
         _register(tab20c());
     }
-}
+} // namespace simox::color::cmaps

@@ -5,58 +5,61 @@
 #include <sstream>
 #include <vector>
 
-
 #include <SimoxUtility/error/SimoxError.h>
 #include <SimoxUtility/math/mean.h>
-
 
 namespace simox::math
 {
 
-namespace detail
-{
-    template <typename Float>
-    void check_not_empty(const std::vector<Float>& values)
+    namespace detail
     {
-        if (values.empty())
+        template <typename Float>
+        void
+        check_not_empty(const std::vector<Float>& values)
         {
-            throw simox::error::SimoxError("Passed vector of values is empty.");
+            if (values.empty())
+            {
+                throw simox::error::SimoxError("Passed vector of values is empty.");
+            }
         }
-    }
-}
+    } // namespace detail
 
     template <typename Float>
-    std::vector<Float> sorted(const std::vector<Float>& values)
+    std::vector<Float>
+    sorted(const std::vector<Float>& values)
     {
         std::vector<Float> s = values;
         std::sort(s.begin(), s.end());
         return s;
     }
 
-
     template <typename Float>
-    Float min(const std::vector<Float>& values, bool isSorted = false)
+    Float
+    min(const std::vector<Float>& values, bool isSorted = false)
     {
         detail::check_not_empty(values);
         return isSorted ? values.front() : *std::min_element(values.begin(), values.end());
     }
 
     template <typename Float>
-    Float max(const std::vector<Float>& values, bool isSorted = false)
+    Float
+    max(const std::vector<Float>& values, bool isSorted = false)
     {
         detail::check_not_empty(values);
         return isSorted ? values.back() : *std::max_element(values.begin(), values.end());
     }
 
     template <typename Float>
-    Float mean(const std::vector<Float>& values)
+    Float
+    mean(const std::vector<Float>& values)
     {
         detail::check_not_empty(values);
         return simox::math::mean(values.begin(), values.end());
     }
 
     template <typename Float>
-    Float stddev(const std::vector<Float>& values, Float mean)
+    Float
+    stddev(const std::vector<Float>& values, Float mean)
     {
         detail::check_not_empty(values);
         Float sum = 0;
@@ -70,14 +73,15 @@ namespace detail
     }
 
     template <typename Float>
-    Float stddev(const std::vector<Float>& values)
+    Float
+    stddev(const std::vector<Float>& values)
     {
         return stddev(values, mean(values));
     }
 
-
     template <typename Float>
-    Float quantile(const std::vector<Float>& _values, Float q, bool isSorted = false)
+    Float
+    quantile(const std::vector<Float>& _values, Float q, bool isSorted = false)
     {
         if (q < 0 || q > 1)
         {
@@ -112,31 +116,36 @@ namespace detail
     }
 
     template <typename Float>
-    Float lower_quartile(const std::vector<Float>& values, bool isSorted = false)
+    Float
+    lower_quartile(const std::vector<Float>& values, bool isSorted = false)
     {
         return quantile<Float>(values, .25, isSorted);
     }
 
     template <typename Float>
-    Float median(const std::vector<Float>& values, bool isSorted = false)
+    Float
+    median(const std::vector<Float>& values, bool isSorted = false)
     {
         return quantile<Float>(values, .5, isSorted);
     }
 
     template <typename Float>
-    Float upper_quartile(const std::vector<Float>& values, bool isSorted = false)
+    Float
+    upper_quartile(const std::vector<Float>& values, bool isSorted = false)
     {
         return quantile<Float>(values, .75, isSorted);
     }
 
     template <typename Float>
-    Float interquartile_range(Float lowerQuartile, Float upperQuartile)
+    Float
+    interquartile_range(Float lowerQuartile, Float upperQuartile)
     {
         return upperQuartile - lowerQuartile;
     }
 
     template <typename Float>
-    Float interquartile_range(const std::vector<Float>& _values, bool isSorted = false)
+    Float
+    interquartile_range(const std::vector<Float>& _values, bool isSorted = false)
     {
         detail::check_not_empty(_values);
 
@@ -144,5 +153,4 @@ namespace detail
         return interquartile_range(lower_quartile(values, true), upper_quartile(values, true));
     }
 
-}
-
+} // namespace simox::math

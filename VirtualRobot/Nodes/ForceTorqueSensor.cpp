@@ -1,7 +1,8 @@
 
 #include "ForceTorqueSensor.h"
-#include "ForceTorqueSensorFactory.h"
+
 #include "../XML/BaseIO.h"
+#include "ForceTorqueSensorFactory.h"
 #include "VirtualRobotException.h"
 
 namespace VirtualRobot
@@ -12,32 +13,33 @@ namespace VirtualRobot
     ForceTorqueSensor::ForceTorqueSensor(GraspableSensorizedObjectWeakPtr parentNode,
                                          const std::string& name,
                                          const Eigen::Matrix4f& rnTrafo) :
-        Sensor(parentNode, name, VisualizationNodePtr(), rnTrafo),
-        forceTorqueValues(6)
+        Sensor(parentNode, name, VisualizationNodePtr(), rnTrafo), forceTorqueValues(6)
     {
         forceTorqueValues.setZero();
     }
 
+    ForceTorqueSensor::~ForceTorqueSensor() = default;
 
-    ForceTorqueSensor::~ForceTorqueSensor()
-    = default;
-
-    Eigen::Vector3f ForceTorqueSensor::getForce() const
+    Eigen::Vector3f
+    ForceTorqueSensor::getForce() const
     {
         return forceTorqueValues.head(3);
     }
 
-    Eigen::Vector3f ForceTorqueSensor::getTorque() const
+    Eigen::Vector3f
+    ForceTorqueSensor::getTorque() const
     {
         return forceTorqueValues.tail(3);
     }
 
-    const Eigen::VectorXf& ForceTorqueSensor::getForceTorque()
+    const Eigen::VectorXf&
+    ForceTorqueSensor::getForceTorque()
     {
         return forceTorqueValues;
     }
 
-    Eigen::Vector3f ForceTorqueSensor::getAxisTorque()
+    Eigen::Vector3f
+    ForceTorqueSensor::getAxisTorque()
     {
         Eigen::Vector3f torqueVector = forceTorqueValues.tail(3);
 
@@ -48,9 +50,8 @@ namespace VirtualRobot
         return axisTorque;
     }
 
-
-
-    void ForceTorqueSensor::print(bool printChildren, bool printDecoration) const
+    void
+    ForceTorqueSensor::print(bool printChildren, bool printDecoration) const
     {
         if (printDecoration)
         {
@@ -60,8 +61,10 @@ namespace VirtualRobot
         Sensor::print(printChildren, false);
     }
 
-
-    SensorPtr ForceTorqueSensor::_clone(const GraspableSensorizedObjectPtr newParentNode, const VisualizationNodePtr /*visualizationModel*/, float scaling)
+    SensorPtr
+    ForceTorqueSensor::_clone(const GraspableSensorizedObjectPtr newParentNode,
+                              const VisualizationNodePtr /*visualizationModel*/,
+                              float scaling)
     {
         THROW_VR_EXCEPTION_IF(scaling < 0, "Scaling must be >0");
         Eigen::Matrix4f rnt = rnTransformation;
@@ -71,8 +74,8 @@ namespace VirtualRobot
         return result;
     }
 
-
-    std::string ForceTorqueSensor::toXML(const std::string& /*modelPath*/, int tabs)
+    std::string
+    ForceTorqueSensor::toXML(const std::string& /*modelPath*/, int tabs)
     {
         std::stringstream ss;
         std::string t = "\t";
@@ -83,7 +86,8 @@ namespace VirtualRobot
             pre += t;
         }
 
-        ss << pre << "<Sensor type='" << ForceTorqueSensorFactory::getName() << "' name='" << name << "'>" << std::endl;
+        ss << pre << "<Sensor type='" << ForceTorqueSensorFactory::getName() << "' name='" << name
+           << "'>" << std::endl;
         std::string pre2 = pre + t;
         ss << pre << "<Transform>" << std::endl;
         ss << BaseIO::toXML(rnTransformation, pre2);
@@ -94,7 +98,8 @@ namespace VirtualRobot
         return ss.str();
     }
 
-    void ForceTorqueSensor::updateSensors(const Eigen::VectorXf& newForceTorque)
+    void
+    ForceTorqueSensor::updateSensors(const Eigen::VectorXf& newForceTorque)
     {
         forceTorqueValues = newForceTorque;
     }

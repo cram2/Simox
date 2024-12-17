@@ -1,20 +1,19 @@
 
-#include "GraspRrtWindow.h"
+#include <iostream>
+#include <string>
 
-#include <VirtualRobot/Robot.h>
-#include <VirtualRobot/VirtualRobotException.h>
 #include <VirtualRobot/Nodes/RobotNode.h>
-#include <VirtualRobot/XML/RobotIO.h>
-#include <VirtualRobot/Visualization/VisualizationFactory.h>
-#include <VirtualRobot/Visualization/CoinVisualization/CoinVisualization.h>
+#include <VirtualRobot/Robot.h>
 #include <VirtualRobot/RuntimeEnvironment.h>
+#include <VirtualRobot/VirtualRobotException.h>
+#include <VirtualRobot/Visualization/CoinVisualization/CoinVisualization.h>
+#include <VirtualRobot/Visualization/VisualizationFactory.h>
+#include <VirtualRobot/XML/RobotIO.h>
 
+#include "GraspRrtWindow.h"
+#include <Inventor/Qt/SoQt.h>
 #include <Inventor/Qt/viewers/SoQtExaminerViewer.h>
 #include <Inventor/nodes/SoSeparator.h>
-#include <Inventor/Qt/SoQt.h>
-
-#include <string>
-#include <iostream>
 
 using std::cout;
 using std::endl;
@@ -23,8 +22,8 @@ using namespace VirtualRobot;
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
-
-int main(int argc, char** argv)
+int
+main(int argc, char** argv)
 {
     VirtualRobot::init(argc, argv, "GraspRrtDemo");
 
@@ -152,14 +151,27 @@ int main(int argc, char** argv)
     std::cout << "Set 1:" << std::endl;
     std::cout << "\t Using RobotNodeSet for planning: <" << rnsName << ">" << std::endl;
     std::cout << "\t Using EEF for grasping: <" << eefName << ">" << std::endl;
-    std::cout << "\t Using robot collision model sets: <" << colModel1 << "> and <" << colModel2 << ">" << std::endl;
+    std::cout << "\t Using robot collision model sets: <" << colModel1 << "> and <" << colModel2
+              << ">" << std::endl;
     std::cout << "Set 2:" << std::endl;
     std::cout << "\t Using RobotNodeSet for planning: <" << rnsNameB << ">" << std::endl;
     std::cout << "\t Using EEF for grasping: <" << eefNameB << ">" << std::endl;
-    std::cout << "\t Using robot collision model sets: <" << colModel1B << "> and <" << colModel2B << ">" << std::endl;
+    std::cout << "\t Using robot collision model sets: <" << colModel1B << "> and <" << colModel2B
+              << ">" << std::endl;
 
 
-    GraspRrtWindow rw(filenameScene, startConfig, goalObject, rnsName, rnsNameB, eefName, eefNameB, colModel1, colModel1B, colModel2, colModel2B, colModel3);
+    GraspRrtWindow rw(filenameScene,
+                      startConfig,
+                      goalObject,
+                      rnsName,
+                      rnsNameB,
+                      eefName,
+                      eefNameB,
+                      colModel1,
+                      colModel1B,
+                      colModel2,
+                      colModel2B,
+                      colModel3);
 
     rw.main();
 

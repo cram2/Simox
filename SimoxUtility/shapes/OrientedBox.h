@@ -25,21 +25,26 @@
 
 namespace simox
 {
-    template<class FloatT>
+    template <class FloatT>
     class OrientedBox : public OrientedBoxBase<FloatT>
     {
         using base = OrientedBoxBase<FloatT>;
+
     public:
-        template<class T> using vector2_casted   = typename base::template vector2_casted<T>;
-        template<class T> using vector_casted    = typename base::template vector_casted<T>;
-        template<class T> using transform_casted = typename base::template transform_casted<T>;
-        template<class T> using rotation_casted  = typename base::template rotation_casted<T>;
+        template <class T>
+        using vector2_casted = typename base::template vector2_casted<T>;
+        template <class T>
+        using vector_casted = typename base::template vector_casted<T>;
+        template <class T>
+        using transform_casted = typename base::template transform_casted<T>;
+        template <class T>
+        using rotation_casted = typename base::template rotation_casted<T>;
 
         using float_t = FloatT;
-        using vector2_t   = typename base::vector2_t;
-        using vector_t    = typename base::vector_t;
+        using vector2_t = typename base::vector2_t;
+        using vector_t = typename base::vector_t;
         using transform_t = typename base::transform_t;
-        using rotation_t  = typename base::rotation_t;
+        using rotation_t = typename base::rotation_t;
 
     public:
         OrientedBox(OrientedBox&&) = default;
@@ -47,12 +52,10 @@ namespace simox
         OrientedBox& operator=(OrientedBox&&) = default;
         OrientedBox& operator=(const OrientedBox&) = default;
 
-        OrientedBox(
-            const vector_t& corner = {0, 0, 0},
-            const vector_t& extend0 = {1, 0, 0},
-            const vector_t& extend1 = {0, 1, 0},
-            const vector_t& extend2 = {0, 0, 1}
-        )
+        OrientedBox(const vector_t& corner = {0, 0, 0},
+                    const vector_t& extend0 = {1, 0, 0},
+                    const vector_t& extend1 = {0, 1, 0},
+                    const vector_t& extend2 = {0, 0, 1})
         {
             const float_t len0 = extend0.norm();
             const float_t len1 = extend1.norm();
@@ -72,27 +75,18 @@ namespace simox
             //checks
             if (std::abs(angle01) > base::eps)
             {
-                throw std::invalid_argument
-                {
-                    "extend0 and extend1 are not perpendicular! (angle = " +
-                    std::to_string(angle01) + "°)"
-                };
+                throw std::invalid_argument{"extend0 and extend1 are not perpendicular! (angle = " +
+                                            std::to_string(angle01) + "°)"};
             }
             if (std::abs(angle02) > base::eps)
             {
-                throw std::invalid_argument
-                {
-                    "extend0 and extend2 are not perpendicular! (angle = " +
-                    std::to_string(angle02) + "°)"
-                };
+                throw std::invalid_argument{"extend0 and extend2 are not perpendicular! (angle = " +
+                                            std::to_string(angle02) + "°)"};
             }
             if (std::abs(angle12) > base::eps)
             {
-                throw std::invalid_argument
-                {
-                    "extend1 and extend2 are not perpendicular! (angle = " +
-                    std::to_string(angle12) + "°)"
-                };
+                throw std::invalid_argument{"extend1 and extend2 are not perpendicular! (angle = " +
+                                            std::to_string(angle12) + "°)"};
             }
 
             //build transform
@@ -120,8 +114,9 @@ namespace simox
             this->_t.template block<3, 1>(0, 3) = corner;
         }
 
-
-        OrientedBox(const vector_t& center, const rotation_t& orientation, const vector_t& extents) :
+        OrientedBox(const vector_t& center,
+                    const rotation_t& orientation,
+                    const vector_t& extents) :
             OrientedBox(center - orientation * extents / 2,
                         orientation.col(0) * extents(0),
                         orientation.col(1) * extents(1),
@@ -130,60 +125,61 @@ namespace simox
         }
 
         OrientedBox(const transform_t& center_pose, const vector_t& extents) :
-            OrientedBox(center_pose.template block<3, 1>(0, 3).eval(), center_pose.template block<3, 3>(0, 0).eval(), extents)
+            OrientedBox(center_pose.template block<3, 1>(0, 3).eval(),
+                        center_pose.template block<3, 3>(0, 0).eval(),
+                        extents)
         {
         }
 
-        OrientedBox(const vector_t& center, const Eigen::Quaternion<FloatT>& ori, const vector_t& extents) :
+        OrientedBox(const vector_t& center,
+                    const Eigen::Quaternion<FloatT>& ori,
+                    const vector_t& extents) :
             OrientedBox(center, ori.toRotationMatrix(), extents)
         {
         }
 
-
-        OrientedBox(const base& b) : base(b) {}
-        template<class T>
-        OrientedBox<T> cast() const
+        OrientedBox(const base& b) : base(b)
         {
-            return
-            {
-                this->template translation<T>(),
-                this->template axis_x<T>() * this->template dimension<T>(0),
-                this->template axis_y<T>() * this->template dimension<T>(1),
-                this->template axis_z<T>() * this->template dimension<T>(2)
-            };
         }
 
-
-        OrientedBox transformed(const rotation_t& t) const
+        template <class T>
+        OrientedBox<T>
+        cast() const
         {
-            return
-            {
-                t * this->translation(),
-                t * this->axis_x() * this->dimension(0),
-                t * this->axis_y() * this->dimension(1),
-                t * this->axis_z() * this->dimension(2)
-            };
+            return {this->template translation<T>(),
+                    this->template axis_x<T>() * this->template dimension<T>(0),
+                    this->template axis_y<T>() * this->template dimension<T>(1),
+                    this->template axis_z<T>() * this->template dimension<T>(2)};
         }
 
-        template<class T>
-        OrientedBox<T> transformed(const rotation_t& t) const
+        OrientedBox
+        transformed(const rotation_t& t) const
+        {
+            return {t * this->translation(),
+                    t * this->axis_x() * this->dimension(0),
+                    t * this->axis_y() * this->dimension(1),
+                    t * this->axis_z() * this->dimension(2)};
+        }
+
+        template <class T>
+        OrientedBox<T>
+        transformed(const rotation_t& t) const
         {
             return transformed(t).template cast<T>();
         }
 
-        OrientedBox transformed(const transform_t& t) const
+        OrientedBox
+        transformed(const transform_t& t) const
         {
-            return
-            {
-                this->rotation(t) * this->translation() + base::translation(t),
-                this->rotation(t) * this->axis_x() * this->dimension(0),
-                this->rotation(t) * this->axis_y() * this->dimension(1),
-                this->rotation(t) * this->axis_z() * this->dimension(2)
-            };
+            return {this->rotation(t) * this->translation() + base::translation(t),
+                    this->rotation(t) * this->axis_x() * this->dimension(0),
+                    this->rotation(t) * this->axis_y() * this->dimension(1),
+                    this->rotation(t) * this->axis_z() * this->dimension(2)};
         }
 
-        template<class T>
-        OrientedBox<T>  transformed(const transform_t& t) const
+        template <class T>
+        OrientedBox<T>
+        transformed(const transform_t& t) const
         {
             return transformed(t).template cast<T>();
         }
@@ -192,5 +188,4 @@ namespace simox
     using OrientedBoxf = OrientedBox<float>;
     using OrientedBoxd = OrientedBox<double>;
 
-}
-
+} // namespace simox

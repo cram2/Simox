@@ -22,10 +22,10 @@
 */
 #pragma once
 
-#include "GraspStudio.h"
-#include "VirtualRobot/MathTools.h"
 #include <vector>
 
+#include "GraspStudio.h"
+#include "VirtualRobot/MathTools.h"
 
 namespace GraspStudio
 {
@@ -42,21 +42,28 @@ namespace GraspStudio
         /*!
             Creates a convex hull of the points stored in pointsInput.
         */
-        static VirtualRobot::MathTools::ConvexHull3DPtr CreateConvexHull(const std::vector<Eigen::Vector3f>& pointsInput);
-        static VirtualRobot::MathTools::ConvexHull3DPtr CreateConvexHull(VirtualRobot::TriMeshModelPtr pointsInput);
-        static VirtualRobot::MathTools::ConvexHull6DPtr CreateConvexHull(std::vector<VirtualRobot::MathTools::ContactPoint>& pointsInput);
+        static VirtualRobot::MathTools::ConvexHull3DPtr
+        CreateConvexHull(const std::vector<Eigen::Vector3f>& pointsInput);
+        static VirtualRobot::MathTools::ConvexHull3DPtr
+        CreateConvexHull(VirtualRobot::TriMeshModelPtr pointsInput);
+        static VirtualRobot::MathTools::ConvexHull6DPtr
+        CreateConvexHull(std::vector<VirtualRobot::MathTools::ContactPoint>& pointsInput);
 
         static void PrintStatistics(VirtualRobot::MathTools::ConvexHull6DPtr convHull);
 
         /*!
             Convert points to qhull format
         */
-        static bool ConvertPoints(const std::vector<Eigen::Vector3f>& points, double* storePointsQHull);
-        static bool ConvertPoints(const std::vector<VirtualRobot::MathTools::ContactPoint>& points, double* storePointsQHull);
+        static bool ConvertPoints(const std::vector<Eigen::Vector3f>& points,
+                                  double* storePointsQHull);
+        static bool ConvertPoints(const std::vector<VirtualRobot::MathTools::ContactPoint>& points,
+                                  double* storePointsQHull);
 
         static void PrintVertices(std::vector<VirtualRobot::MathTools::ContactPoint>& pointsInput);
 
-        static bool checkVerticeOrientation(const Eigen::Vector3f& v1, const Eigen::Vector3f& v2, const Eigen::Vector3f& v3, const Eigen::Vector3f& n);
+        static bool checkVerticeOrientation(const Eigen::Vector3f& v1,
+                                            const Eigen::Vector3f& v2,
+                                            const Eigen::Vector3f& v3,
+                                            const Eigen::Vector3f& n);
     };
-}
-
+} // namespace GraspStudio

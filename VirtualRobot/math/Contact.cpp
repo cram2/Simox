@@ -20,43 +20,44 @@
  */
 
 #include "Contact.h"
-#include "Helpers.h"
 
+#include "Helpers.h"
 
 namespace math
 {
 
-    Contact::Contact()
-        : position(Eigen::Vector3f(0, 0, 0)), normal(Eigen::Vector3f(0, 0, 0))
+    Contact::Contact() : position(Eigen::Vector3f(0, 0, 0)), normal(Eigen::Vector3f(0, 0, 0))
     {
     }
 
-    Contact::Contact(Eigen::Vector3f position, Eigen::Vector3f normal)
-        : position(position), normal(normal)
+    Contact::Contact(Eigen::Vector3f position, Eigen::Vector3f normal) :
+        position(position), normal(normal)
     {
     }
 
-    Contact::Contact(float px, float py, float pz, float nx, float ny, float nz)
-        : position(px, py, pz), normal(nx, ny, nz)
+    Contact::Contact(float px, float py, float pz, float nx, float ny, float nz) :
+        position(px, py, pz), normal(nx, ny, nz)
     {
-
     }
 
-    Contact Contact::Normalized()
+    Contact
+    Contact::Normalized()
     {
         return Contact(position, normal.normalized());
     }
 
-    std::string Contact::ToString()
+    std::string
+    Contact::ToString()
     {
         std::stringstream ss;
         ss << "(" << position.transpose() << ") (" << normal.transpose() << ")";
         return ss.str();
     }
 
-    Contact Contact::Lerp(Contact a, Contact b, float f)
+    Contact
+    Contact::Lerp(Contact a, Contact b, float f)
     {
         return Contact(Helpers::Lerp(a.position, b.position, f),
                        Helpers::Lerp(a.normal, b.normal, f).normalized());
     }
-}
+} // namespace math

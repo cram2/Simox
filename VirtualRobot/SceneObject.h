@@ -22,19 +22,18 @@
 */
 #pragma once
 
-#include "Affordances.h"
-#include "VirtualRobot.h"
-#include "Primitive.h"
-
-#include <Eigen/Core>
-
-#include <type_traits>
-#include <string>
-#include <vector>
 #include <filesystem>
 #include <map>
 #include <set>
+#include <string>
+#include <type_traits>
+#include <vector>
 
+#include <Eigen/Core>
+
+#include "Affordances.h"
+#include "Primitive.h"
+#include "VirtualRobot.h"
 
 namespace VirtualRobot
 {
@@ -43,29 +42,31 @@ namespace VirtualRobot
     class VIRTUAL_ROBOT_IMPORT_EXPORT SceneObject : public std::enable_shared_from_this<SceneObject>
     {
         friend class RobotFactory;
+
     public:
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
         enum VisualizationType
         {
-            Full,           //!< the full model
-            Collision,      //!< the collision model
-            CollisionData   //!< a visualization of the collision model data that is internally used (this mode is only for debug purposes, the model is static, i.e. updates/movements/rotations are not visualized!)
+            Full, //!< the full model
+            Collision, //!< the collision model
+            CollisionData //!< a visualization of the collision model data that is internally used (this mode is only for debug purposes, the model is static, i.e. updates/movements/rotations are not visualized!)
         };
 
         struct VIRTUAL_ROBOT_IMPORT_EXPORT Physics
         {
             enum CoMLocation
             {
-                eCustom,            //!< Not related to 3d model, the position is set by hand
-                eVisuBBoxCenter     //!< The CoM position is automatically computed from the bounding box of the collision model
+                eCustom, //!< Not related to 3d model, the position is set by hand
+                eVisuBBoxCenter //!< The CoM position is automatically computed from the bounding box of the collision model
             };
+
             enum SimulationType
             {
-                eStatic,        // cannot move, but collide
-                eKinematic,     // can be moved, but no dynamics
-                eDynamic,       // full dynamic simulation
-                eUnknown        // not specified
+                eStatic, // cannot move, but collide
+                eKinematic, // can be moved, but no dynamics
+                eDynamic, // full dynamic simulation
+                eUnknown // not specified
             };
 
             // methods
@@ -81,28 +82,33 @@ namespace VirtualRobot
             Physics scale(float scaling) const;
 
             // data members
-            Eigen::Vector3f localCoM;   //!< Defined in the local coordinate system of this object [mm]
-            float massKg;               //!< The mass of this object
-            float friction;             //!< Friction of this object. Use -1.0 to use simulator's default value.
-            CoMLocation comLocation;    //!< Where is the CoM located
+            Eigen::Vector3f
+                localCoM; //!< Defined in the local coordinate system of this object [mm]
+            float massKg; //!< The mass of this object
+            float friction; //!< Friction of this object. Use -1.0 to use simulator's default value.
+            CoMLocation comLocation; //!< Where is the CoM located
             Eigen::Matrix3f inertiaMatrix; //! in kg*m^2
             SimulationType simType;
-            std::vector< std::string > ignoreCollisions; // ignore collisions with other objects (only used within collision engines)
+            std::vector<std::string>
+                ignoreCollisions; // ignore collisions with other objects (only used within collision engines)
         };
 
         struct VIRTUAL_ROBOT_IMPORT_EXPORT PrimitiveApproximation
         {
-            std::vector<Primitive::PrimitivePtr> getModels(const std::vector<std::string> &ids, bool loadDefault = true) const;
+            std::vector<Primitive::PrimitivePtr> getModels(const std::vector<std::string>& ids,
+                                                           bool loadDefault = true) const;
 
-            void addModel(const std::vector<Primitive::PrimitivePtr> &primitives, const std::string &id = std::string());
+            void addModel(const std::vector<Primitive::PrimitivePtr>& primitives,
+                          const std::string& id = std::string());
 
-            void getPrimitiveApproximationIDs(std::set<std::string> &ids) const;
+            void getPrimitiveApproximationIDs(std::set<std::string>& ids) const;
 
             PrimitiveApproximation clone() const;
 
-            PrimitiveApproximation& localTransformation(const Eigen::Matrix4f &localTransformation);
+            PrimitiveApproximation& localTransformation(const Eigen::Matrix4f& localTransformation);
 
-            void join(const PrimitiveApproximation& primitiveApproximation, const Eigen::Matrix4f& localTransformation = Eigen::Matrix4f::Identity());
+            void join(const PrimitiveApproximation& primitiveApproximation,
+                      const Eigen::Matrix4f& localTransformation = Eigen::Matrix4f::Identity());
 
             bool empty() const;
 
@@ -115,7 +121,11 @@ namespace VirtualRobot
 
         /*!
         */
-        SceneObject(const std::string& name, VisualizationNodePtr visualization = VisualizationNodePtr(), CollisionModelPtr collisionModel = CollisionModelPtr(), const Physics& p = Physics(), CollisionCheckerPtr colChecker = CollisionCheckerPtr());
+        SceneObject(const std::string& name,
+                    VisualizationNodePtr visualization = VisualizationNodePtr(),
+                    CollisionModelPtr collisionModel = CollisionModelPtr(),
+                    const Physics& p = Physics(),
+                    CollisionCheckerPtr colChecker = CollisionCheckerPtr());
 
         /*!
         */
@@ -165,12 +175,15 @@ namespace VirtualRobot
             Return visualization object.
             \param visuType Set the type of visualization.
         */
-        virtual VisualizationNodePtr getVisualization(SceneObject::VisualizationType visuType = SceneObject::Full);
+        virtual VisualizationNodePtr
+        getVisualization(SceneObject::VisualizationType visuType = SceneObject::Full);
 
         /*!
             Initialize this object. Optionally the parents and children can be specified.
         */
-        virtual bool initialize(SceneObjectPtr parent = SceneObjectPtr(), const std::vector<SceneObjectPtr>& children = std::vector<SceneObjectPtr>());
+        virtual bool
+        initialize(SceneObjectPtr parent = SceneObjectPtr(),
+                   const std::vector<SceneObjectPtr>& children = std::vector<SceneObjectPtr>());
 
         /*!
             Enables/Disables the visualization updates of collision model and visualization model.
@@ -196,7 +209,10 @@ namespace VirtualRobot
             \p scaling Size of coordinate system
             \p text Text to display at coordinate system. If not given, the name of this robot node will be displayed.
         */
-        virtual void showCoordinateSystem(bool enable, float scaling = 1.0f, std::string* text = NULL, const std::string& visualizationType = "");
+        virtual void showCoordinateSystem(bool enable,
+                                          float scaling = 1.0f,
+                                          std::string* text = NULL,
+                                          const std::string& visualizationType = "");
 
         /*!
             Display some physics debugging information.
@@ -204,7 +220,9 @@ namespace VirtualRobot
             \p enableInertial If true, a visualization of the inertial matrix is shown (if given).
             \p comModel If set, this visualization is used to display the CoM location. If not set, a standard marker is used.
         */
-        virtual void showPhysicsInformation(bool enableCoM, bool enableInertial, VisualizationNodePtr comModel = VisualizationNodePtr());
+        virtual void showPhysicsInformation(bool enableCoM,
+                                            bool enableInertial,
+                                            VisualizationNodePtr comModel = VisualizationNodePtr());
 
         /*!
             Returns true when the coordinate system is currently shown.
@@ -221,7 +239,6 @@ namespace VirtualRobot
             \p wireframe Wireframe or solid visualization.
         */
         virtual void showBoundingBox(bool enable, bool wireframe = false);
-
 
 
         /*!
@@ -260,12 +277,14 @@ namespace VirtualRobot
         /*!
             Transform pose to local coordinate system of this object
         */
-        Eigen::Matrix4f transformTo(const SceneObjectPtr otherObject, const Eigen::Matrix4f& poseInOtherCoordSystem);
+        Eigen::Matrix4f transformTo(const SceneObjectPtr otherObject,
+                                    const Eigen::Matrix4f& poseInOtherCoordSystem);
 
         /*!
             Transform position to local coordinate system of this object
         */
-        Eigen::Vector3f transformTo(const SceneObjectPtr otherObject, const Eigen::Vector3f& positionInOtherCoordSystem);
+        Eigen::Vector3f transformTo(const SceneObjectPtr otherObject,
+                                    const Eigen::Vector3f& positionInOtherCoordSystem);
 
         /*!
             get number of faces (i.e. triangles) of this object
@@ -314,7 +333,8 @@ namespace VirtualRobot
          * @return The Inertia Matrix at the shifted system
          */
         Eigen::Matrix3f getInertiaMatrix(const Eigen::Vector3f& shift);
-        Eigen::Matrix3f getInertiaMatrix(const Eigen::Vector3f& shift, const Eigen::Matrix3f& rotation);
+        Eigen::Matrix3f getInertiaMatrix(const Eigen::Vector3f& shift,
+                                         const Eigen::Matrix3f& rotation);
 
         Eigen::Matrix3f getInertiaMatrix(const Eigen::Matrix4f& transform);
 
@@ -327,7 +347,8 @@ namespace VirtualRobot
          * @param mass
          * @return
          */
-        static Eigen::Matrix3f shiftInertia(const Eigen::Matrix3f inertiaMatrix, const Eigen::Vector3f& shift, float mass);
+        static Eigen::Matrix3f
+        shiftInertia(const Eigen::Matrix3f inertiaMatrix, const Eigen::Vector3f& shift, float mass);
 
         float getFriction();
         void setFriction(float friction);
@@ -353,7 +374,9 @@ namespace VirtualRobot
 
             @see CoinVisualizationFactory::getCoinVisualization() for convenient access!
         */
-        template <typename T> std::shared_ptr<T> getVisualization(SceneObject::VisualizationType visuType = SceneObject::Full);
+        template <typename T>
+        std::shared_ptr<T>
+        getVisualization(SceneObject::VisualizationType visuType = SceneObject::Full);
 
         /*!
           Convenient method for highlighting the visualization of this object.
@@ -369,8 +392,11 @@ namespace VirtualRobot
         /*!
             Clones this object. If no col checker is given, the one of the original object is used.
         */
-        SceneObjectPtr clone(const std::string& name, CollisionCheckerPtr colChecker = CollisionCheckerPtr(), float scaling = 1.0f) const;
-        SceneObjectPtr clone(CollisionCheckerPtr colChecker = CollisionCheckerPtr(), float scaling = 1.0f) const;
+        SceneObjectPtr clone(const std::string& name,
+                             CollisionCheckerPtr colChecker = CollisionCheckerPtr(),
+                             float scaling = 1.0f) const;
+        SceneObjectPtr clone(CollisionCheckerPtr colChecker = CollisionCheckerPtr(),
+                             float scaling = 1.0f) const;
 
         /*!
             Attach a connected object. The connected object is linked to this SceneObject and moves accordingly.
@@ -421,7 +447,8 @@ namespace VirtualRobot
         void setScaling(float scaling);
         float getScaling();
 
-        bool reloadVisualizationFromXML(bool useVisAsColModelIfMissing = true, bool loadColOnly = false);
+        bool reloadVisualizationFromXML(bool useVisAsColModelIfMissing = true,
+                                        bool loadColOnly = false);
 
         const std::string& getVisualizationModelXML() const;
 
@@ -430,14 +457,16 @@ namespace VirtualRobot
 
         PrimitiveApproximation& getPrimitiveApproximation();
 
-        void setPrimitiveApproximation(const PrimitiveApproximation& primitiveApproximation)
+        void
+        setPrimitiveApproximation(const PrimitiveApproximation& primitiveApproximation)
         {
             this->primitiveApproximation = primitiveApproximation;
         }
 
-        void setPrimitiveApproximationModel(const std::vector<std::string> &ids, bool loadDefault = true);
+        void setPrimitiveApproximationModel(const std::vector<std::string>& ids,
+                                            bool loadDefault = true);
 
-        void getPrimitiveApproximationIDs(std::set<std::string> &ids) const;
+        void getPrimitiveApproximationIDs(std::set<std::string>& ids) const;
 
         // Affordances
         using Affordances = std::vector<affordances::Location>;
@@ -445,14 +474,14 @@ namespace VirtualRobot
         void setAffordances(const Affordances& affordances);
         const Affordances& getAffordances() const;
 
-        Affordances
-        getAffordancesOfType(const affordances::Affordance::Type& affordanceType) const;
+        Affordances getAffordancesOfType(const affordances::Affordance::Type& affordanceType) const;
 
-        std::set<affordances::Affordance::Type> 
-        getAllAffordanceTypes() const;
+        std::set<affordances::Affordance::Type> getAllAffordanceTypes() const;
 
     protected:
-        virtual SceneObject* _clone(const std::string& name, CollisionCheckerPtr colChecker = CollisionCheckerPtr(), float scaling = 1.0f) const;
+        virtual SceneObject* _clone(const std::string& name,
+                                    CollisionCheckerPtr colChecker = CollisionCheckerPtr(),
+                                    float scaling = 1.0f) const;
 
         //! Parent detached this object
         virtual void detachedFromParent();
@@ -462,14 +491,17 @@ namespace VirtualRobot
         virtual void updatePose(const Eigen::Matrix4f& parentPose, bool updateChildren = true);
 
 
-
         std::string getFilenameReplacementVisuModel(const std::string standardExtension = ".wrl");
         std::string getFilenameReplacementColModel(const std::string standardExtension = ".wrl");
 
-        SceneObject() {}
+        SceneObject()
+        {
+        }
 
         //! basic data, used by Obstacle and ManipulationObject
-        std::string getSceneObjectXMLString(const std::string& basePath, int tabs, const std::string &modelPathRelative = "");
+        std::string getSceneObjectXMLString(const std::string& basePath,
+                                            int tabs,
+                                            const std::string& modelPathRelative = "");
 
         ///////////////////////// SETUP ////////////////////////////////////
         std::string name;
@@ -506,7 +538,6 @@ namespace VirtualRobot
         Affordances affordances;
     };
 
-
     /**
      * This method creates a new Visualization
      * subclass which is given by the template parameter T.
@@ -514,10 +545,12 @@ namespace VirtualRobot
      * A compile time error is thrown if a different class type is used as template argument.
      */
     template <typename T>
-    std::shared_ptr<T> SceneObject::getVisualization(SceneObject::VisualizationType visuType)
+    std::shared_ptr<T>
+    SceneObject::getVisualization(SceneObject::VisualizationType visuType)
     {
         static_assert(::std::is_base_of_v<Visualization, T>,
-                "TEMPLATE_PARAMETER_FOR_VirtualRobot_getVisualization_MUST_BT_A_SUBCLASS_OF_VirtualRobot__Visualization");
+                      "TEMPLATE_PARAMETER_FOR_VirtualRobot_getVisualization_MUST_BT_A_SUBCLASS_OF_"
+                      "VirtualRobot__Visualization");
         std::shared_ptr<T> visualization(new T(getVisualization(visuType)));
         return visualization;
     }

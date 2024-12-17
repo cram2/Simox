@@ -22,15 +22,15 @@
 */
 #pragma once
 
-#include "../Saba.h"
-#include "../CSpace/CSpaceSampled.h"
-#include "../CSpace/CSpacePath.h"
-#include <VirtualRobot/VirtualRobot.h>
-#include "MotionPlanner.h"
-
-#include <thread>
 #include <mutex>
+#include <thread>
 
+#include <VirtualRobot/VirtualRobot.h>
+
+#include "../CSpace/CSpacePath.h"
+#include "../CSpace/CSpaceSampled.h"
+#include "../Saba.h"
+#include "MotionPlanner.h"
 
 namespace Saba
 {
@@ -79,7 +79,6 @@ namespace Saba
         MotionPlannerPtr getPlanner();
 
     protected:
-
         /*!
             Here the planning takes place.
         */
@@ -91,7 +90,6 @@ namespace Saba
         MotionPlannerPtr planner;
         std::thread planningThread;
         std::mutex mutex;
-
     };
 
-}
+} // namespace Saba

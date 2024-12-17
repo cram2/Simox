@@ -23,10 +23,10 @@
 
 #pragma once
 
-#include <VirtualRobot/VirtualRobot.h>
-#include <VirtualRobot/IK/Constraint.h>
 #include <VirtualRobot/IK/CoMIK.h>
+#include <VirtualRobot/IK/Constraint.h>
 #include <VirtualRobot/IK/SupportPolygon.h>
+#include <VirtualRobot/VirtualRobot.h>
 
 class SoSeparator;
 class SoNode;
@@ -36,12 +36,13 @@ namespace VirtualRobot
     class BalanceConstraintOptimizationFunction
     {
     public:
-        BalanceConstraintOptimizationFunction(const SupportPolygonPtr &supportPolygon);
+        BalanceConstraintOptimizationFunction(const SupportPolygonPtr& supportPolygon);
 
         void updateSupportPolygon();
 
-        double evaluateOptimizationFunction(const Eigen::Vector2f &com);
-        Eigen::VectorXf evaluateOptimizationGradient(const Eigen::Vector2f &com, const Eigen::MatrixXf &Jcom);
+        double evaluateOptimizationFunction(const Eigen::Vector2f& com);
+        Eigen::VectorXf evaluateOptimizationGradient(const Eigen::Vector2f& com,
+                                                     const Eigen::MatrixXf& Jcom);
 
     protected:
         void update();
@@ -55,15 +56,33 @@ namespace VirtualRobot
         std::vector<Eigen::Matrix2f> matrices;
         std::vector<Eigen::Vector2f> displacements;
     };
-    typedef std::shared_ptr<BalanceConstraintOptimizationFunction> BalanceConstraintOptimizationFunctionPtr;
 
-    class VIRTUAL_ROBOT_IMPORT_EXPORT BalanceConstraint : public Constraint, public std::enable_shared_from_this<BalanceConstraint>
+    typedef std::shared_ptr<BalanceConstraintOptimizationFunction>
+        BalanceConstraintOptimizationFunctionPtr;
+
+    class VIRTUAL_ROBOT_IMPORT_EXPORT BalanceConstraint :
+        public Constraint,
+        public std::enable_shared_from_this<BalanceConstraint>
     {
     public:
-        BalanceConstraint(const RobotPtr& robot, const RobotNodeSetPtr& joints, const RobotNodeSetPtr& bodies, const SceneObjectSetPtr& contactNodes,
-                          float tolerance = 0.1f, float minimumStability = 0.5f, float maxSupportDistance = 10.0f, bool supportPolygonUpdates = true, bool considerCoMHeight = false);
-        BalanceConstraint(const RobotPtr& robot, const RobotNodeSetPtr& joints, const RobotNodeSetPtr& bodies, const SupportPolygonPtr& supportPolygon,
-                          float tolerance = 0.1f, float minimumStability = 0.5f, float maxSupportDistance = 10.0f, bool supportPolygonUpdates = true, bool considerCoMHeight = false);
+        BalanceConstraint(const RobotPtr& robot,
+                          const RobotNodeSetPtr& joints,
+                          const RobotNodeSetPtr& bodies,
+                          const SceneObjectSetPtr& contactNodes,
+                          float tolerance = 0.1f,
+                          float minimumStability = 0.5f,
+                          float maxSupportDistance = 10.0f,
+                          bool supportPolygonUpdates = true,
+                          bool considerCoMHeight = false);
+        BalanceConstraint(const RobotPtr& robot,
+                          const RobotNodeSetPtr& joints,
+                          const RobotNodeSetPtr& bodies,
+                          const SupportPolygonPtr& supportPolygon,
+                          float tolerance = 0.1f,
+                          float minimumStability = 0.5f,
+                          float maxSupportDistance = 10.0f,
+                          bool supportPolygonUpdates = true,
+                          bool considerCoMHeight = false);
 
         Eigen::MatrixXf getJacobianMatrix() override;
         Eigen::MatrixXf getJacobianMatrix(SceneObjectPtr tcp) override;
@@ -80,8 +99,15 @@ namespace VirtualRobot
         Eigen::VectorXf optimizationGradient(unsigned int id) override;
 
     protected:
-        void initialize(const RobotPtr& robot, const RobotNodeSetPtr& joints, const RobotNodeSetPtr& bodies, const SceneObjectSetPtr& contactNodes,
-                        float tolerance, float minimumStability, float maxSupportDistance, bool supportPolygonUpdates, bool considerCoMHeight);
+        void initialize(const RobotPtr& robot,
+                        const RobotNodeSetPtr& joints,
+                        const RobotNodeSetPtr& bodies,
+                        const SceneObjectSetPtr& contactNodes,
+                        float tolerance,
+                        float minimumStability,
+                        float maxSupportDistance,
+                        bool supportPolygonUpdates,
+                        bool considerCoMHeight);
 
         void updateSupportPolygon();
         void visualizeSupportPolygon(SoSeparator* sep);
@@ -109,5 +135,4 @@ namespace VirtualRobot
     };
 
     typedef std::shared_ptr<BalanceConstraint> BalanceConstraintPtr;
-}
-
+} // namespace VirtualRobot

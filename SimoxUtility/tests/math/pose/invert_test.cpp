@@ -4,20 +4,20 @@
 * @copyright  2019 Rainer Kartmann
 */
 
-#define BOOST_TEST_MODULE SimoxUtility/math/pose/invert_pose_test
+#define BOOST_TEST_MODULE SimoxUtility / math / pose / invert_pose_test
+
+#include <stdio.h>
+
+#include <random>
+#include <string>
 
 #include <boost/test/included/unit_test.hpp>
 
 #include <SimoxUtility/math/pose/invert.h>
 #include <SimoxUtility/math/pose/pose.h>
 
-#include <string>
-#include <stdio.h>
-#include <random>
-
 
 namespace math = ::simox::math;
-
 
 BOOST_AUTO_TEST_CASE(test_invert_pose)
 {
@@ -39,4 +39,3 @@ BOOST_AUTO_TEST_CASE(test_invert_pose)
     BOOST_CHECK((pose * inv).isIdentity(1e-6f));
     BOOST_CHECK((inv * pose).isIdentity(1e-6f));
 }
-

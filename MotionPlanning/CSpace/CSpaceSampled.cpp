@@ -1,13 +1,14 @@
 
 #include "CSpaceSampled.h"
+
 #include "CSpaceNode.h"
 #include "CSpacePath.h"
 #include "CSpaceTree.h"
 #include "VirtualRobot/Nodes/RobotNode.h"
 #include "VirtualRobot/Robot.h"
 //#include "MathHelpers.h"
-#include <cmath>
 #include <cfloat>
+#include <cmath>
 #include <iostream>
 #include <string>
 
@@ -19,9 +20,12 @@ using namespace std;
 namespace Saba
 {
 
-    CSpaceSampled::CSpaceSampled(VirtualRobot::RobotPtr robot, VirtualRobot::CDManagerPtr collisionManager, VirtualRobot::RobotNodeSetPtr robotNodes, unsigned int maxConfigs, unsigned int randomSeed)
-        : CSpace(robot, collisionManager, robotNodes, maxConfigs, randomSeed),
-          recursionMaxDepth(1000)
+    CSpaceSampled::CSpaceSampled(VirtualRobot::RobotPtr robot,
+                                 VirtualRobot::CDManagerPtr collisionManager,
+                                 VirtualRobot::RobotNodeSetPtr robotNodes,
+                                 unsigned int maxConfigs,
+                                 unsigned int randomSeed) :
+        CSpace(robot, collisionManager, robotNodes, maxConfigs, randomSeed), recursionMaxDepth(1000)
     {
         recursiveTmpValuesIndex = 0;
         samplingSizePaths = 0.1f;
@@ -37,11 +41,13 @@ namespace Saba
         }
     }
 
+    CSpaceSampled::~CSpaceSampled() = default;
 
-    CSpaceSampled::~CSpaceSampled()
-    = default;
-
-    CSpacePtr CSpaceSampled::clone(VirtualRobot::CollisionCheckerPtr newColChecker, VirtualRobot::RobotPtr newRobot, VirtualRobot::CDManagerPtr newCDM, unsigned int newRandomSeed)
+    CSpacePtr
+    CSpaceSampled::clone(VirtualRobot::CollisionCheckerPtr newColChecker,
+                         VirtualRobot::RobotPtr newRobot,
+                         VirtualRobot::CDManagerPtr newCDM,
+                         unsigned int newRandomSeed)
     {
         cloneCounter++;
         SABA_ASSERT(newColChecker && newRobot && newCDM && newRobot->getRootNode());
@@ -68,20 +74,22 @@ namespace Saba
         return (CSpacePtr)result;
     }
 
-    void CSpaceSampled::setSamplingSize(float fSize)
+    void
+    CSpaceSampled::setSamplingSize(float fSize)
     {
         //std::cout << "Setting sampling step size to " << samplingSize << std::endl;
         samplingSizePaths = fSize;
     }
 
-    void CSpaceSampled::setSamplingSizeDCD(float fSize)
+    void
+    CSpaceSampled::setSamplingSizeDCD(float fSize)
     {
         //std::cout << "Setting col check sampling step size to " << samplingSize << std::endl;
         samplingSizeDCD = fSize;
     }
 
-
-    CSpacePathPtr CSpaceSampled::createPath(const Eigen::VectorXf& start, const Eigen::VectorXf& goal)
+    CSpacePathPtr
+    CSpaceSampled::createPath(const Eigen::VectorXf& start, const Eigen::VectorXf& goal)
     {
         SABA_ASSERT(start.rows() == dimension);
         SABA_ASSERT(goal.rows() == dimension);
@@ -143,13 +151,15 @@ namespace Saba
                 lastNode = true;
             }
 
-        }
-        while (!endLoop);
+        } while (!endLoop);
 
         return p;
     }
 
-    Saba::CSpacePathPtr CSpaceSampled::createPathUntilInvalid(const Eigen::VectorXf& start, const Eigen::VectorXf& goal, float& storeAddedLength)
+    Saba::CSpacePathPtr
+    CSpaceSampled::createPathUntilInvalid(const Eigen::VectorXf& start,
+                                          const Eigen::VectorXf& goal,
+                                          float& storeAddedLength)
     {
         SABA_ASSERT(start.rows() == dimension);
         SABA_ASSERT(goal.rows() == dimension);
@@ -220,7 +230,8 @@ namespace Saba
                     // create a new node with config, store it in nodeList and set parentID
                     p->addPoint(tmpConfig);
                     storeAddedLength = (origDist - dist) / origDist;
-                    LOCAL_DEBUG("addPoint (length: " << storeAddedLength << ") " << endl << tmpConfig << endl);
+                    LOCAL_DEBUG("addPoint (length: " << storeAddedLength << ") " << endl
+                                                     << tmpConfig << endl);
                     nodeDist -= samplingSizePaths;
                     LOCAL_DEBUG("addPoint (nodeDist: " << nodeDist << ")" << endl);
                 }
@@ -230,14 +241,13 @@ namespace Saba
                 dist = distT;
             }
 
-        }
-        while (!endLoop);
+        } while (!endLoop);
 
         return p;
     }
 
-
-    bool CSpaceSampled::isPathValid(const Eigen::VectorXf& q1, const Eigen::VectorXf& q2)
+    bool
+    CSpaceSampled::isPathValid(const Eigen::VectorXf& q1, const Eigen::VectorXf& q2)
     {
         if (stopPathCheck)
         {
@@ -250,7 +260,11 @@ namespace Saba
         if (actualWeightedDistance <= samplingSizeDCD * 1.001f)
         {
             // just checking q2, to avoid double checks
-            return isConfigValid(q2, false, true, true); // assuming that q1 and q2 are within the limits of the CSpace
+            return isConfigValid(
+                q2,
+                false,
+                true,
+                true); // assuming that q1 and q2 are within the limits of the CSpace
         }
         else
         {
@@ -258,7 +272,8 @@ namespace Saba
 
             if (recursiveTmpValuesIndex >= recursionMaxDepth)
             {
-                SABA_WARNING << "Recursion depth too high: " << recursiveTmpValuesIndex << std::endl;
+                SABA_WARNING << "Recursion depth too high: " << recursiveTmpValuesIndex
+                             << std::endl;
                 recursiveTmpValuesIndex--;
                 return false;
             }
@@ -266,7 +281,8 @@ namespace Saba
             Eigen::VectorXf& middleConfiguration = recursiveTmpValues[recursiveTmpValuesIndex];
 
             // generate a configuration exactly in the middle of q1 and q2 using weighted distances
-            generateNewConfig(q2, q1, middleConfiguration, actualWeightedDistance * 0.5f, actualWeightedDistance);
+            generateNewConfig(
+                q2, q1, middleConfiguration, actualWeightedDistance * 0.5f, actualWeightedDistance);
 
             bool r = (isPathValid(q1, middleConfiguration) && isPathValid(middleConfiguration, q2));
             recursiveTmpValuesIndex--;
@@ -274,4 +290,4 @@ namespace Saba
         }
     }
 
-} // Saba
+} // namespace Saba

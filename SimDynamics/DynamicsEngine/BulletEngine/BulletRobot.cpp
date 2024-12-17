@@ -1,5 +1,7 @@
 #include "BulletRobot.h"
 
+#include <unordered_set>
+
 #include <Eigen/Dense>
 
 #include <VirtualRobot/Nodes/ContactSensor.h>
@@ -17,7 +19,6 @@
 #include "BulletEngineFactory.h"
 #include "DetectBulletVersion.h"
 #include "VirtualRobot/MathTools.h"
-#include <unordered_set>
 
 //#define DEBUG_FIXED_OBJECTS
 //#define DEBUG_SHOW_LINKS

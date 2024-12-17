@@ -35,4 +35,4 @@ namespace math
 
     private:
     };
-}
+} // namespace math

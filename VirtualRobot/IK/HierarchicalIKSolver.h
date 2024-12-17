@@ -4,7 +4,9 @@
 
 using namespace VirtualRobot;
 
-class HierarchicalIKSolver : public HierarchicalIK, public std::enable_shared_from_this<HierarchicalIKSolver>
+class HierarchicalIKSolver :
+    public HierarchicalIK,
+    public std::enable_shared_from_this<HierarchicalIKSolver>
 {
 
 public:
@@ -15,8 +17,8 @@ public:
 
     bool checkTolerances();
     void clearIKs();
-protected:
 
+protected:
     std::vector<JacobiProviderPtr> jacobies;
 };
 

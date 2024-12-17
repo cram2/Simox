@@ -5,69 +5,114 @@
 */
 
 #include "RobotNodeRevoluteFactory.h"
+
+#include "../CollisionDetection/CollisionModel.h"
 #include "RobotNode.h"
 #include "RobotNodeRevolute.h"
-#include "../CollisionDetection/CollisionModel.h"
-
 
 namespace VirtualRobot
 {
 
-    RobotNodeRevoluteFactory::RobotNodeRevoluteFactory()
-    = default;
+    RobotNodeRevoluteFactory::RobotNodeRevoluteFactory() = default;
 
 
-    RobotNodeRevoluteFactory::~RobotNodeRevoluteFactory()
-    = default;
-
+    RobotNodeRevoluteFactory::~RobotNodeRevoluteFactory() = default;
 
     /**
      * This method creates a VirtualRobot::RobotNodeRevolute.
      *
      * \return instance of VirtualRobot::RobotNodeRevolute.
      */
-    RobotNodePtr RobotNodeRevoluteFactory::createRobotNode(RobotPtr robot, const std::string& nodeName, VisualizationNodePtr visualizationModel, CollisionModelPtr collisionModel, float limitLow, float limitHigh, float jointValueOffset, const Eigen::Matrix4f& preJointTransform, const Eigen::Vector3f& axis, const Eigen::Vector3f& /*translationDirection*/, const SceneObject::Physics& p, RobotNode::RobotNodeType rntype) const
+    RobotNodePtr
+    RobotNodeRevoluteFactory::createRobotNode(RobotPtr robot,
+                                              const std::string& nodeName,
+                                              VisualizationNodePtr visualizationModel,
+                                              CollisionModelPtr collisionModel,
+                                              float limitLow,
+                                              float limitHigh,
+                                              float jointValueOffset,
+                                              const Eigen::Matrix4f& preJointTransform,
+                                              const Eigen::Vector3f& axis,
+                                              const Eigen::Vector3f& /*translationDirection*/,
+                                              const SceneObject::Physics& p,
+                                              RobotNode::RobotNodeType rntype) const
     {
-        RobotNodePtr robotNode(new RobotNodeRevolute(robot, nodeName, limitLow, limitHigh, preJointTransform, axis, visualizationModel, collisionModel, jointValueOffset, p, (collisionModel ? collisionModel->getCollisionChecker() : CollisionCheckerPtr()), rntype));
+        RobotNodePtr robotNode(new RobotNodeRevolute(
+            robot,
+            nodeName,
+            limitLow,
+            limitHigh,
+            preJointTransform,
+            axis,
+            visualizationModel,
+            collisionModel,
+            jointValueOffset,
+            p,
+            (collisionModel ? collisionModel->getCollisionChecker() : CollisionCheckerPtr()),
+            rntype));
 
         return robotNode;
     }
-
 
     /**
      * This method creates a VirtualRobot::RobotNodeRevolute from DH parameters.
      *
      * \return instance of VirtualRobot::RobotNodeRevolute.
      */
-    RobotNodePtr RobotNodeRevoluteFactory::createRobotNodeDH(RobotPtr robot, const std::string& nodeName, VisualizationNodePtr visualizationModel, CollisionModelPtr collisionModel, float limitLow, float limitHigh, float jointValueOffset, const DHParameter& dhParameters, const SceneObject::Physics& p, RobotNode::RobotNodeType rntype) const
+    RobotNodePtr
+    RobotNodeRevoluteFactory::createRobotNodeDH(RobotPtr robot,
+                                                const std::string& nodeName,
+                                                VisualizationNodePtr visualizationModel,
+                                                CollisionModelPtr collisionModel,
+                                                float limitLow,
+                                                float limitHigh,
+                                                float jointValueOffset,
+                                                const DHParameter& dhParameters,
+                                                const SceneObject::Physics& p,
+                                                RobotNode::RobotNodeType rntype) const
     {
-        RobotNodePtr robotNode(new RobotNodeRevolute(robot, nodeName, limitLow, limitHigh, dhParameters.aMM(), dhParameters.dMM(), dhParameters.alphaRadian(), dhParameters.thetaRadian(), visualizationModel, collisionModel, jointValueOffset, p,  CollisionCheckerPtr(), rntype));
+        RobotNodePtr robotNode(new RobotNodeRevolute(robot,
+                                                     nodeName,
+                                                     limitLow,
+                                                     limitHigh,
+                                                     dhParameters.aMM(),
+                                                     dhParameters.dMM(),
+                                                     dhParameters.alphaRadian(),
+                                                     dhParameters.thetaRadian(),
+                                                     visualizationModel,
+                                                     collisionModel,
+                                                     jointValueOffset,
+                                                     p,
+                                                     CollisionCheckerPtr(),
+                                                     rntype));
 
         return robotNode;
     }
 
-
     /**
      * register this class in the super class factory
      */
-    RobotNodeFactory::SubClassRegistry RobotNodeRevoluteFactory::registry(RobotNodeRevoluteFactory::getName(), &RobotNodeRevoluteFactory::createInstance);
-
+    RobotNodeFactory::SubClassRegistry
+        RobotNodeRevoluteFactory::registry(RobotNodeRevoluteFactory::getName(),
+                                           &RobotNodeRevoluteFactory::createInstance);
 
     /**
      * \return "revolute"
      */
-    std::string RobotNodeRevoluteFactory::getName()
+    std::string
+    RobotNodeRevoluteFactory::getName()
     {
         return "revolute";
     }
 
-
     /**
      * \return new instance of RobotNodeRevoluteFactory.
      */
-    std::shared_ptr<RobotNodeFactory> RobotNodeRevoluteFactory::createInstance(void*)
+    std::shared_ptr<RobotNodeFactory>
+    RobotNodeRevoluteFactory::createInstance(void*)
     {
-        std::shared_ptr<RobotNodeRevoluteFactory> revoluteNodeFactory(new RobotNodeRevoluteFactory());
+        std::shared_ptr<RobotNodeRevoluteFactory> revoluteNodeFactory(
+            new RobotNodeRevoluteFactory());
         return revoluteNodeFactory;
     }
 

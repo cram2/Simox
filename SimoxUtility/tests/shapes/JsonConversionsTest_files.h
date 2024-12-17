@@ -2,7 +2,7 @@
 
 
 static const std::string AABB_center_extents =
-R"(
+    R"(
 {
   "center": [
     45.0,
@@ -19,7 +19,7 @@ R"(
 
 
 static const std::string AABB_min_max =
-R"(
+    R"(
 {
   "min": [
     -10.0,
@@ -36,7 +36,7 @@ R"(
 
 
 static const std::string OrientedBox_position_orientation_extents =
-R"(
+    R"(
 {
   "extents": [
     100.0,
@@ -58,9 +58,8 @@ R"(
 )";
 
 
-
 static const std::string OrientedBox_pos_ori_dimensions =
-R"(
+    R"(
 {
   "dimensions": [
     100.0,

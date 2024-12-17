@@ -43,7 +43,8 @@ namespace VirtualRobot
 
         For performance reasons this class is not thread safe and cannot be used from different threads in parallel.
     */
-    class VIRTUAL_ROBOT_IMPORT_EXPORT PoseQualityExtendedManipulability :  public VirtualRobot::PoseQualityManipulability
+    class VIRTUAL_ROBOT_IMPORT_EXPORT PoseQualityExtendedManipulability :
+        public VirtualRobot::PoseQualityManipulability
     {
     public:
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -53,12 +54,15 @@ namespace VirtualRobot
             \param rns The kinematic chain for which the quality should be computed.
             \param i The method that should be used to compute the quality.
         */
-        PoseQualityExtendedManipulability(VirtualRobot::RobotNodeSetPtr rns, PoseQualityManipulability::ManipulabilityIndexType i = PoseQualityManipulability::eMinMaxRatio);
+        PoseQualityExtendedManipulability(VirtualRobot::RobotNodeSetPtr rns,
+                                          PoseQualityManipulability::ManipulabilityIndexType i =
+                                              PoseQualityManipulability::eMinMaxRatio);
         ~PoseQualityExtendedManipulability();
 
         float getPoseQuality() override;
 
-        float getPoseQuality(PoseQualityManipulability::ManipulabilityIndexType i, int considerFirstSV);
+        float getPoseQuality(PoseQualityManipulability::ManipulabilityIndexType i,
+                             int considerFirstSV);
 
         /*!
             The quality is determined for a given Cartesian direction.
@@ -66,8 +70,8 @@ namespace VirtualRobot
             \param direction A 3d or 6d vector with the Cartesian direction to investigate.
         */
         float getPoseQuality(const Eigen::VectorXf& direction) override;
-        float getManipulability(const Eigen::VectorXf& direction, int considerFirstSV = -1) override;
-
+        float getManipulability(const Eigen::VectorXf& direction,
+                                int considerFirstSV = -1) override;
 
         struct extManipData
         {
@@ -75,7 +79,9 @@ namespace VirtualRobot
             {
                 reset();
             }
-            void reset()
+
+            void
+            reset()
             {
                 extManip_InvCondNumber = -1.0f;
                 extManip_Volume = -1.0f;
@@ -85,12 +91,14 @@ namespace VirtualRobot
                 nrJoints = -1;
                 consideFirstSV = -1;
             }
+
             // 2^6 = 64
             // for each hyperoctant, the SVD result is stored
             Eigen::MatrixXf U[64];
             Eigen::MatrixXf V[64];
             Eigen::VectorXf sv[64];
-            Eigen::MatrixXf singVectors[64]; // the scaled singular vectors (U matrix, columns scaled according to sv)
+            Eigen::MatrixXf singVectors
+                [64]; // the scaled singular vectors (U matrix, columns scaled according to sv)
             Eigen::MatrixXf jacPen[64];
 
             // the joint limit penalizations in neg direction (n values)
@@ -123,12 +131,12 @@ namespace VirtualRobot
 
         bool getDetailedAnalysis(extManipData& storeData, int considerFirstSV = 0);
         bool getDetailedAnalysis(extManipData& storeData, bool (&dims)[6], int considerFirstSV = 0);
-        std::vector < std::vector<float> > getPermutationVector();
+        std::vector<std::vector<float>> getPermutationVector();
 
         /*!
             If enabled (standard = disabled), you must take care of setting the obstacle vector before computing the manipulability. (see PoseQualityMeasurement::setObstacleDistanceVector)
         */
-        void considerObstacles(bool enable, float alpha  = 40.0f, float beta = 1.0f);
+        void considerObstacles(bool enable, float alpha = 40.0f, float beta = 1.0f);
 
         static std::string getTypeName();
 
@@ -137,18 +145,31 @@ namespace VirtualRobot
 
         PoseQualityMeasurementPtr clone(RobotPtr newRobot) override;
 
-        void getSelfDistParameters(float &storeAlpha, float &storeBeta);
+        void getSelfDistParameters(float& storeAlpha, float& storeBeta);
 
     protected:
+        bool getDetailedAnalysis(DifferentialIKPtr jacobian,
+                                 RobotNodeSetPtr rns,
+                                 extManipData& storeData,
+                                 int considerFirstSV = 0);
+        bool getDetailedAnalysis(DifferentialIKPtr jacobian,
+                                 RobotNodeSetPtr rns,
+                                 extManipData& storeData,
+                                 bool (&dims)[6],
+                                 int considerFirstSV = 0);
+        bool getDetailedAnalysis(const Eigen::MatrixXf& jac,
+                                 const std::vector<RobotNodePtr>& joints,
+                                 extManipData& storeData,
+                                 bool (&dims)[6],
+                                 int considerFirstSV = 0);
 
-        bool getDetailedAnalysis(DifferentialIKPtr jacobian, RobotNodeSetPtr rns, extManipData& storeData, int considerFirstSV = 0);
-        bool getDetailedAnalysis(DifferentialIKPtr jacobian, RobotNodeSetPtr rns, extManipData& storeData, bool (&dims)[6], int considerFirstSV = 0);
-        bool getDetailedAnalysis(const Eigen::MatrixXf& jac, const std::vector<RobotNodePtr>& joints, extManipData& storeData, bool (&dims)[6], int considerFirstSV = 0);
+        float getPoseQuality(DifferentialIKPtr jacobian,
+                             RobotNodeSetPtr rns,
+                             PoseQualityManipulability::ManipulabilityIndexType i,
+                             int considerFirstSV);
 
-        float getPoseQuality(DifferentialIKPtr jacobian,  RobotNodeSetPtr rns, PoseQualityManipulability::ManipulabilityIndexType i, int considerFirstSV);
 
-
-        bool createCartDimPermutations(std::vector < std::vector<float> >& storePerm);
+        bool createCartDimPermutations(std::vector<std::vector<float>>& storePerm);
 
         /*!
             Get the weighting for jv with limits.
@@ -157,13 +178,22 @@ namespace VirtualRobot
             In case jv is on the lower half of the joint range -> storeWeightMin = 1+w; storeWeightMax = 1
             In case jv is on the upper half of the joint range -> storeWeightMin = 1;   storeWeightMax = 1+w
         */
-        void getQualityWeighting(float jv, float limitMin, float limitMax, float& storeWeightMin, float& storeWeightMax);
+        void getQualityWeighting(float jv,
+                                 float limitMin,
+                                 float limitMax,
+                                 float& storeWeightMin,
+                                 float& storeWeightMax);
 
         //! Compute weightings w and store 1/sqrt(w)
-        void getPenalizations(const std::vector<RobotNodePtr>& joints, Eigen::VectorXf& penLo, Eigen::VectorXf& penHi);
+        void getPenalizations(const std::vector<RobotNodePtr>& joints,
+                              Eigen::VectorXf& penLo,
+                              Eigen::VectorXf& penHi);
 
 
-        Eigen::MatrixXf getJacobianWeighted(const Eigen::MatrixXf& jac, const std::vector<float>& directionVect, const Eigen::VectorXf& penLo, const Eigen::VectorXf& penHi);
+        Eigen::MatrixXf getJacobianWeighted(const Eigen::MatrixXf& jac,
+                                            const std::vector<float>& directionVect,
+                                            const Eigen::VectorXf& penLo,
+                                            const Eigen::VectorXf& penHi);
 
         /*!
             Perform SVD on jac.
@@ -172,12 +202,30 @@ namespace VirtualRobot
             \param U The U matrix is stored here
             \param V The V matrix is stored here
         */
-        bool analyzeJacobian(const Eigen::MatrixXf& jac, Eigen::VectorXf& sv, Eigen::MatrixXf& singVectors, Eigen::MatrixXf& U, Eigen::MatrixXf& V, bool printInfo = false);
-        void getObstaclePenalizations(RobotNodeSetPtr rns, const Eigen::Vector3f& obstVect, const Eigen::MatrixXf& jac, Eigen::MatrixXf& penObstLo, Eigen::MatrixXf& penObstHi);
-        void getObstaclePenalizations(const std::vector<RobotNodePtr>& joints, const Eigen::Vector3f& obstVect, const Eigen::MatrixXf& jac, Eigen::MatrixXf& penObstLo, Eigen::MatrixXf& penObstHi);
-        Eigen::MatrixXf getJacobianWeightedObstacles(const Eigen::MatrixXf& jac, const std::vector<float>& directionVect, const Eigen::VectorXf& penLo, const Eigen::VectorXf& penHi, const Eigen::MatrixXf& penObstLo, const Eigen::MatrixXf& penObstHi);
+        bool analyzeJacobian(const Eigen::MatrixXf& jac,
+                             Eigen::VectorXf& sv,
+                             Eigen::MatrixXf& singVectors,
+                             Eigen::MatrixXf& U,
+                             Eigen::MatrixXf& V,
+                             bool printInfo = false);
+        void getObstaclePenalizations(RobotNodeSetPtr rns,
+                                      const Eigen::Vector3f& obstVect,
+                                      const Eigen::MatrixXf& jac,
+                                      Eigen::MatrixXf& penObstLo,
+                                      Eigen::MatrixXf& penObstHi);
+        void getObstaclePenalizations(const std::vector<RobotNodePtr>& joints,
+                                      const Eigen::Vector3f& obstVect,
+                                      const Eigen::MatrixXf& jac,
+                                      Eigen::MatrixXf& penObstLo,
+                                      Eigen::MatrixXf& penObstHi);
+        Eigen::MatrixXf getJacobianWeightedObstacles(const Eigen::MatrixXf& jac,
+                                                     const std::vector<float>& directionVect,
+                                                     const Eigen::VectorXf& penLo,
+                                                     const Eigen::VectorXf& penHi,
+                                                     const Eigen::MatrixXf& penObstLo,
+                                                     const Eigen::MatrixXf& penObstHi);
 
-        std::vector< std::vector<float> > cartDimPermutations;
+        std::vector<std::vector<float>> cartDimPermutations;
 
         float obstacle_alpha, obstacle_beta;
 
@@ -188,4 +236,4 @@ namespace VirtualRobot
 
     typedef std::shared_ptr<PoseQualityExtendedManipulability> PoseQualityExtendedManipulabilityPtr;
 
-}
+} // namespace VirtualRobot

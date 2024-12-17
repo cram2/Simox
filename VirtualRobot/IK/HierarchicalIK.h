@@ -22,11 +22,10 @@
 */
 #pragma once
 
-#include "VirtualRobot/VirtualRobot.h"
 #include "VirtualRobot/IK/JacobiProvider.h"
-#include "VirtualRobot/RobotNodeSet.h"
 #include "VirtualRobot/Nodes/RobotNode.h"
-
+#include "VirtualRobot/RobotNodeSet.h"
+#include "VirtualRobot/VirtualRobot.h"
 
 namespace VirtualRobot
 {
@@ -41,12 +40,14 @@ namespace VirtualRobot
         Advanced Robotics, 1991. 'Robots in Unstructured Environments', 91 ICAR., Fifth International Conference on
 
     */
-    class VIRTUAL_ROBOT_IMPORT_EXPORT HierarchicalIK : public std::enable_shared_from_this<HierarchicalIK>
+    class VIRTUAL_ROBOT_IMPORT_EXPORT HierarchicalIK :
+        public std::enable_shared_from_this<HierarchicalIK>
     {
     public:
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-        HierarchicalIK(RobotNodeSetPtr rns, JacobiProvider::InverseJacobiMethod method = JacobiProvider::eSVD);
+        HierarchicalIK(RobotNodeSetPtr rns,
+                       JacobiProvider::InverseJacobiMethod method = JacobiProvider::eSVD);
 
         virtual ~HierarchicalIK();
 
@@ -57,11 +58,12 @@ namespace VirtualRobot
                            The deltas specify the error for each Jacobian (e.g. in workspace). deltas[i].rows() must be equal to jacobies[i].rows().
             \param stepSize The deltas can be reduced in order to avoid oscillating behavior.
         */
-        Eigen::VectorXf computeStep(const std::vector<JacobiProviderPtr>& jacDefs, float stepSize = 0.2f);
+        Eigen::VectorXf computeStep(const std::vector<JacobiProviderPtr>& jacDefs,
+                                    float stepSize = 0.2f);
 
         void setVerbose(bool v);
-    protected:
 
+    protected:
         RobotNodeSetPtr rns;
         bool verbose;
 
@@ -71,5 +73,3 @@ namespace VirtualRobot
     typedef std::shared_ptr<HierarchicalIK> HierarchicalIKPtr;
 
 } // namespace VirtualRobot
-
-

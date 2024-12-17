@@ -1,17 +1,18 @@
 
 #include "PoseQualityExtendedManipulability.h"
 
-#include <VirtualRobot/MathTools.h>
-#include "../Nodes/RobotNode.h"
-#include "../RobotNodeSet.h"
-#include "../Robot.h"
-#include "IK/IKSolver.h"
-#include "IK/DifferentialIK.h"
-
-#include <Eigen/Geometry>
-#include <Eigen/Dense>
 #include <cfloat>
 
+#include <Eigen/Dense>
+#include <Eigen/Geometry>
+
+#include <VirtualRobot/MathTools.h>
+
+#include "../Nodes/RobotNode.h"
+#include "../Robot.h"
+#include "../RobotNodeSet.h"
+#include "IK/DifferentialIK.h"
+#include "IK/IKSolver.h"
 
 
 using namespace std;
@@ -20,8 +21,10 @@ namespace VirtualRobot
 {
 
 
-    PoseQualityExtendedManipulability::PoseQualityExtendedManipulability(VirtualRobot::RobotNodeSetPtr rns, PoseQualityManipulability::ManipulabilityIndexType i)
-        : PoseQualityManipulability(rns, i)
+    PoseQualityExtendedManipulability::PoseQualityExtendedManipulability(
+        VirtualRobot::RobotNodeSetPtr rns,
+        PoseQualityManipulability::ManipulabilityIndexType i) :
+        PoseQualityManipulability(rns, i)
     {
         name = getTypeName();
         createCartDimPermutations(cartDimPermutations);
@@ -34,20 +37,28 @@ namespace VirtualRobot
         tmpJac.resize(6, joints.size());
     }
 
-    PoseQualityExtendedManipulability::~PoseQualityExtendedManipulability()
-    = default;
+    PoseQualityExtendedManipulability::~PoseQualityExtendedManipulability() = default;
 
-    float PoseQualityExtendedManipulability::getPoseQuality()
+    float
+    PoseQualityExtendedManipulability::getPoseQuality()
     {
         return getPoseQuality(manipulabilityType, -1);
     }
 
-    float PoseQualityExtendedManipulability::getPoseQuality(PoseQualityManipulability::ManipulabilityIndexType i, int considerFirstSV)
+    float
+    PoseQualityExtendedManipulability::getPoseQuality(
+        PoseQualityManipulability::ManipulabilityIndexType i,
+        int considerFirstSV)
     {
         return getPoseQuality(jacobian, rns, i, considerFirstSV);
     }
 
-    float PoseQualityExtendedManipulability::getPoseQuality(DifferentialIKPtr jac, RobotNodeSetPtr rns, PoseQualityManipulability::ManipulabilityIndexType i, int considerFirstSV)
+    float
+    PoseQualityExtendedManipulability::getPoseQuality(
+        DifferentialIKPtr jac,
+        RobotNodeSetPtr rns,
+        PoseQualityManipulability::ManipulabilityIndexType i,
+        int considerFirstSV)
     {
         //extManipData d;
         currentManipData.reset();
@@ -79,19 +90,26 @@ namespace VirtualRobot
         return 0;
     }
 
-    float PoseQualityExtendedManipulability::getPoseQuality(const Eigen::VectorXf& direction)
+    float
+    PoseQualityExtendedManipulability::getPoseQuality(const Eigen::VectorXf& direction)
     {
         return getManipulability(direction);
     }
 
-
-    void PoseQualityExtendedManipulability::getQualityWeighting(float jv, float limitMin, float limitMax, float& storeWeightMin, float& storeWeightMax)
+    void
+    PoseQualityExtendedManipulability::getQualityWeighting(float jv,
+                                                           float limitMin,
+                                                           float limitMax,
+                                                           float& storeWeightMin,
+                                                           float& storeWeightMax)
     {
         float w;
 
         if (fabs(limitMax - jv) > 1e-10 && fabs(jv - limitMin) > 1e-10)
         {
-            w = ((limitMax - limitMin) * (limitMax - limitMin) * (2.0f * jv - limitMax - limitMin)) / (4.0f * (limitMax - jv) * (limitMax - jv) * (jv - limitMin) * (jv - limitMin));
+            w = ((limitMax - limitMin) * (limitMax - limitMin) *
+                 (2.0f * jv - limitMax - limitMin)) /
+                (4.0f * (limitMax - jv) * (limitMax - jv) * (jv - limitMin) * (jv - limitMin));
         }
         else
         {
@@ -121,7 +139,10 @@ namespace VirtualRobot
         }
     }
 
-    void PoseQualityExtendedManipulability::getPenalizations(const std::vector<RobotNodePtr>& joints, Eigen::VectorXf& penLo, Eigen::VectorXf& penHi)
+    void
+    PoseQualityExtendedManipulability::getPenalizations(const std::vector<RobotNodePtr>& joints,
+                                                        Eigen::VectorXf& penLo,
+                                                        Eigen::VectorXf& penHi)
     {
         penLo.resize(joints.size());
         penHi.resize(joints.size());
@@ -129,7 +150,11 @@ namespace VirtualRobot
         for (size_t i = 0; i < joints.size(); i++)
         {
             float l, h;
-            getQualityWeighting(joints[i]->getJointValue(), joints[i]->getJointLimitLo(), joints[i]->getJointLimitHi(), l, h);
+            getQualityWeighting(joints[i]->getJointValue(),
+                                joints[i]->getJointLimitLo(),
+                                joints[i]->getJointLimitHi(),
+                                l,
+                                h);
             penLo(i) = 1.0f / sqrtf(l);
             penHi(i) = 1.0f / sqrtf(h);
         }
@@ -143,13 +168,24 @@ namespace VirtualRobot
         }
     }
 
-    void PoseQualityExtendedManipulability::getObstaclePenalizations(RobotNodeSetPtr rns, const Eigen::Vector3f& obstVect, const Eigen::MatrixXf& jac, Eigen::MatrixXf& penObstLo, Eigen::MatrixXf& penObstHi)
+    void
+    PoseQualityExtendedManipulability::getObstaclePenalizations(RobotNodeSetPtr rns,
+                                                                const Eigen::Vector3f& obstVect,
+                                                                const Eigen::MatrixXf& jac,
+                                                                Eigen::MatrixXf& penObstLo,
+                                                                Eigen::MatrixXf& penObstHi)
     {
         std::vector<RobotNodePtr> joints = rns->getAllRobotNodes();
         return getObstaclePenalizations(joints, obstVect, jac, penObstLo, penObstHi);
     }
 
-    void PoseQualityExtendedManipulability::getObstaclePenalizations(const std::vector<RobotNodePtr>& joints, const Eigen::Vector3f& obstVect, const Eigen::MatrixXf& jac, Eigen::MatrixXf& penObstLo, Eigen::MatrixXf& penObstHi)
+    void
+    PoseQualityExtendedManipulability::getObstaclePenalizations(
+        const std::vector<RobotNodePtr>& joints,
+        const Eigen::Vector3f& obstVect,
+        const Eigen::MatrixXf& jac,
+        Eigen::MatrixXf& penObstLo,
+        Eigen::MatrixXf& penObstHi)
     {
         float scaleFactor = 0.001f;
 
@@ -170,7 +206,9 @@ namespace VirtualRobot
         d *= scaleFactor; // m
 
         // compute \delta P / \delta d
-        float p1 = (float) - (exp((double)(-obstacle_alpha * d)) * pow((double)d, (double)(-obstacle_beta)) * (double)(obstacle_beta * 1.0f / d + obstacle_alpha));
+        float p1 =
+            (float)-(exp((double)(-obstacle_alpha * d)) * pow((double)d, (double)(-obstacle_beta)) *
+                     (double)(obstacle_beta * 1.0f / d + obstacle_alpha));
 
         if (verbose)
         {
@@ -261,7 +299,14 @@ namespace VirtualRobot
         }
     }
 
-    Eigen::MatrixXf PoseQualityExtendedManipulability::getJacobianWeightedObstacles(const Eigen::MatrixXf& jac, const std::vector<float>& directionVect, const Eigen::VectorXf& penLo, const Eigen::VectorXf& penHi, const Eigen::MatrixXf& penObstLo, const Eigen::MatrixXf& penObstHi)
+    Eigen::MatrixXf
+    PoseQualityExtendedManipulability::getJacobianWeightedObstacles(
+        const Eigen::MatrixXf& jac,
+        const std::vector<float>& directionVect,
+        const Eigen::VectorXf& penLo,
+        const Eigen::VectorXf& penHi,
+        const Eigen::MatrixXf& penObstLo,
+        const Eigen::MatrixXf& penObstHi)
     {
         Eigen::MatrixXf res = jac;
 
@@ -305,8 +350,11 @@ namespace VirtualRobot
         return res;
     }
 
-
-    Eigen::MatrixXf PoseQualityExtendedManipulability::getJacobianWeighted(const Eigen::MatrixXf& jac, const std::vector<float>& directionVect, const Eigen::VectorXf& penLo, const Eigen::VectorXf& penHi)
+    Eigen::MatrixXf
+    PoseQualityExtendedManipulability::getJacobianWeighted(const Eigen::MatrixXf& jac,
+                                                           const std::vector<float>& directionVect,
+                                                           const Eigen::VectorXf& penLo,
+                                                           const Eigen::VectorXf& penHi)
     {
         Eigen::MatrixXf res = jac;
 
@@ -345,7 +393,13 @@ namespace VirtualRobot
         return res;
     }
 
-    bool PoseQualityExtendedManipulability::analyzeJacobian(const Eigen::MatrixXf& jac, Eigen::VectorXf& sv, Eigen::MatrixXf& singVectors, Eigen::MatrixXf& U, Eigen::MatrixXf& V, bool printInfo)
+    bool
+    PoseQualityExtendedManipulability::analyzeJacobian(const Eigen::MatrixXf& jac,
+                                                       Eigen::VectorXf& sv,
+                                                       Eigen::MatrixXf& singVectors,
+                                                       Eigen::MatrixXf& U,
+                                                       Eigen::MatrixXf& V,
+                                                       bool printInfo)
     {
         Eigen::JacobiSVD<Eigen::MatrixXf> svd(jac, Eigen::ComputeThinU | Eigen::ComputeThinV);
         U = svd.matrixU();
@@ -370,18 +424,27 @@ namespace VirtualRobot
         {
             std::cout << "Sing Values:\n" << sv << std::endl;
             std::cout << "U:\n" << U << std::endl;
-            std::cout << "Sing Vectors (scaled according to SingValues:\n" << singVectors << std::endl;
+            std::cout << "Sing Vectors (scaled according to SingValues:\n"
+                      << singVectors << std::endl;
         }
 
         return true;
     }
 
-    bool PoseQualityExtendedManipulability::getDetailedAnalysis(extManipData& storeData, bool (&dims)[6], int considerFirstSV)
+    bool
+    PoseQualityExtendedManipulability::getDetailedAnalysis(extManipData& storeData,
+                                                           bool (&dims)[6],
+                                                           int considerFirstSV)
     {
         return getDetailedAnalysis(jacobian, rns, storeData, dims, considerFirstSV);
     }
 
-    bool PoseQualityExtendedManipulability::getDetailedAnalysis(DifferentialIKPtr jac, RobotNodeSetPtr rns, extManipData& storeData, bool (&dims)[6], int considerFirstSV)
+    bool
+    PoseQualityExtendedManipulability::getDetailedAnalysis(DifferentialIKPtr jac,
+                                                           RobotNodeSetPtr rns,
+                                                           extManipData& storeData,
+                                                           bool (&dims)[6],
+                                                           int considerFirstSV)
     {
         jac->updateJacobianMatrix(tmpJac, rns->getTCP(), IKSolver::All);
 
@@ -389,7 +452,12 @@ namespace VirtualRobot
         return getDetailedAnalysis(tmpJac, joints, storeData, dims, considerFirstSV);
     }
 
-    bool PoseQualityExtendedManipulability::getDetailedAnalysis(const Eigen::MatrixXf& jac, const std::vector<RobotNodePtr>& joints, extManipData& storeData, bool (&dims)[6], int considerFirstSV)
+    bool
+    PoseQualityExtendedManipulability::getDetailedAnalysis(const Eigen::MatrixXf& jac,
+                                                           const std::vector<RobotNodePtr>& joints,
+                                                           extManipData& storeData,
+                                                           bool (&dims)[6],
+                                                           int considerFirstSV)
     {
         storeData.jac = jac;
         storeData.nrJoints = storeData.jac.cols();
@@ -402,7 +470,8 @@ namespace VirtualRobot
 
         if (considerObstacle)
         {
-            getObstaclePenalizations(joints, obstacleDir, storeData.jac, storeData.penObstLo, storeData.penObstHi);
+            getObstaclePenalizations(
+                joints, obstacleDir, storeData.jac, storeData.penObstLo, storeData.penObstHi);
         }
 
         //bool verbose = false;
@@ -417,11 +486,17 @@ namespace VirtualRobot
         {
             if (considerObstacle)
             {
-                storeData.jacPen[i] = getJacobianWeightedObstacles(storeData.jac, cartDimPermutations[i], storeData.penLo, storeData.penHi, storeData.penObstLo, storeData.penObstHi);
+                storeData.jacPen[i] = getJacobianWeightedObstacles(storeData.jac,
+                                                                   cartDimPermutations[i],
+                                                                   storeData.penLo,
+                                                                   storeData.penHi,
+                                                                   storeData.penObstLo,
+                                                                   storeData.penObstHi);
             }
             else
             {
-                storeData.jacPen[i] = getJacobianWeighted(storeData.jac, cartDimPermutations[i], storeData.penLo, storeData.penHi);
+                storeData.jacPen[i] = getJacobianWeighted(
+                    storeData.jac, cartDimPermutations[i], storeData.penLo, storeData.penHi);
             }
 
             for (int j = 0; j < 6; j++)
@@ -438,7 +513,12 @@ namespace VirtualRobot
                 MathTools::printMat(storeData.jacPen[i]);
             }
 
-            analyzeJacobian(storeData.jacPen[i], storeData.sv[i], storeData.singVectors[i], storeData.U[i], storeData.V[i], (verbose && i < 4));
+            analyzeJacobian(storeData.jacPen[i],
+                            storeData.sv[i],
+                            storeData.singVectors[i],
+                            storeData.U[i],
+                            storeData.V[i],
+                            (verbose && i < 4));
         }
 
         if (considerFirstSV <= 0 || considerFirstSV > storeData.sv[0].rows())
@@ -454,7 +534,7 @@ namespace VirtualRobot
 
         for (int k = 0; k < 64; k++)
         {
-            Eigen::VectorXf sv = storeData.sv[k];//.block(0,k,svAll.rows(),1);
+            Eigen::VectorXf sv = storeData.sv[k]; //.block(0,k,svAll.rows(),1);
             //cout << "k: sv:";
             //VirtualRobot::MathTools::print(sv);
             float tmpRes = 0;
@@ -523,13 +603,13 @@ namespace VirtualRobot
 
                     if (verbose)
                     {
-                        std::cout << "## k:" << k << " -> minSV: " << minSV_loc << ", maxSV:" << maxSV_loc << std::endl;
+                        std::cout << "## k:" << k << " -> minSV: " << minSV_loc
+                                  << ", maxSV:" << maxSV_loc << std::endl;
                         std::cout << "## pen jac:\n" << std::endl;
                         MathTools::printMat(storeData.jacPen[k]);
                     }
                 }
             }
-
         }
 
         storeData.extManip_InvCondNumber = result_c;
@@ -541,7 +621,9 @@ namespace VirtualRobot
         return true;
     }
 
-    bool PoseQualityExtendedManipulability::getDetailedAnalysis(extManipData& storeData, int considerFirstSV)
+    bool
+    PoseQualityExtendedManipulability::getDetailedAnalysis(extManipData& storeData,
+                                                           int considerFirstSV)
     {
         if (considerFirstSV <= 0 || considerFirstSV > 6)
         {
@@ -559,7 +641,11 @@ namespace VirtualRobot
         return getDetailedAnalysis(jacobian, rns, storeData, dims, considerFirstSV);
     }
 
-    bool PoseQualityExtendedManipulability::getDetailedAnalysis(DifferentialIKPtr jac, RobotNodeSetPtr rns, extManipData& storeData, int considerFirstSV)
+    bool
+    PoseQualityExtendedManipulability::getDetailedAnalysis(DifferentialIKPtr jac,
+                                                           RobotNodeSetPtr rns,
+                                                           extManipData& storeData,
+                                                           int considerFirstSV)
     {
         if (considerFirstSV <= 0 || considerFirstSV > 6)
         {
@@ -577,7 +663,9 @@ namespace VirtualRobot
         return getDetailedAnalysis(jac, rns, storeData, dims, considerFirstSV);
     }
 
-    bool PoseQualityExtendedManipulability::createCartDimPermutations(std::vector < std::vector<float> >& storePerm)
+    bool
+    PoseQualityExtendedManipulability::createCartDimPermutations(
+        std::vector<std::vector<float>>& storePerm)
     {
         for (int i = 0; i < 64; i++)
         {
@@ -643,29 +731,37 @@ namespace VirtualRobot
         return true;
     }
 
-    std::vector < std::vector<float> > PoseQualityExtendedManipulability::getPermutationVector()
+    std::vector<std::vector<float>>
+    PoseQualityExtendedManipulability::getPermutationVector()
     {
         return cartDimPermutations;
     }
 
-    void PoseQualityExtendedManipulability::considerObstacles(bool enable, float alpha /*= 1.0f*/, float beta /*= 1.0f*/)
+    void
+    PoseQualityExtendedManipulability::considerObstacles(bool enable,
+                                                         float alpha /*= 1.0f*/,
+                                                         float beta /*= 1.0f*/)
     {
         PoseQualityManipulability::considerObstacle = enable;
         obstacle_alpha = alpha;
         obstacle_beta = beta;
     }
 
-    std::string PoseQualityExtendedManipulability::getTypeName()
+    std::string
+    PoseQualityExtendedManipulability::getTypeName()
     {
         return std::string("PoseQualityExtendedManipulability_JLWeightsQuadrants");
     }
 
-    bool PoseQualityExtendedManipulability::consideringJointLimits()
+    bool
+    PoseQualityExtendedManipulability::consideringJointLimits()
     {
         return true;
     }
 
-    float PoseQualityExtendedManipulability::getManipulability(const Eigen::VectorXf& direction, int considerFirstSV)
+    float
+    PoseQualityExtendedManipulability::getManipulability(const Eigen::VectorXf& direction,
+                                                         int considerFirstSV)
     {
         VR_ASSERT(direction.rows() == 3 || direction.rows() == 6);
         Eigen::VectorXf d(6);
@@ -726,7 +822,8 @@ namespace VirtualRobot
             Eigen::Vector3f obstVecGlobal;
             obstVecGlobal.block(0, 0, 3, 1) = pos - zero;
             getObstaclePenalizations(rns, obstVecGlobal, jacGlobal, penObstLo, penObstHi);
-            jacPen = getJacobianWeightedObstacles(jacGlobal, quadrant, penLo, penHi, penObstLo, penObstHi);
+            jacPen = getJacobianWeightedObstacles(
+                jacGlobal, quadrant, penLo, penHi, penObstLo, penObstHi);
         }
         else
         {
@@ -820,7 +917,8 @@ namespace VirtualRobot
 
                 if (verbose)
                 {
-                    std::cout << "##  -> minSV: " << minSV_loc << ", maxSV:" << maxSV_loc << std::endl;
+                    std::cout << "##  -> minSV: " << minSV_loc << ", maxSV:" << maxSV_loc
+                              << std::endl;
                     std::cout << "## pen jac:\n" << jacPen << std::endl;
                 }
             }
@@ -829,21 +927,24 @@ namespace VirtualRobot
         return result * result_c;
     }
 
-    PoseQualityMeasurementPtr PoseQualityExtendedManipulability::clone(RobotPtr newRobot)
+    PoseQualityMeasurementPtr
+    PoseQualityExtendedManipulability::clone(RobotPtr newRobot)
     {
         VR_ASSERT(newRobot);
         VR_ASSERT(newRobot->getRobotNodeSet(rns->getName()));
         VR_ASSERT(newRobot->getRobotNodeSet(rns->getName())->getSize() == rns->getSize());
 
-        PoseQualityExtendedManipulabilityPtr m(new PoseQualityExtendedManipulability(newRobot->getRobotNodeSet(rns->getName()), this->manipulabilityType));
+        PoseQualityExtendedManipulabilityPtr m(new PoseQualityExtendedManipulability(
+            newRobot->getRobotNodeSet(rns->getName()), this->manipulabilityType));
         m->penalizeJointLimits(this->penJointLimits, this->penJointLimits_k);
         m->considerObstacles(this->considerObstacle, this->obstacle_alpha, this->obstacle_beta);
         return m;
     }
 
-    void PoseQualityExtendedManipulability::getSelfDistParameters(float &storeAlpha, float &storeBeta)
+    void
+    PoseQualityExtendedManipulability::getSelfDistParameters(float& storeAlpha, float& storeBeta)
     {
         storeAlpha = obstacle_alpha;
         storeBeta = obstacle_beta;
     }
-}
+} // namespace VirtualRobot

@@ -41,7 +41,8 @@ namespace SimDynamics
         BulletEngineFactory();
         ~BulletEngineFactory() override;
 
-        DynamicsEnginePtr createEngine(DynamicsEngineConfigPtr config = DynamicsEngineConfigPtr()) override;
+        DynamicsEnginePtr
+        createEngine(DynamicsEngineConfigPtr config = DynamicsEngineConfigPtr()) override;
 
         DynamicsObjectPtr createObject(VirtualRobot::SceneObjectPtr o) override;
         DynamicsRobotPtr createRobot(VirtualRobot::RobotPtr robot) override;
@@ -50,9 +51,9 @@ namespace SimDynamics
     public:
         static std::string getName();
         static std::shared_ptr<DynamicsEngineFactory> createInstance(void*);
+
     private:
         static SubClassRegistry registry;
     };
 
-} // namespace VirtualRobot
-
+} // namespace SimDynamics

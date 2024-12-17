@@ -22,14 +22,12 @@
 */
 #pragma once
 
-#include "../VirtualRobot.h"
-#include "../VirtualRobot.h"
-#include "../AbstractFactoryMethod.h"
-#include "../Robot.h"
-#include "../XML/RobotIO.h"
-
 #include <Eigen/Core>
 
+#include "../AbstractFactoryMethod.h"
+#include "../Robot.h"
+#include "../VirtualRobot.h"
+#include "../XML/RobotIO.h"
 
 namespace VirtualRobot
 {
@@ -46,19 +44,23 @@ namespace VirtualRobot
     */
     class RobotImporterFactory;
     typedef std::shared_ptr<RobotImporterFactory> RobotImporterFactoryPtr;
-    class VIRTUAL_ROBOT_IMPORT_EXPORT RobotImporterFactory  : public AbstractFactoryMethod<RobotImporterFactory, void*>
+
+    class VIRTUAL_ROBOT_IMPORT_EXPORT RobotImporterFactory :
+        public AbstractFactoryMethod<RobotImporterFactory, void*>
     {
     public:
         RobotImporterFactory()
         {
             ;
         }
+
         virtual ~RobotImporterFactory()
         {
             ;
         }
 
-        virtual RobotPtr loadFromFile(const std::string& filename, RobotIO::RobotDescription loadMode = RobotIO::eFull) = 0;
+        virtual RobotPtr loadFromFile(const std::string& filename,
+                                      RobotIO::RobotDescription loadMode = RobotIO::eFull) = 0;
 
         virtual std::string getFileExtension() = 0;
         virtual std::string getFileFilter() = 0;
@@ -70,4 +72,3 @@ namespace VirtualRobot
 
 
 } // namespace VirtualRobot
-

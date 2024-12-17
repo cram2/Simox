@@ -22,15 +22,16 @@
 */
 #pragma once
 
-#include "VirtualRobot/VirtualRobot.h"
+#include <vector>
+
 #include "VirtualRobot/IK/Constraint.h"
 #include "VirtualRobot/Robot.h"
-
-#include <vector>
+#include "VirtualRobot/VirtualRobot.h"
 
 namespace VirtualRobot
 {
-    class VIRTUAL_ROBOT_IMPORT_EXPORT ConstrainedIK : public std::enable_shared_from_this<ConstrainedIK>
+    class VIRTUAL_ROBOT_IMPORT_EXPORT ConstrainedIK :
+        public std::enable_shared_from_this<ConstrainedIK>
     {
     public:
         enum SeedType
@@ -46,9 +47,16 @@ namespace VirtualRobot
         };
 
     public:
-        ConstrainedIK(RobotPtr& robot, const RobotNodeSetPtr& nodeSet, int maxIterations = 1000, float stall_epsilon = 0.0001, float raise_epsilon = 0.8, bool reduceRobot = false);
+        ConstrainedIK(RobotPtr& robot,
+                      const RobotNodeSetPtr& nodeSet,
+                      int maxIterations = 1000,
+                      float stall_epsilon = 0.0001,
+                      float raise_epsilon = 0.8,
+                      bool reduceRobot = false);
 
-        void addConstraint(const ConstraintPtr& constraint, int priority = 0, bool hard_constraint = true);
+        void addConstraint(const ConstraintPtr& constraint,
+                           int priority = 0,
+                           bool hard_constraint = true);
         void removeConstraint(const ConstraintPtr& constraint);
         std::vector<ConstraintPtr> getConstraints();
 
@@ -67,8 +75,10 @@ namespace VirtualRobot
         int getCurrentIteration();
 
     protected:
-        void getUnitableNodes(const RobotNodePtr &robotNode, const RobotNodeSetPtr &nodeSet, std::vector<std::string> &unitable);
-        RobotPtr buildReducedRobot(const RobotPtr &original);
+        void getUnitableNodes(const RobotNodePtr& robotNode,
+                              const RobotNodeSetPtr& nodeSet,
+                              std::vector<std::string>& unitable);
+        RobotPtr buildReducedRobot(const RobotPtr& original);
 
     protected:
         std::vector<ConstraintPtr> constraints;
@@ -80,7 +90,7 @@ namespace VirtualRobot
         RobotNodeSetPtr nodeSet;
         Eigen::VectorXf initialConfig;
 
-        std::vector<std::pair<SeedType, Eigen::VectorXf> > seeds;
+        std::vector<std::pair<SeedType, Eigen::VectorXf>> seeds;
 
         int maxIterations;
         int currentIteration;
@@ -91,5 +101,4 @@ namespace VirtualRobot
     };
 
     typedef std::shared_ptr<ConstrainedIK> ConstrainedIKPtr;
-}
-
+} // namespace VirtualRobot

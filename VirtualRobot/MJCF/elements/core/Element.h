@@ -2,11 +2,10 @@
 
 #include <VirtualRobot/Util/xml/tinyxml2.h>
 
+#include "Visitor.h"
 #include "const_aware_ptr.hpp"
 #include "exceptions.h"
 #include "mjcf_utils.h"
-#include "Visitor.h"
-
 
 namespace mjcf
 {
@@ -18,19 +17,20 @@ namespace mjcf
     class Element
     {
     public:
-
         using Derived = _Derived;
 
         // Make all Element<*> friends of each other.
-        template <class OtherDerived> friend class Element;
+        template <class OtherDerived>
+        friend class Element;
 
 
     public:
-
         // CONSTRUCTORS
 
         /// Empty constructor.
-        Element() {}
+        Element()
+        {
+        }
 
         /**
          * @brief Construct and element with given document and underlying (tinyxml2) element.
@@ -39,7 +39,6 @@ namespace mjcf
         Element(Document* document, tinyxml2::XMLElement* element);
 
     protected:
-
         /**
          * Only allow inheriting classes to construct with a const pointers,
          * since const-ness is effectively cast away on construction, and offering
@@ -49,19 +48,24 @@ namespace mjcf
 
 
     public:
-
         // TYPE CHECKING
 
         /// Indicate whether this is an element of the given type.
         template <class OtherT>
-        static bool isSame() { return std::is_same<Derived, typename OtherT::Derived>(); }
-
+        static bool
+        isSame()
+        {
+            return std::is_same<Derived, typename OtherT::Derived>();
+        }
 
         /// Indicate whether the underlying element's tag is OtherT's tag.
         /// This should be true at virtually all times.
         template <class OtherT>
-        bool isElement() const { return OtherT::tag.empty() || std::string(_element->Value()) == OtherT::tag; }
-
+        bool
+        isElement() const
+        {
+            return OtherT::tag.empty() || std::string(_element->Value()) == OtherT::tag;
+        }
 
         // ATTRIBUTES
 
@@ -121,7 +125,8 @@ namespace mjcf
         OtherDerived nextSiblingElement(std::function<bool(OtherDerived)> predicate) const;
         /// Get the next sibling element of the given type with the given attribute value.
         template <class OtherDerived>
-        OtherDerived nextSiblingElement(const std::string& attrName, const std::string& attrValue) const;
+        OtherDerived nextSiblingElement(const std::string& attrName,
+                                        const std::string& attrValue) const;
 
 
         // PARENT
@@ -186,7 +191,6 @@ namespace mjcf
         template <class OtherDerived>
         OtherDerived transform();
 
-
         /**
          * @brief Reinterpret this element as the given element type.
          * This is only safe from and to `AnyElement`.
@@ -196,49 +200,74 @@ namespace mjcf
         //  to work without making document() and element() public (friend declaration does not
         //  seem to work). This seems to only effect the const methods.
         template <class OtherDerived>
-        OtherDerived reinterpret() const { return Element<OtherDerived>(_document, _element); }
-
+        OtherDerived
+        reinterpret() const
+        {
+            return Element<OtherDerived>(_document, _element);
+        }
 
         // OPERATORS
 
         /// Indicate whether this contains a valid element.
-        operator bool() const { return bool(_element); }
+        operator bool() const
+        {
+            return bool(_element);
+        }
 
         template <typename Derived>
         friend std::ostream& operator<<(std::ostream& os, const Element<Derived>& element);
 
 
     protected:
+        Document*
+        document()
+        {
+            return _document;
+        }
 
-        Document* document() { return _document; }
-        const Document* document() const  { return _document; }
+        const Document*
+        document() const
+        {
+            return _document;
+        }
 
-        tinyxml2::XMLElement* element() { return _element; }
-        const tinyxml2::XMLElement* element() const { return _element; }
+        tinyxml2::XMLElement*
+        element()
+        {
+            return _element;
+        }
+
+        const tinyxml2::XMLElement*
+        element() const
+        {
+            return _element;
+        }
 
 
     private:
-
         /// Get Derived::tag as c-string, or nullptr if Derived::tag is empty (AnyElement).
         /// The result can be passed to tinyxml2 methods taking element values (tags) as filters.
-        static const char* tag_c_str() { return Derived::tag.empty() ? nullptr : Derived::tag.c_str(); }
+        static const char*
+        tag_c_str()
+        {
+            return Derived::tag.empty() ? nullptr : Derived::tag.c_str();
+        }
 
         /// Use document to create a new element of type ElementD with given parent.
         template <class ParentD, class ElementD>
-        ElementD createElement(Element<ParentD> parent, const std::string& className = "",
+        ElementD createElement(Element<ParentD> parent,
+                               const std::string& className = "",
                                bool front = false);
 
         void assertElemValueEqualsTag();
 
         template <class OtherDerived>
-        std::function<bool(OtherDerived)> predicateWithAttrib(
-                const std::string& attrName, const std::string& attrValue) const;
+        std::function<bool(OtherDerived)> predicateWithAttrib(const std::string& attrName,
+                                                              const std::string& attrValue) const;
 
         Document* _document = nullptr;
         detail::const_aware_ptr<tinyxml2::XMLElement> _element = nullptr;
-
     };
-
 
     template <class D>
     Element<D>::Element(Document* document, tinyxml2::XMLElement* element) :
@@ -250,17 +279,20 @@ namespace mjcf
     template <class D>
     Element<D>::Element(const Document* document, const tinyxml2::XMLElement* element) :
         Element(const_cast<Document*>(document), const_cast<tinyxml2::XMLElement*>(element))
-    {}
+    {
+    }
 
     template <class D>
-    bool Element<D>::isAttributeSet(const std::string& attrName) const
+    bool
+    Element<D>::isAttributeSet(const std::string& attrName) const
     {
         return _element->Attribute(attrName.c_str()) != nullptr;
     }
 
     template <class D>
     template <typename AttrT>
-    AttrT Element<D>::getAttribute(const std::string& name) const
+    AttrT
+    Element<D>::getAttribute(const std::string& name) const
     {
         const char* attr = _element->Attribute(name.c_str());
         if (!attr)
@@ -274,21 +306,24 @@ namespace mjcf
 
     template <class D>
     template <typename AttrT>
-    AttrT Element<D>::getAttribute(const std::string& name, const AttrT& defaultValue) const
+    AttrT
+    Element<D>::getAttribute(const std::string& name, const AttrT& defaultValue) const
     {
         return isAttributeSet(name) ? getAttribute<AttrT>(name) : defaultValue;
     }
 
     template <class D>
-    template<typename AttrT>
-    void Element<D>::setAttribute(const std::string& name, const AttrT& value)
+    template <typename AttrT>
+    void
+    Element<D>::setAttribute(const std::string& name, const AttrT& value)
     {
         std::string attrStr = toAttr(value);
         _element->SetAttribute(name.c_str(), attrStr.c_str());
     }
 
     template <class D>
-    std::vector<std::string> Element<D>::getSetAttributeNames() const
+    std::vector<std::string>
+    Element<D>::getSetAttributeNames() const
     {
         std::vector<std::string> names;
         for (auto* attr = _element->FirstAttribute(); attr; attr = attr->Next())
@@ -299,35 +334,40 @@ namespace mjcf
     }
 
     template <class D>
-    bool Element<D>::hasChildren() const
+    bool
+    Element<D>::hasChildren() const
     {
         return !_element->NoChildren();
     }
 
     template <class D>
     template <class OtherD>
-    bool Element<D>::hasChild() const
+    bool
+    Element<D>::hasChild() const
     {
         return firstChild<OtherD>();
     }
 
     template <class D>
     template <class OtherD>
-    bool Element<D>::hasChild(std::function<bool(OtherD)> predicate) const
+    bool
+    Element<D>::hasChild(std::function<bool(OtherD)> predicate) const
     {
         return firstChild<OtherD>(predicate);
     }
 
     template <class D>
     template <class OtherD>
-    bool Element<D>::hasChild(const std::string& attrName, const std::string& attrValue) const
+    bool
+    Element<D>::hasChild(const std::string& attrName, const std::string& attrValue) const
     {
         return firstChild<OtherD>(attrName, attrValue);
     }
 
     template <class D>
     template <class OtherD>
-    OtherD Element<D>::firstChild() const
+    OtherD
+    Element<D>::firstChild() const
     {
         return Element<OtherD>(_document, /*may be null*/
                                _element->FirstChildElement(OtherD::tag_c_str()));
@@ -335,7 +375,8 @@ namespace mjcf
 
     template <class D>
     template <class OtherD>
-    OtherD Element<D>::firstChild(std::function<bool(OtherD)> predicate) const
+    OtherD
+    Element<D>::firstChild(std::function<bool(OtherD)> predicate) const
     {
         for (OtherD child = firstChild<OtherD>(); child;
              child = child.template nextSiblingElement<OtherD>())
@@ -350,15 +391,16 @@ namespace mjcf
 
     template <class D>
     template <class OtherD>
-    OtherD Element<D>::firstChild(const std::string& attrName, const std::string& attrValue) const
+    OtherD
+    Element<D>::firstChild(const std::string& attrName, const std::string& attrValue) const
     {
         return firstChild<OtherD>(predicateWithAttrib<OtherD>(attrName, attrValue));
     }
 
-
     template <class D>
     template <class OtherD>
-    std::vector<OtherD> Element<D>::getChildren() const
+    std::vector<OtherD>
+    Element<D>::getChildren() const
     {
         std::vector<OtherD> children;
         for (OtherD child = firstChild<OtherD>(); child;
@@ -369,17 +411,18 @@ namespace mjcf
         return children;
     }
 
-
     template <class D>
     template <class OtherD>
-    OtherD Element<D>::nextSiblingElement() const
+    OtherD
+    Element<D>::nextSiblingElement() const
     {
         return Element<OtherD>(_document, _element->NextSiblingElement(OtherD::tag_c_str()));
     }
 
     template <class D>
     template <class OtherD>
-    OtherD Element<D>::nextSiblingElement(std::function<bool (OtherD)> predicate) const
+    OtherD
+    Element<D>::nextSiblingElement(std::function<bool(OtherD)> predicate) const
     {
         for (OtherD sibling = nextSiblingElement<OtherD>(); sibling;
              sibling = sibling.template nextSiblingElement<OtherD>())
@@ -393,38 +436,41 @@ namespace mjcf
     }
 
     template <class D>
-    template<class OtherD>
-    OtherD Element<D>::nextSiblingElement(const std::string& attrName, const std::string& attrValue) const
+    template <class OtherD>
+    OtherD
+    Element<D>::nextSiblingElement(const std::string& attrName, const std::string& attrValue) const
     {
         return nextSiblingElement<OtherD>(predicateWithAttrib<OtherD>(attrName, attrValue));
     }
 
-
     template <class D>
     template <class ParentDerived>
-    ParentDerived Element<D>::parent()
+    ParentDerived
+    Element<D>::parent()
     {
-        return { _document, _element->Parent()->ToElement() };
+        return {_document, _element->Parent()->ToElement()};
     }
 
     template <class D>
     template <class ParentDerived>
-    const ParentDerived Element<D>::parent() const
+    const ParentDerived
+    Element<D>::parent() const
     {
         return Element<ParentDerived>(_document, _element->Parent()->ToElement());
     }
 
-
     template <class D>
     template <class OtherD>
-    OtherD Element<D>::addChild(const std::string& className, bool front)
+    OtherD
+    Element<D>::addChild(const std::string& className, bool front)
     {
         return createElement<D, OtherD>(*this, className, front);
     }
 
     template <class D>
     template <class OtherD>
-    OtherD Element<D>::getOrCreateChild()
+    OtherD
+    Element<D>::getOrCreateChild()
     {
         OtherD child = firstChild<OtherD>();
         if (!child)
@@ -434,57 +480,64 @@ namespace mjcf
         return child;
     }
 
-
     template <class D>
     template <class OtherD>
-    void Element<D>::insertChild(Element<OtherD>& element, bool front)
+    void
+    Element<D>::insertChild(Element<OtherD>& element, bool front)
     {
         front ? insertFirstChild(element) : insertEndChild(element());
     }
 
     template <class D>
     template <class OtherD>
-    void Element<D>::insertFirstChild(Element<OtherD>& element)
+    void
+    Element<D>::insertFirstChild(Element<OtherD>& element)
     {
         _element->InsertFirstChild(element._element);
     }
 
     template <class D>
     template <class OtherD>
-    void Element<D>::insertEndChild(Element<OtherD>& element)
+    void
+    Element<D>::insertEndChild(Element<OtherD>& element)
     {
         _element->InsertEndChild(element._element);
     }
 
     template <class D>
     template <class OtherD>
-    void Element<D>::deleteChild(Element<OtherD>& element)
+    void
+    Element<D>::deleteChild(Element<OtherD>& element)
     {
         _element->DeleteChild(element._element);
     }
 
     template <class D>
-    bool Element<D>::accept(Visitor& visitor)
+    bool
+    Element<D>::accept(Visitor& visitor)
     {
         return _element->Accept(visitor.adapter());
     }
 
     template <class D>
-    auto Element<D>::deepClone() const -> Derived
+    auto
+    Element<D>::deepClone() const -> Derived
     {
-        return { _document, _element->DeepClone(nullptr)->ToElement() };
+        return {_document, _element->DeepClone(nullptr)->ToElement()};
     }
 
     template <class D>
     template <class OtherD>
-    OtherD Element<D>::transform()
+    OtherD
+    Element<D>::transform()
     {
         _element->SetValue(OtherD::tag.c_str());
-        return { _document, _element };
+        return {_document, _element};
     }
 
     template <class D>
-    void Element<D>::assertElemValueEqualsTag()
+    void
+    Element<D>::assertElemValueEqualsTag()
     {
         if (_element && !isElement<D>())
         {
@@ -494,39 +547,56 @@ namespace mjcf
 
     template <class D>
     template <class OtherDerived>
-    std::function<bool(OtherDerived)> Element<D>::predicateWithAttrib(
-            const std::string& attrName, const std::string& attrValue) const
+    std::function<bool(OtherDerived)>
+    Element<D>::predicateWithAttrib(const std::string& attrName, const std::string& attrValue) const
     {
         return [&attrName, &attrValue](OtherDerived e)
-        {
-            return e.isAttributeSet(attrName) && e.getAttribute(attrName) == attrValue;
-        };
+        { return e.isAttributeSet(attrName) && e.getAttribute(attrName) == attrValue; };
     }
 
     template <class D>
-    std::ostream& operator<<(std::ostream& os, const Element<D>& element)
+    std::ostream&
+    operator<<(std::ostream& os, const Element<D>& element)
     {
         os << "MJCF Element '" << D::tag << "' (-> " << element._element << ")";
         return os;
     }
 
+#define mjcf_ElementDerivedConstructorsBase(Base, Derived)                                         \
+    Derived() : Base<Derived>()                                                                    \
+    {                                                                                              \
+    }                                                                                              \
+    Derived(Document* document, ::tinyxml2::XMLElement* elem) : Base<Derived>(document, elem)      \
+    {                                                                                              \
+    }                                                                                              \
+    Derived(const Base<Derived>& base) : Base<Derived>(base)                                       \
+    {                                                                                              \
+    }                                                                                              \
+    Derived(const Derived& other) : Base<Derived>(other)                                           \
+    {                                                                                              \
+    }                                                                                              \
+    Derived(Derived&& other) : Base<Derived>(other)                                                \
+    {                                                                                              \
+    }                                                                                              \
+    Derived& operator=(const Base<Derived>& base)                                                  \
+    {                                                                                              \
+        Base<Derived>::operator=(base);                                                            \
+        return *this;                                                                              \
+    }                                                                                              \
+    Derived& operator=(const Derived& other)                                                       \
+    {                                                                                              \
+        Base<Derived>::operator=(other);                                                           \
+        return *this;                                                                              \
+    }                                                                                              \
+    Derived& operator=(Derived&& other)                                                            \
+    {                                                                                              \
+        Base<Derived>::operator=(other);                                                           \
+        return *this;                                                                              \
+    }
 
-#define mjcf_ElementDerivedConstructorsBase(Base, Derived)  \
-    Derived() : Base<Derived>() {}                   \
-    Derived(Document* document, ::tinyxml2::XMLElement* elem) : Base<Derived>(document, elem) {} \
-    Derived(const Base<Derived>& base) : Base<Derived>(base) {}      \
-    Derived(const Derived& other) : Base<Derived>(other) {} \
-    Derived(Derived&& other) : Base<Derived>(other) {}      \
-    Derived& operator=(const Base<Derived>& base)           \
-    { Base<Derived>::operator=(base);  return *this; }      \
-    Derived& operator=(const Derived& other)                \
-    { Base<Derived>::operator=(other); return *this; }      \
-    Derived& operator=(Derived&& other)                     \
-    { Base<Derived>::operator=(other); return *this; }
 
-
-#define mjcf_ElementDerivedConstructors(Derived)            \
+#define mjcf_ElementDerivedConstructors(Derived)                                                   \
     mjcf_ElementDerivedConstructorsBase(Element, Derived)
 
 
-}
+} // namespace mjcf

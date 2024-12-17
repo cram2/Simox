@@ -20,13 +20,20 @@
  */
 
 #include "Kernels.h"
-#include "Helpers.h"
+
 #include <cmath>
 #include <iostream>
 
+#include "Helpers.h"
+
 namespace math
 {
-    float KernelWithDerivatives::Kernel(const Eigen::Vector3f& p1, const Eigen::Vector3f& p2, float R, int i, int j) const
+    float
+    KernelWithDerivatives::Kernel(const Eigen::Vector3f& p1,
+                                  const Eigen::Vector3f& p2,
+                                  float R,
+                                  int i,
+                                  int j) const
     {
         if (i == 0 && j == 0)
         {
@@ -43,7 +50,11 @@ namespace math
         return Kernel_didj(p1, p2, R, i - 1, j - 1);
     }
 
-    float KernelWithDerivatives::Kernel_di(const Eigen::Vector3f& p1, const Eigen::Vector3f& p2, float R, int i) const
+    float
+    KernelWithDerivatives::Kernel_di(const Eigen::Vector3f& p1,
+                                     const Eigen::Vector3f& p2,
+                                     float R,
+                                     int i) const
     {
         float r = (p1 - p2).norm();
         float x = p1.x() - p2.x();
@@ -52,7 +63,12 @@ namespace math
         swap(x, y, z, i);
         return Kernel_dx(x, y, z, r, R);
     }
-    float KernelWithDerivatives::Kernel_dj(const Eigen::Vector3f& p1, const Eigen::Vector3f& p2, float R, int j) const
+
+    float
+    KernelWithDerivatives::Kernel_dj(const Eigen::Vector3f& p1,
+                                     const Eigen::Vector3f& p2,
+                                     float R,
+                                     int j) const
     {
         float r = (p1 - p2).norm();
         float x = p1.x() - p2.x();
@@ -62,7 +78,12 @@ namespace math
         return -Kernel_dx(x, y, z, r, R);
     }
 
-    float KernelWithDerivatives::Kernel_didj(const Eigen::Vector3f& p1, const Eigen::Vector3f& p2, float R, int i, int j) const
+    float
+    KernelWithDerivatives::Kernel_didj(const Eigen::Vector3f& p1,
+                                       const Eigen::Vector3f& p2,
+                                       float R,
+                                       int i,
+                                       int j) const
     {
         float r = (p1 - p2).norm();
         float x = p1.x() - p2.x();
@@ -84,7 +105,8 @@ namespace math
         return -Kernel_dxdy(x, y, z, r, R);
     }
 
-    void KernelWithDerivatives::swap(float& x, float& y, float& z, int index) const
+    void
+    KernelWithDerivatives::swap(float& x, float& y, float& z, int index) const
     {
         switch (index)
         {
@@ -101,44 +123,53 @@ namespace math
         }
     }
 
-    GaussianKernel::GaussianKernel(float lengthScale)
-        : lengthScale(lengthScale) {}
+    GaussianKernel::GaussianKernel(float lengthScale) : lengthScale(lengthScale)
+    {
+    }
 
-    float GaussianKernel::Kernel(const Eigen::Vector3f& p1, const Eigen::Vector3f& p2, float /*R*/) const
+    float
+    GaussianKernel::Kernel(const Eigen::Vector3f& p1, const Eigen::Vector3f& p2, float /*R*/) const
     {
         const float tmp = (p1 - p2).squaredNorm() / (2 * lengthScale * lengthScale);
         //std::cout << (2*lengthScale*lengthScale) << " " << (p1 - p2).squaredNorm() << " " <<  tmp << std::endl;
         return std::exp(-tmp);
     }
 
-    float GaussianKernel::Kernel_dx(float /*x*/, float /*y*/, float /*z*/, float /*r*/, float /*R*/) const
+    float
+    GaussianKernel::Kernel_dx(float /*x*/, float /*y*/, float /*z*/, float /*r*/, float /*R*/) const
     {
         throw std::runtime_error("function not implemented");
     }
 
-    float GaussianKernel::Kernel_ddx(float /*x*/, float /*y*/, float /*z*/, float /*r*/, float /*R*/) const
+    float
+    GaussianKernel::Kernel_ddx(float /*x*/, float /*y*/, float /*z*/, float /*r*/, float /*R*/)
+        const
     {
         throw std::runtime_error("function not implemented");
     }
 
-    float GaussianKernel::Kernel_dxdy(float /*x*/, float /*y*/, float /*z*/, float /*r*/, float /*R*/) const
+    float
+    GaussianKernel::Kernel_dxdy(float /*x*/, float /*y*/, float /*z*/, float /*r*/, float /*R*/)
+        const
     {
         throw std::runtime_error("function not implemented");
     }
 
-
-    float WilliamsPlusKernel::Kernel(const Eigen::Vector3f& p1, const Eigen::Vector3f& p2, float R) const
+    float
+    WilliamsPlusKernel::Kernel(const Eigen::Vector3f& p1, const Eigen::Vector3f& p2, float R) const
     {
         float r = (p1 - p2).norm();
         return 2 * r * r * r + 3 * R * r * r + R * R * R;
     }
 
-    float WilliamsPlusKernel::Kernel_dx(float x, float /*y*/, float /*z*/, float r, float R) const
+    float
+    WilliamsPlusKernel::Kernel_dx(float x, float /*y*/, float /*z*/, float r, float R) const
     {
         return 6 * x * (r + R);
     }
 
-    float WilliamsPlusKernel::Kernel_ddx(float x, float /*y*/, float /*z*/, float r, float R) const
+    float
+    WilliamsPlusKernel::Kernel_ddx(float x, float /*y*/, float /*z*/, float r, float R) const
     {
         if (r == 0)
         {
@@ -147,7 +178,8 @@ namespace math
         return 6 * (R + r) + 6 * x * x / r;
     }
 
-    float WilliamsPlusKernel::Kernel_dxdy(float x, float y, float /*z*/, float r, float /*R*/) const
+    float
+    WilliamsPlusKernel::Kernel_dxdy(float x, float y, float /*z*/, float r, float /*R*/) const
     {
         if (r == 0)
         {
@@ -156,18 +188,21 @@ namespace math
         return 6 * x * y / r;
     }
 
-    float WilliamsMinusKernel::Kernel(const Eigen::Vector3f& p1, const Eigen::Vector3f& p2, float R) const
+    float
+    WilliamsMinusKernel::Kernel(const Eigen::Vector3f& p1, const Eigen::Vector3f& p2, float R) const
     {
         float r = (p1 - p2).norm();
         return 2 * r * r * r - 3 * R * r * r + R * R * R;
     }
 
-    float WilliamsMinusKernel::Kernel_dx(float x, float /*y*/, float /*z*/, float r, float R) const
+    float
+    WilliamsMinusKernel::Kernel_dx(float x, float /*y*/, float /*z*/, float r, float R) const
     {
         return 6 * x * (r - R);
     }
 
-    float WilliamsMinusKernel::Kernel_ddx(float x, float /*y*/, float /*z*/, float r, float R) const
+    float
+    WilliamsMinusKernel::Kernel_ddx(float x, float /*y*/, float /*z*/, float r, float R) const
     {
         if (r == 0)
         {
@@ -176,7 +211,8 @@ namespace math
         return -6 * (r - R) + 6 * x * x / r;
     }
 
-    float WilliamsMinusKernel::Kernel_dxdy(float x, float y, float /*z*/, float r, float /*R*/) const
+    float
+    WilliamsMinusKernel::Kernel_dxdy(float x, float y, float /*z*/, float r, float /*R*/) const
     {
         if (r == 0)
         {
@@ -184,4 +220,4 @@ namespace math
         }
         return -6 * x * y / r;
     }
-}
+} // namespace math

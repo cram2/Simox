@@ -21,7 +21,9 @@
 *
 */
 #include "MeshConverter.h"
+
 #include <VirtualRobot/Visualization/VisualizationFactory.h>
+
 #include "VirtualRobot/CollisionDetection/CollisionModel.h"
 #include <GraspPlanning/ConvexHullGenerator.h>
 
@@ -30,7 +32,9 @@ using namespace VirtualRobot;
 
 namespace GraspStudio
 {
-    VirtualRobot::ManipulationObjectPtr MeshConverter::CreateManipulationObject(const std::string& name, VirtualRobot::MathTools::ConvexHull3DPtr hull)
+    VirtualRobot::ManipulationObjectPtr
+    MeshConverter::CreateManipulationObject(const std::string& name,
+                                            VirtualRobot::MathTools::ConvexHull3DPtr hull)
     {
         VirtualRobot::ManipulationObjectPtr res;
 
@@ -61,8 +65,8 @@ namespace GraspStudio
         return res;
     }
 
-
-    VirtualRobot::TriMeshModelPtr MeshConverter::CreateTriMeshModel(VirtualRobot::MathTools::ConvexHull3DPtr hull)
+    VirtualRobot::TriMeshModelPtr
+    MeshConverter::CreateTriMeshModel(VirtualRobot::MathTools::ConvexHull3DPtr hull)
     {
         VirtualRobot::TriMeshModelPtr res(new TriMeshModel());
 
@@ -101,7 +105,8 @@ namespace GraspStudio
         return res;
     }
 
-    int MeshConverter::hasVertex(std::vector< Eigen::Vector3f>& vectList, Eigen::Vector3f& obj)
+    int
+    MeshConverter::hasVertex(std::vector<Eigen::Vector3f>& vectList, Eigen::Vector3f& obj)
     {
         for (size_t j = 0; j < vectList.size(); j++)
         {
@@ -114,7 +119,10 @@ namespace GraspStudio
         return -1;
     }
 
-    VirtualRobot::ObstaclePtr MeshConverter::RefineObjectSurface(VirtualRobot::ObstaclePtr object, float maxDist, bool verbose)
+    VirtualRobot::ObstaclePtr
+    MeshConverter::RefineObjectSurface(VirtualRobot::ObstaclePtr object,
+                                       float maxDist,
+                                       bool verbose)
     {
         VirtualRobot::ObstaclePtr res;
 
@@ -215,7 +223,8 @@ namespace GraspStudio
         return res;
     }
 
-    void MeshConverter::checkAndSplitVertex(VirtualRobot::TriMeshModelPtr tm, int faceIdx, float maxDist)
+    void
+    MeshConverter::checkAndSplitVertex(VirtualRobot::TriMeshModelPtr tm, int faceIdx, float maxDist)
     {
         VR_ASSERT(tm);
         VR_ASSERT(faceIdx >= 0 && faceIdx < (int)tm->faces.size());
@@ -285,7 +294,6 @@ namespace GraspStudio
 
                 // update current face
                 tm->faces[faceIdx].id1 = id4;
-
             }
 
             checkFaceIdx = tm->faces.size() - 1;
@@ -296,7 +304,8 @@ namespace GraspStudio
         }
     }
 
-    float MeshConverter::getMaxVertexDistance(VirtualRobot::TriMeshModelPtr tm)
+    float
+    MeshConverter::getMaxVertexDistance(VirtualRobot::TriMeshModelPtr tm)
     {
         if (!tm)
         {
@@ -333,7 +342,6 @@ namespace GraspStudio
         }
 
         return maxDist;
-
     }
 
-}
+} // namespace GraspStudio

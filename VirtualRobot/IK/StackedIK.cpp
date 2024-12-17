@@ -24,29 +24,31 @@
 #include "StackedIK.h"
 
 #include <VirtualRobot/MathTools.h>
+
 #include "VirtualRobotException.h"
 
 using namespace VirtualRobot;
 
 namespace VirtualRobot
 {
-    StackedIK::StackedIK(VirtualRobot::RobotNodeSetPtr rns, JacobiProvider::InverseJacobiMethod method) :
-        rns(rns),
-        method(method)
+    StackedIK::StackedIK(VirtualRobot::RobotNodeSetPtr rns,
+                         JacobiProvider::InverseJacobiMethod method) :
+        rns(rns), method(method)
     {
         VR_ASSERT(this->rns);
         verbose = false;
     }
 
-    StackedIK::~StackedIK()
-    = default;
+    StackedIK::~StackedIK() = default;
 
-    void StackedIK::setVerbose(bool v)
+    void
+    StackedIK::setVerbose(bool v)
     {
         verbose = v;
     }
 
-    Eigen::VectorXf StackedIK::computeStep(const std::vector<JacobiProviderPtr>& jacDefs, float stepSize)
+    Eigen::VectorXf
+    StackedIK::computeStep(const std::vector<JacobiProviderPtr>& jacDefs, float stepSize)
     {
         VR_ASSERT(jacDefs.size() > 0);
 
@@ -56,13 +58,15 @@ namespace VirtualRobot
 
         for (size_t i = 0; i < jacDefs.size(); i++)
         {
-            THROW_VR_EXCEPTION_IF(!jacDefs[0]->isInitialized(), "JacobiProvider is not initialized");
+            THROW_VR_EXCEPTION_IF(!jacDefs[0]->isInitialized(),
+                                  "JacobiProvider is not initialized");
 
             Eigen::MatrixXf J = jacDefs[i]->getJacobianMatrix();
             Eigen::VectorXf e = jacDefs[i]->getError();
 
             THROW_VR_EXCEPTION_IF(J.cols() != total_cols, "Jacobian size mismatch");
-            THROW_VR_EXCEPTION_IF(J.rows() != e.rows(), "Jacobian matrix and error vector don't match");
+            THROW_VR_EXCEPTION_IF(J.rows() != e.rows(),
+                                  "Jacobian matrix and error vector don't match");
 
             total_rows += J.rows();
         }
@@ -73,7 +77,7 @@ namespace VirtualRobot
 
         int current_row = 0;
 
-        for (const auto & jacDef : jacDefs)
+        for (const auto& jacDef : jacDefs)
         {
             Eigen::MatrixXf J = jacDef->getJacobianMatrix();
             jacobian.block(current_row, 0, J.rows(), J.cols()) = J;

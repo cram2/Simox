@@ -27,13 +27,12 @@
 namespace math
 {
 
-      class Primitive :
-              public std::vector<Triangle>
-      {
-         public:
-              void AddTriangle(Eigen::Vector3f v1, Eigen::Vector3f v2, Eigen::Vector3f v3);
-          private:
-      };
+    class Primitive : public std::vector<Triangle>
+    {
+    public:
+        void AddTriangle(Eigen::Vector3f v1, Eigen::Vector3f v2, Eigen::Vector3f v3);
 
-}
+    private:
+    };
 
+} // namespace math

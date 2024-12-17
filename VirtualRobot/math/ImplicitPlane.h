@@ -21,43 +21,59 @@
 
 #pragma once
 
-#include "MathForwardDefinitions.h"
 #include "AbstractFunctionR3R1.h"
+#include "MathForwardDefinitions.h"
 
 namespace math
 {
 
-class ImplicitPlane
-        : public SimpleAbstractFunctionR3R1
-{
-public:
-    // ax + by + cz = d
-    ImplicitPlane(float a, float b, float c, float d);
+    class ImplicitPlane : public SimpleAbstractFunctionR3R1
+    {
+    public:
+        // ax + by + cz = d
+        ImplicitPlane(float a, float b, float c, float d);
 
-    float A() { return a; }
-    float B() { return b; }
-    float C() { return c; }
-    float D() { return d; }
+        float
+        A()
+        {
+            return a;
+        }
 
-    ImplicitPlane Normalize();
-    ImplicitPlane Flipped();
-    Eigen::Vector3f GetNormal();
-    Eigen::Vector3f GetClosestPoint(Eigen::Vector3f v);
-    static ImplicitPlane FromPositionNormal(Eigen::Vector3f pos, Eigen::Vector3f normal);
-    static ImplicitPlane FromContact(Contact c);
-    float GetSignedDistance(const Eigen::Vector3f& p);
+        float
+        B()
+        {
+            return b;
+        }
 
-    // https://de.wikipedia.org/wiki/Schnittgerade
-    Line Intersect(Plane plane);
+        float
+        C()
+        {
+            return c;
+        }
 
-    float Get(Eigen::Vector3f pos) override;
+        float
+        D()
+        {
+            return d;
+        }
 
-private:
-    float a;
-    float b;
-    float c;
-    float d;
+        ImplicitPlane Normalize();
+        ImplicitPlane Flipped();
+        Eigen::Vector3f GetNormal();
+        Eigen::Vector3f GetClosestPoint(Eigen::Vector3f v);
+        static ImplicitPlane FromPositionNormal(Eigen::Vector3f pos, Eigen::Vector3f normal);
+        static ImplicitPlane FromContact(Contact c);
+        float GetSignedDistance(const Eigen::Vector3f& p);
 
-};
-}
+        // https://de.wikipedia.org/wiki/Schnittgerade
+        Line Intersect(Plane plane);
 
+        float Get(Eigen::Vector3f pos) override;
+
+    private:
+        float a;
+        float b;
+        float c;
+        float d;
+    };
+} // namespace math

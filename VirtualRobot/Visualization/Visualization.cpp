@@ -6,9 +6,10 @@
 
 
 #include "Visualization.h"
-#include "VisualizationNode.h"
 
 #include <iostream>
+
+#include "VisualizationNode.h"
 
 namespace VirtualRobot
 {
@@ -25,43 +26,47 @@ namespace VirtualRobot
         this->visualizationNodes = visualizationNodes;
     }
 
-    Visualization::~Visualization()
-    = default;
+    Visualization::~Visualization() = default;
 
-    VirtualRobot::VisualizationPtr Visualization::clone()
+    VirtualRobot::VisualizationPtr
+    Visualization::clone()
     {
         VR_ERROR << " clone nyi\n";
         return VisualizationPtr();
     }
 
-    bool Visualization::isVisualizationNodeRegistered(VisualizationNodePtr visualizationNode)
+    bool
+    Visualization::isVisualizationNodeRegistered(VisualizationNodePtr visualizationNode)
     {
-        std::vector<VisualizationNodePtr>::iterator i = find(visualizationNodes.begin(), visualizationNodes.end(), visualizationNode);
+        std::vector<VisualizationNodePtr>::iterator i =
+            find(visualizationNodes.begin(), visualizationNodes.end(), visualizationNode);
         return (i != visualizationNodes.end());
     }
 
-
-    bool Visualization::highlight(VisualizationNodePtr /*visualizationNode*/, bool /*enable*/)
+    bool
+    Visualization::highlight(VisualizationNodePtr /*visualizationNode*/, bool /*enable*/)
     {
         return false;
     }
 
-    bool Visualization::highlight(unsigned int /*which*/, bool /*enable*/)
+    bool
+    Visualization::highlight(unsigned int /*which*/, bool /*enable*/)
     {
         return false;
     }
 
-    void Visualization::colorize(VisualizationFactory::Color /*c*/)
+    void
+    Visualization::colorize(VisualizationFactory::Color /*c*/)
     {
-
     }
 
-    void Visualization::setTransparency(float /*transparency*/)
+    void
+    Visualization::setTransparency(float /*transparency*/)
     {
-
     }
 
-    int Visualization::getNumFaces()
+    int
+    Visualization::getNumFaces()
     {
         int res = 0;
         std::vector<VisualizationNodePtr>::iterator i = visualizationNodes.begin();

@@ -6,14 +6,15 @@
 
 #define BOOST_TEST_MODULE VirtualRobot_CompressionBZip2Test
 
-#include <VirtualRobot/VirtualRobotTest.h>
-#include <VirtualRobot/Compression/CompressionBZip2.h>
-#include <VirtualRobot/VirtualRobotException.h>
-#include <Eigen/Core>
-
+#include <ctime>
 #include <fstream>
 #include <istream>
-#include <ctime>
+
+#include <Eigen/Core>
+
+#include <VirtualRobot/Compression/CompressionBZip2.h>
+#include <VirtualRobot/VirtualRobotException.h>
+#include <VirtualRobot/VirtualRobotTest.h>
 
 BOOST_AUTO_TEST_SUITE(Compression)
 
@@ -32,7 +33,7 @@ BOOST_AUTO_TEST_CASE(testNullBlock)
     // COMPRESS
     std::stringstream ios;
     unsigned char blockN[BLOCK_SIZE_COMPRESSION_TEST];
-    memset(blockN, 0, sizeof(unsigned char)*BLOCK_SIZE_COMPRESSION_TEST);
+    memset(blockN, 0, sizeof(unsigned char) * BLOCK_SIZE_COMPRESSION_TEST);
     VirtualRobot::CompressionBZip2* bzip2 = nullptr;
     BOOST_CHECK_NO_THROW(bzip2 = new VirtualRobot::CompressionBZip2((std::ostream*)(&ios)));
 
@@ -48,7 +49,7 @@ BOOST_AUTO_TEST_CASE(testNullBlock)
     // set position to start
     ios.seekg(0);
     unsigned char blockN2[BLOCK_SIZE_COMPRESSION_TEST];
-    memset(blockN2, 1, sizeof(unsigned char)*BLOCK_SIZE_COMPRESSION_TEST);
+    memset(blockN2, 1, sizeof(unsigned char) * BLOCK_SIZE_COMPRESSION_TEST);
     VirtualRobot::CompressionBZip2* bzip2b = nullptr;
     BOOST_CHECK_NO_THROW(bzip2b = new VirtualRobot::CompressionBZip2((std::istream*)(&ios)));
 
@@ -64,13 +65,12 @@ BOOST_AUTO_TEST_CASE(testNullBlock)
 
     for (unsigned char i : blockN2)
     {
-        (void) i;
-//        BOOST_CHECK_EQUAL(i, 0);
+        (void)i;
+        //        BOOST_CHECK_EQUAL(i, 0);
     }
 
     delete bzip2;
     delete bzip2b;
-
 }
 
 #define NR_BLOCKS_COMPRESSION_TEST 17
@@ -96,10 +96,10 @@ BOOST_AUTO_TEST_CASE(testMultipleRandomBlocks)
 
     bool ok = false;
 
-    for (auto & j : blockN)
+    for (auto& j : blockN)
     {
         BOOST_CHECK_NO_THROW(ok = bzip2->write((void*)j, BLOCK_SIZE_COMPRESSION_TEST));
-//        BOOST_CHECK_EQUAL(ok, true);
+        //        BOOST_CHECK_EQUAL(ok, true);
     }
 
     BOOST_CHECK_NO_THROW(ok = bzip2->close());
@@ -116,11 +116,11 @@ BOOST_AUTO_TEST_CASE(testMultipleRandomBlocks)
     ok = false;
     int nrBytes = 0;
 
-    for (auto & j : blockN2)
+    for (auto& j : blockN2)
     {
         BOOST_CHECK_NO_THROW(ok = bzip2b->read((void*)j, BLOCK_SIZE_COMPRESSION_TEST, nrBytes));
-//        BOOST_CHECK_EQUAL(ok, true);
-//        BOOST_CHECK_EQUAL(nrBytes, BLOCK_SIZE_COMPRESSION_TEST);
+        //        BOOST_CHECK_EQUAL(ok, true);
+        //        BOOST_CHECK_EQUAL(nrBytes, BLOCK_SIZE_COMPRESSION_TEST);
     }
 
     BOOST_CHECK_NO_THROW(ok = bzip2b->close());
@@ -133,7 +133,7 @@ BOOST_AUTO_TEST_CASE(testMultipleRandomBlocks)
     {
         for (int j = 0; j < BLOCK_SIZE_COMPRESSION_TEST; j++)
         {
-//            BOOST_CHECK_EQUAL(blockN2[i][j], blockN[i][j]);
+            //            BOOST_CHECK_EQUAL(blockN2[i][j], blockN[i][j]);
         }
     }
 
@@ -141,14 +141,13 @@ BOOST_AUTO_TEST_CASE(testMultipleRandomBlocks)
     delete bzip2b;
 }
 
-
 BOOST_AUTO_TEST_CASE(testCorrectEnding)
 {
     static const int sizeSmall = 23;
     // COMPRESS
     std::stringstream ios;
     unsigned char blockN[sizeSmall];
-    memset(blockN, 0, sizeof(unsigned char)*sizeSmall);
+    memset(blockN, 0, sizeof(unsigned char) * sizeSmall);
     VirtualRobot::CompressionBZip2* bzip2 = nullptr;
     BOOST_CHECK_NO_THROW(bzip2 = new VirtualRobot::CompressionBZip2((std::ostream*)(&ios)));
 
@@ -169,7 +168,7 @@ BOOST_AUTO_TEST_CASE(testCorrectEnding)
     // set position to start
     ios.seekg(0);
     unsigned char blockN2[sizeSmall];
-    memset(blockN2, 1, sizeof(unsigned char)*sizeSmall);
+    memset(blockN2, 1, sizeof(unsigned char) * sizeSmall);
     VirtualRobot::CompressionBZip2* bzip2b = nullptr;
     BOOST_CHECK_NO_THROW(bzip2b = new VirtualRobot::CompressionBZip2((std::istream*)(&ios)));
 
@@ -182,10 +181,10 @@ BOOST_AUTO_TEST_CASE(testCorrectEnding)
     BOOST_CHECK_EQUAL(ok, true);
 
 
-//    for (unsigned char i : blockN2)
-//    {
-//        BOOST_CHECK_EQUAL(i, 0);
-//    }
+    //    for (unsigned char i : blockN2)
+    //    {
+    //        BOOST_CHECK_EQUAL(i, 0);
+    //    }
 
     BOOST_CHECK_EQUAL(ios.eof(), false);
 
@@ -210,7 +209,6 @@ BOOST_AUTO_TEST_CASE(testCorrectEnding)
 
     delete bzip2;
     delete bzip2b;
-
 }
 
 

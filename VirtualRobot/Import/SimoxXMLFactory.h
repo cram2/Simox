@@ -22,29 +22,28 @@
 */
 #pragma once
 
-#include "../VirtualRobot.h"
 #include "../Robot.h"
+#include "../VirtualRobot.h"
 #include "RobotImporterFactory.h"
-
-
-
 
 namespace VirtualRobot
 {
     class Robot;
 
-    class VIRTUAL_ROBOT_IMPORT_EXPORT SimoxXMLFactory  : public RobotImporterFactory
+    class VIRTUAL_ROBOT_IMPORT_EXPORT SimoxXMLFactory : public RobotImporterFactory
     {
     public:
         SimoxXMLFactory();
         ~SimoxXMLFactory() override;
 
-        RobotPtr loadFromFile(const std::string& filename, RobotIO::RobotDescription loadMode = RobotIO::eFull) override;
+        RobotPtr loadFromFile(const std::string& filename,
+                              RobotIO::RobotDescription loadMode = RobotIO::eFull) override;
 
         // AbstractFactoryMethod
     public:
         static std::string getName();
         static std::shared_ptr<RobotImporterFactory> createInstance(void*);
+
     private:
         static SubClassRegistry registry;
 
@@ -56,4 +55,3 @@ namespace VirtualRobot
     };
 
 } // namespace VirtualRobot
-

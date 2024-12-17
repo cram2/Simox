@@ -2,7 +2,6 @@
 
 namespace VirtualRobot
 {
-    IKSolver::IKSolver()
-    = default;
+    IKSolver::IKSolver() = default;
 
 } // namespace VirtualRobot

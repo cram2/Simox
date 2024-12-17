@@ -8,7 +8,7 @@ namespace SimDynamics
     {
         this->world = world;
         SIMDYNAMICS_ASSERT(world);
-        m_sundirection = btVector3(1, 1, -2) * BulletObject::ScaleFactor * 1000 ;
+        m_sundirection = btVector3(1, 1, -2) * BulletObject::ScaleFactor * 1000;
 
         bulletEngine = std::dynamic_pointer_cast<BulletEngine>(world->getEngine());
 
@@ -30,7 +30,8 @@ namespace SimDynamics
         clientResetScene();
     }
 
-    void BulletOpenGLViewer::clientMoveAndDisplay()
+    void
+    BulletOpenGLViewer::clientMoveAndDisplay()
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -46,9 +47,9 @@ namespace SimDynamics
 
         if (m_dynamicsWorld)
         {
-            btScalar dt1 = 0.015;//btScalar(ms / 1000000.0f);
-//            std::cout << "dt1: " << dt1  << " internal: " << (1./140.f) << std::endl;
-            m_dynamicsWorld->stepSimulation(dt1, 100, 1./140.f);
+            btScalar dt1 = 0.015; //btScalar(ms / 1000000.0f);
+            //            std::cout << "dt1: " << dt1  << " internal: " << (1./140.f) << std::endl;
+            m_dynamicsWorld->stepSimulation(dt1, 100, 1. / 140.f);
 
             //optional but useful: debug drawing
             m_dynamicsWorld->debugDrawWorld();
@@ -61,7 +62,8 @@ namespace SimDynamics
         swapBuffers();
     }
 
-    void BulletOpenGLViewer::displayCallback()
+    void
+    BulletOpenGLViewer::displayCallback()
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -76,7 +78,8 @@ namespace SimDynamics
         swapBuffers();
     }
 
-    void BulletOpenGLViewer::keyboardCallback(unsigned char key, int x, int y)
+    void
+    BulletOpenGLViewer::keyboardCallback(unsigned char key, int x, int y)
     {
         //DemoApplication::keyboardCallback(key, x, y);
         switch (key)
@@ -90,24 +93,25 @@ namespace SimDynamics
         }
     }
 
-    BulletOpenGLViewer::~BulletOpenGLViewer()
-    = default;
+    BulletOpenGLViewer::~BulletOpenGLViewer() = default;
 
-    void BulletOpenGLViewer::initPhysics()
+    void
+    BulletOpenGLViewer::initPhysics()
     {
         // nothing to do, this has already be done in DynamicsWorld
-
     }
 
-    void BulletOpenGLViewer::myinit()
+    void
+    BulletOpenGLViewer::myinit()
     {
 
-        GLfloat light_ambient[] = { btScalar(0.2), btScalar(0.2), btScalar(0.2), btScalar(1.0) };
-        GLfloat light_diffuse[] = { btScalar(1.0), btScalar(1.0), btScalar(1.0), btScalar(1.0) };
-        GLfloat light_specular[] = { btScalar(1.0), btScalar(1.0), btScalar(1.0), btScalar(1.0)};
+        GLfloat light_ambient[] = {btScalar(0.2), btScalar(0.2), btScalar(0.2), btScalar(1.0)};
+        GLfloat light_diffuse[] = {btScalar(1.0), btScalar(1.0), btScalar(1.0), btScalar(1.0)};
+        GLfloat light_specular[] = {btScalar(1.0), btScalar(1.0), btScalar(1.0), btScalar(1.0)};
         /*  light_position is NOT default value */
-        GLfloat light_position0[] = { btScalar(1.0), btScalar(1.0), btScalar(10.0), btScalar(0.0)};
-        GLfloat light_position1[] = { btScalar(-1.0), btScalar(-1.0), btScalar(-10.0), btScalar(0.0) };
+        GLfloat light_position0[] = {btScalar(1.0), btScalar(1.0), btScalar(10.0), btScalar(0.0)};
+        GLfloat light_position1[] = {
+            btScalar(-1.0), btScalar(-1.0), btScalar(-10.0), btScalar(0.0)};
 
         glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
         glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
@@ -134,11 +138,13 @@ namespace SimDynamics
         //  glCullFace(GL_BACK);
     }
 
-    void BulletOpenGLViewer::enableContraintsDebugDrawing()
+    void
+    BulletOpenGLViewer::enableContraintsDebugDrawing()
     {
-        m_dynamicsWorld->getDebugDrawer()->setDebugMode(btIDebugDraw::DBG_DrawConstraints | btIDebugDraw::DBG_DrawConstraintLimits | btIDebugDraw::DBG_DrawContactPoints);
-
+        m_dynamicsWorld->getDebugDrawer()->setDebugMode(btIDebugDraw::DBG_DrawConstraints |
+                                                        btIDebugDraw::DBG_DrawConstraintLimits |
+                                                        btIDebugDraw::DBG_DrawContactPoints);
     }
 
 
-}
+} // namespace SimDynamics

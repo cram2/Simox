@@ -42,26 +42,27 @@ implementation of the 6d wrench space algorithm for grasp quality measurement.
 
 #endif
 
-#include "VirtualRobot/VirtualRobot.h"
-#include "VirtualRobot/VirtualRobotException.h"
-
+#include <cmath>
 #include <iostream>
 #include <sstream>
-#include <cmath>
+
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
+#include "VirtualRobot/VirtualRobot.h"
+#include "VirtualRobot/VirtualRobotException.h"
+
 #ifdef WIN32
-#  include <winsock2.h>
-#  include <windows.h>
-#  pragma warning ( disable : 4251 )
-#  if defined(GraspStudio_EXPORTS)
-#    define GRASPSTUDIO_IMPORT_EXPORT __declspec(dllexport)
-#  else
-#    define GRASPSTUDIO_IMPORT_EXPORT __declspec(dllimport)
-#  endif
+#include <windows.h>
+#include <winsock2.h>
+#pragma warning(disable : 4251)
+#if defined(GraspStudio_EXPORTS)
+#define GRASPSTUDIO_IMPORT_EXPORT __declspec(dllexport)
 #else
-#  define GRASPSTUDIO_IMPORT_EXPORT
+#define GRASPSTUDIO_IMPORT_EXPORT __declspec(dllimport)
+#endif
+#else
+#define GRASPSTUDIO_IMPORT_EXPORT
 #endif
 
 
@@ -84,7 +85,8 @@ namespace GraspStudio
 
     typedef std::shared_ptr<GraspQualityMeasure> GraspQualityMeasurePtr;
     typedef std::shared_ptr<GraspQualityMeasureWrenchSpace> GraspQualityMeasureWrenchSpacePtr;
-    typedef std::shared_ptr<GraspQualityMeasureWrenchSpaceNotNormalized> GraspQualityMeasureWrenchSpaceNotNormalizedPtr;
+    typedef std::shared_ptr<GraspQualityMeasureWrenchSpaceNotNormalized>
+        GraspQualityMeasureWrenchSpaceNotNormalizedPtr;
     typedef std::shared_ptr<ContactConeGenerator> ContactConeGeneratorPtr;
     typedef std::shared_ptr<GraspQualityMeasure> GraspQualityMeasurePtr;
     typedef std::shared_ptr<ApproachMovementGenerator> ApproachMovementGeneratorPtr;
@@ -100,12 +102,21 @@ namespace GraspStudio
 
 #ifdef NDEBUG
 #define GRASPSTUDIO_ASSERT(a)
-#define GRASPSTUDIO_ASSERT_MESSAGE(a,b)
+#define GRASPSTUDIO_ASSERT_MESSAGE(a, b)
 
 #else
-#define GRASPSTUDIO_ASSERT(a) if (!(a)) {cout << "ASSERT failed (" << #a <<")"<<endl; THROW_GRASPSTUDIO_EXCEPTION( "ASSERT failed (" << #a << ")" )};
-#define GRASPSTUDIO_ASSERT_MESSAGE(a,b) if (!(a)) {cout << "ASSERT failed (" << #a <<"): "<<b<<endl; THROW_GRASPSTUDIO_EXCEPTION( "ASSERT failed (" << #a << "): " << b )};
+#define GRASPSTUDIO_ASSERT(a)                                                                      \
+    if (!(a))                                                                                      \
+    {                                                                                              \
+        cout << "ASSERT failed (" << #a << ")" << endl;                                            \
+        THROW_GRASPSTUDIO_EXCEPTION("ASSERT failed (" << #a << ")")                                \
+    };
+#define GRASPSTUDIO_ASSERT_MESSAGE(a, b)                                                           \
+    if (!(a))                                                                                      \
+    {                                                                                              \
+        cout << "ASSERT failed (" << #a << "): " << b << endl;                                     \
+        THROW_GRASPSTUDIO_EXCEPTION("ASSERT failed (" << #a << "): " << b)                         \
+    };
 #endif
 
-}
-
+} // namespace GraspStudio

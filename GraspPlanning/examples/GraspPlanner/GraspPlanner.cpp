@@ -1,8 +1,8 @@
-#include <VirtualRobot/VirtualRobot.h>
-#include <VirtualRobot/RuntimeEnvironment.h>
-
-#include <string>
 #include <iostream>
+#include <string>
+
+#include <VirtualRobot/RuntimeEnvironment.h>
+#include <VirtualRobot/VirtualRobot.h>
 
 using std::cout;
 using std::endl;
@@ -13,15 +13,21 @@ using namespace VirtualRobot;
 
 #include "GraspPlannerWindow.h"
 
-
-int main(int argc, char* argv[])
+int
+main(int argc, char* argv[])
 {
     VirtualRobot::init(argc, argv, "Simox Grasp Planner");
     std::cout << " --- START --- " << std::endl;
     std::cout << endl << "Hint: You can start this demo for different hands:" << std::endl;
-    std::cout << "GraspPlanner --robot robots/iCub/iCub.xml --endeffector \"Left Hand\" --preshape \"Grasp Preshape\"" << std::endl;
-    std::cout << "GraspPlanner --robot robots/Shadow_Dexterous_Hand/shadowhand.xml --endeffector \"SHADOWHAND\" --preshape \"Grasp Preshape\"" << std::endl;
-    std::cout << "GraspPlanner --robot robots/Schunk_SAH/SAH_RightHand.xml --endeffector \"Right Hand\" --preshape \"Grasp Preshape\"" << std::endl;
+    std::cout << "GraspPlanner --robot robots/iCub/iCub.xml --endeffector \"Left Hand\" --preshape "
+                 "\"Grasp Preshape\""
+              << std::endl;
+    std::cout << "GraspPlanner --robot robots/Shadow_Dexterous_Hand/shadowhand.xml --endeffector "
+                 "\"SHADOWHAND\" --preshape \"Grasp Preshape\""
+              << std::endl;
+    std::cout << "GraspPlanner --robot robots/Schunk_SAH/SAH_RightHand.xml --endeffector \"Right "
+                 "Hand\" --preshape \"Grasp Preshape\""
+              << std::endl;
 
     // --robot robots/iCub/iCub.xml --endeffector "Left Hand" --preshape "Grasp Preshape"
     std::string robot("robots/ArmarIII/ArmarIII.xml");

@@ -24,18 +24,16 @@
 
 #define ARMARX_BOOST_TEST
 
-#include <VirtualRobot/VirtualRobotTest.h>
-
-#include <VirtualRobot/XML/mujoco/Mesh.h>
-
 #include <filesystem>
+
+#include <VirtualRobot/VirtualRobotTest.h>
+#include <VirtualRobot/XML/mujoco/Mesh.h>
 
 
 namespace fs = std::filesystem;
 
 // Defined by CMake.
-static const fs::path meshFileName = TEST_MESH_FILE;  // "VirtualRobotMujocoMeshTestMesh.msh";
-
+static const fs::path meshFileName = TEST_MESH_FILE; // "VirtualRobotMujocoMeshTestMesh.msh";
 
 struct Fixture
 {
@@ -47,7 +45,6 @@ struct Fixture
 
     VirtualRobot::mujoco::Mesh mesh;
 };
-
 
 BOOST_FIXTURE_TEST_CASE(test_consistency_after_read, Fixture)
 {
@@ -61,7 +58,6 @@ BOOST_FIXTURE_TEST_CASE(test_consistency_after_read, Fixture)
     BOOST_CHECK_EQUAL(mesh.vertexTexcoords().size(), 2 * mesh.ntexcoord());
     BOOST_CHECK_EQUAL(mesh.faceVertexIndices().size(), 3 * mesh.nface());
 }
-
 
 BOOST_FIXTURE_TEST_CASE(test_write_consistency, Fixture)
 {
@@ -83,4 +79,3 @@ BOOST_FIXTURE_TEST_CASE(test_write_consistency, Fixture)
         }
     }
 }
-

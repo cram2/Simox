@@ -1,7 +1,7 @@
 #include "osgViewerWidget.h"
 
-#include <osgGA/TrackballManipulator>
 #include <osgGA/StateSetManipulator>
+#include <osgGA/TrackballManipulator>
 
 namespace VirtualRobot
 {
@@ -26,10 +26,13 @@ namespace VirtualRobot
         }
     }
 
-    void osgViewerWidget::initializeGL()
+    void
+    osgViewerWidget::initializeGL()
     {
-        window = viewer->setUpViewerAsEmbeddedInWindow(0, 0, canvasSize.width(), canvasSize.height());
-        viewer->addEventHandler(new osgGA::StateSetManipulator(transformation->getOrCreateStateSet()));
+        window =
+            viewer->setUpViewerAsEmbeddedInWindow(0, 0, canvasSize.width(), canvasSize.height());
+        viewer->addEventHandler(
+            new osgGA::StateSetManipulator(transformation->getOrCreateStateSet()));
         viewer->addEventHandler(new osgViewer::StatsHandler);
         viewer->addEventHandler(new osgViewer::WindowSizeHandler);
         sceneManipulator = new osgGA::TrackballManipulator;
@@ -41,27 +44,31 @@ namespace VirtualRobot
         paintTimer.start();
     }
 
-    void osgViewerWidget::resizeGL(int width, int height)
+    void
+    osgViewerWidget::resizeGL(int width, int height)
     {
         // this method is not invoked on when resizing the window?!
         std::cout << "resizeGL " << width << "," << height << std::endl;
         resizeOSG(width, height);
     }
 
-    void osgViewerWidget::resizeOSG(int width, int height)
+    void
+    osgViewerWidget::resizeOSG(int width, int height)
     {
         if (window.valid() && parentWidget())
         {
             //std::cout << "Resizing " << width << "," << height << std::endl;
             window->resized(window->getTraits()->x, window->getTraits()->y, width, height);
-            window->getEventQueue()->windowResize(window->getTraits()->x, window->getTraits()->y, width, height);
+            window->getEventQueue()->windowResize(
+                window->getTraits()->x, window->getTraits()->y, width, height);
             // the qt GLwidget must also be resized
             resize(width, height);
             //window = viewer->setUpViewerAsEmbeddedInWindow(0, 0, width, height);
         }
     }
 
-    void osgViewerWidget::timerCB()
+    void
+    osgViewerWidget::timerCB()
     {
         if (parentWidget())
         {
@@ -76,9 +83,10 @@ namespace VirtualRobot
         }
 
         paintOSG();
-
     }
-    void osgViewerWidget::paintOSG()
+
+    void
+    osgViewerWidget::paintOSG()
     {
         if (viewer.valid())
         {
@@ -88,14 +96,15 @@ namespace VirtualRobot
         }
     }
 
-    void osgViewerWidget::paintGL()
+    void
+    osgViewerWidget::paintGL()
     {
         paintOSG();
-
     }
 
     //////////////////////////////////////////////////////////////////////////////////
-    void osgViewerWidget::keyPressEvent(QKeyEvent* event)
+    void
+    osgViewerWidget::keyPressEvent(QKeyEvent* event)
     {
         if (window.valid())
         {
@@ -105,7 +114,8 @@ namespace VirtualRobot
     }
 
     //////////////////////////////////////////////////////////////////////////////////
-    void osgViewerWidget::keyReleaseEvent(QKeyEvent* event)
+    void
+    osgViewerWidget::keyReleaseEvent(QKeyEvent* event)
     {
         if (window.valid())
         {
@@ -115,7 +125,8 @@ namespace VirtualRobot
     }
 
     //////////////////////////////////////////////////////////////////////////////////
-    void osgViewerWidget::mousePressEvent(QMouseEvent* event)
+    void
+    osgViewerWidget::mousePressEvent(QMouseEvent* event)
     {
         int button = 0;
 
@@ -146,11 +157,11 @@ namespace VirtualRobot
         {
             window->getEventQueue()->mouseButtonPress(event->x(), event->y(), button);
         }
-
     }
 
     //////////////////////////////////////////////////////////////////////////////////
-    void osgViewerWidget::mouseReleaseEvent(QMouseEvent* event)
+    void
+    osgViewerWidget::mouseReleaseEvent(QMouseEvent* event)
     {
         int button = 0;
 
@@ -184,7 +195,8 @@ namespace VirtualRobot
     }
 
     //////////////////////////////////////////////////////////////////////////////////
-    void osgViewerWidget::mouseMoveEvent(QMouseEvent* event)
+    void
+    osgViewerWidget::mouseMoveEvent(QMouseEvent* event)
     {
         if (window.valid())
         {
@@ -193,7 +205,8 @@ namespace VirtualRobot
     }
 
     //////////////////////////////////////////////////////////////////////////
-    void osgViewerWidget::mouseDoubleClickEvent(QMouseEvent* event)
+    void
+    osgViewerWidget::mouseDoubleClickEvent(QMouseEvent* event)
     {
         int button = 0;
 
@@ -227,7 +240,8 @@ namespace VirtualRobot
     }
 
     //////////////////////////////////////////////////////////////////////////////////
-    void osgViewerWidget::wheelEvent(QWheelEvent* event)
+    void
+    osgViewerWidget::wheelEvent(QWheelEvent* event)
     {
         if (window.valid())
         {
@@ -256,7 +270,8 @@ namespace VirtualRobot
         }
     }
 
-    void osgViewerWidget::resizeEvent(QResizeEvent* event)
+    void
+    osgViewerWidget::resizeEvent(QResizeEvent* event)
     {
         QSize widgetSize = event->size();
         std::cout << "w:" << widgetSize.width() << ", h:" << widgetSize.height() << std::endl;
@@ -264,7 +279,8 @@ namespace VirtualRobot
         QGLWidget::resizeEvent(event);
     }
 
-    void osgViewerWidget::viewAll()
+    void
+    osgViewerWidget::viewAll()
     {
         if (!sceneManipulator)
         {
@@ -274,7 +290,6 @@ namespace VirtualRobot
         sceneManipulator->computeHomePosition();
         sceneManipulator->home(0);
     }
-
 
     /*
 
@@ -343,4 +358,4 @@ namespace VirtualRobot
         frame();
     }
     */
-} // namespace
+} // namespace VirtualRobot

@@ -1,9 +1,8 @@
 #pragma once
 
-#include <boost/circular_buffer.hpp>
-
 #include <algorithm>
 
+#include <boost/circular_buffer.hpp>
 
 namespace simox
 {
@@ -22,7 +21,8 @@ namespace simox
 
         struct EntryKeyCompare
         {
-            bool operator () (Entry const& entry, KeyT const& key)
+            bool
+            operator()(Entry const& entry, KeyT const& key)
             {
                 return entry.first < key;
             }
@@ -34,7 +34,6 @@ namespace simox
         Container storage;
 
     public:
-
         // Container typedefs
         using value_type = typename Container::value_type;
         using reference = typename Container::reference;
@@ -47,20 +46,75 @@ namespace simox
         using const_reverse_iterator = typename Container::const_reverse_iterator;
 
         // Container interface (forwards to storage container)
-        iterator begin() { return storage.begin(); }
-        const_iterator begin() const { return storage.begin(); }
-        iterator end() { return storage.end(); }
-        const_iterator end() const { return storage.end(); }
-        reverse_iterator rbegin() { return storage.rbegin(); }
-        const_reverse_iterator rbegin() const { return storage.rbegin(); }
-        reverse_iterator rend() { return storage.rend(); }
-        const_reverse_iterator rend() const { return storage.rend(); }
-        bool empty() const { return storage.empty(); }
-        std::size_t size() const { return storage.size(); }
-        void clear() { storage.clear(); }
+        iterator
+        begin()
+        {
+            return storage.begin();
+        }
+
+        const_iterator
+        begin() const
+        {
+            return storage.begin();
+        }
+
+        iterator
+        end()
+        {
+            return storage.end();
+        }
+
+        const_iterator
+        end() const
+        {
+            return storage.end();
+        }
+
+        reverse_iterator
+        rbegin()
+        {
+            return storage.rbegin();
+        }
+
+        const_reverse_iterator
+        rbegin() const
+        {
+            return storage.rbegin();
+        }
+
+        reverse_iterator
+        rend()
+        {
+            return storage.rend();
+        }
+
+        const_reverse_iterator
+        rend() const
+        {
+            return storage.rend();
+        }
+
+        bool
+        empty() const
+        {
+            return storage.empty();
+        }
+
+        std::size_t
+        size() const
+        {
+            return storage.size();
+        }
+
+        void
+        clear()
+        {
+            storage.clear();
+        }
 
         // Map like functions (require sorted elements)
-        iterator find(KeyT const& key)
+        iterator
+        find(KeyT const& key)
         {
             iterator end_ = end();
             iterator found = std::lower_bound(begin(), end_, key, EntryKeyCompare());
@@ -72,12 +126,14 @@ namespace simox
             return found;
         }
 
-        const_iterator find(KeyT const& key) const
+        const_iterator
+        find(KeyT const& key) const
         {
             return const_cast<This*>(this)->find(key);
         }
 
-        int count(KeyT const& key) const
+        int
+        count(KeyT const& key) const
         {
             const_iterator it = find(key);
             if (it == end())
@@ -90,7 +146,8 @@ namespace simox
             }
         }
 
-        ElementT& at(KeyT const& key)
+        ElementT&
+        at(KeyT const& key)
         {
             iterator found = find(key);
             if (found == end())
@@ -100,13 +157,15 @@ namespace simox
             return found->second;
         }
 
-        ElementT const& at(KeyT const& key) const
+        ElementT const&
+        at(KeyT const& key) const
         {
             return const_cast<This*>(this)->at(key);
         }
 
         // Map insert functions (need to keep order)
-        std::pair<iterator, bool> emplace(KeyT const& key, ElementT&& element)
+        std::pair<iterator, bool>
+        emplace(KeyT const& key, ElementT&& element)
         {
             std::pair<iterator, bool> result;
 
@@ -138,24 +197,26 @@ namespace simox
             return result;
         }
 
-        static OrderedCircularBuffer createWithMaxSize(std::size_t maxSize)
+        static OrderedCircularBuffer
+        createWithMaxSize(std::size_t maxSize)
         {
             OrderedCircularBuffer result;
             result.setMaxSize(maxSize);
             return result;
         }
 
-        void setMaxSize(std::size_t maxSize)
+        void
+        setMaxSize(std::size_t maxSize)
         {
             storage.set_capacity(maxSize);
         }
 
-        std::size_t getMaxSize()
+        std::size_t
+        getMaxSize()
         {
             // The vectors size is the max capacity
             return storage.capacity();
         }
-
     };
 
-}
+} // namespace simox

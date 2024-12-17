@@ -1,15 +1,17 @@
 
 #include "GraspIkRrt.h"
 
-#include "../CSpace/CSpaceNode.h"
-#include "../CSpace/CSpaceTree.h"
-#include "../CSpace/CSpacePath.h"
-#include "VirtualRobot/Grasping/Grasp.h"
-#include <VirtualRobot/Robot.h>
-#include <VirtualRobot/RobotNodeSet.h>
+#include <ctime>
+
 #include <VirtualRobot/Grasping/GraspSet.h>
 #include <VirtualRobot/Random.h>
-#include <ctime>
+#include <VirtualRobot/Robot.h>
+#include <VirtualRobot/RobotNodeSet.h>
+
+#include "../CSpace/CSpaceNode.h"
+#include "../CSpace/CSpacePath.h"
+#include "../CSpace/CSpaceTree.h"
+#include "VirtualRobot/Grasping/Grasp.h"
 
 
 //#define LOCAL_DEBUG(a) {SABA_INFO << a;};
@@ -21,8 +23,16 @@ using namespace VirtualRobot;
 namespace Saba
 {
 
-    GraspIkRrt::GraspIkRrt(CSpaceSampledPtr cspace, VirtualRobot::ManipulationObjectPtr object, VirtualRobot::AdvancedIKSolverPtr ikSolver, VirtualRobot::GraspSetPtr graspSet, float probabSampleGoal)
-        : BiRrt(cspace, Rrt::eConnect, Rrt::eConnect), sampleGoalProbab(probabSampleGoal), object(object), ikSolver(ikSolver), graspSet(graspSet)
+    GraspIkRrt::GraspIkRrt(CSpaceSampledPtr cspace,
+                           VirtualRobot::ManipulationObjectPtr object,
+                           VirtualRobot::AdvancedIKSolverPtr ikSolver,
+                           VirtualRobot::GraspSetPtr graspSet,
+                           float probabSampleGoal) :
+        BiRrt(cspace, Rrt::eConnect, Rrt::eConnect),
+        sampleGoalProbab(probabSampleGoal),
+        object(object),
+        ikSolver(ikSolver),
+        graspSet(graspSet)
     {
         THROW_VR_EXCEPTION_IF(!object, "NULL object");
         THROW_VR_EXCEPTION_IF(!ikSolver, "NULL ikSolver");
@@ -32,13 +42,15 @@ namespace Saba
 
         if (sampleGoalProbab < 0)
         {
-            SABA_WARNING << "Low value for sample goal probability, setting probability to 0" << std::endl;
+            SABA_WARNING << "Low value for sample goal probability, setting probability to 0"
+                         << std::endl;
             sampleGoalProbab = 0.0f;
         }
 
         if (sampleGoalProbab >= 1.0f)
         {
-            SABA_WARNING << "High value for sample goal probability, setting probability to 0.99" << std::endl;
+            SABA_WARNING << "High value for sample goal probability, setting probability to 0.99"
+                         << std::endl;
             sampleGoalProbab = 0.99f;
         }
 
@@ -49,10 +61,10 @@ namespace Saba
         graspSetWorking = graspSet->clone();
     }
 
-    GraspIkRrt::~GraspIkRrt()
-    = default;
+    GraspIkRrt::~GraspIkRrt() = default;
 
-    bool GraspIkRrt::searchNewGoal()
+    bool
+    GraspIkRrt::searchNewGoal()
     {
         if (graspSetWorking->getSize() == 0)
         {
@@ -68,7 +80,7 @@ namespace Saba
 
             if (graspNodeMapping.find(grasp) != graspNodeMapping.end())
             {
-                LOCAL_DEBUG("Grasp " <<  grasp->getName() << " already added..." << endl);
+                LOCAL_DEBUG("Grasp " << grasp->getName() << " already added..." << endl);
             }
             else
             {
@@ -85,7 +97,6 @@ namespace Saba
                 {
                     SABA_INFO << "IK solution in collision " << std::endl;
                 }
-
             }
         }
 
@@ -93,7 +104,8 @@ namespace Saba
         return true;
     }
 
-    bool GraspIkRrt::addIKSolution(Eigen::VectorXf& config, VirtualRobot::GraspPtr grasp)
+    bool
+    GraspIkRrt::addIKSolution(Eigen::VectorXf& config, VirtualRobot::GraspPtr grasp)
     {
         ikSolutions.push_back(config);
 
@@ -120,12 +132,14 @@ namespace Saba
         return true;
     }
 
-    bool GraspIkRrt::checkGoalConfig(Eigen::VectorXf& config)
+    bool
+    GraspIkRrt::checkGoalConfig(Eigen::VectorXf& config)
     {
         return cspace->isConfigValid(config);
     }
 
-    bool GraspIkRrt::doPlanningCycle()
+    bool
+    GraspIkRrt::doPlanningCycle()
     {
         ExtensionResult resA, resB;
         float r = RandomFloat();
@@ -185,8 +199,8 @@ namespace Saba
         return !stopSearch;
     }
 
-
-    bool GraspIkRrt::plan(bool bQuiet)
+    bool
+    GraspIkRrt::plan(bool bQuiet)
     {
 
         if (!bQuiet)
@@ -218,7 +232,6 @@ namespace Saba
         robot->setUpdateVisualization(false);
 
 
-
         // PLANNING LOOP
         do
         {
@@ -230,14 +243,15 @@ namespace Saba
             cycles++;
             clock_t currentClock = clock();
 
-            long diffClock = (long)(((float)(currentClock - startClock) / (float)CLOCKS_PER_SEC) * 1000.0);
-            if(diffClock > planningTimeout)
+            long diffClock =
+                (long)(((float)(currentClock - startClock) / (float)CLOCKS_PER_SEC) * 1000.0);
+            if (diffClock > planningTimeout)
             {
-                std::cout << "Encountered timeout of " << planningTimeout << " ms - aborting" << std::endl;
+                std::cout << "Encountered timeout of " << planningTimeout << " ms - aborting"
+                          << std::endl;
                 return false;
             }
-        }
-        while (!stopSearch && cycles < maxCycles && !found);
+        } while (!stopSearch && cycles < maxCycles && !found);
 
         clock_t endClock = clock();
 
@@ -248,9 +262,13 @@ namespace Saba
         {
             SABA_INFO << "Needed " << diffClock << " ms of processor time." << std::endl;
 
-            SABA_INFO << "Created " << tree->getNrOfNodes() << " + " << tree2->getNrOfNodes() << " = " << tree->getNrOfNodes() + tree2->getNrOfNodes() << " nodes." << std::endl;
-            SABA_INFO << "Collision Checks: " << (cspace->performaceVars_collisionCheck - colChecksStart) << std::endl;
-            SABA_INFO << "Distance Calculations: " << (cspace->performaceVars_distanceCheck - distChecksStart) << std::endl;
+            SABA_INFO << "Created " << tree->getNrOfNodes() << " + " << tree2->getNrOfNodes()
+                      << " = " << tree->getNrOfNodes() + tree2->getNrOfNodes() << " nodes."
+                      << std::endl;
+            SABA_INFO << "Collision Checks: "
+                      << (cspace->performaceVars_collisionCheck - colChecksStart) << std::endl;
+            SABA_INFO << "Distance Calculations: "
+                      << (cspace->performaceVars_distanceCheck - distChecksStart) << std::endl;
             SABA_INFO << "IK solutions: " << ikSolutions.size() << std::endl;
 
             int nColChecks = (cspace->performaceVars_collisionCheck - colChecksStart);
@@ -258,7 +276,8 @@ namespace Saba
             if (diffClock > 0)
             {
                 float fPerf = (float)nColChecks / (float)diffClock * 1000.0f;
-                std::cout << "Performance: " << fPerf << " cps (collision-checks per second)." << std::endl;
+                std::cout << "Performance: " << fPerf << " cps (collision-checks per second)."
+                          << std::endl;
             }
         }
 
@@ -291,17 +310,17 @@ namespace Saba
         }
 
         return false;
-
     }
 
-
-    bool GraspIkRrt::setGoal(const Eigen::VectorXf& /*c*/)
+    bool
+    GraspIkRrt::setGoal(const Eigen::VectorXf& /*c*/)
     {
         THROW_VR_EXCEPTION("Not allowed here, goal configurations are sampled during planning..");
         return false;
     }
 
-    void GraspIkRrt::reset()
+    void
+    GraspIkRrt::reset()
     {
         BiRrt::reset();
         goalValid = true;
@@ -310,7 +329,8 @@ namespace Saba
         graspNodeMapping.clear();
     }
 
-    void GraspIkRrt::printConfig(bool printOnlyParams)
+    void
+    GraspIkRrt::printConfig(bool printOnlyParams)
     {
         if (!printOnlyParams)
         {
@@ -327,4 +347,4 @@ namespace Saba
     }
 
 
-} // namespace
+} // namespace Saba

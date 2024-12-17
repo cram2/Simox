@@ -22,13 +22,12 @@
 */
 #pragma once
 
-#include "../Saba.h"
-
-#include "PathProcessor.h"
-#include "../CSpace/CSpacePath.h"
-
-#include <thread>
 #include <mutex>
+#include <thread>
+
+#include "../CSpace/CSpacePath.h"
+#include "../Saba.h"
+#include "PathProcessor.h"
 
 namespace Saba
 {
@@ -80,7 +79,6 @@ namespace Saba
         CSpacePathPtr getProcessedPath();
 
     protected:
-
         /*!
             Here the post processing takes place.
         */
@@ -95,8 +93,6 @@ namespace Saba
 
         CSpacePathPtr resultPath;
         int optimizeSteps;
-
     };
 
-}
-
+} // namespace Saba

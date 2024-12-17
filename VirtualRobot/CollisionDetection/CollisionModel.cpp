@@ -1,18 +1,21 @@
 
 #include "CollisionModel.h"
-#include "CollisionChecker.h"
+
+#include <algorithm>
+#include <filesystem>
+
 #include "../Visualization/TriMeshModel.h"
 #include "../Visualization/VisualizationNode.h"
 #include "../XML/BaseIO.h"
-
-#include <filesystem>
-#include <algorithm>
-
-
+#include "CollisionChecker.h"
 
 namespace VirtualRobot
 {
-    CollisionModel::CollisionModel(const VisualizationNodePtr& visu, const std::string& name, CollisionCheckerPtr colChecker, int id, float margin)
+    CollisionModel::CollisionModel(const VisualizationNodePtr& visu,
+                                   const std::string& name,
+                                   CollisionCheckerPtr colChecker,
+                                   int id,
+                                   float margin)
     {
         globalPose = Eigen::Matrix4f::Identity();
         this->id = id;
@@ -38,13 +41,19 @@ namespace VirtualRobot
 
     CollisionModel::CollisionModel(const TriMeshModelPtr& mesh) :
         CollisionModel(std::make_shared<VisualizationNode>(mesh))
-    {}
+    {
+    }
 
     CollisionModel::CollisionModel(const TriMeshModel& mesh) :
         CollisionModel(std::make_shared<VisualizationNode>(mesh))
-    {}
+    {
+    }
 
-    CollisionModel::CollisionModel(const VisualizationNodePtr& visu, const std::string& name, CollisionCheckerPtr colChecker, int id, InternalCollisionModelPtr collisionModel)
+    CollisionModel::CollisionModel(const VisualizationNodePtr& visu,
+                                   const std::string& name,
+                                   CollisionCheckerPtr colChecker,
+                                   int id,
+                                   InternalCollisionModelPtr collisionModel)
     {
         margin = 0.0;
         globalPose = Eigen::Matrix4f::Identity();
@@ -69,28 +78,30 @@ namespace VirtualRobot
         {
             VR_WARNING << "internal collision model is NULL for " << name << std::endl;
         }
-        collisionModelImplementation = std::dynamic_pointer_cast<InternalCollisionModel>(collisionModel->clone(false));
+        collisionModelImplementation =
+            std::dynamic_pointer_cast<InternalCollisionModel>(collisionModel->clone(false));
         VR_ASSERT(collisionModelImplementation->getPQPModel());
         setVisualization(visu);
     }
-
 
     CollisionModel::~CollisionModel()
     {
         //        destroyData();
     }
 
-
-    void CollisionModel::destroyData()
+    void
+    CollisionModel::destroyData()
     {
     }
 
-    float CollisionModel::getMargin() const
+    float
+    CollisionModel::getMargin() const
     {
         return margin;
     }
 
-    void CollisionModel::inflateModel(float value)
+    void
+    CollisionModel::inflateModel(float value)
     {
         float diff = std::abs(margin - value);
         if (diff > 0.01f || (origVisualization && !model))
@@ -120,13 +131,14 @@ namespace VirtualRobot
         }
     }
 
-
-    std::string CollisionModel::getName()
+    std::string
+    CollisionModel::getName()
     {
         return name;
     }
 
-    void CollisionModel::setGlobalPose(const Eigen::Matrix4f& m)
+    void
+    CollisionModel::setGlobalPose(const Eigen::Matrix4f& m)
     {
         globalPose = m;
         collisionModelImplementation->setGlobalPose(m);
@@ -139,7 +151,8 @@ namespace VirtualRobot
         }
     }
 
-    VirtualRobot::CollisionModelPtr CollisionModel::clone(CollisionCheckerPtr colChecker, float scaling, bool deepVisuMesh)
+    VirtualRobot::CollisionModelPtr
+    CollisionModel::clone(CollisionCheckerPtr colChecker, float scaling, bool deepVisuMesh)
     {
         VisualizationNodePtr visuOrigNew;
 
@@ -158,7 +171,8 @@ namespace VirtualRobot
         }
         else
         {
-            p.reset(new CollisionModel(visuOrigNew, nameNew, colChecker, idNew, this->collisionModelImplementation));
+            p.reset(new CollisionModel(
+                visuOrigNew, nameNew, colChecker, idNew, this->collisionModelImplementation));
             if (visualization)
             {
                 p->visualization = visualization->clone(false, scaling);
@@ -168,7 +182,6 @@ namespace VirtualRobot
             {
                 p->inflateModel(margin);
             }
-
         }
         p->setLocalPose(localPose);
         p->setGlobalPose(getGlobalPose());
@@ -176,7 +189,8 @@ namespace VirtualRobot
         return p;
     }
 
-    void CollisionModel::setVisualization(const VisualizationNodePtr visu)
+    void
+    CollisionModel::setVisualization(const VisualizationNodePtr visu)
     {
         visualization = visu;
         origVisualization = visu;
@@ -186,27 +200,32 @@ namespace VirtualRobot
         inflateModel(margin); // updates the model
     }
 
-    int CollisionModel::getId()
+    int
+    CollisionModel::getId()
     {
         return id;
     }
 
-    void CollisionModel::setUpdateVisualization(bool enable)
+    void
+    CollisionModel::setUpdateVisualization(bool enable)
     {
         updateVisualization = enable;
     }
 
-    bool CollisionModel::getUpdateVisualizationStatus()
+    bool
+    CollisionModel::getUpdateVisualizationStatus()
     {
         return updateVisualization;
     }
 
-    VisualizationNodePtr CollisionModel::getVisualization()
+    VisualizationNodePtr
+    CollisionModel::getVisualization()
     {
         return visualization;
     }
 
-    void CollisionModel::print()
+    void
+    CollisionModel::print()
     {
         collisionModelImplementation->print();
 
@@ -216,7 +235,8 @@ namespace VirtualRobot
         }
     }
 
-    int CollisionModel::getNumFaces()
+    int
+    CollisionModel::getNumFaces()
     {
         if (!visualization)
         {
@@ -224,12 +244,12 @@ namespace VirtualRobot
         }
 
         return visualization->getNumFaces();
-
     }
 
-    std::vector< Eigen::Vector3f > CollisionModel::getModelVeticesGlobal()
+    std::vector<Eigen::Vector3f>
+    CollisionModel::getModelVeticesGlobal()
     {
-        std::vector< Eigen::Vector3f > result;
+        std::vector<Eigen::Vector3f> result;
         TriMeshModelPtr model = collisionModelImplementation->getTriMeshModel();
 
         if (!model)
@@ -252,7 +272,8 @@ namespace VirtualRobot
         return result;
     }
 
-    BoundingBox CollisionModel::getBoundingBox(bool global /*= true*/)
+    BoundingBox
+    CollisionModel::getBoundingBox(bool global /*= true*/)
     {
         if (global)
         {
@@ -271,7 +292,8 @@ namespace VirtualRobot
         return bbox;
     }
 
-    VirtualRobot::VisualizationNodePtr CollisionModel::getModelDataVisualization()
+    VirtualRobot::VisualizationNodePtr
+    CollisionModel::getModelDataVisualization()
     {
         if (!modelVisualization && visualization)
         {
@@ -280,11 +302,13 @@ namespace VirtualRobot
             if (model)
             {
                 std::string type = visualization->getType();
-                VisualizationFactoryPtr visualizationFactory = VisualizationFactory::fromName(type, NULL);
+                VisualizationFactoryPtr visualizationFactory =
+                    VisualizationFactory::fromName(type, NULL);
 
                 if (visualizationFactory)
                 {
-                    modelVisualization = visualizationFactory->createTriMeshModelVisualization(model, true, globalPose);
+                    modelVisualization = visualizationFactory->createTriMeshModelVisualization(
+                        model, true, globalPose);
                 }
             }
         }
@@ -292,7 +316,8 @@ namespace VirtualRobot
         return modelVisualization;
     }
 
-    std::string CollisionModel::toXML(const std::string& basePath, const std::string& filename, int tabs)
+    std::string
+    CollisionModel::toXML(const std::string& basePath, const std::string& filename, int tabs)
     {
         std::stringstream ss;
         std::string t = "\t";
@@ -327,10 +352,7 @@ namespace VirtualRobot
         {
             std::string tmpFilename = filename;
             BaseIO::makeRelativePath(basePath, tmpFilename);
-            ss << pre << t
-               << "<File type='" << fileType << "'>"
-               << tmpFilename
-               << "</File>\n";
+            ss << pre << t << "<File type='" << fileType << "'>" << tmpFilename << "</File>\n";
         }
 
         if (visualization && visualization->primitives.size() != 0)
@@ -338,7 +360,8 @@ namespace VirtualRobot
             ss << pre << "\t<Primitives>\n";
             std::vector<Primitive::PrimitivePtr>::const_iterator it;
 
-            for (it = visualization->primitives.begin(); it != visualization->primitives.end(); it++)
+            for (it = visualization->primitives.begin(); it != visualization->primitives.end();
+                 it++)
             {
                 ss << (*it)->toXMLString(tabs + 1);
             }
@@ -350,7 +373,8 @@ namespace VirtualRobot
         return ss.str();
     }
 
-    std::string CollisionModel::toXML(const std::string& basePath, int tabs)
+    std::string
+    CollisionModel::toXML(const std::string& basePath, int tabs)
     {
         std::string collisionFilename;
 
@@ -365,10 +389,10 @@ namespace VirtualRobot
 
         std::filesystem::path fn(collisionFilename);
         return toXML(basePath, fn.string(), tabs);
-
     }
 
-    VirtualRobot::CollisionModelPtr CollisionModel::CreateUnitedCollisionModel(const std::vector<CollisionModelPtr>& colModels)
+    VirtualRobot::CollisionModelPtr
+    CollisionModel::CreateUnitedCollisionModel(const std::vector<CollisionModelPtr>& colModels)
     {
         VR_ASSERT(colModels.size() > 0);
         CollisionCheckerPtr colChecker = colModels[0]->getCollisionChecker();
@@ -395,7 +419,8 @@ namespace VirtualRobot
         return CollisionModelPtr(new CollisionModel(vc, "", colChecker));
     }
 
-    bool CollisionModel::saveModel(const std::string& modelPath, const std::string& filename)
+    bool
+    CollisionModel::saveModel(const std::string& modelPath, const std::string& filename)
     {
         if (visualization)
         {
@@ -410,7 +435,8 @@ namespace VirtualRobot
         return true; // no model given
     }
 
-    void CollisionModel::scale(Eigen::Vector3f& scaleFactor)
+    void
+    CollisionModel::scale(Eigen::Vector3f& scaleFactor)
     {
         if (model)
         {

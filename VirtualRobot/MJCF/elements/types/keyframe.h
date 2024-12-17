@@ -5,11 +5,11 @@
 namespace mjcf
 {
 
-struct KeyframeSection : public Element<KeyframeSection>
-{
-    static const std::string tag;
-    mjcf_ElementDerivedConstructors(KeyframeSection)
-};
+    struct KeyframeSection : public Element<KeyframeSection>
+    {
+        static const std::string tag;
+        mjcf_ElementDerivedConstructors(KeyframeSection)
+    };
 
 
-}
+} // namespace mjcf

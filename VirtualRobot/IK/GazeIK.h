@@ -22,14 +22,12 @@
 */
 #pragma once
 
-#include "VirtualRobot/VirtualRobot.h"
 #include "VirtualRobot/IK/DifferentialIK.h"
-#include "VirtualRobot/IK/JointLimitAvoidanceJacobi.h"
 #include "VirtualRobot/IK/HierarchicalIK.h"
-#include "VirtualRobot/RobotNodeSet.h"
+#include "VirtualRobot/IK/JointLimitAvoidanceJacobi.h"
 #include "VirtualRobot/Nodes/RobotNodePrismatic.h"
+#include "VirtualRobot/RobotNodeSet.h"
 #include "VirtualRobot/VirtualRobot.h"
-
 
 namespace VirtualRobot
 {
@@ -82,10 +80,11 @@ namespace VirtualRobot
         void setVerbose(bool v);
 
     protected:
-
         void setupIK();
         void setJointsRandom();
-        void setJointsRandom(const Eigen::Vector3f& goal, int bestOfTries); // do random joint config bestOfTries times and determine the best in terms of tcp to goal distance (good guess)
+        void setJointsRandom(
+            const Eigen::Vector3f& goal,
+            int bestOfTries); // do random joint config bestOfTries times and determine the best in terms of tcp to goal distance (good guess)
         bool trySolve(const Eigen::Vector3f& goal, float stepSize);
 
         float getCurrentError(const Eigen::Vector3f& goal);
@@ -112,5 +111,3 @@ namespace VirtualRobot
     typedef std::shared_ptr<GazeIK> GazeIKPtr;
 
 } // namespace VirtualRobot
-
-

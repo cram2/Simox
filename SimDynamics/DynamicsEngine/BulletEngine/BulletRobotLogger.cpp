@@ -1,23 +1,28 @@
 
-#include <Eigen/Dense>
-#include <fstream>
-#include <VirtualRobot/RobotNodeSet.h>
-
 #include "BulletRobotLogger.h"
+
+#include <fstream>
+
+#include <Eigen/Dense>
+
+#include <VirtualRobot/RobotNodeSet.h>
 
 using namespace SimDynamics;
 
-void BulletRobotLogger::startLogging()
+void
+BulletRobotLogger::startLogging()
 {
     running = true;
 }
 
-void BulletRobotLogger::stopLogging()
+void
+BulletRobotLogger::stopLogging()
 {
     running = false;
 }
 
-void BulletRobotLogger::writeToFile(const std::string& path)
+void
+BulletRobotLogger::writeToFile(const std::string& path)
 {
     // Nothing to log
     if (targetAngleLog.size() == 0)
@@ -30,7 +35,8 @@ void BulletRobotLogger::writeToFile(const std::string& path)
     int num_frames = timestamps.size();
     int num_dof = targetAngleLog[0].rows();
 
-    output << "Timestamp" << ",";
+    output << "Timestamp"
+           << ",";
 
     for (int dof = 0; dof < num_dof; dof++)
     {
@@ -45,12 +51,18 @@ void BulletRobotLogger::writeToFile(const std::string& path)
         output << "ActualForceZ" << name << ",";
     }
 
-    output << "CoM X" << ",";
-    output << "CoM Y" << ",";
-    output << "CoM Z" << ",";
-    output << "CoMVelocity X" << ",";
-    output << "CoMVelocity Y" << ",";
-    output << "CoMVelocity Z" << ",";
+    output << "CoM X"
+           << ",";
+    output << "CoM Y"
+           << ",";
+    output << "CoM Z"
+           << ",";
+    output << "CoMVelocity X"
+           << ",";
+    output << "CoMVelocity Y"
+           << ",";
+    output << "CoMVelocity Z"
+           << ",";
     output << std::endl;
 
     for (int frame = 0; frame < num_frames; frame++)
@@ -79,13 +91,15 @@ void BulletRobotLogger::writeToFile(const std::string& path)
     }
 }
 
-void BulletRobotLogger::logCB(void* data, btScalar dt)
+void
+BulletRobotLogger::logCB(void* data, btScalar dt)
 {
     BulletRobotLogger* logger = static_cast<BulletRobotLogger*>(data);
     logger->log(dt);
 }
 
-void BulletRobotLogger::log(btScalar dt)
+void
+BulletRobotLogger::log(btScalar dt)
 {
     if (!running)
     {
@@ -110,7 +124,7 @@ void BulletRobotLogger::log(btScalar dt)
     for (unsigned int i = 0; i < jointNodes->getSize(); i++)
     {
         const VirtualRobot::RobotNodePtr& node = (*jointNodes)[i];
-        actualAngle(i)    = float(robot->getJointAngle(node));
+        actualAngle(i) = float(robot->getJointAngle(node));
         // bullet changes the sign???
         actualVelocity(i) = float(-robot->getJointSpeed(node));
         targetAngle(i) = float(robot->getNodeTarget(node));
@@ -130,4 +144,3 @@ void BulletRobotLogger::log(btScalar dt)
     timestamp += dt;
     timestamps.push_back(timestamp);
 }
-

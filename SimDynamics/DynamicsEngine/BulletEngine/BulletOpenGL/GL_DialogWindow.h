@@ -19,23 +19,24 @@ class btCollisionObject;
 
 
 //think different
-#if defined(__APPLE__) && !defined (VMDMESA)
+#if defined(__APPLE__) && !defined(VMDMESA)
 #include <TargetConditionals.h>
-#if (defined (TARGET_OS_IPHONE) && TARGET_OS_IPHONE) || (defined (TARGET_IPHONE_SIMULATOR) && TARGET_IPHONE_SIMULATOR)
+#if (defined(TARGET_OS_IPHONE) && TARGET_OS_IPHONE) ||                                             \
+    (defined(TARGET_IPHONE_SIMULATOR) && TARGET_IPHONE_SIMULATOR)
 #import <OpenGLES/ES1/gl.h>
 #define glOrtho glOrthof
 #else
+#include <GLUT/glut.h>
 #include <OpenGL/gl.h>
 #include <OpenGL/glu.h>
-#include <GLUT/glut.h>
 #endif
 #else
 
 
 #ifdef _WIN32
-#include <windows.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
+#include <windows.h>
 #else
 #include <GL/gl.h>
 #include <GL/glut.h>
@@ -43,8 +44,8 @@ class btCollisionObject;
 #endif
 
 
-#include "LinearMath/btScalar.h"
 #include "LinearMath/btAlignedObjectArray.h"
+#include "LinearMath/btScalar.h"
 class btTypedConstraint;
 
 class GL_DialogWindow;
@@ -63,13 +64,14 @@ protected:
     int m_type;
 
 public:
-
     virtual ~GL_DialogControl()
     {
     }
-    virtual void    draw(int& parentHorPos, int& parentVertPos, btScalar deltaTime) = 0;
 
-    int getType() const
+    virtual void draw(int& parentHorPos, int& parentVertPos, btScalar deltaTime) = 0;
+
+    int
+    getType() const
     {
         return m_type;
     }
@@ -78,7 +80,6 @@ public:
 struct GL_TextControl : public GL_DialogControl
 {
 public:
-
     btAlignedObjectArray<const char*> m_textLines;
 
     GL_TextControl()
@@ -86,11 +87,12 @@ public:
         m_type = GL_TEXT_CONTROL;
     }
 
-    ~GL_TextControl() override {}
+    ~GL_TextControl() override
+    {
+    }
 
     void draw(int& parentHorPos, int& parentVertPos, btScalar deltaTime) override;
 };
-
 
 struct GL_ToggleControl : public GL_DialogControl
 {
@@ -100,15 +102,15 @@ struct GL_ToggleControl : public GL_DialogControl
     const char* m_toggleText;
 
 public:
+    bool m_active;
 
-    bool    m_active;
-
-
-    GL_ToggleControl(const char* toggleText, btCollisionObject* toggleBody, GL_DialogWindow* parentWindow)
-        : m_toggleBody(toggleBody),
-          m_parentWindow(parentWindow),
-          m_toggleText(toggleText),
-          m_active(false)
+    GL_ToggleControl(const char* toggleText,
+                     btCollisionObject* toggleBody,
+                     GL_DialogWindow* parentWindow) :
+        m_toggleBody(toggleBody),
+        m_parentWindow(parentWindow),
+        m_toggleText(toggleText),
+        m_active(false)
     {
         m_type = GL_TOGGLE_CONTROL;
     }
@@ -126,35 +128,46 @@ struct GL_SliderControl : public GL_DialogControl
     btScalar m_fraction;
 
     const char* m_sliderText;
-public:
 
-    GL_SliderControl(const char* sliderText, btCollisionObject* sliderBody, GL_DialogWindow* parentWindow, btScalar lowerLimit, btScalar upperLimit, btTypedConstraint* constaint)
-        : m_sliderBody(sliderBody),
-          m_parentWindow(parentWindow),
-          m_lowerLimit(lowerLimit),
-          m_upperLimit(upperLimit),
-          m_constraint(constaint),
-          m_sliderText(sliderText)
+public:
+    GL_SliderControl(const char* sliderText,
+                     btCollisionObject* sliderBody,
+                     GL_DialogWindow* parentWindow,
+                     btScalar lowerLimit,
+                     btScalar upperLimit,
+                     btTypedConstraint* constaint) :
+        m_sliderBody(sliderBody),
+        m_parentWindow(parentWindow),
+        m_lowerLimit(lowerLimit),
+        m_upperLimit(upperLimit),
+        m_constraint(constaint),
+        m_sliderText(sliderText)
     {
         m_type = GL_SLIDER_CONTROL;
     }
 
     void draw(int& parentHorPos, int& parentVertPos, btScalar deltaTime) override;
 
-    btScalar    btGetFraction()
+    btScalar
+    btGetFraction()
     {
         return m_fraction;
     }
 
-    btScalar getLowerLimit()
+    btScalar
+    getLowerLimit()
     {
         return m_lowerLimit;
     }
-    btScalar getUpperLimit()
+
+    btScalar
+    getUpperLimit()
     {
         return m_upperLimit;
     }
-    btTypedConstraint* getConstraint()
+
+    btTypedConstraint*
+    getConstraint()
     {
         return m_constraint;
     }
@@ -175,112 +188,129 @@ class GL_DialogWindow
     const char* m_dialogTitle;
 
     //saved OpenGL settings
-    GLfloat             m_PrevLineWidth;
-    GLint               m_PrevTexEnv;
-    GLint               m_PrevPolygonMode[2];
-    GLint               m_MaxClipPlanes;
-    GLint               m_PrevTexture;
-    GLint               m_PrevArrayBufferARB;
-    GLint               m_PrevElementArrayBufferARB;
-    GLboolean           m_PrevVertexProgramARB;
-    GLboolean           m_PrevFragmentProgramARB;
-    GLuint              m_PrevProgramObjectARB;
-    GLboolean           m_PrevTexture3D;
-    GLboolean           m_PrevActiveTexture1D[32];
-    GLboolean           m_PrevActiveTexture2D[32];
-    GLboolean           m_PrevActiveTexture3D[32];
-    GLint               m_PrevActiveTextureARB;
-    bool                m_SupportTexRect;
-    GLboolean           m_PrevTexRectARB;
-    GLint               m_PrevBlendEquation;
-    GLint               m_PrevBlendEquationRGB;
-    GLint               m_PrevBlendEquationAlpha;
-    GLint               m_PrevBlendSrcRGB;
-    GLint               m_PrevBlendDstRGB;
-    GLint               m_PrevBlendSrcAlpha;
-    GLint               m_PrevBlendDstAlpha;
-    GLint               m_ViewportInit[4];
-    GLfloat             m_ProjMatrixInit[16];
+    GLfloat m_PrevLineWidth;
+    GLint m_PrevTexEnv;
+    GLint m_PrevPolygonMode[2];
+    GLint m_MaxClipPlanes;
+    GLint m_PrevTexture;
+    GLint m_PrevArrayBufferARB;
+    GLint m_PrevElementArrayBufferARB;
+    GLboolean m_PrevVertexProgramARB;
+    GLboolean m_PrevFragmentProgramARB;
+    GLuint m_PrevProgramObjectARB;
+    GLboolean m_PrevTexture3D;
+    GLboolean m_PrevActiveTexture1D[32];
+    GLboolean m_PrevActiveTexture2D[32];
+    GLboolean m_PrevActiveTexture3D[32];
+    GLint m_PrevActiveTextureARB;
+    bool m_SupportTexRect;
+    GLboolean m_PrevTexRectARB;
+    GLint m_PrevBlendEquation;
+    GLint m_PrevBlendEquationRGB;
+    GLint m_PrevBlendEquationAlpha;
+    GLint m_PrevBlendSrcRGB;
+    GLint m_PrevBlendDstRGB;
+    GLint m_PrevBlendSrcAlpha;
+    GLint m_PrevBlendDstAlpha;
+    GLint m_ViewportInit[4];
+    GLfloat m_ProjMatrixInit[16];
 
-    btCollisionObject*  m_collisionObject;
+    btCollisionObject* m_collisionObject;
 
     btAlignedObjectArray<GL_DialogControl*> m_controls;
 
 protected:
-
-
-    void    saveOpenGLState();
-    void    restoreOpenGLState();
+    void saveOpenGLState();
+    void restoreOpenGLState();
 
     //  void    drawLine(int _X0, int _Y0, int _X1, int _Y1, unsigned int _Color0, unsigned int _Color1, bool antiAliased);
     //  void    drawRect(int horStart, int vertStart, int horEnd, int vertEnd, unsigned int argbColor00,unsigned int argbColor10,unsigned int argbColor01,unsigned int argbColor11);
 
 public:
-
-
-    GL_DialogWindow(int horPos, int vertPos, int dialogWidth, int dialogHeight, btCollisionObject* colObject, const char* dialogTitle);
+    GL_DialogWindow(int horPos,
+                    int vertPos,
+                    int dialogWidth,
+                    int dialogHeight,
+                    btCollisionObject* colObject,
+                    const char* dialogTitle);
 
     virtual ~GL_DialogWindow();
 
-    void    draw(btScalar deltaTime);
+    void draw(btScalar deltaTime);
 
-    void    setScreenSize(int width, int height);
+    void setScreenSize(int width, int height);
 
-    void    setStartPosition(int    dialogHorPos, int    dialogVertPos);
+    void setStartPosition(int dialogHorPos, int dialogVertPos);
 
-    void    addControl(GL_DialogControl* control)
+    void
+    addControl(GL_DialogControl* control)
     {
         m_controls.push_back(control);
     }
 
-    void    removeControl(GL_DialogControl* control)
+    void
+    removeControl(GL_DialogControl* control)
     {
         m_controls.remove(control);
     }
 
-    btCollisionObject* getCollisionObject()
+    btCollisionObject*
+    getCollisionObject()
     {
         return m_collisionObject;
     }
 
-    int getDialogHorPos() const
+    int
+    getDialogHorPos() const
     {
         return m_dialogHorPos;
     }
-    int getDialogVertPos() const
+
+    int
+    getDialogVertPos() const
     {
         return m_dialogVertPos;
     }
-    int getDialogWidth() const
+
+    int
+    getDialogWidth() const
     {
         return m_dialogWidth;
     }
 
-    int getDialogHeight() const
+    int
+    getDialogHeight() const
     {
         return m_dialogHeight;
     }
-    int getScreenWidth() const
+
+    int
+    getScreenWidth() const
     {
         return m_screenWidth;
     }
-    int getScreenHeight() const
+
+    int
+    getScreenHeight() const
     {
         return m_screenHeight;
     }
 
-    int getNumControls() const
+    int
+    getNumControls() const
     {
         return m_controls.size();
     }
 
-    const GL_DialogControl* getControl(int index) const
+    const GL_DialogControl*
+    getControl(int index) const
     {
         return m_controls[index];
     }
-    GL_DialogControl* getControl(int index)
+
+    GL_DialogControl*
+    getControl(int index)
     {
         return m_controls[index];
     }
 };
-

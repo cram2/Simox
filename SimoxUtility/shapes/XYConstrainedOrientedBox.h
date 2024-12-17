@@ -25,21 +25,26 @@
 
 namespace simox
 {
-    template<class FloatT>
+    template <class FloatT>
     class XYConstrainedOrientedBox : public OrientedBoxBase<FloatT>
     {
         using base = OrientedBoxBase<FloatT>;
+
     public:
-        template<class T> using vector2_casted   = typename base::template vector2_casted<T>;
-        template<class T> using vector_casted    = typename base::template vector_casted<T>;
-        template<class T> using transform_casted = typename base::template transform_casted<T>;
-        template<class T> using rotation_casted  = typename base::template rotation_casted<T>;
+        template <class T>
+        using vector2_casted = typename base::template vector2_casted<T>;
+        template <class T>
+        using vector_casted = typename base::template vector_casted<T>;
+        template <class T>
+        using transform_casted = typename base::template transform_casted<T>;
+        template <class T>
+        using rotation_casted = typename base::template rotation_casted<T>;
 
         using float_t = FloatT;
-        using vector2_t   = typename base::vector2_t;
-        using vector_t    = typename base::vector_t;
+        using vector2_t = typename base::vector2_t;
+        using vector_t = typename base::vector_t;
         using transform_t = typename base::transform_t;
-        using rotation_t  = typename base::rotation_t;
+        using rotation_t = typename base::rotation_t;
 
     public:
         XYConstrainedOrientedBox(XYConstrainedOrientedBox&&) = default;
@@ -47,29 +52,23 @@ namespace simox
         XYConstrainedOrientedBox& operator=(XYConstrainedOrientedBox&&) = default;
         XYConstrainedOrientedBox& operator=(const XYConstrainedOrientedBox&) = default;
 
-
-        XYConstrainedOrientedBox(
-            const vector_t& corner = {0, 0, 0},
-            const float_t yaw = 0,
-            const vector_t& dimensions = {0, 0, 0}
-        ) :
-            base(
-                base::transformation(
-                    Eigen::AngleAxis<float_t>(yaw, vector_t::UnitZ()).toRotationMatrix(),
-                    corner),
-                dimensions
-            ),
+        XYConstrainedOrientedBox(const vector_t& corner = {0, 0, 0},
+                                 const float_t yaw = 0,
+                                 const vector_t& dimensions = {0, 0, 0}) :
+            base(base::transformation(
+                     Eigen::AngleAxis<float_t>(yaw, vector_t::UnitZ()).toRotationMatrix(),
+                     corner),
+                 dimensions),
             _yaw{yaw}
-        {}
+        {
+        }
 
     private:
-
-        static std::tuple<vector_t, float_t, vector_t> calc_params(
-            const vector_t& corner,
-            const vector2_t& extend0,
-            const vector2_t& extend1,
-            const float_t height
-        )
+        static std::tuple<vector_t, float_t, vector_t>
+        calc_params(const vector_t& corner,
+                    const vector2_t& extend0,
+                    const vector2_t& extend1,
+                    const float_t height)
         {
             const float_t len0 = extend0.norm();
             const float_t len1 = extend1.norm();
@@ -83,11 +82,8 @@ namespace simox
             //checks
             if (std::abs(angle01) > base::eps)
             {
-                throw std::invalid_argument
-                {
-                    "extend0 and extend1 are not perpendicular! (angle = " +
-                    std::to_string(angle01) + "°)"
-                };
+                throw std::invalid_argument{"extend0 and extend1 are not perpendicular! (angle = " +
+                                            std::to_string(angle01) + "°)"};
             }
 
             //make sure the system is right handed + calculate yaw
@@ -109,34 +105,39 @@ namespace simox
 
         XYConstrainedOrientedBox(std::tuple<vector_t, float_t, vector_t> params) :
             XYConstrainedOrientedBox(std::get<0>(params), std::get<1>(params), std::get<2>(params))
-        {}
+        {
+        }
+
     public:
-
-        XYConstrainedOrientedBox(
-            const vector_t& corner,
-            const vector2_t& extend0,
-            const vector2_t& extend1,
-            const float_t height
-        ) :
+        XYConstrainedOrientedBox(const vector_t& corner,
+                                 const vector2_t& extend0,
+                                 const vector2_t& extend1,
+                                 const float_t height) :
             XYConstrainedOrientedBox(calc_params(corner, extend0, extend1, height))
-        {}
+        {
+        }
 
-        float_t yaw() const
+        float_t
+        yaw() const
         {
             return _yaw;
         }
-        template<class T>
-        T yaw() const
+
+        template <class T>
+        T
+        yaw() const
         {
             return _yaw;
         }
-        
-        template<class T>
-        XYConstrainedOrientedBox<T> cast() const
+
+        template <class T>
+        XYConstrainedOrientedBox<T>
+        cast() const
         {
             return {this->template translation<T>(), yaw<T>(), this->template dimensions<T>()};
         }
+
     private:
         float_t _yaw;
     };
-}
+} // namespace simox

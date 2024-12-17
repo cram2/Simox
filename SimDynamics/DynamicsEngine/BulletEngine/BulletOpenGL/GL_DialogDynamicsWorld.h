@@ -45,10 +45,10 @@ class GL_DialogDynamicsWorld
 
     btDiscreteDynamicsWorld* m_dynamicsWorld;
 
-    btCollisionObject*  m_lowerBorder;
-    btCollisionObject*  m_upperBorder;
-    btCollisionObject*  m_leftBorder;
-    btCollisionObject*  m_rightBorder;
+    btCollisionObject* m_lowerBorder;
+    btCollisionObject* m_upperBorder;
+    btCollisionObject* m_leftBorder;
+    btCollisionObject* m_rightBorder;
 
     btAlignedObjectArray<GL_DialogWindow*> m_dialogs;
 
@@ -61,29 +61,32 @@ class GL_DialogDynamicsWorld
     int m_mouseOldY;
     int m_mouseButtons;
     ///constraint for mouse picking
-    btTypedConstraint*      m_pickConstraint;
+    btTypedConstraint* m_pickConstraint;
 
-    btVector3   getRayTo(int x, int y);
+    btVector3 getRayTo(int x, int y);
 
 public:
-
     GL_DialogDynamicsWorld();
 
     virtual ~GL_DialogDynamicsWorld();
 
-    virtual void    setScreenSize(int width, int height);
+    virtual void setScreenSize(int width, int height);
 
-    virtual GL_DialogWindow* createDialog(int horPos, int vertPos, int dialogWidth, int dialogHeight, const char* dialogTitle);
+    virtual GL_DialogWindow* createDialog(int horPos,
+                                          int vertPos,
+                                          int dialogWidth,
+                                          int dialogHeight,
+                                          const char* dialogTitle);
 
     GL_ToggleControl* createToggle(GL_DialogWindow* dialog, const char* toggleText);
 
-    GL_SliderControl* createSlider(GL_DialogWindow* dialog, const char* sliderText, btScalar initialFraction = btScalar(0.5f));
+    GL_SliderControl* createSlider(GL_DialogWindow* dialog,
+                                   const char* sliderText,
+                                   btScalar initialFraction = btScalar(0.5f));
 
-    virtual void    draw(btScalar timeStep);
+    virtual void draw(btScalar timeStep);
 
-    virtual bool    mouseFunc(int button, int state, int x, int y);
+    virtual bool mouseFunc(int button, int state, int x, int y);
 
-    virtual void    mouseMotionFunc(int x, int y);
-
+    virtual void mouseMotionFunc(int x, int y);
 };
-

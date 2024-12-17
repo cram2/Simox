@@ -8,24 +8,30 @@
 // *****************************************************************
 
 #include "SphereApproximator.h"
+
 #include <cmath>
 #include <iostream>
-#include "VirtualRobot/Visualization/TriMeshModel.h"
 
 #include <Eigen/Geometry>
+
+#include "VirtualRobot/Visualization/TriMeshModel.h"
 
 using namespace std;
 
 namespace VirtualRobot
 {
 
-    void SphereApproximator::generateGraph(SphereApproximation& storeResult, EPolyhedronType baseType, int levels, float radius)
+    void
+    SphereApproximator::generateGraph(SphereApproximation& storeResult,
+                                      EPolyhedronType baseType,
+                                      int levels,
+                                      float radius)
     {
         GraphData gd;
         initBasePolyhedron(baseType, gd);
         projectToSphere(radius, gd);
 
-        for (int L = 0 ; L < levels ; L++)
+        for (int L = 0; L < levels; L++)
         {
             subDivide(gd);
             projectToSphere(radius, gd);
@@ -37,14 +43,16 @@ namespace VirtualRobot
         buildVertexFaceMapping(storeResult);
     }
 
-    void SphereApproximator::buildVertexFaceMapping(SphereApproximation& storeResult)
+    void
+    SphereApproximator::buildVertexFaceMapping(SphereApproximation& storeResult)
     {
         for (int i = 0; i < (int)storeResult.faces.size(); i++)
         {
             MathTools::TriangleFace f = storeResult.faces[i];
             FaceIndex fi;
 
-            if (storeResult.mapVerticeIndxToFaceIndx.find(f.id1) == storeResult.mapVerticeIndxToFaceIndx.end())
+            if (storeResult.mapVerticeIndxToFaceIndx.find(f.id1) ==
+                storeResult.mapVerticeIndxToFaceIndx.end())
             {
                 fi.faceIds.clear();
             }
@@ -56,7 +64,8 @@ namespace VirtualRobot
             fi.faceIds.push_back(i);
             storeResult.mapVerticeIndxToFaceIndx[f.id1] = fi;
 
-            if (storeResult.mapVerticeIndxToFaceIndx.find(f.id2) == storeResult.mapVerticeIndxToFaceIndx.end())
+            if (storeResult.mapVerticeIndxToFaceIndx.find(f.id2) ==
+                storeResult.mapVerticeIndxToFaceIndx.end())
             {
                 fi.faceIds.clear();
             }
@@ -68,7 +77,8 @@ namespace VirtualRobot
             fi.faceIds.push_back(i);
             storeResult.mapVerticeIndxToFaceIndx[f.id2] = fi;
 
-            if (storeResult.mapVerticeIndxToFaceIndx.find(f.id3) == storeResult.mapVerticeIndxToFaceIndx.end())
+            if (storeResult.mapVerticeIndxToFaceIndx.find(f.id3) ==
+                storeResult.mapVerticeIndxToFaceIndx.end())
             {
                 fi.faceIds.clear();
             }
@@ -82,7 +92,8 @@ namespace VirtualRobot
         }
     }
 
-    void SphereApproximator::initBasePolyhedron(EPolyhedronType nBaseType, GraphData& gd)
+    void
+    SphereApproximator::initBasePolyhedron(EPolyhedronType nBaseType, GraphData& gd)
     {
         gd.vertices.clear();
         gd.faces.clear();
@@ -106,14 +117,17 @@ namespace VirtualRobot
                 break;
         }
     }
-    void SphereApproximator::setVec(Eigen::Vector3f& v, float x, float y, float z)
+
+    void
+    SphereApproximator::setVec(Eigen::Vector3f& v, float x, float y, float z)
     {
         v(0) = x;
         v(1) = y;
         v(2) = z;
     }
 
-    void SphereApproximator::generateTetrahedron(GraphData& gd)
+    void
+    SphereApproximator::generateTetrahedron(GraphData& gd)
     {
         // vertices of a tetrahedron
         float fSqrt3 = sqrtf(3.0);
@@ -124,7 +138,7 @@ namespace VirtualRobot
         setVec(v[2], -fSqrt3, fSqrt3, -fSqrt3);
         setVec(v[3], fSqrt3, -fSqrt3, -fSqrt3);
 
-        for (const auto & i : v)
+        for (const auto& i : v)
         {
             gd.vertices.push_back(i);
         }
@@ -136,7 +150,7 @@ namespace VirtualRobot
         f[2].set(3, 2, 4);
         f[3].set(4, 1, 3);
 
-        for (auto & i : f)
+        for (auto& i : f)
         {
             i.id1--;
             i.id2--;
@@ -145,7 +159,8 @@ namespace VirtualRobot
         }
     }
 
-    void SphereApproximator::generateOctahedron(GraphData& gd)
+    void
+    SphereApproximator::generateOctahedron(GraphData& gd)
     {
         // Six equidistant points lying on the unit sphere
         Eigen::Vector3f v[6];
@@ -156,7 +171,7 @@ namespace VirtualRobot
         setVec(v[4], 0, 0, 1);
         setVec(v[5], 0, 0, -1);
 
-        for (const auto & i : v)
+        for (const auto& i : v)
         {
             gd.vertices.push_back(i);
         }
@@ -172,7 +187,7 @@ namespace VirtualRobot
         f[6].set(2, 4, 6);
         f[7].set(4, 1, 6);
 
-        for (auto & i : f)
+        for (auto& i : f)
         {
             i.id1--;
             i.id2--;
@@ -181,7 +196,8 @@ namespace VirtualRobot
         }
     }
 
-    void SphereApproximator::generateIcosahedron(GraphData& gd)
+    void
+    SphereApproximator::generateIcosahedron(GraphData& gd)
     {
         // Twelve vertices of icosahedron on unit sphere
         float tau = 0.8506508084f;
@@ -202,7 +218,7 @@ namespace VirtualRobot
         setVec(v[10], 0, -tau, -one);
         setVec(v[11], 0, tau, -one);
 
-        for (const auto & i : v)
+        for (const auto& i : v)
         {
             gd.vertices.push_back(i);
         }
@@ -210,28 +226,28 @@ namespace VirtualRobot
 
         // Structure for unit icosahedron
         MathTools::TriangleFace f[20];
-        f[0].set(5,  8,  9);
-        f[1].set(5, 10,  8);
-        f[2].set(6, 12,  7);
-        f[3].set(6,  7, 11);
-        f[4].set(1,  4,  5);
-        f[5].set(1,  6,  4);
-        f[6].set(3,  2,  8);
-        f[7].set(3,  7,  2);
-        f[8].set(9, 12,  1);
-        f[9].set(9,  2, 12);
-        f[10].set(10,  4, 11);
+        f[0].set(5, 8, 9);
+        f[1].set(5, 10, 8);
+        f[2].set(6, 12, 7);
+        f[3].set(6, 7, 11);
+        f[4].set(1, 4, 5);
+        f[5].set(1, 6, 4);
+        f[6].set(3, 2, 8);
+        f[7].set(3, 7, 2);
+        f[8].set(9, 12, 1);
+        f[9].set(9, 2, 12);
+        f[10].set(10, 4, 11);
         f[11].set(10, 11, 3);
-        f[12].set(9,  1,  5);
-        f[13].set(12,  6,  1);
-        f[14].set(5,  4, 10);
-        f[15].set(6, 11,  4);
-        f[16].set(8,  2,  9);
-        f[17].set(7, 12,  2);
+        f[12].set(9, 1, 5);
+        f[13].set(12, 6, 1);
+        f[14].set(5, 4, 10);
+        f[15].set(6, 11, 4);
+        f[16].set(8, 2, 9);
+        f[17].set(7, 12, 2);
         f[18].set(8, 10, 3);
-        f[19].set(7,  3, 11);
+        f[19].set(7, 3, 11);
 
-        for (auto & i : f)
+        for (auto& i : f)
         {
             i.id1--;
             i.id2--;
@@ -240,13 +256,14 @@ namespace VirtualRobot
         }
     }
 
-    void SphereApproximator::subDivide(GraphData& gd)
+    void
+    SphereApproximator::subDivide(GraphData& gd)
     {
         // buffer new faces
         vector<MathTools::TriangleFace> newFaces;
 
         // gp through all faces and subdivide
-        for (int f = 0 ; f < int(gd.faces.size()) ; f++)
+        for (int f = 0; f < int(gd.faces.size()); f++)
         {
             // get the triangle vertex indices
             int nA = gd.faces.at(f).id1;
@@ -321,7 +338,7 @@ namespace VirtualRobot
             fa[2].set(nC_m, nB_m, nC);
             fa[3].set(nA_m, nB_m, nC_m);
 
-            for (const auto & i : fa)
+            for (const auto& i : fa)
             {
                 newFaces.push_back(i);
             }
@@ -331,20 +348,26 @@ namespace VirtualRobot
         gd.faces = newFaces;
     }
 
-
-    void SphereApproximator::addVecVec(const Eigen::Vector3f& vector1, const Eigen::Vector3f& vector2, Eigen::Vector3f& result)
+    void
+    SphereApproximator::addVecVec(const Eigen::Vector3f& vector1,
+                                  const Eigen::Vector3f& vector2,
+                                  Eigen::Vector3f& result)
     {
         result = vector1 + vector2;
     }
 
-    void SphereApproximator::mulVecScalar(const Eigen::Vector3f& vec, float scalar, Eigen::Vector3f& result)
+    void
+    SphereApproximator::mulVecScalar(const Eigen::Vector3f& vec,
+                                     float scalar,
+                                     Eigen::Vector3f& result)
     {
         result = scalar * vec;
     }
 
-    void SphereApproximator::projectToSphere(float radius, GraphData& gd)
+    void
+    SphereApproximator::projectToSphere(float radius, GraphData& gd)
     {
-        for (int v = 0 ; v < int(gd.vertices.size()) ; v++)
+        for (int v = 0; v < int(gd.vertices.size()); v++)
         {
             float X = (float)gd.vertices.at(v)(0);
             float Y = (float)gd.vertices.at(v)(1);
@@ -354,7 +377,7 @@ namespace VirtualRobot
 
             // Convert Cartesian X,Y,Z to spherical (radians)
             float theta = atan2(Y, X);
-            float phi   = atan2(sqrt(X * X + Y * Y), Z);
+            float phi = atan2(sqrt(X * X + Y * Y), Z);
 
             // Recalculate X,Y,Z for constant r, given theta & phi.
             x = radius * sin(phi) * cos(theta);
@@ -367,11 +390,15 @@ namespace VirtualRobot
         }
     }
 
-    float SphereApproximator::AngleVecVec(const Eigen::Vector3f& vector1, const Eigen::Vector3f& vector2)
+    float
+    SphereApproximator::AngleVecVec(const Eigen::Vector3f& vector1, const Eigen::Vector3f& vector2)
     {
-        const float sp = (float)(vector1(0) * vector2(0) + vector1(1) * vector2(1) + vector1(2) * vector2(2));
-        const float l1 = sqrtf((float)(vector1(0) * vector1(0) + vector1(1) * vector1(1) + vector1(2) * vector1(2)));
-        const float l2 = sqrtf((float)(vector2(0) * vector2(0) + vector2(1) * vector2(1) + vector2(2) * vector2(2)));
+        const float sp =
+            (float)(vector1(0) * vector2(0) + vector1(1) * vector2(1) + vector1(2) * vector2(2));
+        const float l1 = sqrtf(
+            (float)(vector1(0) * vector1(0) + vector1(1) * vector1(1) + vector1(2) * vector1(2)));
+        const float l2 = sqrtf(
+            (float)(vector2(0) * vector2(0) + vector2(1) * vector2(1) + vector2(2) * vector2(2)));
 
 
         // added this. In some cases angle was numerically unstable
@@ -395,13 +422,16 @@ namespace VirtualRobot
         return acosf(r);
     }
 
-    int SphereApproximator::findVertex(const Eigen::Vector3f& position, float epsilon, std::vector<Eigen::Vector3f>& vertices)
+    int
+    SphereApproximator::findVertex(const Eigen::Vector3f& position,
+                                   float epsilon,
+                                   std::vector<Eigen::Vector3f>& vertices)
     {
         float fDistance;
         float fMinDistance = FLT_MAX;
         int nIndex = -1;
 
-        for (int v = 0 ; v < int(vertices.size()) ; v++)
+        for (int v = 0; v < int(vertices.size()); v++)
         {
             fDistance = AngleVecVec(position, vertices.at(v));
 
@@ -493,7 +523,11 @@ namespace VirtualRobot
         return pResult;
     }*/
 
-    bool SphereApproximator::check_same_clock_dir(const Eigen::Vector3f& pt1, const Eigen::Vector3f& pt2, const Eigen::Vector3f& pt3, const Eigen::Vector3f& norm)
+    bool
+    SphereApproximator::check_same_clock_dir(const Eigen::Vector3f& pt1,
+                                             const Eigen::Vector3f& pt2,
+                                             const Eigen::Vector3f& pt3,
+                                             const Eigen::Vector3f& norm)
     {
         float testi, testj, testk;
         float dotprod;
@@ -516,7 +550,13 @@ namespace VirtualRobot
         }
     }
 
-    bool SphereApproximator::check_intersect_tri(const Eigen::Vector3f& pt1, const Eigen::Vector3f& pt2, const Eigen::Vector3f& pt3, const Eigen::Vector3f& linept, const Eigen::Vector3f& vect, Eigen::Vector3f& storeIntersection)
+    bool
+    SphereApproximator::check_intersect_tri(const Eigen::Vector3f& pt1,
+                                            const Eigen::Vector3f& pt2,
+                                            const Eigen::Vector3f& pt3,
+                                            const Eigen::Vector3f& linept,
+                                            const Eigen::Vector3f& vect,
+                                            Eigen::Vector3f& storeIntersection)
     {
         // code from http://www.angelfire.com/fl/houseofbartlett/solutions/line2tri.html
         Eigen::Vector3f v1, v2, norm;
@@ -541,7 +581,8 @@ namespace VirtualRobot
         {
             //Find point of intersect to triangle plane.
             //find t to intersect point
-            t = -(norm(0) * (linept(0) - pt1(0)) + norm(1) * (linept(1) - pt1(1)) + norm(2) * (linept(2) - pt1(2))) /
+            t = -(norm(0) * (linept(0) - pt1(0)) + norm(1) * (linept(1) - pt1(1)) +
+                  norm(2) * (linept(2) - pt1(2))) /
                 (norm(0) * vect(0) + norm(1) * vect(1) + norm(2) * vect(2));
 
             // if ds is neg line started past triangle so can't hit triangle.
@@ -568,7 +609,8 @@ namespace VirtualRobot
         return false;
     }
 
-    VirtualRobot::TriMeshModelPtr SphereApproximator::generateTriMesh(const SphereApproximation& a)
+    VirtualRobot::TriMeshModelPtr
+    SphereApproximator::generateTriMesh(const SphereApproximation& a)
     {
         Eigen::Vector3f v1, v2, v3;
         MathTools::TriangleFace f;
@@ -594,5 +636,4 @@ namespace VirtualRobot
         return tr;
     }
 
-}
-
+} // namespace VirtualRobot

@@ -27,13 +27,17 @@
 namespace math
 {
 
-class VIRTUAL_ROBOT_IMPORT_EXPORT SimpleAbstractFunctionR2R3
-{
-public:
-    virtual Eigen::Vector3f GetPoint(float u, float v) = 0;
-    Eigen::Vector3f GetPoint(Eigen::Vector2f uv){return GetPoint(uv.x(),uv.y());}
+    class VIRTUAL_ROBOT_IMPORT_EXPORT SimpleAbstractFunctionR2R3
+    {
+    public:
+        virtual Eigen::Vector3f GetPoint(float u, float v) = 0;
 
-private:
-};
-}
+        Eigen::Vector3f
+        GetPoint(Eigen::Vector2f uv)
+        {
+            return GetPoint(uv.x(), uv.y());
+        }
 
+    private:
+    };
+} // namespace math

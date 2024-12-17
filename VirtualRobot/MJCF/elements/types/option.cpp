@@ -6,11 +6,11 @@
 using namespace mjcf;
 
 
-const std::string OptionFlag::tag    = "flag";
+const std::string OptionFlag::tag = "flag";
 const std::string OptionSection::tag = "option";
 
-
-OptionFlag OptionSection::flag()
+OptionFlag
+OptionSection::flag()
 {
     return getOrCreateChild<OptionFlag>();
 }

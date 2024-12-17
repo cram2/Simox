@@ -1,28 +1,27 @@
 
 #include "MTPlanningWindow.h"
 
-#include "ui_MTPlanning.h"
-
-#include <vector>
 #include <iostream>
-#include <qlayout.h>
+#include <sstream>
+#include <vector>
+
+#include <qcheckbox.h>
+#include <qgl.h>
+#include <qimage.h>
 #include <qlabel.h>
+#include <qlayout.h>
+#include <qlcdnumber.h>
 #include <qpixmap.h>
 #include <qprogressbar.h>
-#include <qcheckbox.h>
-#include <qlcdnumber.h>
 #include <qslider.h>
-#include <qimage.h>
-#include <qgl.h>
 
-#include <Inventor/sensors/SoTimerSensor.h>
-#include <Inventor/nodes/SoEventCallback.h>
 #include "Inventor/actions/SoLineHighlightRenderAction.h"
-#include <Inventor/nodes/SoShapeHints.h>
+#include "ui_MTPlanning.h"
+#include <Inventor/nodes/SoEventCallback.h>
 #include <Inventor/nodes/SoLightModel.h>
 #include <Inventor/nodes/SoMatrixTransform.h>
-
-#include <sstream>
+#include <Inventor/nodes/SoShapeHints.h>
+#include <Inventor/sensors/SoTimerSensor.h>
 
 using namespace std;
 
@@ -31,8 +30,7 @@ float TIMER_MS = 30.0f;
 bool runtimeDisplayed = false;
 bool optiTimeDisplayed = false;
 
-MTPlanningWindow::MTPlanningWindow()
-    : QMainWindow(nullptr)
+MTPlanningWindow::MTPlanningWindow() : QMainWindow(nullptr)
 {
     //resize(1100, 768);
 
@@ -56,7 +54,6 @@ MTPlanningWindow::MTPlanningWindow()
     sensor_mgr->insertTimerSensor(timer2);
 }
 
-
 MTPlanningWindow::~MTPlanningWindow()
 {
     if (scene != nullptr)
@@ -65,8 +62,8 @@ MTPlanningWindow::~MTPlanningWindow()
     }
 }
 
-
-void MTPlanningWindow::timerCBPlanning(void* data, SoSensor* /*sensor*/)
+void
+MTPlanningWindow::timerCBPlanning(void* data, SoSensor* /*sensor*/)
 {
     MTPlanningWindow* mtWindow = static_cast<MTPlanningWindow*>(data);
     mtWindow->scene->checkPlanningThreads();
@@ -90,8 +87,8 @@ void MTPlanningWindow::timerCBPlanning(void* data, SoSensor* /*sensor*/)
     }
 }
 
-
-void MTPlanningWindow::timerCBOptimize(void* data, SoSensor* /*sensor*/)
+void
+MTPlanningWindow::timerCBOptimize(void* data, SoSensor* /*sensor*/)
 {
     MTPlanningWindow* mtWindow = static_cast<MTPlanningWindow*>(data);
     mtWindow->scene->checkOptimizeThreads();
@@ -116,8 +113,8 @@ void MTPlanningWindow::timerCBOptimize(void* data, SoSensor* /*sensor*/)
     }
 }
 
-
-void MTPlanningWindow::setupLayoutMTPlanning()
+void
+MTPlanningWindow::setupLayoutMTPlanning()
 {
     UI.setupUi(this);
     viewer = new SoQtExaminerViewer(UI.frameViewer, "", TRUE, SoQtExaminerViewer::BUILD_POPUP);
@@ -138,7 +135,10 @@ void MTPlanningWindow::setupLayoutMTPlanning()
     UI.comboBoxColChecking->addItem(QString("Singleton Col Checker"));
     UI.comboBoxColChecking->addItem(QString("Multiple Col Checker Instances"));
     UI.comboBoxColChecking->setCurrentIndex(1);
-    connect(UI.comboBoxColChecking, SIGNAL(activated(int)), this, SLOT(selectColCheckerComboBoxChanged(int)));
+    connect(UI.comboBoxColChecking,
+            SIGNAL(activated(int)),
+            this,
+            SLOT(selectColCheckerComboBoxChanged(int)));
     connect(UI.pushButtonAdd, SIGNAL(clicked()), this, SLOT(addThread()));
     connect(UI.pushButtonPlanning, SIGNAL(clicked()), this, SLOT(startThreads()));
     connect(UI.pushButtonPlanningStop, SIGNAL(clicked()), this, SLOT(stopThreads()));
@@ -146,35 +146,37 @@ void MTPlanningWindow::setupLayoutMTPlanning()
     connect(UI.pushButtonPostStop, SIGNAL(clicked()), this, SLOT(stopOptimize()));
 }
 
-void MTPlanningWindow::selectColCheckerComboBoxChanged(int /*value*/)
+void
+MTPlanningWindow::selectColCheckerComboBoxChanged(int /*value*/)
 {
     reset();
 }
 
-void MTPlanningWindow::closeEvent(QCloseEvent* event)
+void
+MTPlanningWindow::closeEvent(QCloseEvent* event)
 {
     quit();
     QMainWindow::closeEvent(event);
 }
 
-
-int MTPlanningWindow::main()
+int
+MTPlanningWindow::main()
 {
     SoQt::show(this);
     SoQt::mainLoop();
     return 0;
 }
 
-
-void MTPlanningWindow::quit()
+void
+MTPlanningWindow::quit()
 {
     std::cout << "MTPlanningWindow: Closing" << std::endl;
     this->close();
     SoQt::exitMainLoop();
 }
 
-
-void MTPlanningWindow::reset()
+void
+MTPlanningWindow::reset()
 {
     std::cout << "MTPlanningWindow: Reset" << std::endl;
     runtimeDisplayed = false;
@@ -183,7 +185,8 @@ void MTPlanningWindow::reset()
     viewer->viewAll();
 }
 
-void MTPlanningWindow::buildScene()
+void
+MTPlanningWindow::buildScene()
 {
     std::cout << "MTPlanningWindow: buildScene " << std::endl;
     scene->reset();
@@ -191,7 +194,8 @@ void MTPlanningWindow::buildScene()
     viewer->viewAll();
 }
 
-void MTPlanningWindow::addThread()
+void
+MTPlanningWindow::addThread()
 {
     int n = UI.spinBoxThreads->value();
     std::cout << "MTPlanningWindow: addThread " << n << std::endl;
@@ -210,8 +214,8 @@ void MTPlanningWindow::addThread()
     }
 }
 
-
-void MTPlanningWindow::startThreads()
+void
+MTPlanningWindow::startThreads()
 {
     std::cout << "MTPlanningWindow: startThreads " << std::endl;
     this->startTime = clock();
@@ -219,14 +223,15 @@ void MTPlanningWindow::startThreads()
     runtimeDisplayed = false;
 }
 
-
-void MTPlanningWindow::stopThreads()
+void
+MTPlanningWindow::stopThreads()
 {
     std::cout << "MTPlanningWindow: stopThreads " << std::endl;
     scene->stopPlanning();
 }
 
-void MTPlanningWindow::startOptimize()
+void
+MTPlanningWindow::startOptimize()
 {
     std::cout << "MTPlanningWindow: startOptimize " << std::endl;
     this->optiStartTime = clock();
@@ -234,7 +239,8 @@ void MTPlanningWindow::startOptimize()
     optiTimeDisplayed = false;
 }
 
-void MTPlanningWindow::stopOptimize()
+void
+MTPlanningWindow::stopOptimize()
 {
     std::cout << "MTPlanningWindow: stopOptimize " << std::endl;
     scene->stopOptimizing();

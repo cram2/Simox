@@ -1,29 +1,36 @@
-#include <VirtualRobot/Robot.h>
-#include <VirtualRobot/VirtualRobotException.h>
+#include <iostream>
+#include <string>
+
 #include <VirtualRobot/Nodes/RobotNode.h>
 #include <VirtualRobot/Nodes/RobotNodeRevoluteFactory.h>
-#include <VirtualRobot/Transformation/DHParameter.h>
-#include <VirtualRobot/XML/RobotIO.h>
-#include <VirtualRobot/RuntimeEnvironment.h>
+#include <VirtualRobot/Robot.h>
 #include <VirtualRobot/RobotFactory.h>
-
-#include <string>
-#include <iostream>
+#include <VirtualRobot/RuntimeEnvironment.h>
+#include <VirtualRobot/Transformation/DHParameter.h>
+#include <VirtualRobot/VirtualRobotException.h>
+#include <VirtualRobot/XML/RobotIO.h>
 
 using std::cout;
 using std::endl;
 using namespace VirtualRobot;
 
-
-int main(int argc, char* argv[])
+int
+main(int argc, char* argv[])
 {
     std::shared_ptr<Robot> robot = RobotFactory::createRobot("Robbi");
-    std::vector< std::shared_ptr<RobotNode> > robotNodes;
+    std::vector<std::shared_ptr<RobotNode>> robotNodes;
     VirtualRobot::RobotNodeRevoluteFactory revoluteNodeFactory;
     DHParameter dhParameter(0, 0, 0, 0, true);
-    std::shared_ptr<RobotNode> node1 = revoluteNodeFactory.createRobotNodeDH(robot, "RootNode", VisualizationNodePtr(), CollisionModelPtr(), (float) - M_PI, (float)M_PI, 0.0f, dhParameter);
+    std::shared_ptr<RobotNode> node1 = revoluteNodeFactory.createRobotNodeDH(robot,
+                                                                             "RootNode",
+                                                                             VisualizationNodePtr(),
+                                                                             CollisionModelPtr(),
+                                                                             (float)-M_PI,
+                                                                             (float)M_PI,
+                                                                             0.0f,
+                                                                             dhParameter);
     robotNodes.push_back(node1);
-    std::map<RobotNodePtr, std::vector<std::string> > childrenMap;
+    std::map<RobotNodePtr, std::vector<std::string>> childrenMap;
     bool resInit = RobotFactory::initializeRobot(robot, robotNodes, childrenMap, node1);
 
     std::cout << "resInit:" << resInit << std::endl;

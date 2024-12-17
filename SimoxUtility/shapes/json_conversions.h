@@ -2,11 +2,10 @@
 
 #include <SimoxUtility/json/json.hpp>
 
-
 namespace simox
 {
     class AxisAlignedBoundingBox;
-    template<class FloatT>
+    template <class FloatT>
     class OrientedBox;
 
 
@@ -19,5 +18,4 @@ namespace simox
     void to_json(nlohmann::json& j, const OrientedBox<double>& ob);
     void from_json(const nlohmann::json& j, OrientedBox<double>& ob);
 
-}
-
+} // namespace simox

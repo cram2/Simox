@@ -1,11 +1,14 @@
 
 #include "Rrt.h"
-#include "../CSpace/CSpaceNode.h"
-#include "../CSpace/CSpaceTree.h"
-#include "../CSpace/CSpacePath.h"
-#include "VirtualRobot/Robot.h"
-#include <VirtualRobot/Random.h>
+
 #include <ctime>
+
+#include <VirtualRobot/Random.h>
+
+#include "../CSpace/CSpaceNode.h"
+#include "../CSpace/CSpacePath.h"
+#include "../CSpace/CSpaceTree.h"
+#include "VirtualRobot/Robot.h"
 
 
 using namespace std;
@@ -14,40 +17,42 @@ using namespace VirtualRobot;
 namespace Saba
 {
 
-    Rrt::Rrt(CSpacePtr cspace, RrtMethod mode, float probabilityExtendToGoal, float samplingSize)
-        : MotionPlanner(std::dynamic_pointer_cast<CSpace>(cspace))
+    Rrt::Rrt(CSpacePtr cspace, RrtMethod mode, float probabilityExtendToGoal, float samplingSize) :
+        MotionPlanner(std::dynamic_pointer_cast<CSpace>(cspace))
     {
         rrtMode = mode;
         tree.reset(new CSpaceTree(cspace));
 
         if (probabilityExtendToGoal <= 0)
         {
-            SABA_ERROR << " probabilityExtendToGoal is wrong: " << probabilityExtendToGoal << std::endl;
+            SABA_ERROR << " probabilityExtendToGoal is wrong: " << probabilityExtendToGoal
+                       << std::endl;
             probabilityExtendToGoal = 0.1f;
         }
 
         if (probabilityExtendToGoal >= 1.0f)
         {
-            SABA_ERROR << " probabilityExtendToGoal is wrong: " << probabilityExtendToGoal << std::endl;
+            SABA_ERROR << " probabilityExtendToGoal is wrong: " << probabilityExtendToGoal
+                       << std::endl;
             probabilityExtendToGoal = 0.9f;
         }
 
         extendGoToGoal = probabilityExtendToGoal;
         CSpaceSampledPtr sampledCSpace = std::dynamic_pointer_cast<CSpaceSampled>(cspace);
-        if(samplingSize > 0)
+        if (samplingSize > 0)
             this->extendStepSize = samplingSize;
-        else if(sampledCSpace)
+        else if (sampledCSpace)
             this->extendStepSize = sampledCSpace->getSamplingSize();
-        else SABA_ERROR << "Sampling size neither set from cspace nor from parameter";
+        else
+            SABA_ERROR << "Sampling size neither set from cspace nor from parameter";
         tmpConfig.setZero(dimension);
         lastAddedID = -1;
     }
 
-    Rrt::~Rrt()
-    = default;
+    Rrt::~Rrt() = default;
 
-
-    bool Rrt::plan(bool bQuiet)
+    bool
+    Rrt::plan(bool bQuiet)
     {
         if (!bQuiet)
         {
@@ -143,7 +148,8 @@ namespace Saba
                     {
                         if (!goalConfig.isApprox(goalNode->configuration))
                         {
-                            SABA_WARNING << "GoalConfig: (" << goalConfig << ") != goalNode (" << goalNode->configuration << ")" << std::endl;
+                            SABA_WARNING << "GoalConfig: (" << goalConfig << ") != goalNode ("
+                                         << goalNode->configuration << ")" << std::endl;
                         }
 
                         //SABA_ASSERT(goalConfig.isApprox(goalNode->configuration));
@@ -187,15 +193,16 @@ namespace Saba
             cycles++;
             clock_t currentClock = clock();
 
-            long diffClock = (long)(((float)(currentClock - startClock) / (float)CLOCKS_PER_SEC) * 1000.0);
-            if(diffClock > planningTimeout)
+            long diffClock =
+                (long)(((float)(currentClock - startClock) / (float)CLOCKS_PER_SEC) * 1000.0);
+            if (diffClock > planningTimeout)
             {
-                std::cout << "Encountered timeout of " << planningTimeout << " ms - aborting" << std::endl;
+                std::cout << "Encountered timeout of " << planningTimeout << " ms - aborting"
+                          << std::endl;
                 return false;
             }
 
-        }
-        while (!stopSearch && cycles < maxCycles && !found);
+        } while (!stopSearch && cycles < maxCycles && !found);
 
         clock_t endClock = clock();
 
@@ -207,15 +214,18 @@ namespace Saba
             SABA_INFO << "Needed " << diffClock << " ms of processor time." << std::endl;
 
             SABA_INFO << "Created " << tree->getNrOfNodes() << " nodes." << std::endl;
-            SABA_INFO << "Collision Checks: " << (cspace->performaceVars_collisionCheck - colChecksStart) << std::endl;
-            SABA_INFO << "Distance Calculations: " << (cspace->performaceVars_distanceCheck - distChecksStart) << std::endl;
+            SABA_INFO << "Collision Checks: "
+                      << (cspace->performaceVars_collisionCheck - colChecksStart) << std::endl;
+            SABA_INFO << "Distance Calculations: "
+                      << (cspace->performaceVars_distanceCheck - distChecksStart) << std::endl;
 
             int nColChecks = (cspace->performaceVars_collisionCheck - colChecksStart);
 
             if (diffClock > 0)
             {
                 float fPerf = (float)nColChecks / (float)diffClock * 1000.0f;
-                std::cout << "Performance: " << fPerf << " cps (collision-checks per second)." << std::endl;
+                std::cout << "Performance: " << fPerf << " cps (collision-checks per second)."
+                          << std::endl;
             }
         }
 
@@ -250,7 +260,8 @@ namespace Saba
         return false;
     }
 
-    Rrt::ExtensionResult Rrt::extend(Eigen::VectorXf& c, CSpaceTreePtr tree, int& storeLastAddedID)
+    Rrt::ExtensionResult
+    Rrt::extend(Eigen::VectorXf& c, CSpaceTreePtr tree, int& storeLastAddedID)
     {
         // NEAREST NEIGHBOR OF RANDOM CONFIGURATION
         CSpaceNodePtr nn = tree->getNearestNeighbor(c);
@@ -297,13 +308,13 @@ namespace Saba
             {
                 return ePartial; // ADVANCED
             }
-        }//PATH NOT COLLISION FREE
+        } //PATH NOT COLLISION FREE
 
         return eFailed; // EXTEND FAILS
     }
 
-
-    Rrt::ExtensionResult Rrt::connectComplete(Eigen::VectorXf& c, CSpaceTreePtr tree, int& storeLastAddedID)
+    Rrt::ExtensionResult
+    Rrt::connectComplete(Eigen::VectorXf& c, CSpaceTreePtr tree, int& storeLastAddedID)
     {
         // NEAREST NEIGHBOR OF RANDOM CONFIGURATION
         CSpaceNodePtr nn = tree->getNearestNeighbor(c);
@@ -320,12 +331,13 @@ namespace Saba
             }
 
             return eSuccess; // REACHED
-        }//PATH NOT COLLISION FREE
+        } //PATH NOT COLLISION FREE
 
         return eFailed; // CONNECT FAILS
     }
 
-    Rrt::ExtensionResult Rrt::connectUntilCollision(Eigen::VectorXf& c, CSpaceTreePtr tree, int& storeLastAddedID)
+    Rrt::ExtensionResult
+    Rrt::connectUntilCollision(Eigen::VectorXf& c, CSpaceTreePtr tree, int& storeLastAddedID)
     {
         // NEAREST NEIGHBOR OF RANDOM CONFIGURATION
         CSpaceNodePtr nn = tree->getNearestNeighbor(c);
@@ -336,19 +348,20 @@ namespace Saba
         if (tree->appendPathUntilCollision(nn, c, &storeLastAddedID))
         {
             return eSuccess; // REACHED (add m_pExtendRrtRandValue to rrt tree)
-        }//PATH NOT COLLISION FREE
+        } //PATH NOT COLLISION FREE
 
         if (oldLastID == storeLastAddedID)
         {
-            return eFailed;    // CONNECT FAILS
+            return eFailed; // CONNECT FAILS
         }
         else
         {
-            return ePartial;    // added some new nodes
+            return ePartial; // added some new nodes
         }
     }
 
-    void Rrt::printConfig(bool printOnlyParams)
+    void
+    Rrt::printConfig(bool printOnlyParams)
     {
         if (!printOnlyParams)
         {
@@ -397,8 +410,8 @@ namespace Saba
         }
     }
 
-
-    bool Rrt::setStart(const Eigen::VectorXf& c)
+    bool
+    Rrt::setStart(const Eigen::VectorXf& c)
     {
         if (!MotionPlanner::setStart(c))
         {
@@ -417,8 +430,8 @@ namespace Saba
         return true;
     }
 
-
-    bool Rrt::setGoal(const Eigen::VectorXf& c)
+    bool
+    Rrt::setGoal(const Eigen::VectorXf& c)
     {
         if (!MotionPlanner::setGoal(c))
         {
@@ -429,7 +442,8 @@ namespace Saba
     }
 
     // uses last added CSpaceNode as start
-    bool Rrt::createSolution(bool bQuiet)
+    bool
+    Rrt::createSolution(bool bQuiet)
     {
 
         // check if we have a path
@@ -448,7 +462,7 @@ namespace Saba
         bool failure = false;
 
         // check if last node has goal configuration
-        CSpaceNodePtr lastNode = tree->getNode(goalNode->ID);//parentID);
+        CSpaceNodePtr lastNode = tree->getNode(goalNode->ID); //parentID);
         tmpSol.push_back(lastNode->ID);
         actNode = lastNode;
 
@@ -478,8 +492,7 @@ namespace Saba
             {
                 failure = true;
             }
-        }
-        while (!failure && actNode->ID != startNode->ID);
+        } while (!failure && actNode->ID != startNode->ID);
 
         if (!failure)
         {
@@ -493,7 +506,8 @@ namespace Saba
 
             if (!bQuiet)
             {
-                SABA_INFO << "Created solution with " << solution->getNrOfPoints() << " nodes." << std::endl;
+                SABA_INFO << "Created solution with " << solution->getNrOfPoints() << " nodes."
+                          << std::endl;
             }
 
             return true;
@@ -504,7 +518,8 @@ namespace Saba
         }
     }
 
-    void Rrt::reset()
+    void
+    Rrt::reset()
     {
         MotionPlanner::reset();
         startNode.reset();
@@ -516,9 +531,8 @@ namespace Saba
         }
     }
 
-
-
-    void Rrt::setProbabilityExtendToGoal(float p)
+    void
+    Rrt::setProbabilityExtendToGoal(float p)
     {
         extendGoToGoal = p;
 
@@ -533,9 +547,10 @@ namespace Saba
         }
     }
 
-    Saba::CSpaceTreePtr Rrt::getTree()
+    Saba::CSpaceTreePtr
+    Rrt::getTree()
     {
         return tree;
     }
 
-} // namespace
+} // namespace Saba

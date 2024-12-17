@@ -7,7 +7,6 @@
 
 #include "json.h"
 
-
 namespace simox::json
 {
     Eigen::Matrix4f posquat2eigen4f(const std::string& str);
@@ -24,4 +23,4 @@ namespace simox::json
     std::map<std::string, float> json2NameValueMap(const std::string& str);
     std::map<std::string, float> json2NameValueMap(const char* str);
     std::map<std::string, float> json2NameValueMap(const simox::json::json& j);
-}
+} // namespace simox::json

@@ -21,22 +21,25 @@
 
 #pragma once
 
-#include "MathForwardDefinitions.h"
-
 #include "../VirtualRobot.h"
 #include "Contact.h"
 #include "DataR3R1.h"
 #include "GaussianImplicitSurface3D.h"
 #include "ImplicitObjectModel.h"
+#include "MathForwardDefinitions.h"
 
 namespace math
 {
 
-    class VIRTUAL_ROBOT_IMPORT_EXPORT GaussianObjectModel :
-            public ImplicitObjectModel
+    class VIRTUAL_ROBOT_IMPORT_EXPORT GaussianObjectModel : public ImplicitObjectModel
     {
     public:
-        float Noise(){ return noise;}
+        float
+        Noise()
+        {
+            return noise;
+        }
+
         GaussianObjectModel(float noise);
         void AddContact(Contact contact);
         void Update() override;
@@ -47,7 +50,5 @@ namespace math
         float noise;
         GaussianImplicitSurface3DPtr gpModel;
         std::vector<DataR3R1> CreateSamples();
-
-            };
-}
-
+    };
+} // namespace math

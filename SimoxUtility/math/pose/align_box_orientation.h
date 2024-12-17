@@ -2,7 +2,6 @@
 
 #include <Eigen/Core>
 
-
 namespace simox::math
 {
 
@@ -21,7 +20,6 @@ namespace simox::math
         Eigen::Vector3f extents = Eigen::Vector3f::Zero();
     };
 
-
     /**
      * @brief Align the given box orientation and extents to the canonic orientation.
      *
@@ -36,9 +34,10 @@ namespace simox::math
      * @param canonicOrientation The canonic orientation (global by default).
      * @return The aligned box orientation and extents.
      */
-    AlignedBox align_box_orientation(
-            Eigen::Matrix3f orientation, Eigen::Vector3f extents,
-            Eigen::Matrix3f canonicOrientation = Eigen::Matrix3f::Identity());
+    AlignedBox
+    align_box_orientation(Eigen::Matrix3f orientation,
+                          Eigen::Vector3f extents,
+                          Eigen::Matrix3f canonicOrientation = Eigen::Matrix3f::Identity());
 
 
     /**
@@ -50,9 +49,9 @@ namespace simox::math
      *
      * @see `align_box_orientation()`
      */
-    Eigen::Matrix3f align_box_orientation(
-            Eigen::Matrix3f orientation,
-            Eigen::Matrix3f canonicOrientation = Eigen::Matrix3f::Identity());
+    Eigen::Matrix3f
+    align_box_orientation(Eigen::Matrix3f orientation,
+                          Eigen::Matrix3f canonicOrientation = Eigen::Matrix3f::Identity());
 
 
     /**
@@ -64,8 +63,8 @@ namespace simox::math
      *
      * @see `align_box_orientation()`
      */
-    Eigen::Matrix3f get_rotation_to_align_box(
-            Eigen::Matrix3f orientation,
-            Eigen::Matrix3f canonicOrientation = Eigen::Matrix3f::Identity());
+    Eigen::Matrix3f
+    get_rotation_to_align_box(Eigen::Matrix3f orientation,
+                              Eigen::Matrix3f canonicOrientation = Eigen::Matrix3f::Identity());
 
-}
+} // namespace simox::math

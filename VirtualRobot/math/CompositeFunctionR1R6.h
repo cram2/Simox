@@ -29,19 +29,30 @@
 namespace math
 {
 
-    class CompositeFunctionR1R6
-        : public AbstractFunctionR1R6
+    class CompositeFunctionR1R6 : public AbstractFunctionR1R6
     {
     public:
-        CompositeFunctionR1R6(const AbstractFunctionR1R3Ptr& position, const AbstractFunctionR1OriPtr& orientation, float startT, float endT);
+        CompositeFunctionR1R6(const AbstractFunctionR1R3Ptr& position,
+                              const AbstractFunctionR1OriPtr& orientation,
+                              float startT,
+                              float endT);
 
         Eigen::Vector3f GetPosition(float t) override;
         Eigen::Quaternionf GetOrientation(float t) override;
         Eigen::Vector3f GetPositionDerivative(float t) override;
         Eigen::Vector3f GetOrientationDerivative(float t) override;
 
-        static CompositeFunctionR1R6Ptr CreateLine(const Eigen::Vector3f& startPos, const Eigen::Vector3f& endPos, const Eigen::Quaternionf& startOri, const Eigen::Quaternionf& endOri, float startT, float endT);
-        static CompositeFunctionR1R6Ptr CreateLine(const Eigen::Vector3f& startPos, const Eigen::Vector3f& endPos, const Eigen::Quaternionf& ori, float startT, float endT);
+        static CompositeFunctionR1R6Ptr CreateLine(const Eigen::Vector3f& startPos,
+                                                   const Eigen::Vector3f& endPos,
+                                                   const Eigen::Quaternionf& startOri,
+                                                   const Eigen::Quaternionf& endOri,
+                                                   float startT,
+                                                   float endT);
+        static CompositeFunctionR1R6Ptr CreateLine(const Eigen::Vector3f& startPos,
+                                                   const Eigen::Vector3f& endPos,
+                                                   const Eigen::Quaternionf& ori,
+                                                   float startT,
+                                                   float endT);
 
     private:
         AbstractFunctionR1R3Ptr position;
@@ -49,4 +60,4 @@ namespace math
         float startT;
         float endT;
     };
-}
+} // namespace math

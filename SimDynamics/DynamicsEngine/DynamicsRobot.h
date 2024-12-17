@@ -22,18 +22,19 @@
 */
 #pragma once
 
+#include <VirtualRobot/Nodes/Sensor.h>
+#include <VirtualRobot/Robot.h>
+
 #include "../SimDynamics.h"
 #include "DynamicsObject.h"
 #include "DynamicsUtils.h"
-#include <VirtualRobot/Robot.h>
-#include <VirtualRobot/Nodes/Sensor.h>
-
 
 namespace SimDynamics
 {
     class SIMDYNAMICS_IMPORT_EXPORT DynamicsRobot
     {
         friend class DynamicsEngine;
+
     public:
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
@@ -48,7 +49,8 @@ namespace SimDynamics
 
         std::string getName() const;
 
-        VirtualRobot::RobotPtr getRobot()
+        VirtualRobot::RobotPtr
+        getRobot()
         {
             return robot;
         }
@@ -61,13 +63,14 @@ namespace SimDynamics
             An empty DynamicsObjectPtr is returned in case no dynamic version has been created so far.
         */
         DynamicsObjectPtr getDynamicsRobotNode(VirtualRobot::RobotNodePtr node);
-        DynamicsObjectPtr getDynamicsRobotNode(const std::string &nodeName);
+        DynamicsObjectPtr getDynamicsRobotNode(const std::string& nodeName);
 
 
         /*!
             Enable joint actuation for given node.
         */
-        virtual void actuateNode(VirtualRobot::RobotNodePtr node, double jointValue, double jointVelocity);
+        virtual void
+        actuateNode(VirtualRobot::RobotNodePtr node, double jointValue, double jointVelocity);
         virtual void actuateNode(VirtualRobot::RobotNodePtr node, double jointValue);
         virtual void actuateNodeVel(VirtualRobot::RobotNodePtr node, double jointVelocity);
         virtual void actuateNodeTorque(VirtualRobot::RobotNodePtr node, double jointTorque);
@@ -79,7 +82,7 @@ namespace SimDynamics
         virtual double getNodeTarget(VirtualRobot::RobotNodePtr node);
         virtual void enableActuation(ActuationMode mode);
         virtual void disableActuation();
-        
+
         void addJointFriction(VirtualRobot::RobotNodePtr node);
 
         /*!
@@ -87,7 +90,11 @@ namespace SimDynamics
             \param dt Timestep
         */
         virtual void actuateJoints(double dt);
-        virtual void updateSensors(double) {}
+
+        virtual void
+        updateSensors(double)
+        {
+        }
 
         // experimental...
         virtual void ensureKinematicConstraints();
@@ -115,12 +122,12 @@ namespace SimDynamics
         virtual void setGlobalPose(const Eigen::Matrix4f& gp);
 
         //! If set, all actions are protected with this mutex
-        virtual void setMutex(std::shared_ptr <std::recursive_mutex> engineMutexPtr);
+        virtual void setMutex(std::shared_ptr<std::recursive_mutex> engineMutexPtr);
 
         //! can be used to access the internal controllers
         std::map<VirtualRobot::RobotNodePtr, VelocityMotorController>& getControllers();
 
-        typedef std::shared_ptr< std::scoped_lock<std::recursive_mutex> > MutexLockPtr;
+        typedef std::shared_ptr<std::scoped_lock<std::recursive_mutex>> MutexLockPtr;
         /*!
             This lock can be used to protect data access. It locks the mutex until deletion.
             If no mutex was specified, an empty lock will be returned which does not protect the engine calls (this is the standard behavior).
@@ -148,23 +155,20 @@ namespace SimDynamics
         virtual void enableSelfCollisions(bool enable);
 
     protected:
-
         virtual void createDynamicsNode(VirtualRobot::RobotNodePtr node);
 
         //! creates a link and attaches object to internal data structure
         virtual bool attachObject(const std::string& nodeName, DynamicsObjectPtr object);
         virtual bool detachObject(DynamicsObjectPtr object);
 
-
         struct robotNodeActuationTarget
         {
-            robotNodeActuationTarget()
-                : jointValueTarget(0)
-                , jointVelocityTarget(0)
-                , jointTorqueTarget(0)
+            robotNodeActuationTarget() :
+                jointValueTarget(0), jointVelocityTarget(0), jointTorqueTarget(0)
             {
                 actuation.mode = 0;
             }
+
             double jointValueTarget;
             double jointVelocityTarget;
             double jointTorqueTarget;
@@ -185,10 +189,9 @@ namespace SimDynamics
         float PID_i = 0.f;
         float PID_d = 0.f;
 
-        std::shared_ptr <std::recursive_mutex> engineMutexPtr;
+        std::shared_ptr<std::recursive_mutex> engineMutexPtr;
     };
 
     typedef std::shared_ptr<DynamicsRobot> DynamicsRobotPtr;
 
 } // namespace SimDynamics
-

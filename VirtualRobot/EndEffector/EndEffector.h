@@ -22,14 +22,14 @@
 */
 #pragma once
 
-#include "../VirtualRobot.h"
-
-#include <string>
-#include <vector>
 #include <map>
 #include <optional>
+#include <string>
+#include <vector>
 
 #include <Eigen/Core>
+
+#include "../VirtualRobot.h"
 
 namespace VirtualRobot
 {
@@ -45,7 +45,7 @@ namespace VirtualRobot
             std::optional<std::string> shape;
         };
 
-        using Capabilities = std::vector<Capability>; 
+        using Capabilities = std::vector<Capability>;
 
         Capabilities capabilities;
 
@@ -62,23 +62,32 @@ namespace VirtualRobot
 
         struct ContactInfo
         {
-            EndEffectorPtr eef;             // the eef
-            EndEffectorActorPtr actor;      // an eef may have multiple actors
-            RobotNodePtr robotNode;         // an actor may have multiple robotNodes
+            EndEffectorPtr eef; // the eef
+            EndEffectorActorPtr actor; // an eef may have multiple actors
+            RobotNodePtr robotNode; // an actor may have multiple robotNodes
             SceneObjectPtr obstacle;
             float distance;
-            Eigen::Vector3f contactPointFingerLocal;        // given in coord system of the object
-            Eigen::Vector3f contactPointObstacleLocal;      // given in coord system of the object
-            Eigen::Vector3f contactPointFingerGlobal;       // given in global coord system
-            Eigen::Vector3f contactPointObstacleGlobal;     // given in global coord system
+            Eigen::Vector3f contactPointFingerLocal; // given in coord system of the object
+            Eigen::Vector3f contactPointObstacleLocal; // given in coord system of the object
+            Eigen::Vector3f contactPointFingerGlobal; // given in global coord system
+            Eigen::Vector3f contactPointObstacleGlobal; // given in global coord system
 
-            Eigen::Vector3f approachDirectionGlobal;    // the movement of the contact point while closing the finger (in this direction force can be applied)
+            Eigen::Vector3f
+                approachDirectionGlobal; // the movement of the contact point while closing the finger (in this direction force can be applied)
         };
 
         //! We need an Eigen::aligned_allocator here, otherwise access to a std::vector could crash
         using ContactInfoVector = std::vector<ContactInfo, Eigen::aligned_allocator<ContactInfo>>;
 
-        EndEffector(const std::string& nameString, const std::vector<EndEffectorActorPtr>& actorsVector, const std::vector<RobotNodePtr>& staticPartVector, RobotNodePtr baseNodePtr, RobotNodePtr tcpNodePtr, RobotNodePtr gcpNodePtr = RobotNodePtr(), std::vector< RobotConfigPtr > preshapes = std::vector< RobotConfigPtr >(), const std::optional<ManipulationCapabilities>& manipulationCapabilities = std::nullopt);
+        EndEffector(
+            const std::string& nameString,
+            const std::vector<EndEffectorActorPtr>& actorsVector,
+            const std::vector<RobotNodePtr>& staticPartVector,
+            RobotNodePtr baseNodePtr,
+            RobotNodePtr tcpNodePtr,
+            RobotNodePtr gcpNodePtr = RobotNodePtr(),
+            std::vector<RobotConfigPtr> preshapes = std::vector<RobotConfigPtr>(),
+            const std::optional<ManipulationCapabilities>& manipulationCapabilities = std::nullopt);
 
         virtual ~EndEffector();
         /*!
@@ -131,10 +140,20 @@ namespace VirtualRobot
             Closes each actor until a joint limit is hit or a collision occurred.
             This method is intended for gripper or hand-like end-effectors.
         */
-        ContactInfoVector closeActors(SceneObjectSetPtr obstacles = SceneObjectSetPtr(), float stepSize = 0.02, float stepSizeSpeedFactor = 1, std::uint64_t steps = 0);
-        ContactInfoVector closeActors(SceneObjectPtr obstacle, float stepSize = 0.02, float stepSizeSpeedFactor = 1, std::uint64_t steps = 0);
-        ContactInfoVector closeActors(std::nullptr_t, float stepSize = 0.02, float stepSizeSpeedFactor = 1, std::uint64_t steps = 0);
-        ContactInfoVector closeActors(float stepSize, float stepSizeSpeedFactor = 1, std::uint64_t steps = 0);
+        ContactInfoVector closeActors(SceneObjectSetPtr obstacles = SceneObjectSetPtr(),
+                                      float stepSize = 0.02,
+                                      float stepSizeSpeedFactor = 1,
+                                      std::uint64_t steps = 0);
+        ContactInfoVector closeActors(SceneObjectPtr obstacle,
+                                      float stepSize = 0.02,
+                                      float stepSizeSpeedFactor = 1,
+                                      std::uint64_t steps = 0);
+        ContactInfoVector closeActors(std::nullptr_t,
+                                      float stepSize = 0.02,
+                                      float stepSizeSpeedFactor = 1,
+                                      std::uint64_t steps = 0);
+        ContactInfoVector
+        closeActors(float stepSize, float stepSizeSpeedFactor = 1, std::uint64_t steps = 0);
 
         bool allActorsClosed() const;
         bool allActorsOpen() const;
@@ -144,8 +163,12 @@ namespace VirtualRobot
             This method is intended for hand-like end-effectors.
             Note that the same effect can be realized by calling closeActors with a negative step size
         */
-        void openActors(SceneObjectSetPtr obstacles = SceneObjectSetPtr(), float stepSize = 0.02, float stepSizeSpeedFactor = 1);
-        void openActors(float stepSize, float stepSizeSpeedFactor)
+        void openActors(SceneObjectSetPtr obstacles = SceneObjectSetPtr(),
+                        float stepSize = 0.02,
+                        float stepSizeSpeedFactor = 1);
+
+        void
+        openActors(float stepSize, float stepSizeSpeedFactor)
         {
             openActors(nullptr, stepSize, stepSizeSpeedFactor);
         }
@@ -154,14 +177,17 @@ namespace VirtualRobot
             Build a SceneObjectSet that covers all RobotNodes of this EndEffector.
             \note The set can be used for collision detection, e.g. to check if the eef is in collision with an obstacle.
         */
-        SceneObjectSetPtr createSceneObjectSet(CollisionCheckerPtr colChecker = CollisionCheckerPtr());
+        SceneObjectSetPtr
+        createSceneObjectSet(CollisionCheckerPtr colChecker = CollisionCheckerPtr());
 
         /*!
             Construct a robot that consists only of this eef.
             All corresponding robot nodes with visualization and collision models are cloned.
             The resulting robot will have one end effector defined which is identical to this object.
         */
-        RobotPtr createEefRobot(const std::string& newRobotType, const std::string& newRobotName, CollisionCheckerPtr collisionChecker = CollisionCheckerPtr());
+        RobotPtr createEefRobot(const std::string& newRobotType,
+                                const std::string& newRobotName,
+                                CollisionCheckerPtr collisionChecker = CollisionCheckerPtr());
 
         /*!
             Register a preshape to this EEF. An exception is thrown if preshape covers joints that are not part of this eef.
@@ -198,7 +224,7 @@ namespace VirtualRobot
         RobotConfigPtr getConfiguration();
 
         //! Return all associated robot nodes
-        std::vector< RobotNodePtr > getAllNodes();
+        std::vector<RobotNodePtr> getAllNodes();
 
         //! Returns true, if nodes (only name strings are checked)  are sufficient for building this eef
         bool nodesSufficient(std::vector<RobotNodePtr> nodes) const;
@@ -213,7 +239,10 @@ namespace VirtualRobot
         */
         virtual std::string toXML(int ident = 1);
 
-        int addStaticPartContacts(SceneObjectPtr obstacle, ContactInfoVector& contacts, const Eigen::Vector3f& approachDirGlobal, float maxDistance = 3.0f);
+        int addStaticPartContacts(SceneObjectPtr obstacle,
+                                  ContactInfoVector& contacts,
+                                  const Eigen::Vector3f& approachDirGlobal,
+                                  float maxDistance = 3.0f);
 
         const std::optional<ManipulationCapabilities>& getManipulationCapabilities() const;
 
@@ -221,7 +250,7 @@ namespace VirtualRobot
         std::string name;
         std::vector<EndEffectorActorPtr> actors;
         std::vector<RobotNodePtr> statics;
-        std::map< std::string, RobotConfigPtr > preshapes;
+        std::map<std::string, RobotConfigPtr> preshapes;
         RobotNodePtr baseNode;
         RobotNodePtr tcpNode;
         RobotNodePtr gcpNode;

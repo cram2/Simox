@@ -22,12 +22,13 @@
 */
 #pragma once
 
-#include "../Saba.h"
-#include "VirtualRobot/Robot.h"
-#include "VirtualRobot/VirtualRobot.h"
-#include "VirtualRobot/CollisionDetection/CDManager.h"
 #include <iostream>
 #include <vector>
+
+#include "../Saba.h"
+#include "VirtualRobot/CollisionDetection/CDManager.h"
+#include "VirtualRobot/Robot.h"
+#include "VirtualRobot/VirtualRobot.h"
 
 namespace Saba
 {
@@ -67,7 +68,11 @@ namespace Saba
             The boundaries of this c-space are set according to definitions in robotNodes.
             On startup, memory is allocate din order to allow fats processing on runtime.
         */
-        CSpace(VirtualRobot::RobotPtr robot, VirtualRobot::CDManagerPtr collisionManager, VirtualRobot::RobotNodeSetPtr robotNodes, unsigned int maxConfigs = 50000, unsigned int randomSeed = 0);
+        CSpace(VirtualRobot::RobotPtr robot,
+               VirtualRobot::CDManagerPtr collisionManager,
+               VirtualRobot::RobotNodeSetPtr robotNodes,
+               unsigned int maxConfigs = 50000,
+               unsigned int randomSeed = 0);
 
         //! destructor
         virtual ~CSpace();
@@ -87,7 +92,9 @@ namespace Saba
             \param goal The goal configuration.
             \param storeAddedLength The length of the collision free path is stored here (1.0 means the complete path from start to goal was valid)
         */
-        virtual CSpacePathPtr createPathUntilInvalid(const Eigen::VectorXf& start, const Eigen::VectorXf& goal, float& storeAddedLength);
+        virtual CSpacePathPtr createPathUntilInvalid(const Eigen::VectorXf& start,
+                                                     const Eigen::VectorXf& goal,
+                                                     float& storeAddedLength);
 
 
         /*!
@@ -167,7 +174,8 @@ namespace Saba
         //! checks complete tree (with the pathCheck methods provided by the CSpace implementation)
         virtual bool checkTree(CSpaceTreePtr tree);
 
-        void resetPerformanceVars()
+        void
+        resetPerformanceVars()
         {
             performaceVars_collisionCheck = 0;
             performaceVars_distanceCheck = 0;
@@ -178,11 +186,11 @@ namespace Saba
         /*!
             Returns array of size dimension.
         */
-        Eigen::VectorXf getMetricWeights()
+        Eigen::VectorXf
+        getMetricWeights()
         {
             return metricWeights;
         }
-
 
         /*!
             Enable/Disable weighting of c-space dimensions. (standard: disabled)
@@ -217,7 +225,10 @@ namespace Saba
         Clone this CSpace structure
         The new Robot and the new CCM are used, the robot and the ccm have to be linked to the new ColChecker!
         */
-        virtual CSpacePtr clone(VirtualRobot::CollisionCheckerPtr newCollisionChecker, VirtualRobot::RobotPtr newRobot, VirtualRobot::CDManagerPtr newCDM, unsigned int nNewRandomSeed = 0) = 0;
+        virtual CSpacePtr clone(VirtualRobot::CollisionCheckerPtr newCollisionChecker,
+                                VirtualRobot::RobotPtr newRobot,
+                                VirtualRobot::CDManagerPtr newCDM,
+                                unsigned int nNewRandomSeed = 0) = 0;
 
 
         /*!
@@ -239,8 +250,12 @@ namespace Saba
             \see checkForBorderlessDimensions
 
         */
-        float calcDist(const Eigen::VectorXf& c1, const Eigen::VectorXf& c2, bool forceDisablingMetricWeights = false);
-        float calcDist2(const Eigen::VectorXf& c1, const Eigen::VectorXf& c2, bool forceDisablingMetricWeights = false);
+        float calcDist(const Eigen::VectorXf& c1,
+                       const Eigen::VectorXf& c2,
+                       bool forceDisablingMetricWeights = false);
+        float calcDist2(const Eigen::VectorXf& c1,
+                        const Eigen::VectorXf& c2,
+                        bool forceDisablingMetricWeights = false);
 
 
         //! calculate distance to obstacles
@@ -280,12 +295,17 @@ namespace Saba
             Checks weather the corresponding joint moves translational or a rotational and performs the interpolation accordingly.
             When a rotational joint is limitless (and checkForBorderlessDimensions was not disabled), the correct direction for interpolating is determined automatically.
         */
-        float interpolate(const Eigen::VectorXf& q1, const Eigen::VectorXf& q2, int dim, float step);
-        Eigen::VectorXf interpolate(const Eigen::VectorXf& q1, const Eigen::VectorXf& q2, float step);
+        float
+        interpolate(const Eigen::VectorXf& q1, const Eigen::VectorXf& q2, int dim, float step);
+        Eigen::VectorXf
+        interpolate(const Eigen::VectorXf& q1, const Eigen::VectorXf& q2, float step);
 
 
         //! check whether a configuration is valid (collision, boundary, and constraints check)
-        virtual bool isConfigValid(const Eigen::VectorXf& pConfig, bool checkBorders = true, bool checkCollisions = true, bool checkConstraints = true);
+        virtual bool isConfigValid(const Eigen::VectorXf& pConfig,
+                                   bool checkBorders = true,
+                                   bool checkCollisions = true,
+                                   bool checkConstraints = true);
 
         /*!
             Add a configuration constraint to be checked within this cspace.
@@ -294,18 +314,22 @@ namespace Saba
         virtual void addConstraintCheck(Saba::ConfigurationConstraintPtr constraint);
 
     protected:
-
-
-
         // gets direction vector from c1 to c2, with (weighted) length
-        virtual void getDirectionVector(const Eigen::VectorXf& c1, const Eigen::VectorXf& c2, Eigen::VectorXf& storeDir, float length);
+        virtual void getDirectionVector(const Eigen::VectorXf& c1,
+                                        const Eigen::VectorXf& c2,
+                                        Eigen::VectorXf& storeDir,
+                                        float length);
 
-        virtual void generateNewConfig(const Eigen::VectorXf& randomConfig, const Eigen::VectorXf& nearestConfig, Eigen::VectorXf& storeNewConfig, float stepSize, float preCalculatedDist = -1.0);
-
+        virtual void generateNewConfig(const Eigen::VectorXf& randomConfig,
+                                       const Eigen::VectorXf& nearestConfig,
+                                       Eigen::VectorXf& storeNewConfig,
+                                       float stepSize,
+                                       float preCalculatedDist = -1.0);
 
 
         //! return upper limit for movement of any point on joints if moving from config to nextConfig
-        virtual float getDirectedMaxMovement(const Eigen::VectorXf& config, const Eigen::VectorXf& nextConfig);
+        virtual float getDirectedMaxMovement(const Eigen::VectorXf& config,
+                                             const Eigen::VectorXf& nextConfig);
 
         static int cloneCounter;
 
@@ -316,37 +340,38 @@ namespace Saba
         //! The interpolation takes the direction of the shorter path between 'a' and 'b'.
         float interpolateRotational(float a, float b, float step);
 
-        unsigned int dimension;                                     //!< dimension of this c-space
+        unsigned int dimension; //!< dimension of this c-space
 
-        Eigen::VectorXf boundaryMax, boundaryMin, boundaryDist;     //!< boundaries of this c-space
+        Eigen::VectorXf boundaryMax, boundaryMin, boundaryDist; //!< boundaries of this c-space
 
-        Eigen::VectorXf metricWeights;                              //!< weights for distance computation
+        Eigen::VectorXf metricWeights; //!< weights for distance computation
 
         bool stopPathCheck;
 
-        VirtualRobot::RobotPtr robo;                                //!< the robot for collision checking
-        VirtualRobot::RobotNodeSetPtr robotNodes;                   //!< the robot nodes defining the c-space
+        VirtualRobot::RobotPtr robo; //!< the robot for collision checking
+        VirtualRobot::RobotNodeSetPtr robotNodes; //!< the robot nodes defining the c-space
 
-        VirtualRobot::CDManagerPtr cdm;                             //!< handling of collision detections
+        VirtualRobot::CDManagerPtr cdm; //!< handling of collision detections
 
 
         int maxNodes;
-        std::vector< CSpaceNodePtr > nodes;                         //! vector with pointers to really used nodes
-        std::vector< CSpaceNodePtr > freeNodes;                     //! vector with pointers to free (not used) nodes
+        std::vector<CSpaceNodePtr> nodes; //! vector with pointers to really used nodes
+        std::vector<CSpaceNodePtr> freeNodes; //! vector with pointers to free (not used) nodes
 
-        std::vector<VirtualRobot::RobotNodePtr> robotJoints;        //!< joints of the robot that we are manipulating
+        std::vector<VirtualRobot::RobotNodePtr>
+            robotJoints; //!< joints of the robot that we are manipulating
 
         bool useMetricWeights;
         bool checkForBorderlessDims;
-        std::vector< bool > borderLessDimension;         // store borderless state
+        std::vector<bool> borderLessDimension; // store borderless state
 
-        bool multiThreaded;                             // indicates that more than one CSpace is used by some threads
-        static std::mutex colCheckMutex;              // only needed when multithreading support is enabled
+        bool multiThreaded; // indicates that more than one CSpace is used by some threads
+        static std::mutex colCheckMutex; // only needed when multithreading support is enabled
         //  -> setting the configurations and checking against collisions is protected by this mutex
-        std::vector<ConfigurationConstraintPtr>  constraints;
+        std::vector<ConfigurationConstraintPtr> constraints;
 
-        SamplerPtr sampleAlgorithm; // standard is NULL (uniformly sampling), is used in getRandomConfig()
+        SamplerPtr
+            sampleAlgorithm; // standard is NULL (uniformly sampling), is used in getRandomConfig()
     };
 
-} // namespace
-
+} // namespace Saba

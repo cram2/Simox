@@ -11,14 +11,15 @@
 // **************************************************************
 
 #include "GraspQualityMeasureWrenchSpaceNotNormalized.h"
+
+#include <cassert>
+#include <cfloat>
 #include <cmath>
 #include <cstdio>
-#include <cassert>
+#include <fstream>
 #include <iostream>
 #include <sstream>
-#include <fstream>
 #include <string>
-#include <cfloat>
 
 #include <Eigen/Geometry>
 
@@ -29,32 +30,38 @@ using namespace VirtualRobot;
 namespace GraspStudio
 {
 
-    void GraspQualityMeasureWrenchSpaceNotNormalized::setContactPoints(const std::vector<VirtualRobot::MathTools::ContactPoint>& contactPoints)
+    void
+    GraspQualityMeasureWrenchSpaceNotNormalized::setContactPoints(
+        const std::vector<VirtualRobot::MathTools::ContactPoint>& contactPoints)
     {
         GraspQualityMeasure::setContactPoints(contactPoints);
         GWSCalculated = false;
     }
 
-    void GraspQualityMeasureWrenchSpaceNotNormalized::setContactPoints(const VirtualRobot::EndEffector::ContactInfoVector& contactPoints)
+    void
+    GraspQualityMeasureWrenchSpaceNotNormalized::setContactPoints(
+        const VirtualRobot::EndEffector::ContactInfoVector& contactPoints)
     {
         GraspQualityMeasure::setContactPoints(contactPoints);
         GWSCalculated = false;
     }
 
-
-    float GraspQualityMeasureWrenchSpaceNotNormalized::getGraspQuality()
+    float
+    GraspQualityMeasureWrenchSpaceNotNormalized::getGraspQuality()
     {
         calculateGraspQuality();
         return graspQuality;
     }
 
-    bool GraspQualityMeasureWrenchSpaceNotNormalized::isGraspForceClosure()
+    bool
+    GraspQualityMeasureWrenchSpaceNotNormalized::isGraspForceClosure()
     {
         updateGWS();
         return isOriginInGWSHull();
     }
 
-    void GraspQualityMeasureWrenchSpaceNotNormalized::updateGWS()
+    void
+    GraspQualityMeasureWrenchSpaceNotNormalized::updateGWS()
     {
         if (GWSCalculated)
         {
@@ -80,7 +87,8 @@ namespace GraspStudio
             std::cout << "GWS contact points:" << std::endl;
         }
 
-        for (objPointsIter = contactPointsM.begin(); objPointsIter != contactPointsM.end(); objPointsIter++)
+        for (objPointsIter = contactPointsM.begin(); objPointsIter != contactPointsM.end();
+             objPointsIter++)
         {
             if (verbose && printAll)
             {
@@ -104,7 +112,9 @@ namespace GraspStudio
         GWSCalculated = true;
     }
 
-    VirtualRobot::MathTools::ConvexHull6DPtr GraspQualityMeasureWrenchSpaceNotNormalized::calculateConvexHull(std::vector<VirtualRobot::MathTools::ContactPoint>& points)
+    VirtualRobot::MathTools::ConvexHull6DPtr
+    GraspQualityMeasureWrenchSpaceNotNormalized::calculateConvexHull(
+        std::vector<VirtualRobot::MathTools::ContactPoint>& points)
     {
         bool printAll = true;
 
@@ -115,7 +125,10 @@ namespace GraspStudio
         }
 
         // create wrench
-        std::vector<VirtualRobot::MathTools::ContactPoint> wrenchPoints = createWrenchPoints(points, Eigen::Vector3f::Zero(), objectLength); // contact points are already moved so that com is at origin
+        std::vector<VirtualRobot::MathTools::ContactPoint> wrenchPoints = createWrenchPoints(
+            points,
+            Eigen::Vector3f::Zero(),
+            objectLength); // contact points are already moved so that com is at origin
 
         if (verbose && printAll)
         {
@@ -126,7 +139,11 @@ namespace GraspStudio
         return ConvexHullGenerator::CreateConvexHull(wrenchPoints);
     }
 
-    std::vector<VirtualRobot::MathTools::ContactPoint> GraspQualityMeasureWrenchSpaceNotNormalized::createWrenchPoints(std::vector<VirtualRobot::MathTools::ContactPoint>& points, const Eigen::Vector3f& centerOfModel, float objectLengthMM)
+    std::vector<VirtualRobot::MathTools::ContactPoint>
+    GraspQualityMeasureWrenchSpaceNotNormalized::createWrenchPoints(
+        std::vector<VirtualRobot::MathTools::ContactPoint>& points,
+        const Eigen::Vector3f& centerOfModel,
+        float objectLengthMM)
     {
         std::vector<VirtualRobot::MathTools::ContactPoint> result;
         std::vector<VirtualRobot::MathTools::ContactPoint>::iterator iter = points.begin();
@@ -142,11 +159,12 @@ namespace GraspStudio
         {
             if (convertMM2M)
             {
-                factor = 2.0f / (objectLengthMM / 1000.0f);    // == max distance from center ( 1 / (length/2) )
+                factor = 2.0f / (objectLengthMM /
+                                 1000.0f); // == max distance from center ( 1 / (length/2) )
             }
             else
             {
-                factor = 2.0f / objectLengthMM;    // == max distance from center ( 1 / (length/2) )
+                factor = 2.0f / objectLengthMM; // == max distance from center ( 1 / (length/2) )
             }
         }
 
@@ -176,7 +194,9 @@ namespace GraspStudio
         return result;
     }
 
-    void GraspQualityMeasureWrenchSpaceNotNormalized::printContacts(std::vector<VirtualRobot::MathTools::ContactPoint>& points)
+    void
+    GraspQualityMeasureWrenchSpaceNotNormalized::printContacts(
+        std::vector<VirtualRobot::MathTools::ContactPoint>& points)
     {
         std::vector<VirtualRobot::MathTools::ContactPoint>::iterator iter = points.begin();
 
@@ -188,7 +208,9 @@ namespace GraspStudio
         }
     }
 
-    VirtualRobot::MathTools::ContactPoint GraspQualityMeasureWrenchSpaceNotNormalized::calculateHullCenter(VirtualRobot::MathTools::ConvexHull6DPtr hull)
+    VirtualRobot::MathTools::ContactPoint
+    GraspQualityMeasureWrenchSpaceNotNormalized::calculateHullCenter(
+        VirtualRobot::MathTools::ConvexHull6DPtr hull)
     {
         if (!hull)
         {
@@ -218,14 +240,17 @@ namespace GraspStudio
         return resultCenter;
     }
 
-    float GraspQualityMeasureWrenchSpaceNotNormalized::minDistanceToGWSHull(VirtualRobot::MathTools::ContactPoint& point)
+    float
+    GraspQualityMeasureWrenchSpaceNotNormalized::minDistanceToGWSHull(
+        VirtualRobot::MathTools::ContactPoint& point)
     {
         float minDist = FLT_MAX;
         float dist[6];
         float currentDist2;
         std::vector<MathTools::TriangleFace6D>::iterator faceIter;
 
-        for (faceIter = convexHullGWS->faces.begin(); faceIter != convexHullGWS->faces.end(); faceIter++)
+        for (faceIter = convexHullGWS->faces.begin(); faceIter != convexHullGWS->faces.end();
+             faceIter++)
         {
             VirtualRobot::MathTools::ContactPoint faceCenter;
             faceCenter.p.setZero();
@@ -258,7 +283,9 @@ namespace GraspStudio
 
         return sqrtf(minDist);
     }
-    bool GraspQualityMeasureWrenchSpaceNotNormalized::isOriginInGWSHull()
+
+    bool
+    GraspQualityMeasureWrenchSpaceNotNormalized::isOriginInGWSHull()
     {
         if (!GWSCalculated || !convexHullGWS)
         {
@@ -277,9 +304,9 @@ namespace GraspStudio
         return true;
     }
 
-
-
-    float GraspQualityMeasureWrenchSpaceNotNormalized::minOffset(VirtualRobot::MathTools::ConvexHull6DPtr ch)
+    float
+    GraspQualityMeasureWrenchSpaceNotNormalized::minOffset(
+        VirtualRobot::MathTools::ConvexHull6DPtr ch)
     {
         if (!ch)
         {
@@ -303,25 +330,31 @@ namespace GraspStudio
 
         if (nWrongFacets > 0)
         {
-            std::cout << __FUNCTION__ << " Warning: offset of " << nWrongFacets << " facets >0 (# of facets:" << ch->faces.size() << ")" << std::endl;
+            std::cout << __FUNCTION__ << " Warning: offset of " << nWrongFacets
+                      << " facets >0 (# of facets:" << ch->faces.size() << ")" << std::endl;
         }
 
         return fRes;
     }
 
-    float GraspQualityMeasureWrenchSpaceNotNormalized::getVolumeGraspMeasure()
+    float
+    GraspQualityMeasureWrenchSpaceNotNormalized::getVolumeGraspMeasure()
     {
         updateGWS();
 
         if (!convexHullGWS || convexHullGWS->vertices.size() == 0)
         {
-            std::cout << __FUNCTION__ << "No vertices in Grasp Wrench Space?! Maybe I was not initialized correctly..." << std::endl;
+            std::cout
+                << __FUNCTION__
+                << "No vertices in Grasp Wrench Space?! Maybe I was not initialized correctly..."
+                << std::endl;
             return 0.0;
         }
         return convexHullGWS->volume;
     }
 
-    bool GraspQualityMeasureWrenchSpaceNotNormalized::calculateGraspQuality()
+    bool
+    GraspQualityMeasureWrenchSpaceNotNormalized::calculateGraspQuality()
     {
         updateGWS();
 
@@ -329,7 +362,10 @@ namespace GraspStudio
 
         if (!convexHullGWS || convexHullGWS->vertices.size() == 0)
         {
-            std::cout << __FUNCTION__ << "No vertices in Grasp Wrench Space?! Maybe I was not initialized correctly..." << std::endl;
+            std::cout
+                << __FUNCTION__
+                << "No vertices in Grasp Wrench Space?! Maybe I was not initialized correctly..."
+                << std::endl;
             return 0.0;
         }
 
@@ -348,13 +384,15 @@ namespace GraspStudio
         return true;
     }
 
-    std::string GraspQualityMeasureWrenchSpaceNotNormalized::getName()
+    std::string
+    GraspQualityMeasureWrenchSpaceNotNormalized::getName()
     {
         return "GraspWrenchSpaceNotNormalized";
     }
 
-
-    Eigen::Vector3f GraspQualityMeasureWrenchSpaceNotNormalized::crossProductPosNormalInv(const VirtualRobot::MathTools::ContactPoint& v1)
+    Eigen::Vector3f
+    GraspQualityMeasureWrenchSpaceNotNormalized::crossProductPosNormalInv(
+        const VirtualRobot::MathTools::ContactPoint& v1)
     {
         Eigen::Vector3f res;
         res(0) = v1.p(1) * (-v1.n(2)) - v1.p(2) * (-v1.n(1));
@@ -363,4 +401,4 @@ namespace GraspStudio
         return res;
     }
 
-}
+} // namespace GraspStudio

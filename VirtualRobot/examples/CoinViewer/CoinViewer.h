@@ -2,11 +2,10 @@
 #include <QtCore/QtGlobal>
 #include <QtGui/QtGui>
 
-#include <Inventor/Qt/viewers/SoQtExaminerViewer.h>
-#include <Inventor/Qt/SoQt.h>
-#include <Inventor/nodes/SoSeparator.h>
-
 #include "ui_CoinViewer.h"
+#include <Inventor/Qt/SoQt.h>
+#include <Inventor/Qt/viewers/SoQtExaminerViewer.h>
+#include <Inventor/nodes/SoSeparator.h>
 
 class CoinViewerExample : public QMainWindow
 {
@@ -27,4 +26,3 @@ protected:
     SoQtExaminerViewer* viewer;
     SoSeparator* sceneSep;
 };
-

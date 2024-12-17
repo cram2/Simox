@@ -7,7 +7,6 @@
 
 #include "periodic_clamp.h"
 
-
 namespace simox::math
 {
 
@@ -15,10 +14,9 @@ namespace simox::math
      * @brief Computes the periodic (cyclic, wrapped) difference `a - b`
      * over the cyclic interval `[periodLo, periodHi]`.
      */
-    template <class Float,
-              std::enable_if_t<std::is_floating_point_v<Float>, int> = 0>
-    inline
-    Float periodic_diff(Float a, Float b, Float periodLo, Float periodHi)
+    template <class Float, std::enable_if_t<std::is_floating_point_v<Float>, int> = 0>
+    inline Float
+    periodic_diff(Float a, Float b, Float periodLo, Float periodHi)
     {
         /* Python:
         a, b = wrap_angles([a, b])
@@ -31,22 +29,16 @@ namespace simox::math
 
         const Float period = periodHi - periodLo;
 
-        Eigen::Array<Float, 3, 1> diffs = {
-            a - b,
-            (a + period) - b,
-            (a - period) - b
-        };
+        Eigen::Array<Float, 3, 1> diffs = {a - b, (a + period) - b, (a - period) - b};
 
         int i = 0;
         diffs.abs().minCoeff(&i);
         return diffs(i);
     }
 
-
     // Pre-compiled versions.
 
     float periodic_diff(float a, float b, float periodLo, float periodHi);
     double periodic_diff(double a, double b, double periodLo, double periodHi);
 
-}
-
+} // namespace simox::math

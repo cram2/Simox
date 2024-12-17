@@ -4,6 +4,7 @@
 #include <Eigen/Geometry>
 
 #include <VirtualRobot/RobotNodeSet.h>
+
 #include "VirtualRobot/Nodes/RobotNode.h"
 
 namespace simox::geometric_planning
@@ -20,8 +21,9 @@ namespace simox::geometric_planning
     {
         return path->progress(toLocalPathFrame(global_T_pose));
     }
-    
-    float ParametricPath::progress(const float param) const
+
+    float
+    ParametricPath::progress(const float param) const
     {
         return path->progress(param);
     }
@@ -87,6 +89,7 @@ namespace simox::geometric_planning
         frame(frame), path(path), path_T_pose(postTransform)
     {
     }
+
     ParameterRange
     ParametricPath::parameterRange() const
     {

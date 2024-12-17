@@ -24,16 +24,22 @@
 #include "AbstractFunctionR1Ori.h"
 #include "MathForwardDefinitions.h"
 
-
 namespace math
 {
 
-    class LinearInterpolatedOrientation
-            : public AbstractFunctionR1Ori
+    class LinearInterpolatedOrientation : public AbstractFunctionR1Ori
     {
     public:
-        LinearInterpolatedOrientation(const Eigen::Quaternionf& startOri, const Eigen::Quaternionf& endOri, float startT, float endT, bool clamp);
-        LinearInterpolatedOrientation(const Eigen::Matrix3f& startOri, const Eigen::Matrix3f& endOri, float startT, float endT, bool clamp);
+        LinearInterpolatedOrientation(const Eigen::Quaternionf& startOri,
+                                      const Eigen::Quaternionf& endOri,
+                                      float startT,
+                                      float endT,
+                                      bool clamp);
+        LinearInterpolatedOrientation(const Eigen::Matrix3f& startOri,
+                                      const Eigen::Matrix3f& endOri,
+                                      float startT,
+                                      float endT,
+                                      bool clamp);
         Eigen::Quaternionf Get(float t) override;
         Eigen::Vector3f GetDerivative(float t) override;
 
@@ -46,6 +52,5 @@ namespace math
         Eigen::Vector3f derivative;
         Eigen::Vector3f axis;
         float angle;
-
     };
-}
+} // namespace math

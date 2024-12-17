@@ -22,13 +22,13 @@
 */
 #pragma once
 
-#include "VirtualRobot/VirtualRobot.h"
-#include "VirtualRobot/Primitive.h"
-#include "VirtualRobot/Visualization/VisualizationFactory.h"
+#include <map>
 
 #include <Eigen/Core>
 
-#include <map>
+#include "VirtualRobot/Primitive.h"
+#include "VirtualRobot/VirtualRobot.h"
+#include "VirtualRobot/Visualization/VisualizationFactory.h"
 
 namespace VirtualRobot
 {
@@ -129,7 +129,8 @@ namespace VirtualRobot
         //! Just stores the filename, no loading is performed!
         void setFilename(const std::string& filename, bool boundingBox);
 
-        virtual std::string getType()
+        virtual std::string
+        getType()
         {
             return VisualizationFactory::getName();
         }
@@ -145,7 +146,8 @@ namespace VirtualRobot
             Create a united visualization. Behavior depends on the derived implementation,
             but usually the visualizations are copied and united to one object.
         */
-        static VisualizationNodePtr CreateUnitedVisualization(const std::vector<VisualizationNodePtr>& visualizations);
+        static VisualizationNodePtr
+        CreateUnitedVisualization(const std::vector<VisualizationNodePtr>& visualizations);
 
         /*!
             Returns (current) bounding box in global coordinate system.
@@ -180,7 +182,8 @@ namespace VirtualRobot
 
         TriMeshModelPtr triMeshModel;
 
-        std::map< std::string, VisualizationNodePtr > attachedVisualizations;   //< These optional visualizations will not show up in the TriMeshModel
+        std::map<std::string, VisualizationNodePtr>
+            attachedVisualizations; //< These optional visualizations will not show up in the TriMeshModel
     };
 
 } // namespace VirtualRobot

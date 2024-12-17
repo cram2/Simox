@@ -2,7 +2,6 @@
 
 #include <VirtualRobot/VirtualRobotException.h>
 
-
 namespace VirtualRobot::mujoco::error
 {
 
@@ -11,10 +10,10 @@ namespace VirtualRobot::mujoco::error
     {
     public:
         NoBodyOfRobotNode(const std::string& nodeName);
+
     private:
         static std::string makeMsg(const std::string& nodeName);
     };
-
 
     /// Indicates that a robot node has to be a joint node, but is not.
     class NodeIsNoJoint : public VirtualRobotException
@@ -24,4 +23,4 @@ namespace VirtualRobot::mujoco::error
     };
 
 
-}
+} // namespace VirtualRobot::mujoco::error

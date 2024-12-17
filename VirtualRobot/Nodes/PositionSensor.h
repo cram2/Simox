@@ -24,13 +24,11 @@
 
 #include "Sensor.h"
 
-
 namespace VirtualRobot
 {
 
     class PositionSensor;
     typedef std::shared_ptr<PositionSensor> PositionSensorPtr;
-
 
     /*!
         This is a dummy sensor that can be queried for positions (Via the getGlobalPose method, defined in SceneObject)
@@ -49,8 +47,7 @@ namespace VirtualRobot
         PositionSensor(GraspableSensorizedObjectWeakPtr parentNode,
                        const std::string& name,
                        VisualizationNodePtr visualization = VisualizationNodePtr(),
-                       const Eigen::Matrix4f& rnTrafo = Eigen::Matrix4f::Identity()
-                      );
+                       const Eigen::Matrix4f& rnTrafo = Eigen::Matrix4f::Identity());
 
         /*!
         */
@@ -66,18 +63,16 @@ namespace VirtualRobot
         std::string toXML(const std::string& modelPath, int tabs) override;
 
     protected:
-
-
-        PositionSensor() {};
+        PositionSensor(){};
 
         /*!
         Derived classes must implement their clone method here.
         */
-        SensorPtr _clone(const GraspableSensorizedObjectPtr newRobotNode, const VisualizationNodePtr visualizationModel, float scaling) override;
-
+        SensorPtr _clone(const GraspableSensorizedObjectPtr newRobotNode,
+                         const VisualizationNodePtr visualizationModel,
+                         float scaling) override;
     };
 
     typedef std::shared_ptr<PositionSensor> PositionSensorPtr;
 
 } // namespace VirtualRobot
-

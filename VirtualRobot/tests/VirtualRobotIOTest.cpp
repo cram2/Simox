@@ -6,22 +6,22 @@
 
 #define BOOST_TEST_MODULE VirtualRobot_VirtualRobotIOTest
 
-#include <VirtualRobot/VirtualRobotTest.h>
-#include <VirtualRobot/XML/RobotIO.h>
-#include <VirtualRobot/XML/ObjectIO.h>
-#include <VirtualRobot/Robot.h>
-#include <VirtualRobot/VirtualRobotException.h>
-#include <VirtualRobot/Nodes/Sensor.h>
-#include <VirtualRobot/Nodes/PositionSensor.h>
-#include <VirtualRobot/RuntimeEnvironment.h>
-#include <VirtualRobot/ManipulationObject.h>
 #include <string>
+
+#include <VirtualRobot/ManipulationObject.h>
+#include <VirtualRobot/Nodes/PositionSensor.h>
+#include <VirtualRobot/Nodes/Sensor.h>
+#include <VirtualRobot/Robot.h>
+#include <VirtualRobot/RuntimeEnvironment.h>
+#include <VirtualRobot/VirtualRobotException.h>
+#include <VirtualRobot/VirtualRobotTest.h>
+#include <VirtualRobot/XML/ObjectIO.h>
+#include <VirtualRobot/XML/RobotIO.h>
 
 
 using namespace VirtualRobot;
 
 BOOST_AUTO_TEST_SUITE(VirtualRobotIO)
-
 
 BOOST_AUTO_TEST_CASE(testRobotLoadXML)
 {
@@ -42,7 +42,6 @@ BOOST_AUTO_TEST_CASE(testRobotLoadXML)
     std::vector<RobotNodeSetPtr> rns = r->getRobotNodeSets();
     BOOST_REQUIRE_GT(rns.size(), 0);
 }
-
 
 BOOST_AUTO_TEST_CASE(testRobotSaveXML)
 {
@@ -71,7 +70,6 @@ BOOST_AUTO_TEST_CASE(testRobotSaveXML)
     BOOST_REQUIRE(r2);
 }
 
-
 BOOST_AUTO_TEST_CASE(testLoadStoreManipulationObjectPhysics)
 {
     std::string filename("objects/physics-test.xml");
@@ -87,11 +85,11 @@ BOOST_AUTO_TEST_CASE(testLoadStoreManipulationObjectPhysics)
     BOOST_CHECK_EQUAL(physicsObject.comLocation, SceneObject::Physics::eVisuBBoxCenter);
 
 
-    // This causes the test to get stuck. ToDo: Fix it and re-enable.
-    #if 0
+// This causes the test to get stuck. ToDo: Fix it and re-enable.
+#if 0
     ManipulationObjectPtr savedObject = ObjectIO::createManipulationObjectFromString(manipulatioObject->toXML());
     physicsObject = savedObject->getPhysics();
-    #endif
+#endif
 
     BOOST_CHECK_EQUAL(physicsObject.simType, SceneObject::Physics::eStatic);
     BOOST_CHECK_CLOSE(physicsObject.massKg, 0.0, 0.0001);

@@ -29,10 +29,9 @@
 
 using namespace VirtualRobot;
 
-ReferenceConfigurationConstraint::ReferenceConfigurationConstraint(const RobotPtr& robot, const RobotNodeSetPtr& nodeSet) :
-    Constraint(nodeSet),
-    robot(robot),
-    nodeSet(nodeSet)
+ReferenceConfigurationConstraint::ReferenceConfigurationConstraint(const RobotPtr& robot,
+                                                                   const RobotNodeSetPtr& nodeSet) :
+    Constraint(nodeSet), robot(robot), nodeSet(nodeSet)
 {
     // Use zero reference by default
     setReferenceConfiguration(Eigen::VectorXf::Zero(nodeSet->getSize()));
@@ -44,11 +43,11 @@ ReferenceConfigurationConstraint::ReferenceConfigurationConstraint(const RobotPt
     initialized = true;
 }
 
-ReferenceConfigurationConstraint::ReferenceConfigurationConstraint(const RobotPtr &robot, const RobotNodeSetPtr &nodeSet, const Eigen::VectorXf &reference) :
-    Constraint(nodeSet),
-    robot(robot),
-    nodeSet(nodeSet),
-    reference(reference)
+ReferenceConfigurationConstraint::ReferenceConfigurationConstraint(
+    const RobotPtr& robot,
+    const RobotNodeSetPtr& nodeSet,
+    const Eigen::VectorXf& reference) :
+    Constraint(nodeSet), robot(robot), nodeSet(nodeSet), reference(reference)
 {
     setReferenceConfiguration(reference);
 
@@ -60,12 +59,15 @@ ReferenceConfigurationConstraint::ReferenceConfigurationConstraint(const RobotPt
     initialized = true;
 }
 
-void ReferenceConfigurationConstraint::setReferenceConfiguration(const Eigen::VectorXf &config)
+void
+ReferenceConfigurationConstraint::setReferenceConfiguration(const Eigen::VectorXf& config)
 {
-    if(nodeSet->getSize() != config.rows())
+    if (nodeSet->getSize() != config.rows())
     {
         std::stringstream sstr;
-        sstr << "Reference configuration does not match node set size: "  << " nodeSet size: " << nodeSet->getSize() << " reference joint set size: " << reference.rows();
+        sstr << "Reference configuration does not match node set size: "
+             << " nodeSet size: " << nodeSet->getSize()
+             << " reference joint set size: " << reference.rows();
         THROW_VR_EXCEPTION(sstr.str());
         return;
     }
@@ -73,17 +75,19 @@ void ReferenceConfigurationConstraint::setReferenceConfiguration(const Eigen::Ve
     reference = config;
 }
 
-Eigen::VectorXf ReferenceConfigurationConstraint::getReferenceConfiguration()
+Eigen::VectorXf
+ReferenceConfigurationConstraint::getReferenceConfiguration()
 {
     return reference;
 }
 
-double ReferenceConfigurationConstraint::optimizationFunction(unsigned int /*id*/)
+double
+ReferenceConfigurationConstraint::optimizationFunction(unsigned int /*id*/)
 {
     double value = 0;
 
     float v;
-    for(size_t i = 0; i < nodeSet->getSize(); i++)
+    for (size_t i = 0; i < nodeSet->getSize(); i++)
     {
         RobotNodePtr node = nodeSet->getNode(i);
         v = (node->getJointValue() - reference(i));
@@ -93,11 +97,12 @@ double ReferenceConfigurationConstraint::optimizationFunction(unsigned int /*id*
     return optimizationFunctionFactor * value;
 }
 
-Eigen::VectorXf ReferenceConfigurationConstraint::optimizationGradient(unsigned int /*id*/)
+Eigen::VectorXf
+ReferenceConfigurationConstraint::optimizationGradient(unsigned int /*id*/)
 {
     Eigen::VectorXf gradient(nodeSet->getSize());
 
-    for(size_t i = 0; i < nodeSet->getSize(); i++)
+    for (size_t i = 0; i < nodeSet->getSize(); i++)
     {
         gradient(i) = 2 * (nodeSet->getNode(i)->getJointValue() - reference(i));
     }

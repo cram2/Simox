@@ -6,15 +6,15 @@
 
 #define BOOST_TEST_MODULE VirtualRobot_VirtualRobotWorkSpaceTest
 
-#include <VirtualRobot/VirtualRobotTest.h>
-#include <VirtualRobot/MathTools.h>
-#include <VirtualRobot/Workspace/WorkspaceRepresentation.h>
-#include <VirtualRobot/XML/RobotIO.h>
-#include <VirtualRobot/VirtualRobotException.h>
+#include <string>
+
 #include <VirtualRobot/MathTools.h>
 #include <VirtualRobot/RobotNodeSet.h>
+#include <VirtualRobot/VirtualRobotException.h>
+#include <VirtualRobot/VirtualRobotTest.h>
 #include <VirtualRobot/Workspace/Reachability.h>
-#include <string>
+#include <VirtualRobot/Workspace/WorkspaceRepresentation.h>
+#include <VirtualRobot/XML/RobotIO.h>
 
 BOOST_AUTO_TEST_SUITE(WorkSpace)
 
@@ -141,7 +141,6 @@ BOOST_AUTO_TEST_CASE(testWorkSpaceEuler)
     BOOST_CHECK_SMALL(ax(0) - 1.0f / float(sqrt(2.0f)), 1e-3f);
     BOOST_CHECK_SMALL(ax(1) - 1.0f / float(sqrt(2.0f)), 1e-3f);
     BOOST_CHECK_SMALL(ax(2), 1e-4f);
-
 }
 
 BOOST_AUTO_TEST_CASE(testWorkSpaceNeighbors)
@@ -149,21 +148,21 @@ BOOST_AUTO_TEST_CASE(testWorkSpaceNeighbors)
     // CREATE ROBOT AND DATA STRUCTURES
     const std::string robotString =
         "<Robot Type='MyDemoRobotType' StandardName='ExampleRobo' RootNode='root'>"
-            " <RobotNode name='root'>"
-            "   <Child name='joint1'/>"
-            " </RobotNode>"
-            " <RobotNode name='joint1'>"
-            "   <Joint type='revolute'>"
-            "      <Limits unit='degree' lo='0' hi='90'/>"
-            "      <axis x='0' y='0' z='1'/>"
-            "   </Joint>"
-            "   <Child name='tcp'/>"
-            " </RobotNode>"
-            " <RobotNode name='tcp'>"
-            "   <Transform>"
-            "      <Translation x='100' y='0' z='0'/>"
-            "   </Transform>"
-            " </RobotNode>"
+        " <RobotNode name='root'>"
+        "   <Child name='joint1'/>"
+        " </RobotNode>"
+        " <RobotNode name='joint1'>"
+        "   <Joint type='revolute'>"
+        "      <Limits unit='degree' lo='0' hi='90'/>"
+        "      <axis x='0' y='0' z='1'/>"
+        "   </Joint>"
+        "   <Child name='tcp'/>"
+        " </RobotNode>"
+        " <RobotNode name='tcp'>"
+        "   <Transform>"
+        "      <Translation x='100' y='0' z='0'/>"
+        "   </Transform>"
+        " </RobotNode>"
         "</Robot>";
     VirtualRobot::RobotPtr rob;
     BOOST_REQUIRE_NO_THROW(rob = VirtualRobot::RobotIO::createRobotFromString(robotString));
@@ -171,7 +170,8 @@ BOOST_AUTO_TEST_CASE(testWorkSpaceNeighbors)
 
     std::vector<std::string> rnsNames;
     rnsNames.push_back("joint1");
-    VirtualRobot::RobotNodeSetPtr rns = VirtualRobot::RobotNodeSet::createRobotNodeSet(rob, "rns", rnsNames, "", "tcp", true);
+    VirtualRobot::RobotNodeSetPtr rns =
+        VirtualRobot::RobotNodeSet::createRobotNodeSet(rob, "rns", rnsNames, "", "tcp", true);
     BOOST_REQUIRE(rns);
     BOOST_REQUIRE(rob->hasRobotNodeSet("rns"));
 
@@ -195,15 +195,23 @@ BOOST_AUTO_TEST_CASE(testWorkSpaceNeighbors)
     // CREATE REACHABILITY DATA
     static float discrTr = 10.0f;
     static float discrRot = 0.5f;
-    static float discrTr3 = discrTr*sqrt(3);
-    static float discrRot3 = discrRot*sqrt(3);
-    float minBounds[6] = {0,0,0,0,0,0};
-    float maxBounds[6] = {100.0f,100.0f,100.0f,2*M_PI,2*M_PI,2*M_PI};
+    static float discrTr3 = discrTr * sqrt(3);
+    static float discrRot3 = discrRot * sqrt(3);
+    float minBounds[6] = {0, 0, 0, 0, 0, 0};
+    float maxBounds[6] = {100.0f, 100.0f, 100.0f, 2 * M_PI, 2 * M_PI, 2 * M_PI};
     VirtualRobot::ReachabilityPtr reach(new VirtualRobot::Reachability(rob));
     BOOST_REQUIRE(reach);
     reach->setOrientationType(VirtualRobot::WorkspaceRepresentation::Hopf);
-    reach->initialize(rns, discrTr, discrRot, minBounds, maxBounds, VirtualRobot::SceneObjectSetPtr(), VirtualRobot::SceneObjectSetPtr(), rootNode, tcp);
-/*
+    reach->initialize(rns,
+                      discrTr,
+                      discrRot,
+                      minBounds,
+                      maxBounds,
+                      VirtualRobot::SceneObjectSetPtr(),
+                      VirtualRobot::SceneObjectSetPtr(),
+                      rootNode,
+                      tcp);
+    /*
     float jv = M_PI/4;
     joint1->setJointValue(jv);
     reach->addCurrentTCPPose();
@@ -214,14 +222,14 @@ BOOST_AUTO_TEST_CASE(testWorkSpaceNeighbors)
     Eigen::Matrix4f m2 = Eigen::Matrix4f::Identity();
     float x[6];
     unsigned int v[6];
-    float diffRot,diffPos;
+    float diffRot, diffPos;
     bool poseOK;
 
     // identity, matrix -> voxel -> matrix
-    poseOK = reach->getVoxelFromPose(m,v);
+    poseOK = reach->getVoxelFromPose(m, v);
     BOOST_REQUIRE(poseOK);
     m2 = reach->getPoseFromVoxel(v);
-    VirtualRobot::MathTools::getPoseDiff(m,m2,diffPos,diffRot);
+    VirtualRobot::MathTools::getPoseDiff(m, m2, diffPos, diffRot);
     BOOST_REQUIRE_LE(diffPos, discrTr3);
     BOOST_REQUIRE_LE(diffRot, discrRot3);
 
@@ -229,10 +237,10 @@ BOOST_AUTO_TEST_CASE(testWorkSpaceNeighbors)
     m.setIdentity();
     Eigen::Matrix3f m3 = Eigen::AngleAxisf(float(M_PI) / 4.0f, Eigen::Vector3f::UnitX()).matrix();
     m.block(0, 0, 3, 3) = m3;
-    poseOK = reach->getVoxelFromPose(m,v);
+    poseOK = reach->getVoxelFromPose(m, v);
     BOOST_REQUIRE(poseOK);
     m2 = reach->getPoseFromVoxel(v);
-    VirtualRobot::MathTools::getPoseDiff(m,m2,diffPos,diffRot);
+    VirtualRobot::MathTools::getPoseDiff(m, m2, diffPos, diffRot);
     BOOST_REQUIRE_LE(diffPos, discrTr3);
     BOOST_REQUIRE_LE(diffRot, discrRot3);
 
@@ -240,10 +248,10 @@ BOOST_AUTO_TEST_CASE(testWorkSpaceNeighbors)
     m.setIdentity();
     m3 = Eigen::AngleAxisf(-float(M_PI) / 4.0f, Eigen::Vector3f::UnitY()).matrix();
     m.block(0, 0, 3, 3) = m3;
-    poseOK = reach->getVoxelFromPose(m,v);
+    poseOK = reach->getVoxelFromPose(m, v);
     BOOST_REQUIRE(poseOK);
     m2 = reach->getPoseFromVoxel(v);
-    VirtualRobot::MathTools::getPoseDiff(m,m2,diffPos,diffRot);
+    VirtualRobot::MathTools::getPoseDiff(m, m2, diffPos, diffRot);
     BOOST_REQUIRE_LE(diffPos, discrTr3);
     BOOST_REQUIRE_LE(diffRot, discrRot3);
 
@@ -251,40 +259,42 @@ BOOST_AUTO_TEST_CASE(testWorkSpaceNeighbors)
     m.setIdentity();
     m3 = Eigen::AngleAxisf(float(M_PI) / 2.0f, Eigen::Vector3f::UnitZ()).matrix();
     m.block(0, 0, 3, 3) = m3;
-    poseOK = reach->getVoxelFromPose(m,v);
+    poseOK = reach->getVoxelFromPose(m, v);
     BOOST_REQUIRE(poseOK);
     m2 = reach->getPoseFromVoxel(v);
-    VirtualRobot::MathTools::getPoseDiff(m,m2,diffPos,diffRot);
+    VirtualRobot::MathTools::getPoseDiff(m, m2, diffPos, diffRot);
     BOOST_REQUIRE_LE(diffPos, discrTr3);
     BOOST_REQUIRE_LE(diffRot, discrRot3);
 
     const int NR_TESTS = 1000;
-    for (int i=0;i<NR_TESTS;i++)
+    for (int i = 0; i < NR_TESTS; i++)
     {
         Eigen::Vector3f ax = Eigen::Vector3f::Random();
         ax.normalize();
-        float ang = rand() % 1000 / 1000.0f * 2.0f*M_PI -M_PI;
+        float ang = rand() % 1000 / 1000.0f * 2.0f * M_PI - M_PI;
         float xa = rand() % 1000 / 1000.0f * 100.0f;
         float ya = rand() % 1000 / 1000.0f * 100.0f;
         float za = rand() % 1000 / 1000.0f * 100.0f;
         m3 = Eigen::AngleAxisf(ang, ax).matrix();
         m.block(0, 0, 3, 3) = m3;
-        m(0,3) = xa;
-        m(1,3) = ya;
-        m(2,3) = za;
+        m(0, 3) = xa;
+        m(1, 3) = ya;
+        m(2, 3) = za;
 
         reach->matrix2Vector(m, x);
         reach->vector2Matrix(x, m2);
-        VirtualRobot::MathTools::getPoseDiff(m,m2,diffPos,diffRot);
+        VirtualRobot::MathTools::getPoseDiff(m, m2, diffPos, diffRot);
         if (diffPos > discrTr || diffRot > discrRot)
         {
-            std::cout << "matrix<->vect: Pose diff: tr:" << diffPos << ", rot:" << diffRot << ", p:" << xa << "," << ya << "," << za << ", ax:" << ax.transpose() << ", ang:" << ang << std::endl;
+            std::cout << "matrix<->vect: Pose diff: tr:" << diffPos << ", rot:" << diffRot
+                      << ", p:" << xa << "," << ya << "," << za << ", ax:" << ax.transpose()
+                      << ", ang:" << ang << std::endl;
         }
         BOOST_REQUIRE_LE(diffPos, discrTr3);
         BOOST_REQUIRE_LE(diffRot, discrRot3);
 
 
-        poseOK = reach->getVoxelFromPose(m,v);
+        poseOK = reach->getVoxelFromPose(m, v);
         BOOST_REQUIRE(poseOK);
         if (!poseOK)
         {
@@ -304,10 +314,12 @@ BOOST_AUTO_TEST_CASE(testWorkSpaceNeighbors)
         reach->getPoseFromVoxelLocal(v2,x2);
         reach->getPoseFromVoxelLocal(v3,x3);*/
 
-        VirtualRobot::MathTools::getPoseDiff(m,m2,diffPos,diffRot);
+        VirtualRobot::MathTools::getPoseDiff(m, m2, diffPos, diffRot);
         if (diffPos > discrTr3 || diffRot > discrRot3)
         {
-            std::cout << "Pose diff: tr:" << diffPos << ", rot:" << diffRot << ", p:" << xa << "," << ya << "," << za << ", ax:" << ax.transpose() << ", ang:" << ang << std::endl;
+            std::cout << "Pose diff: tr:" << diffPos << ", rot:" << diffRot << ", p:" << xa << ","
+                      << ya << "," << za << ", ax:" << ax.transpose() << ", ang:" << ang
+                      << std::endl;
             /*std::cout << "vOrig:";
             for (int i=0;i<6;i++)
                 std::cout << v[i] << ",";
@@ -341,10 +353,9 @@ BOOST_AUTO_TEST_CASE(testWorkSpaceNeighbors)
             reach->vector2Matrix(xT1,mT1);
             VirtualRobot::MathTools::getPoseDiff(m,mT1,diffPos,diffRot);
             std::cout << "T1 Pose diff: tr:" << diffPos << ", rot:" << diffRot << std::endl;*/
-         }
+        }
         BOOST_REQUIRE_LE(diffPos, discrTr3);
         BOOST_REQUIRE_LE(diffRot, discrRot3);
-
     }
 }
 

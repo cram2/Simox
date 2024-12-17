@@ -4,47 +4,48 @@
 
 #include <boost/lexical_cast.hpp>
 
-#include <SimoxUtility/meta/undefined_t.h>
-#include <SimoxUtility/meta/type_traits/is_string_like.h>
-#include <SimoxUtility/meta/type_name.h>
 #include <SimoxUtility/meta/enum/EnumNames.hpp>
+#include <SimoxUtility/meta/type_name.h>
+#include <SimoxUtility/meta/type_traits/is_string_like.h>
+#include <SimoxUtility/meta/undefined_t.h>
 
 namespace simox::meta
 {
-    template<class T, class = void>
-    struct is_enum_adapted : std::false_type {};
+    template <class T, class = void>
+    struct is_enum_adapted : std::false_type
+    {
+    };
 
-    template<class T>
+    template <class T>
     static constexpr bool is_enum_adapted_v = is_enum_adapted<T>::value;
 
-    template<class T, class R = void>
+    template <class T, class R = void>
     using enable_if_is_enum_adapted = std::enable_if<is_enum_adapted_v<T>, R>;
 
-    template<class T, class R = void>
+    template <class T, class R = void>
     using enable_if_enum_adapted_t = typename enable_if_is_enum_adapted<T, R>::type;
 
-    template<class T>
+    template <class T>
     constexpr undefined_t enum_names;
 
-    template<class T>
-    struct is_enum_adapted <
+    template <class T>
+    struct is_enum_adapted<
         T,
-        std::enable_if_t<
-            has_type_of<simox::meta::EnumNames<T>>(enum_names<T>)
-        >
-    > : std::true_type
+        std::enable_if_t<has_type_of<simox::meta::EnumNames<T>>(enum_names<T>)>> : std::true_type
     {
         static_assert(std::is_enum_v<T>);
-        static const auto& names()
+
+        static const auto&
+        names()
         {
             return enum_names<T>;
         }
     };
-}
+} // namespace simox::meta
 
 namespace std
 {
-    template<class T>
+    template <class T>
     simox::meta::enable_if_enum_adapted_t<T, std::string>
     to_string(T f)
     {
@@ -57,14 +58,13 @@ namespace std
         else
         {
             using base = std::underlying_type_t<T>;
-            str = simox::meta::get_type_name<T>() + "::" +
-                  std::to_string(static_cast<base>(f));
+            str = simox::meta::get_type_name<T>() + "::" + std::to_string(static_cast<base>(f));
         }
         return str;
     }
-}
+} // namespace std
 
-template<class T>
+template <class T>
 simox::meta::enable_if_enum_adapted_t<T, std::ostream&>
 operator<<(std::ostream& o, const T& f)
 {
@@ -73,13 +73,13 @@ operator<<(std::ostream& o, const T& f)
 
 namespace boost::detail
 {
-    template<class T>
-    struct lexical_converter_impl <
-        simox::meta::enable_if_enum_adapted_t<T, std::string>,
-        T >
+    template <class T>
+    struct lexical_converter_impl<simox::meta::enable_if_enum_adapted_t<T, std::string>, T>
     {
         static_assert(std::is_enum_v<T>);
-        static inline bool try_convert(T arg, std::string& result)
+
+        static inline bool
+        try_convert(T arg, std::string& result)
         {
             const auto& map = simox::meta::is_enum_adapted<T>::names().map();
             if (map.left.count(arg))
@@ -88,21 +88,22 @@ namespace boost::detail
                 return true;
             }
             using base = std::underlying_type_t<T>;
-            result = simox::meta::get_type_name<T>() + "::" +
-                     std::to_string(static_cast<base>(arg));
+            result =
+                simox::meta::get_type_name<T>() + "::" + std::to_string(static_cast<base>(arg));
             return false;
         }
     };
-}
+} // namespace boost::detail
+
 namespace boost::detail::simoxdetail
 {
-    template<class T, class Src>
+    template <class T, class Src>
     struct lex_conv_help
     {
-        static inline bool try_convert(const Src& arg, T& result)
+        static inline bool
+        try_convert(const Src& arg, T& result)
         {
-            const auto sv =
-                std::string{simox::meta::is_string_like<Src>::string_view(arg)};
+            const auto sv = std::string{simox::meta::is_string_like<Src>::string_view(arg)};
             const auto& map = simox::meta::is_enum_adapted<T>::names().map();
             if (map.right.count(sv))
             {
@@ -112,18 +113,16 @@ namespace boost::detail::simoxdetail
             return false;
         }
     };
-}
-
+} // namespace boost::detail::simoxdetail
 
 namespace boost::detail
 {
-#define make_specialization(StrT)                           \
-    template<class T>                                       \
-    struct lexical_converter_impl <                         \
-        T,                                                  \
-        simox::meta::enable_if_enum_adapted_t<T, StrT> >    \
-        : simoxdetail::lex_conv_help<T, StrT>               \
-    {}
+#define make_specialization(StrT)                                                                  \
+    template <class T>                                                                             \
+    struct lexical_converter_impl<T, simox::meta::enable_if_enum_adapted_t<T, StrT>> :             \
+        simoxdetail::lex_conv_help<T, StrT>                                                        \
+    {                                                                                              \
+    }
 
     make_specialization(std::string);
     make_specialization(std::string_view);
@@ -222,5 +221,4 @@ namespace boost::detail
     //        simox::meta::enable_if_enum_adapted_t<T, char*> >
     //        : simoxdetail::lex_conv_help<T, char*>
     //    {};
-}
-
+} // namespace boost::detail

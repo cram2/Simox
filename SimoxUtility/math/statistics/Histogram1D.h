@@ -1,8 +1,7 @@
 #pragma once
 
-#include <vector>
 #include <ostream>
-
+#include <vector>
 
 namespace simox::math
 {
@@ -13,7 +12,6 @@ namespace simox::math
     class Histogram1D
     {
     public:
-
         /// No initialization constructor.
         Histogram1D();
 
@@ -22,7 +20,10 @@ namespace simox::math
         Histogram1D(const std::vector<float>& data, std::size_t numBins = 128);
 
         /// Construct with the given data and given limits.
-        Histogram1D(const std::vector<float>& data, float min, float max, std::size_t numBins = 128);
+        Histogram1D(const std::vector<float>& data,
+                    float min,
+                    float max,
+                    std::size_t numBins = 128);
 
 
         /// Set the number of bins and set them to 0.
@@ -84,7 +85,6 @@ namespace simox::math
 
 
     private:
-
         /// The minimum mapped value.
         float min;
         /// The maximum mapped value.
@@ -92,7 +92,6 @@ namespace simox::math
 
         /// The bins.
         std::vector<std::size_t> bins;
-
     };
 
-}
+} // namespace simox::math

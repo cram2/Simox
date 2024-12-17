@@ -27,7 +27,7 @@
 #include "VirtualRobotImportExport.h"
 
 #ifdef WIN32
-#pragma warning(disable:4275)
+#pragma warning(disable : 4275)
 #endif
 
 namespace VirtualRobot
@@ -61,23 +61,27 @@ namespace VirtualRobot
  * The reported message is composed of the line number and the file in which
  * the throw occurred and is followed by the \a messageString parameter.
  */
-#define THROW_VR_EXCEPTION(messageString) \
-    do { \
-        std::stringstream s; \
-        s << __FILE__ << ":" << __LINE__ << ": " << BOOST_CURRENT_FUNCTION << ": " << messageString; \
-        std::string er = s.str(); throw VirtualRobot::VirtualRobotException(er); \
-    } while(0);
+#define THROW_VR_EXCEPTION(messageString)                                                          \
+    do                                                                                             \
+    {                                                                                              \
+        std::stringstream s;                                                                       \
+        s << __FILE__ << ":" << __LINE__ << ": " << BOOST_CURRENT_FUNCTION << ": "                 \
+          << messageString;                                                                        \
+        std::string er = s.str();                                                                  \
+        throw VirtualRobot::VirtualRobotException(er);                                             \
+    } while (0);
 
 /**
  * This macro checks \a condition and calls THROW_VR_EXCEPTION
  * with the parameter \a messageString if the condition is true.
  */
-#define THROW_VR_EXCEPTION_IF(condition, messageString) \
-    do { \
-        if (condition) \
-            THROW_VR_EXCEPTION(messageString); \
-    } while(0);
+#define THROW_VR_EXCEPTION_IF(condition, messageString)                                            \
+    do                                                                                             \
+    {                                                                                              \
+        if (condition)                                                                             \
+            THROW_VR_EXCEPTION(messageString);                                                     \
+    } while (0);
 
 #ifdef WIN32
-#pragma warning(default:4275)
+#pragma warning(default : 4275)
 #endif

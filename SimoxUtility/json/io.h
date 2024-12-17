@@ -3,7 +3,6 @@
 #include "error.h"
 #include "json.h"
 
-
 namespace simox::json
 {
 
@@ -28,7 +27,6 @@ namespace simox::json
      */
     json read(std::istream& is);
 
-
     /**
      * @brief Read a JSON document from the given file
      * and convert it to the business-object type `BO`.
@@ -42,19 +40,19 @@ namespace simox::json
      *  If converting the JSON document to the BO fails.
      */
     template <class BO>
-    BO read(const std::string& filename)
+    BO
+    read(const std::string& filename)
     {
         const json j = simox::json::read(filename);
         try
         {
             return j.get<BO>();
         }
-        catch (const json::out_of_range& e)  // Add other exception types if they come up.
+        catch (const json::out_of_range& e) // Add other exception types if they come up.
         {
             throw error::ConversionError(e.what());
         }
     }
-
 
     /**
      * @brief Write a JSON document to the given file.
@@ -66,8 +64,10 @@ namespace simox::json
      *
      * @throw `simox::json::error::IOError` If IO access fails.
      */
-    void write(const std::string& filename, const json& j,
-               const int indent = -1, const char indent_char = ' ');
+    void write(const std::string& filename,
+               const json& j,
+               const int indent = -1,
+               const char indent_char = ' ');
 
     /**
      * @brief Write a JSON document to the given out-stream.
@@ -77,9 +77,8 @@ namespace simox::json
      * @param indent The number of indents, if nonnegative (see nlohmann::json::dump()).
      * @param indent_char The character used for indents (see nlohmann::json::dump()).
      */
-    void write(std::ostream& os, const json& j,
-               const int indent = -1, const char indent_char = ' ');
-
+    void
+    write(std::ostream& os, const json& j, const int indent = -1, const char indent_char = ' ');
 
     /**
      * @brief Write a business object as JSON to the given file.
@@ -93,23 +92,25 @@ namespace simox::json
      * @throw `simox::json::error::ConversionError` If the bo could not access fails.
      */
     template <class BO>
-    void write(const std::string& filename, const BO& bo,
-               const int indent = -1, const char indent_char = ' ')
+    void
+    write(const std::string& filename,
+          const BO& bo,
+          const int indent = -1,
+          const char indent_char = ' ')
     {
         json j;
         try
         {
             j = bo;
         }
-        catch (const json::out_of_range& e)  // Add other exception types if they come up.
+        catch (const json::out_of_range& e) // Add other exception types if they come up.
         {
             throw error::ConversionError(e.what());
         }
         simox::json::write(filename, j, indent, indent_char);
     }
 
-}
-
+} // namespace simox::json
 
 // Legacy names.
 namespace nlohmann
@@ -118,10 +119,13 @@ namespace nlohmann
     json read_json(const std::string& filename);
     json read_json(std::istream& is);
 
-    void write_json(const std::string& filename, const json& j,
-                    const int indent = -1, const char indent_char = ' ');
-    void write_json(std::ostream& os, const json& j,
-                    const int indent = -1, const char indent_char = ' ');
+    void write_json(const std::string& filename,
+                    const json& j,
+                    const int indent = -1,
+                    const char indent_char = ' ');
+    void write_json(std::ostream& os,
+                    const json& j,
+                    const int indent = -1,
+                    const char indent_char = ' ');
 
-}
-
+} // namespace nlohmann

@@ -1,30 +1,30 @@
 
 #pragma once
 
-#include <VirtualRobot/VirtualRobot.h>
-#include <VirtualRobot/Robot.h>
-#include <VirtualRobot/VirtualRobotException.h>
-#include <VirtualRobot/Nodes/RobotNode.h>
-#include <VirtualRobot/XML/SceneIO.h>
-#include <VirtualRobot/Visualization/VisualizationFactory.h>
-#include <VirtualRobot/Visualization/CoinVisualization/CoinVisualization.h>
-#include <VirtualRobot/Obstacle.h>
 #include <string.h>
-#include <QtCore/QtGlobal>
-#include <QtGui/QtGui>
-#include <QtCore/QtCore>
-#include <VirtualRobot/Workspace/Reachability.h>
-
-#include <Inventor/sensors/SoTimerSensor.h>
-#include <Inventor/nodes/SoEventCallback.h>
-#include <Inventor/Qt/viewers/SoQtExaminerViewer.h>
-#include <Inventor/Qt/SoQt.h>
-#include <Inventor/nodes/SoSeparator.h>
-
 
 #include <vector>
 
+#include <QtCore/QtCore>
+#include <QtCore/QtGlobal>
+#include <QtGui/QtGui>
+
+#include <VirtualRobot/Nodes/RobotNode.h>
+#include <VirtualRobot/Obstacle.h>
+#include <VirtualRobot/Robot.h>
+#include <VirtualRobot/VirtualRobot.h>
+#include <VirtualRobot/VirtualRobotException.h>
+#include <VirtualRobot/Visualization/CoinVisualization/CoinVisualization.h>
+#include <VirtualRobot/Visualization/VisualizationFactory.h>
+#include <VirtualRobot/Workspace/Reachability.h>
+#include <VirtualRobot/XML/SceneIO.h>
+
 #include "ui_reachabilityScene.h"
+#include <Inventor/Qt/SoQt.h>
+#include <Inventor/Qt/viewers/SoQtExaminerViewer.h>
+#include <Inventor/nodes/SoEventCallback.h>
+#include <Inventor/nodes/SoSeparator.h>
+#include <Inventor/sensors/SoTimerSensor.h>
 
 class reachabilityWindow : public QMainWindow
 {
@@ -70,8 +70,8 @@ public slots:
     void selectEEF(int nr);*/
 
 
-
-    SoQtExaminerViewer* getExaminerViewer()
+    SoQtExaminerViewer*
+    getExaminerViewer()
     {
         return m_pExViewer;
     };
@@ -91,7 +91,8 @@ protected:
     void updateEEFBox();
     void displayTriangles();*/
     Ui::MainWindowReachability UI;
-    SoQtExaminerViewer* m_pExViewer; /*!< Viewer to display the 3D model of the robot and the environment. */
+    SoQtExaminerViewer*
+        m_pExViewer; /*!< Viewer to display the 3D model of the robot and the environment. */
 
     SoSeparator* sceneSep;
     SoSeparator* robotVisuSep;
@@ -102,9 +103,9 @@ protected:
     std::string reachFile;
     Eigen::Vector3f axisTCP;
     VirtualRobot::RobotNodeSetPtr currentRobotNodeSet;
-    std::vector < VirtualRobot::RobotNodePtr > allRobotNodes;
-    std::vector < VirtualRobot::RobotNodePtr > currentRobotNodes;
-    std::vector < VirtualRobot::RobotNodeSetPtr > robotNodeSets;
+    std::vector<VirtualRobot::RobotNodePtr> allRobotNodes;
+    std::vector<VirtualRobot::RobotNodePtr> currentRobotNodes;
+    std::vector<VirtualRobot::RobotNodeSetPtr> robotNodeSets;
 
     VirtualRobot::WorkspaceRepresentationPtr reachSpace;
     VirtualRobot::RobotNodePtr currentRobotNode;
@@ -120,4 +121,3 @@ protected:
 
     std::shared_ptr<VirtualRobot::CoinVisualization> visualization;
 };
-

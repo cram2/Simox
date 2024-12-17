@@ -21,10 +21,10 @@
 
 #include "FitPlane.h"
 
-
 namespace math
 {
-    Plane FitPlane::Fit(const std::vector<Eigen::Vector3f>& points)
+    Plane
+    FitPlane::Fit(const std::vector<Eigen::Vector3f>& points)
     {
         Eigen::Vector3f mean = Eigen::Vector3f::Zero();
         for (const Eigen::Vector3f& p : points)
@@ -44,4 +44,4 @@ namespace math
         Eigen::Vector3f dir2 = matrixU.block<3, 1>(0, 1);
         return Plane(mean, dir1.normalized(), dir2.normalized());
     }
-}
+} // namespace math

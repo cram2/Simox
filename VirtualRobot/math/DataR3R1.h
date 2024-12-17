@@ -29,19 +29,23 @@ namespace math
     class DataR3R1
     {
     public:
-        Eigen::Vector3f Position() const
+        Eigen::Vector3f
+        Position() const
         {
             return position;
         }
-        float Value() const
+
+        float
+        Value() const
         {
             return value;
         }
+
         DataR3R1(Eigen::Vector3f position, float value);
         std::string ToString();
+
     private:
         Eigen::Vector3f position;
         float value;
     };
-}
-
+} // namespace math

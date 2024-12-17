@@ -4,7 +4,6 @@
 
 #include <SimoxUtility/error/SimoxError.h>
 
-
 namespace simox::math
 {
     bool is_rotation_matrix(const Eigen::Matrix3f& rotation, float precision = 1e-6f);
@@ -20,8 +19,7 @@ namespace simox::math
      */
     void check_rotation_matrix(const Eigen::Matrix3f& rotation, float precision = 1e-6f);
 
-}
-
+} // namespace simox::math
 
 namespace simox::error
 {
@@ -33,4 +31,4 @@ namespace simox::error
 
         static std::string make_msg(Eigen::Matrix3f matrix, const std::string& message = "");
     };
-}
+} // namespace simox::error

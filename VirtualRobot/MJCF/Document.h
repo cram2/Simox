@@ -10,7 +10,6 @@
 
 #include "elements.h"
 
-
 namespace mjcf
 {
 
@@ -21,7 +20,6 @@ namespace mjcf
     {
 
     public:
-
         /// Constructor.
         Document();
 
@@ -32,9 +30,9 @@ namespace mjcf
         Document(Document&& other);
 
         /// Copy assignment operator. Performs a deep copy from `other` to `*this`.
-        Document& operator= (const Document& other);
+        Document& operator=(const Document& other);
         /// Move assignment operator.
-        Document& operator= (Document&& other);
+        Document& operator=(Document&& other);
 
 
         /// Set the precision for float comparison.
@@ -61,22 +59,90 @@ namespace mjcf
         /// Set the name of the Mujoco model.
         void setModelName(const std::string& name);
 
-
         // Section elements (children of top-level 'mujoco' element).
-        CompilerSection  compiler()  { return section<CompilerSection>();   }
-        OptionSection    option()    { return section<OptionSection>();     }
-        SizeSection      size()      { return section<SizeSection>();       }
-        VisualSection    visual()    { return section<VisualSection>();     }
-        StatisticSection statistic() { return section<StatisticSection>();  }
-        DefaultSection   default_()  { return section<DefaultSection>();    }
-        AssetSection     asset()     { return section<AssetSection>();      }
-        Worldbody        worldbody() { return section<Worldbody>();         }
-        ContactSection   contact()   { return section<ContactSection>();    }
-        EqualitySection  equality()  { return section<EqualitySection>();   }
-        TendonSection    tendon()    { return section<TendonSection>();     }
-        ActuatorSection  actuator()  { return section<ActuatorSection>();   }
-        SensorSection    sensor()    { return section<SensorSection>();     }
-        KeyframeSection  keyframe()  { return section<KeyframeSection>();   }
+        CompilerSection
+        compiler()
+        {
+            return section<CompilerSection>();
+        }
+
+        OptionSection
+        option()
+        {
+            return section<OptionSection>();
+        }
+
+        SizeSection
+        size()
+        {
+            return section<SizeSection>();
+        }
+
+        VisualSection
+        visual()
+        {
+            return section<VisualSection>();
+        }
+
+        StatisticSection
+        statistic()
+        {
+            return section<StatisticSection>();
+        }
+
+        DefaultSection
+        default_()
+        {
+            return section<DefaultSection>();
+        }
+
+        AssetSection
+        asset()
+        {
+            return section<AssetSection>();
+        }
+
+        Worldbody
+        worldbody()
+        {
+            return section<Worldbody>();
+        }
+
+        ContactSection
+        contact()
+        {
+            return section<ContactSection>();
+        }
+
+        EqualitySection
+        equality()
+        {
+            return section<EqualitySection>();
+        }
+
+        TendonSection
+        tendon()
+        {
+            return section<TendonSection>();
+        }
+
+        ActuatorSection
+        actuator()
+        {
+            return section<ActuatorSection>();
+        }
+
+        SensorSection
+        sensor()
+        {
+            return section<SensorSection>();
+        }
+
+        KeyframeSection
+        keyframe()
+        {
+            return section<KeyframeSection>();
+        }
 
         /**
          * @brief Add an include element including the file specified by `relativePath`.
@@ -100,7 +166,6 @@ namespace mjcf
 
 
     private:
-
         // METHODS
 
         /**
@@ -109,7 +174,9 @@ namespace mjcf
          * @param first If true, will be inserted as first, otherweise at end (default)
          */
         template <class ElementD, class ParentD>
-        ElementD createElement(Element<ParentD> parent, const std::string& className = "", bool front = false);
+        ElementD createElement(Element<ParentD> parent,
+                               const std::string& className = "",
+                               bool front = false);
 
         /// Return the first child element of parent with the given element name.
         /// If it does not exist, create it.
@@ -125,7 +192,6 @@ namespace mjcf
 
 
     private:
-
         // ATTRIBUTES
 
         /// The document.
@@ -145,12 +211,9 @@ namespace mjcf
         /// Indicate whether body elements and their children shall be
         /// exluded from setting the class attribute.
         bool newElementClassExcludeBody = true;
-
-
     };
 
     using DocumentPtr = std::unique_ptr<Document>;
-
 
 
 #include "elements/has_member.hpp"
@@ -158,7 +221,8 @@ namespace mjcf
     define_has_member(class_);
 
     template <class ElementD, class ParentD>
-    ElementD Document::createElement(Element<ParentD> parent, const std::string& className, bool front)
+    ElementD
+    Document::createElement(Element<ParentD> parent, const std::string& className, bool front)
     {
         ElementD element(this, document->NewElement(ElementD::Derived::tag.c_str()));
 
@@ -167,14 +231,14 @@ namespace mjcf
             bool isSet = !newElementClass.empty();
             bool hasClass = has_member(ElementD, class_);
             bool excludeBecauseBody = std::is_same<ParentD, Body>() && newElementClassExcludeBody;
-                    // body itself does not have a class attribute
+            // body itself does not have a class attribute
 
             bool inDefaultClass = std::is_same<ParentD, DefaultClass>();
 
-            return isSet                     // must not be empty
-                    && hasClass              // must have class attribute
-                    && !excludeBecauseBody   // not excluded because of body exclusion
-                    && !inDefaultClass;      // not part of default class
+            return isSet // must not be empty
+                   && hasClass // must have class attribute
+                   && !excludeBecauseBody // not excluded because of body exclusion
+                   && !inDefaultClass; // not part of default class
         };
 
 
@@ -202,9 +266,9 @@ namespace mjcf
 #undef define_has_member
 #undef has_member
 
-
     template <class ElementD, class ParentD>
-    ElementD Document::getOrCreateElement(Element<ParentD>& parent)
+    ElementD
+    Document::getOrCreateElement(Element<ParentD>& parent)
     {
         ElementD element = parent.template firstChild<ElementD>();
 
@@ -216,8 +280,9 @@ namespace mjcf
         return element;
     }
 
-    template<class SectionT>
-    SectionT Document::section()
+    template <class SectionT>
+    SectionT
+    Document::section()
     {
         return getOrCreateElement<SectionT>(*root);
     }
@@ -226,14 +291,15 @@ namespace mjcf
     // definition of Document.
     template <class D>
     template <class ParentD, class ElementD>
-    ElementD Element<D>::createElement(Element<ParentD> parent, const std::string& className,
-                                       bool front)
+    ElementD
+    Element<D>::createElement(Element<ParentD> parent, const std::string& className, bool front)
     {
         return _document->createElement<ElementD, ParentD>(parent, className, front);
     }
 
     template <class D>
-    void Element<D>::insertComment(const std::string& text, bool front)
+    void
+    Element<D>::insertComment(const std::string& text, bool front)
     {
         tinyxml2::XMLComment* comment = _document->document->NewComment(text.c_str());
         if (front)
@@ -246,4 +312,4 @@ namespace mjcf
         }
     }
 
-}
+} // namespace mjcf

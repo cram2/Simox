@@ -24,13 +24,19 @@
 #include "PositionConstraint.h"
 
 #include <VirtualRobot/Robot.h>
+
 #include "Nodes/RobotNode.h"
 #include "RobotNodeSet.h"
 
 using namespace VirtualRobot;
 
-PositionConstraint::PositionConstraint(const VirtualRobot::RobotPtr &robot, const VirtualRobot::RobotNodeSetPtr &nodeSet, const VirtualRobot::SceneObjectPtr &eef,
-                                                     const Eigen::Vector3f &target, VirtualRobot::IKSolver::CartesianSelection cartesianSelection, float tolerance) :
+PositionConstraint::PositionConstraint(
+    const VirtualRobot::RobotPtr& robot,
+    const VirtualRobot::RobotNodeSetPtr& nodeSet,
+    const VirtualRobot::SceneObjectPtr& eef,
+    const Eigen::Vector3f& target,
+    VirtualRobot::IKSolver::CartesianSelection cartesianSelection,
+    float tolerance) :
     Constraint(nodeSet),
     robot(robot),
     nodeSet(nodeSet),
@@ -41,16 +47,17 @@ PositionConstraint::PositionConstraint(const VirtualRobot::RobotPtr &robot, cons
 {
     ik.reset(new DifferentialIK(nodeSet));
     Eigen::Matrix4f target4x4 = Eigen::Matrix4f::Identity();
-    target4x4.block<3,1>(0,3) = target;
+    target4x4.block<3, 1>(0, 3) = target;
     ik->setGoal(target, eef, cartesianSelection);
     addOptimizationFunction(0, false);
 }
 
-double PositionConstraint::optimizationFunction(unsigned int /*id*/)
+double
+PositionConstraint::optimizationFunction(unsigned int /*id*/)
 {
-    Eigen::Vector3f d = eef->getGlobalPose().block<3,1>(0,3) - target;
+    Eigen::Vector3f d = eef->getGlobalPose().block<3, 1>(0, 3) - target;
 
-    switch(cartesianSelection)
+    switch (cartesianSelection)
     {
         case IKSolver::CartesianSelection::X:
             return optimizationFunctionFactor * d.x() * d.x();
@@ -72,14 +79,15 @@ double PositionConstraint::optimizationFunction(unsigned int /*id*/)
     return 0;
 }
 
-Eigen::VectorXf PositionConstraint::optimizationGradient(unsigned int /*id*/)
+Eigen::VectorXf
+PositionConstraint::optimizationGradient(unsigned int /*id*/)
 {
     int size = nodeSet->getSize();
 
     Eigen::MatrixXf J = ik->getJacobianMatrix(eef).block(0, 0, 3, size);
-    Eigen::Vector3f d = eef->getGlobalPose().block<3,1>(0,3) - target;
+    Eigen::Vector3f d = eef->getGlobalPose().block<3, 1>(0, 3) - target;
 
-    switch(cartesianSelection)
+    switch (cartesianSelection)
     {
         case IKSolver::CartesianSelection::X:
             return 2 * optimizationFunctionFactor * Eigen::Vector3f(d.x(), 0, 0).transpose() * J;
@@ -101,10 +109,11 @@ Eigen::VectorXf PositionConstraint::optimizationGradient(unsigned int /*id*/)
     return Eigen::VectorXf::Zero(size);
 }
 
-bool PositionConstraint::checkTolerances()
+bool
+PositionConstraint::checkTolerances()
 {
-    Eigen::Vector3f d = eef->getGlobalPose().block<3,1>(0,3) - target;
-    switch(cartesianSelection)
+    Eigen::Vector3f d = eef->getGlobalPose().block<3, 1>(0, 3) - target;
+    switch (cartesianSelection)
     {
         case IKSolver::CartesianSelection::X:
             return d.x() <= tolerance;
@@ -123,11 +132,13 @@ bool PositionConstraint::checkTolerances()
             return true;
     }
     std::stringstream ss;
-    ss << "PositionConstraint::checkTolerances(): unknown value for cartesianSelection = " << cartesianSelection;
+    ss << "PositionConstraint::checkTolerances(): unknown value for cartesianSelection = "
+       << cartesianSelection;
     throw std::logic_error{ss.str()};
 }
 
-Eigen::Vector3f PositionConstraint::getTarget()
+Eigen::Vector3f
+PositionConstraint::getTarget()
 {
     return target;
 }

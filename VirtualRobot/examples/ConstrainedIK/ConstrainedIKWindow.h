@@ -23,39 +23,37 @@
 
 #pragma once
 
-#include <VirtualRobot/VirtualRobot.h>
-#include <VirtualRobot/Robot.h>
-#include <VirtualRobot/Obstacle.h>
-#include <VirtualRobot/VirtualRobotException.h>
-#include <VirtualRobot/Nodes/RobotNode.h>
-#include <VirtualRobot/XML/RobotIO.h>
-#include <VirtualRobot/Visualization/VisualizationFactory.h>
-#include <VirtualRobot/Visualization/CoinVisualization/CoinVisualization.h>
-#include <VirtualRobot/IK/GazeIK.h>
-#include <VirtualRobot/IK/ConstrainedIK.h>
-
-#include <VirtualRobot/IK/constraints/PoseConstraint.h>
-#include <VirtualRobot/IK/constraints/TSRConstraint.h>
-#include <VirtualRobot/IK/constraints/JointLimitAvoidanceConstraint.h>
-#include <VirtualRobot/IK/constraints/BalanceConstraint.h>
-#include <VirtualRobot/IK/constraints/PositionConstraint.h>
-#include <VirtualRobot/IK/constraints/OrientationConstraint.h>
-
 #include <string.h>
-#include <QtCore/QtGlobal>
-#include <QtGui/QtGui>
-#include <QtCore/QtCore>
-
-#include <Inventor/sensors/SoTimerSensor.h>
-#include <Inventor/nodes/SoEventCallback.h>
-#include <Inventor/Qt/viewers/SoQtExaminerViewer.h>
-#include <Inventor/Qt/SoQt.h>
-#include <Inventor/nodes/SoSeparator.h>
-
 
 #include <vector>
 
+#include <QtCore/QtCore>
+#include <QtCore/QtGlobal>
+#include <QtGui/QtGui>
+
+#include <VirtualRobot/IK/ConstrainedIK.h>
+#include <VirtualRobot/IK/GazeIK.h>
+#include <VirtualRobot/IK/constraints/BalanceConstraint.h>
+#include <VirtualRobot/IK/constraints/JointLimitAvoidanceConstraint.h>
+#include <VirtualRobot/IK/constraints/OrientationConstraint.h>
+#include <VirtualRobot/IK/constraints/PoseConstraint.h>
+#include <VirtualRobot/IK/constraints/PositionConstraint.h>
+#include <VirtualRobot/IK/constraints/TSRConstraint.h>
+#include <VirtualRobot/Nodes/RobotNode.h>
+#include <VirtualRobot/Obstacle.h>
+#include <VirtualRobot/Robot.h>
+#include <VirtualRobot/VirtualRobot.h>
+#include <VirtualRobot/VirtualRobotException.h>
+#include <VirtualRobot/Visualization/CoinVisualization/CoinVisualization.h>
+#include <VirtualRobot/Visualization/VisualizationFactory.h>
+#include <VirtualRobot/XML/RobotIO.h>
+
 #include "ui_ConstrainedIK.h"
+#include <Inventor/Qt/SoQt.h>
+#include <Inventor/Qt/viewers/SoQtExaminerViewer.h>
+#include <Inventor/nodes/SoEventCallback.h>
+#include <Inventor/nodes/SoSeparator.h>
+#include <Inventor/sensors/SoTimerSensor.h>
 
 class ConstrainedIKWindow : public QMainWindow
 {
@@ -83,11 +81,11 @@ public slots:
     void solve();
 
     void updateTSR(double value);
-    void randomTSR(bool quiet=false);
+    void randomTSR(bool quiet = false);
     void enableTSR();
 
     void updatePose(double value);
-    void randomPose(bool quiet=false);
+    void randomPose(bool quiet = false);
     void enablePose();
 
     void enableBalance();
@@ -102,7 +100,8 @@ protected:
     void computeTSRError();
 
     Ui::MainWindowConstrainedIKDemo UI;
-    SoQtExaminerViewer* exViewer; /*!< Viewer to display the 3D model of the robot and the environment. */
+    SoQtExaminerViewer*
+        exViewer; /*!< Viewer to display the 3D model of the robot and the environment. */
 
     SoSeparator* sceneSep;
     SoSeparator* robotSep;
@@ -121,4 +120,3 @@ protected:
     VirtualRobot::TSRConstraintPtr tsrConstraint;
     VirtualRobot::BalanceConstraintPtr balanceConstraint;
 };
-

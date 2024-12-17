@@ -4,47 +4,53 @@
 * @copyright  2018 Rainer Kartmann
 */
 
-#define BOOST_TEST_MODULE SimoxUtility/meta/AdaptEnum
+#define BOOST_TEST_MODULE SimoxUtility / meta / AdaptEnum
 
-#include <string>
 #include <iostream>
+#include <string>
 
-#include <boost/test/included/unit_test.hpp>
 #include <boost/bimap.hpp>
+#include <boost/test/included/unit_test.hpp>
 
 #include <SimoxUtility/meta/enum/adapt_enum.h>
 
 namespace ns
 {
-    enum class enum_1 {e0, e1, e2};
-    enum class enum_2 {e0, e1, e2};
-}
+    enum class enum_1
+    {
+        e0,
+        e1,
+        e2
+    };
+    enum class enum_2
+    {
+        e0,
+        e1,
+        e2
+    };
+} // namespace ns
 
 namespace simox::meta
 {
-    template<>
+    template <>
     struct is_enum_adapted<ns::enum_1, void> : std::true_type
     {
-        static const auto& names()
+        static const auto&
+        names()
         {
-            static const simox::meta::EnumNames<ns::enum_1> names =
-            {
-                { ns::enum_1::e0, "enum_1::e0" },
-                { ns::enum_1::e1, "enum_1::e1" },
-                { ns::enum_1::e2, "enum_1::e2" }
-            };
+            static const simox::meta::EnumNames<ns::enum_1> names = {
+                {ns::enum_1::e0, "enum_1::e0"},
+                {ns::enum_1::e1, "enum_1::e1"},
+                {ns::enum_1::e2, "enum_1::e2"}};
             return names;
         }
     };
 
-    template<>
-    const simox::meta::EnumNames<ns::enum_2> enum_names<ns::enum_2>
-    {
-        { ns::enum_2::e0, "enum_2::e0" },
-        { ns::enum_2::e1, "enum_2::e1" },
-        { ns::enum_2::e2, "enum_2::e2" }
-    };
-}
+    template <>
+    const simox::meta::EnumNames<ns::enum_2> enum_names<ns::enum_2>{{ns::enum_2::e0, "enum_2::e0"},
+                                                                    {ns::enum_2::e1, "enum_2::e1"},
+                                                                    {ns::enum_2::e2, "enum_2::e2"}};
+} // namespace simox::meta
 
 BOOST_AUTO_TEST_CASE(test_adapt_enum)
 {

@@ -24,9 +24,8 @@
 #include <optional>
 #include <string>
 
-#include <VirtualRobot/VirtualRobot.h>
-
 #include <GeometricPlanning/types.h>
+#include <VirtualRobot/VirtualRobot.h>
 
 namespace simox::geometric_planning
 {
@@ -72,10 +71,10 @@ namespace simox::geometric_planning
 
         ArticulatedObjectDoorHelper(const VirtualRobot::RobotPtr& object, const Params& params);
 
-        DoorInteractionContext
-        planInteraction(const std::string& nodeSetName,
-                        const std::optional<std::string>& targetFrameSuffix = std::nullopt,
-                        const std::optional<std::string>& surfaceProjectionFrameSuffix = std::nullopt) const;
+        DoorInteractionContext planInteraction(
+            const std::string& nodeSetName,
+            const std::optional<std::string>& targetFrameSuffix = std::nullopt,
+            const std::optional<std::string>& surfaceProjectionFrameSuffix = std::nullopt) const;
 
         DoorInteractionContextExtended planInteractionExtended(
             const std::string& nodeSetName,

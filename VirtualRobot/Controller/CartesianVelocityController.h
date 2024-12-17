@@ -32,21 +32,31 @@ namespace VirtualRobot
     class CartesianVelocityController
     {
     public:
-        CartesianVelocityController(const RobotNodeSetPtr& rns, const RobotNodePtr& tcp = nullptr,
-                                    const JacobiProvider::InverseJacobiMethod invJacMethod = JacobiProvider::eSVDDamped,
-                                    bool _considerJointLimits = true);
+        CartesianVelocityController(
+            const RobotNodeSetPtr& rns,
+            const RobotNodePtr& tcp = nullptr,
+            const JacobiProvider::InverseJacobiMethod invJacMethod = JacobiProvider::eSVDDamped,
+            bool _considerJointLimits = true);
 
         CartesianVelocityController(CartesianVelocityController&&) = default;
         CartesianVelocityController& operator=(CartesianVelocityController&&) = default;
 
-        Eigen::VectorXf calculate(const Eigen::VectorXf& cartesianVel, IKSolver::CartesianSelection mode);
-        Eigen::VectorXf calculate(const Eigen::VectorXf& cartesianVel, float KpJointLimitAvoidanceScale, IKSolver::CartesianSelection mode);
-        Eigen::VectorXf calculate(const Eigen::VectorXf& cartesianVel, const Eigen::VectorXf& nullspaceVel, IKSolver::CartesianSelection mode);
+        Eigen::VectorXf calculate(const Eigen::VectorXf& cartesianVel,
+                                  IKSolver::CartesianSelection mode);
+        Eigen::VectorXf calculate(const Eigen::VectorXf& cartesianVel,
+                                  float KpJointLimitAvoidanceScale,
+                                  IKSolver::CartesianSelection mode);
+        Eigen::VectorXf calculate(const Eigen::VectorXf& cartesianVel,
+                                  const Eigen::VectorXf& nullspaceVel,
+                                  IKSolver::CartesianSelection mode);
         Eigen::VectorXf calculateJointLimitAvoidance();
         Eigen::VectorXf calculateJointLimitAvoidanceWithMargins(const Eigen::VectorXf& margins);
-        Eigen::VectorXf calculateNullspaceVelocity(const Eigen::VectorXf& cartesianVel, float KpScale, IKSolver::CartesianSelection mode);
+        Eigen::VectorXf calculateNullspaceVelocity(const Eigen::VectorXf& cartesianVel,
+                                                   float KpScale,
+                                                   IKSolver::CartesianSelection mode);
 
-        void setCartesianRegularization(float cartesianMMRegularization, float cartesianRadianRegularization);
+        void setCartesianRegularization(float cartesianMMRegularization,
+                                        float cartesianRadianRegularization);
 
         bool getConsiderJointLimits() const;
         void setConsiderJointLimits(bool value);
@@ -64,11 +74,14 @@ namespace VirtualRobot
         void calculateJacobis(IKSolver::CartesianSelection mode);
         Eigen::MatrixXf _jacobiWithCosts;
         Eigen::MatrixXf _inv;
-        bool clampJacobiAtJointLimits(IKSolver::CartesianSelection mode, const Eigen::VectorXf& cartesianVel, Eigen::MatrixXf& jacobi, Eigen::MatrixXf& _inv, float jointLimitCheckAccuracy = 0.001f);
+        bool clampJacobiAtJointLimits(IKSolver::CartesianSelection mode,
+                                      const Eigen::VectorXf& cartesianVel,
+                                      Eigen::MatrixXf& jacobi,
+                                      Eigen::MatrixXf& _inv,
+                                      float jointLimitCheckAccuracy = 0.001f);
         bool _considerJointLimits = true;
         float _cartesianMMRegularization;
         float _cartesianRadianRegularization;
         Eigen::VectorXf _jointCosts;
     };
-}
-
+} // namespace VirtualRobot

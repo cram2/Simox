@@ -2,12 +2,10 @@
 
 #include <Eigen/Geometry>
 
-#include <VirtualRobot/VirtualRobot.h>
-
 #include <GeometricPlanning/ParametricPath.h>
 #include <GeometricPlanning/path_primitives/PathPrimitive.h>
 #include <GeometricPlanning/types.h>
-
+#include <VirtualRobot/VirtualRobot.h>
 
 namespace simox::geometric_planning
 {

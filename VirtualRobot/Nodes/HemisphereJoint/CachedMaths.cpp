@@ -1,9 +1,9 @@
 #include "CachedMaths.h"
 
-
 namespace VirtualRobot::hemisphere
 {
-    void CachedMaths::update(const Eigen::Vector2d& actuatorsAngle)
+    void
+    CachedMaths::update(const Eigen::Vector2d& actuatorsAngle)
     {
         if (not actuatorsAngle.isApprox(_actuators, EQUALITY_PRECISION))
         {
@@ -11,4 +11,4 @@ namespace VirtualRobot::hemisphere
             maths.computeFkOfAngle(_actuators);
         }
     }
-}
+} // namespace VirtualRobot::hemisphere

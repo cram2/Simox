@@ -13,6 +13,7 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 #include "GL_Simplex1to4.h"
+
 #include "BulletCollision/NarrowPhaseCollision/btSimplexSolverInterface.h"
 #include "GL_ShapeDrawer.h"
 #ifdef _WIN32
@@ -20,7 +21,7 @@ subject to the following restrictions:
 #endif
 
 //think different
-#if defined(__APPLE__) && !defined (VMDMESA)
+#if defined(__APPLE__) && !defined(VMDMESA)
 #include <OpenGL/gl.h>
 #include <OpenGL/glu.h>
 #else
@@ -29,22 +30,20 @@ subject to the following restrictions:
 #include "GlutStuff.h"
 #include "LinearMath/btTransform.h"
 
-GL_Simplex1to4::GL_Simplex1to4()
-    : m_simplexSolver(nullptr)
+GL_Simplex1to4::GL_Simplex1to4() : m_simplexSolver(nullptr)
 {
 }
 
-GL_Simplex1to4::~GL_Simplex1to4()
-= default;
+GL_Simplex1to4::~GL_Simplex1to4() = default;
 
 ///
 /// Debugging method calcClosest calculates the closest point to the origin, using m_simplexSolver
 ///
-void    GL_Simplex1to4::calcClosest(btScalar* m)
+void
+GL_Simplex1to4::calcClosest(btScalar* m)
 {
     btTransform tr;
     tr.setFromOpenGLMatrix(m);
-
 
 
     GL_ShapeDrawer::drawCoordSystem();
@@ -57,7 +56,7 @@ void    GL_Simplex1to4::calcClosest(btScalar* m)
 
         for (int i = 0; i < m_numVertices; i++)
         {
-            v =  tr(m_vertices[i]);
+            v = tr(m_vertices[i]);
             m_simplexSolver->addVertex(v, v, btVector3(0.f, 0.f, 0.f));
         }
 
@@ -70,8 +69,5 @@ void    GL_Simplex1to4::calcClosest(btScalar* m)
         glEnd();
 
         glEnable(GL_LIGHTING);
-
-
     }
-
 }

@@ -6,13 +6,15 @@
 
 #define BOOST_TEST_MODULE VirtualRobot_TransformationTest
 
-#include <VirtualRobot/VirtualRobotTest.h>
-#include <VirtualRobot/Transformation/Transformation.h>
 #include <Eigen/Core>
+
+#include <VirtualRobot/Transformation/Transformation.h>
+#include <VirtualRobot/VirtualRobotTest.h>
 
 BOOST_AUTO_TEST_SUITE(Transformation)
 
-void checkMatrix4fIdentity(const Eigen::Matrix4f& matrix)
+void
+checkMatrix4fIdentity(const Eigen::Matrix4f& matrix)
 {
     // first row
     BOOST_CHECK_EQUAL(1, matrix(0, 0));
@@ -36,7 +38,8 @@ void checkMatrix4fIdentity(const Eigen::Matrix4f& matrix)
     BOOST_CHECK_EQUAL(1, matrix(3, 3));
 }
 
-void checkVector3fIdentity(const Eigen::Vector3f& vector)
+void
+checkVector3fIdentity(const Eigen::Vector3f& vector)
 {
     BOOST_CHECK_EQUAL(1, vector.x());
     BOOST_CHECK_EQUAL(0, vector.y());

@@ -4,33 +4,32 @@
 * @copyright  2019 Rainer Kartmann
 */
 
-#define BOOST_TEST_MODULE SimoxUtility/math/pose/pose_test
+#define BOOST_TEST_MODULE SimoxUtility / math / pose / pose_test
+
+#include <stdio.h>
+
+#include <random>
+#include <string>
 
 #include <boost/test/included/unit_test.hpp>
 
 #include <SimoxUtility/math/pose.h>
 
-#include <string>
-#include <stdio.h>
-#include <random>
-
 
 namespace math = ::simox::math;
-
 
 struct BlockFixture
 {
     BlockFixture()
     {
         quat = Eigen::Quaternionf{
-            Eigen::AngleAxisf(static_cast<float>(M_PI), Eigen::Vector3f::UnitZ())
-            * Eigen::AngleAxisf(static_cast<float>(M_PI_2), Eigen::Vector3f::UnitY())
-        };
+            Eigen::AngleAxisf(static_cast<float>(M_PI), Eigen::Vector3f::UnitZ()) *
+            Eigen::AngleAxisf(static_cast<float>(M_PI_2), Eigen::Vector3f::UnitY())};
 
         quat2 = Eigen::AngleAxisf(static_cast<float>(M_PI_4), Eigen::Vector3f::UnitX()) * quat;
 
-        pos = Eigen::Vector3f{ 1, 2, 3 };
-        pos2 = Eigen::Vector3f{ 4, 5, 6 };
+        pos = Eigen::Vector3f{1, 2, 3};
+        pos2 = Eigen::Vector3f{4, 5, 6};
 
         ori = quat.toRotationMatrix();
         ori2 = quat2.toRotationMatrix();
@@ -49,7 +48,6 @@ struct BlockFixture
 
 BOOST_FIXTURE_TEST_SUITE(MathHelpers, BlockFixture)
 
-
 BOOST_AUTO_TEST_CASE(test_position_const)
 {
     BOOST_CHECK_EQUAL(math::position(const_cast<const Eigen::Matrix4f&>(pose)), pos);
@@ -62,7 +60,6 @@ BOOST_AUTO_TEST_CASE(test_position_nonconst)
     math::position(pose) = pos2;
     BOOST_CHECK_EQUAL(math::position(pose), pos2);
 }
-
 
 BOOST_AUTO_TEST_CASE(test_orientation_const)
 {
@@ -79,7 +76,6 @@ BOOST_AUTO_TEST_CASE(test_orientation_nonconst)
     math::orientation(pose) = quat.toRotationMatrix();
     BOOST_CHECK_EQUAL(math::orientation(pose), quat.toRotationMatrix());
 }
-
 
 BOOST_AUTO_TEST_CASE(test_pose_matrix_and_quaternion)
 {

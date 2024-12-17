@@ -1,14 +1,15 @@
-#include <Eigen/Geometry>
 #include "JacobiProvider.h"
 
-#include <VirtualRobot/MathTools.h>
-#include "VirtualRobotException.h"
-#include "../Nodes/RobotNode.h"
-#include "../RobotNodeSet.h"
+#include <algorithm>
 
 #include <Eigen/Dense>
+#include <Eigen/Geometry>
 
-#include <algorithm>
+#include <VirtualRobot/MathTools.h>
+
+#include "../Nodes/RobotNode.h"
+#include "../RobotNodeSet.h"
+#include "VirtualRobotException.h"
 
 //#define CHECK_PERFORMANCE
 
@@ -26,20 +27,23 @@ namespace VirtualRobot
         jacobiRadianRegularization = 1;
     }
 
-    JacobiProvider::~JacobiProvider()
-    = default;
+    JacobiProvider::~JacobiProvider() = default;
 
-    Eigen::MatrixXd JacobiProvider::getJacobianMatrixD()
+    Eigen::MatrixXd
+    JacobiProvider::getJacobianMatrixD()
     {
         return getJacobianMatrix().cast<double>();
     }
 
-    Eigen::MatrixXd JacobiProvider::getJacobianMatrixD(SceneObjectPtr tcp)
+    Eigen::MatrixXd
+    JacobiProvider::getJacobianMatrixD(SceneObjectPtr tcp)
     {
         return getJacobianMatrix(tcp).cast<double>();
     }
 
-    Eigen::MatrixXf JacobiProvider::getPseudoInverseJacobianMatrix(SceneObjectPtr tcp, const Eigen::VectorXf regularization)
+    Eigen::MatrixXf
+    JacobiProvider::getPseudoInverseJacobianMatrix(SceneObjectPtr tcp,
+                                                   const Eigen::VectorXf regularization)
     {
 #ifdef CHECK_PERFORMANCE
         clock_t startT = clock();
@@ -53,12 +57,15 @@ namespace VirtualRobot
         clock_t endT = clock();
         float diffClock1 = (float)(((float)(startT2 - startT) / (float)CLOCKS_PER_SEC) * 1000.0f);
         float diffClock2 = (float)(((float)(endT - startT2) / (float)CLOCKS_PER_SEC) * 1000.0f);
-        std::cout << "getPseudoInverseJacobianMatrix time1:" << diffClock1 << ", time2: " << diffClock2 << std::endl;
+        std::cout << "getPseudoInverseJacobianMatrix time1:" << diffClock1
+                  << ", time2: " << diffClock2 << std::endl;
 #endif
         return res;
     }
 
-    Eigen::MatrixXd JacobiProvider::getPseudoInverseJacobianMatrixD(SceneObjectPtr tcp, const Eigen::VectorXd regularization)
+    Eigen::MatrixXd
+    JacobiProvider::getPseudoInverseJacobianMatrixD(SceneObjectPtr tcp,
+                                                    const Eigen::VectorXd regularization)
     {
 #ifdef CHECK_PERFORMANCE
         clock_t startT = clock();
@@ -72,12 +79,14 @@ namespace VirtualRobot
         clock_t endT = clock();
         float diffClock1 = (float)(((float)(startT2 - startT) / (float)CLOCKS_PER_SEC) * 1000.0f);
         float diffClock2 = (float)(((float)(endT - startT2) / (float)CLOCKS_PER_SEC) * 1000.0f);
-        std::cout << "getPseudoInverseJacobianMatrix time1:" << diffClock1 << ", time2: " << diffClock2 << std::endl;
+        std::cout << "getPseudoInverseJacobianMatrix time1:" << diffClock1
+                  << ", time2: " << diffClock2 << std::endl;
 #endif
         return res;
     }
 
-    Eigen::VectorXf JacobiProvider::getJacobiRegularization(IKSolver::CartesianSelection mode)
+    Eigen::VectorXf
+    JacobiProvider::getJacobiRegularization(IKSolver::CartesianSelection mode)
     {
         Eigen::VectorXf regularization(6);
 
@@ -105,52 +114,66 @@ namespace VirtualRobot
             regularization(i++) = 1 / jacobiRadianRegularization;
         }
         return regularization.topRows(i);
-
     }
 
-
-    Eigen::MatrixXf JacobiProvider::getPseudoInverseJacobianMatrix(const Eigen::VectorXf regularization)
+    Eigen::MatrixXf
+    JacobiProvider::getPseudoInverseJacobianMatrix(const Eigen::VectorXf regularization)
     {
         Eigen::MatrixXf Jacobian = this->getJacobianMatrix();
         return computePseudoInverseJacobianMatrix(Jacobian, regularization);
         //return getPseudoInverseJacobianMatrix(rns->getTCP());
     }
 
-    Eigen::MatrixXd JacobiProvider::getPseudoInverseJacobianMatrixD(const Eigen::VectorXd regularization)
+    Eigen::MatrixXd
+    JacobiProvider::getPseudoInverseJacobianMatrixD(const Eigen::VectorXd regularization)
     {
         Eigen::MatrixXd Jacobian = this->getJacobianMatrixD();
         return computePseudoInverseJacobianMatrixD(Jacobian, regularization);
     }
 
-    Eigen::MatrixXf JacobiProvider::computePseudoInverseJacobianMatrix(const Eigen::MatrixXf& m, const Eigen::VectorXf regularization) const
+    Eigen::MatrixXf
+    JacobiProvider::computePseudoInverseJacobianMatrix(const Eigen::MatrixXf& m,
+                                                       const Eigen::VectorXf regularization) const
     {
         return computePseudoInverseJacobianMatrix(m, 0.0f, regularization);
     }
 
-    Eigen::MatrixXd JacobiProvider::computePseudoInverseJacobianMatrixD(const Eigen::MatrixXd& m, const Eigen::VectorXd regularization) const
+    Eigen::MatrixXd
+    JacobiProvider::computePseudoInverseJacobianMatrixD(const Eigen::MatrixXd& m,
+                                                        const Eigen::VectorXd regularization) const
     {
         return computePseudoInverseJacobianMatrixD(m, 0.0, regularization);
     }
 
-    Eigen::MatrixXf JacobiProvider::computePseudoInverseJacobianMatrix(const Eigen::MatrixXf& m, float invParameter, const Eigen::VectorXf regularization) const
+    Eigen::MatrixXf
+    JacobiProvider::computePseudoInverseJacobianMatrix(const Eigen::MatrixXf& m,
+                                                       float invParameter,
+                                                       const Eigen::VectorXf regularization) const
     {
         Eigen::MatrixXf result(m.cols(), m.rows());
         updatePseudoInverseJacobianMatrix(result, m, invParameter, regularization);
         return result;
     }
 
-    Eigen::MatrixXd JacobiProvider::computePseudoInverseJacobianMatrixD(const Eigen::MatrixXd& m, double invParameter, const Eigen::VectorXd regularization) const
+    Eigen::MatrixXd
+    JacobiProvider::computePseudoInverseJacobianMatrixD(const Eigen::MatrixXd& m,
+                                                        double invParameter,
+                                                        const Eigen::VectorXd regularization) const
     {
         Eigen::MatrixXd result(m.cols(), m.rows());
         updatePseudoInverseJacobianMatrixD(result, m, invParameter, regularization);
         return result;
     }
 
-    void JacobiProvider::updatePseudoInverseJacobianMatrix(Eigen::MatrixXf& invJac, const Eigen::MatrixXf& m, float invParameter, Eigen::VectorXf regularization) const
+    void
+    JacobiProvider::updatePseudoInverseJacobianMatrix(Eigen::MatrixXf& invJac,
+                                                      const Eigen::MatrixXf& m,
+                                                      float invParameter,
+                                                      Eigen::VectorXf regularization) const
     {
         Eigen::MatrixXf m2 = m;
         VR_ASSERT(regularization.rows() == 0 || regularization.rows() == m2.rows());
-        if(regularization.rows() != m2.rows())
+        if (regularization.rows() != m2.rows())
         {
             regularization = Eigen::VectorXf::Ones(m2.rows());
         }
@@ -160,13 +183,17 @@ namespace VirtualRobot
         invJac = invJac * regularization.asDiagonal();
     }
 
-    void JacobiProvider::updatePseudoInverseJacobianMatrixInternal(Eigen::MatrixXf& invJac, const Eigen::MatrixXf& m, float invParameter) const
+    void
+    JacobiProvider::updatePseudoInverseJacobianMatrixInternal(Eigen::MatrixXf& invJac,
+                                                              const Eigen::MatrixXf& m,
+                                                              float invParameter) const
     {
 #ifdef CHECK_PERFORMANCE
         clock_t startT = clock();
 #endif
 
-        VR_ASSERT(m.rows() > 0 && m.cols() > 0 && invJac.cols() == m.rows() && invJac.rows() == m.cols());
+        VR_ASSERT(m.rows() > 0 && m.cols() > 0 && invJac.cols() == m.rows() &&
+                  invJac.rows() == m.cols());
 
         switch (inverseMethod)
         {
@@ -202,7 +229,8 @@ namespace VirtualRobot
 
                     for (int i = 0; i < jointWeights.rows(); i++)
                     {
-                        THROW_VR_EXCEPTION_IF(jointWeights(i) <= 0.f, "joint weights cannot be negative or zero");
+                        THROW_VR_EXCEPTION_IF(jointWeights(i) <= 0.f,
+                                              "joint weights cannot be negative or zero");
                         W_12(i, i) = sqrt(1 / jointWeights(i));
                     }
 
@@ -247,11 +275,15 @@ namespace VirtualRobot
 #endif
     }
 
-    void JacobiProvider::updatePseudoInverseJacobianMatrixD(Eigen::MatrixXd& invJac, const Eigen::MatrixXd& m, double invParameter, Eigen::VectorXd regularization) const
+    void
+    JacobiProvider::updatePseudoInverseJacobianMatrixD(Eigen::MatrixXd& invJac,
+                                                       const Eigen::MatrixXd& m,
+                                                       double invParameter,
+                                                       Eigen::VectorXd regularization) const
     {
         Eigen::MatrixXd m2 = m;
         VR_ASSERT(regularization.rows() == 0 || regularization.rows() == m2.rows());
-        if(regularization.rows() != m2.rows())
+        if (regularization.rows() != m2.rows())
         {
             regularization = Eigen::VectorXd::Ones(m2.rows());
         }
@@ -260,13 +292,17 @@ namespace VirtualRobot
         invJac = invJac * regularization.asDiagonal();
     }
 
-    void JacobiProvider::updatePseudoInverseJacobianMatrixDInternal(Eigen::MatrixXd& invJac, const Eigen::MatrixXd& m, double invParameter) const
+    void
+    JacobiProvider::updatePseudoInverseJacobianMatrixDInternal(Eigen::MatrixXd& invJac,
+                                                               const Eigen::MatrixXd& m,
+                                                               double invParameter) const
     {
 #ifdef CHECK_PERFORMANCE
         clock_t startT = clock();
 #endif
 
-        VR_ASSERT(m.rows() > 0 && m.cols() > 0 && invJac.cols() == m.rows() && invJac.rows() == m.cols());
+        VR_ASSERT(m.rows() > 0 && m.cols() > 0 && invJac.cols() == m.rows() &&
+                  invJac.rows() == m.cols());
 
         switch (inverseMethod)
         {
@@ -302,7 +338,8 @@ namespace VirtualRobot
 
                     for (int i = 0; i < jointWeights.rows(); i++)
                     {
-                        THROW_VR_EXCEPTION_IF(jointWeights(i) <= 0.f, "joint weights cannot be negative or zero");
+                        THROW_VR_EXCEPTION_IF(jointWeights(i) <= 0.f,
+                                              "joint weights cannot be negative or zero");
                         W_12(i, i) = sqrt(1 / jointWeights(i));
                     }
 
@@ -347,56 +384,65 @@ namespace VirtualRobot
 #endif
     }
 
-    float JacobiProvider::getJacobiRadianRegularization() const
+    float
+    JacobiProvider::getJacobiRadianRegularization() const
     {
         return jacobiRadianRegularization;
     }
 
-    void JacobiProvider::setJacobiRadianRegularization(float value)
+    void
+    JacobiProvider::setJacobiRadianRegularization(float value)
     {
         jacobiRadianRegularization = value;
     }
 
-    float JacobiProvider::getJacobiMMRegularization() const
+    float
+    JacobiProvider::getJacobiMMRegularization() const
     {
         return jacobiMMRegularization;
     }
 
-    void JacobiProvider::setJacobiMMRegularization(float value)
+    void
+    JacobiProvider::setJacobiMMRegularization(float value)
     {
         jacobiMMRegularization = value;
     }
 
-    float JacobiProvider::getDampedSvdLambda() const
+    float
+    JacobiProvider::getDampedSvdLambda() const
     {
         return dampedSvdLambda;
     }
 
-    void JacobiProvider::setDampedSvdLambda(float value)
+    void
+    JacobiProvider::setDampedSvdLambda(float value)
     {
         dampedSvdLambda = value;
     }
 
-
-
-    VirtualRobot::RobotNodeSetPtr JacobiProvider::getRobotNodeSet()
+    VirtualRobot::RobotNodeSetPtr
+    JacobiProvider::getRobotNodeSet()
     {
         return rns;
     }
 
-    void JacobiProvider::setJointWeights(const Eigen::VectorXf& jointWeights)
+    void
+    JacobiProvider::setJointWeights(const Eigen::VectorXf& jointWeights)
     {
         this->jointWeights = jointWeights;
     }
 
-    void JacobiProvider::print()
+    void
+    JacobiProvider::print()
     {
         std::cout << "IK solver:" << name << std::endl;
         std::cout << "==========================" << std::endl;
-        std::cout << "RNS:" << rns->getName() << " with " << rns->getSize() << " joints" << std::endl;
+        std::cout << "RNS:" << rns->getName() << " with " << rns->getSize() << " joints"
+                  << std::endl;
     }
 
-    bool JacobiProvider::isInitialized()
+    bool
+    JacobiProvider::isInitialized()
     {
         return initialized;
     }

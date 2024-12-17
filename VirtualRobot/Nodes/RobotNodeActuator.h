@@ -22,10 +22,10 @@
 */
 #pragma once
 
-#include "../VirtualRobot.h"
-
-#include "RobotNode.h"
 #include <Eigen/Core>
+
+#include "../VirtualRobot.h"
+#include "RobotNode.h"
 
 namespace VirtualRobot
 {
@@ -38,25 +38,26 @@ namespace VirtualRobot
         /*!
             Constructor
         */
-        RobotNodeActuator(RobotNodePtr node);               //!< The node to actuate
+        RobotNodeActuator(RobotNodePtr node); //!< The node to actuate
 
         /*!
         */
         virtual ~RobotNodeActuator();
 
-        virtual void updateVisualizationPose(const Eigen::Matrix4f& pose, bool updateChildren = false);
-        virtual void updateVisualizationPose(const Eigen::Matrix4f& pose, float jointValue, bool updateChildren = false);
+        virtual void updateVisualizationPose(const Eigen::Matrix4f& pose,
+                                             bool updateChildren = false);
+        virtual void updateVisualizationPose(const Eigen::Matrix4f& pose,
+                                             float jointValue,
+                                             bool updateChildren = false);
         //! Just sets the joint angle without performing any calculations, model updates
         virtual void updateJointAngle(float jointValue);
 
         RobotNodePtr getRobotNode();
-    protected:
 
+    protected:
         RobotNodePtr robotNode;
     };
-
 
     typedef std::shared_ptr<RobotNodeActuator> RobotNodeActuatorPtr;
 
 } // namespace VirtualRobot
-

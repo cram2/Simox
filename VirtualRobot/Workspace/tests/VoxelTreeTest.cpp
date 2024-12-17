@@ -22,13 +22,12 @@ BOOST_AUTO_TEST_CASE(VoxelTreeConstructionTest)
     {
         minB[i] = -100.0f;
         maxB[i] = 100.0f;
-        minB[3 + i] = (float) - M_PI;
+        minB[3 + i] = (float)-M_PI;
         maxB[3 + i] = (float)M_PI;
     }
 
     BOOST_REQUIRE_NO_THROW(VirtualRobot::VoxelTree6D<unsigned char> v(minB, maxB, 20.0f, 1.0f));
 }
-
 
 BOOST_AUTO_TEST_CASE(VoxelTreeNDConstructionTest)
 {
@@ -49,7 +48,6 @@ BOOST_AUTO_TEST_CASE(VoxelTreeNDConstructionTest)
     VirtualRobot::VoxelTreeND<unsigned char, 5> v(minB, maxB, discr);
 }
 
-
 BOOST_AUTO_TEST_CASE(VoxelTreeEntriesTest)
 {
     float minB[6];
@@ -59,14 +57,14 @@ BOOST_AUTO_TEST_CASE(VoxelTreeEntriesTest)
     {
         minB[i] = -100.0f;
         maxB[i] = 100.0f;
-        minB[3 + i] = (float) - M_PI;
+        minB[3 + i] = (float)-M_PI;
         maxB[3 + i] = (float)M_PI;
     }
 
     VirtualRobot::VoxelTree6D<unsigned char> v(minB, maxB, 20.0f, 1.0f);
     float pos[6];
 
-    for (float & po : pos)
+    for (float& po : pos)
     {
         po = 0;
     }
@@ -80,7 +78,6 @@ BOOST_AUTO_TEST_CASE(VoxelTreeEntriesTest)
     BOOST_REQUIRE(!isNull);
 
     BOOST_REQUIRE_EQUAL(*c, 10);
-
 }
 
 BOOST_AUTO_TEST_CASE(VoxelTreeNDEntriesTest)
@@ -101,7 +98,7 @@ BOOST_AUTO_TEST_CASE(VoxelTreeNDEntriesTest)
     VirtualRobot::VoxelTreeND<unsigned char, N> v(minB, maxB, discr, true);
     float pos[N];
 
-    for (float & po : pos)
+    for (float& po : pos)
     {
         po = 0;
     }
@@ -126,7 +123,6 @@ BOOST_AUTO_TEST_CASE(VoxelTreeNDEntriesTest)
     }
 }
 
-
 BOOST_AUTO_TEST_CASE(VoxelTreeNDSaveLoad)
 {
     const unsigned int N = 6;
@@ -149,7 +145,7 @@ BOOST_AUTO_TEST_CASE(VoxelTreeNDSaveLoad)
 
     for (unsigned int i = 0; i < TEST_LOOPS; i++)
     {
-        for (float & po : pos)
+        for (float& po : pos)
         {
             po = float(rand() % 10000) / 10000.0f * 200.0f - 100.0f;
         }
@@ -157,7 +153,7 @@ BOOST_AUTO_TEST_CASE(VoxelTreeNDSaveLoad)
         v.setEntry(pos, rand() % 255);
     }
 
-    for (float & po : pos)
+    for (float& po : pos)
     {
         po = 17.0f;
     }
@@ -165,7 +161,8 @@ BOOST_AUTO_TEST_CASE(VoxelTreeNDSaveLoad)
     v.setEntry(pos, 10);
 
     v.save("testVoxelTree.bin");
-    VirtualRobot::VoxelTreeND<unsigned char, N>* v2 = VirtualRobot::VoxelTreeND<unsigned char, N>::load("testVoxelTree.bin");
+    VirtualRobot::VoxelTreeND<unsigned char, N>* v2 =
+        VirtualRobot::VoxelTreeND<unsigned char, N>::load("testVoxelTree.bin");
     unsigned char* c = v2->getEntry(pos);
     bool isNull = (c == nullptr);
     BOOST_REQUIRE(!isNull);
@@ -194,9 +191,9 @@ BOOST_AUTO_TEST_CASE(VoxelTreeNDIterator)
     const int TEST_LOOPS = 10000;
     float pos[TEST_LOOPS][N];
 
-    for (auto & po : pos)
+    for (auto& po : pos)
     {
-        for (float & j : po)
+        for (float& j : po)
         {
             j = float(rand() % 10000) / 10000.0f * 200.0f - 100.0f;
         }
@@ -217,7 +214,6 @@ BOOST_AUTO_TEST_CASE(VoxelTreeNDIterator)
     BOOST_CHECK_EQUAL(nrElements, TEST_LOOPS);
 }
 
-
 BOOST_AUTO_TEST_CASE(VoxelTreeNDMem)
 {
     const unsigned int N = 6;
@@ -237,7 +233,7 @@ BOOST_AUTO_TEST_CASE(VoxelTreeNDMem)
 
     float pos[N];
 
-    for (float & po : pos)
+    for (float& po : pos)
     {
         po = float(rand() % 10000) / 10000.0f * 200.0f - 100.0f;
     }
@@ -247,8 +243,13 @@ BOOST_AUTO_TEST_CASE(VoxelTreeNDMem)
     long structMem;
     long dataMem;
     v.getMemoryConsumtion(structMem, dataMem);
-    long expectedStructMem = sizeof(VirtualRobot::VoxelTreeND<unsigned char, N>) + sizeof(VirtualRobot::VoxelTreeNDElement<unsigned char, N>) * v.getMaxLevels(); // the basic data structures
-    expectedStructMem += (sizeof(VirtualRobot::VoxelTreeNDElement<unsigned char, N>*) * VirtualRobot::MathTools::pow_int(2, N)) * (N - 1) ; // all except the leaf have to store an array of 64 pointers to the leafs
+    long expectedStructMem = sizeof(VirtualRobot::VoxelTreeND<unsigned char, N>) +
+                             sizeof(VirtualRobot::VoxelTreeNDElement<unsigned char, N>) *
+                                 v.getMaxLevels(); // the basic data structures
+    expectedStructMem +=
+        (sizeof(VirtualRobot::VoxelTreeNDElement<unsigned char, N>*) *
+         VirtualRobot::MathTools::pow_int(2, N)) *
+        (N - 1); // all except the leaf have to store an array of 64 pointers to the leafs
     BOOST_CHECK_EQUAL(structMem, expectedStructMem);
     BOOST_CHECK_EQUAL(dataMem, 1);
 }

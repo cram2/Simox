@@ -21,20 +21,20 @@
 *
 */
 
-#include <VirtualRobot/Robot.h>
-#include <VirtualRobot/VirtualRobotException.h>
-#include <VirtualRobot/Nodes/RobotNode.h>
-#include <VirtualRobot/XML/RobotIO.h>
-#include <VirtualRobot/Visualization/VisualizationFactory.h>
-#include <VirtualRobot/Visualization/CoinVisualization/CoinVisualization.h>
-#include <VirtualRobot/RuntimeEnvironment.h>
+#include <iostream>
+#include <string>
 
+#include <VirtualRobot/Nodes/RobotNode.h>
+#include <VirtualRobot/Robot.h>
+#include <VirtualRobot/RuntimeEnvironment.h>
+#include <VirtualRobot/VirtualRobotException.h>
+#include <VirtualRobot/Visualization/CoinVisualization/CoinVisualization.h>
+#include <VirtualRobot/Visualization/VisualizationFactory.h>
+#include <VirtualRobot/XML/RobotIO.h>
+
+#include <Inventor/Qt/SoQt.h>
 #include <Inventor/Qt/viewers/SoQtExaminerViewer.h>
 #include <Inventor/nodes/SoSeparator.h>
-#include <Inventor/Qt/SoQt.h>
-
-#include <string>
-#include <iostream>
 
 using namespace VirtualRobot;
 
@@ -43,7 +43,8 @@ using namespace VirtualRobot;
 
 #include "ConstrainedIKWindow.h"
 
-int main(int argc, char* argv[])
+int
+main(int argc, char* argv[])
 {
     VirtualRobot::init(argc, argv, "Constrained IK Demo");
     std::cout << " --- START --- " << std::endl;

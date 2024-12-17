@@ -21,22 +21,24 @@
 
 #include "ImplicitObjectModel.h"
 
- namespace math
+namespace math
 {
-ImplicitObjectModel::ImplicitObjectModel()
-{
-    contacts = ContactListPtr(new ContactList());
-}
+    ImplicitObjectModel::ImplicitObjectModel()
+    {
+        contacts = ContactListPtr(new ContactList());
+    }
 
-void ImplicitObjectModel::AddContact(Contact contact)
-{
-    contacts->push_back(contact);
-    Update();
-}
+    void
+    ImplicitObjectModel::AddContact(Contact contact)
+    {
+        contacts->push_back(contact);
+        Update();
+    }
 
-void ImplicitObjectModel::Clear()
-{
-    contacts->clear();
-    //Update();
-}
- }
+    void
+    ImplicitObjectModel::Clear()
+    {
+        contacts->clear();
+        //Update();
+    }
+} // namespace math

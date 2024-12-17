@@ -1,31 +1,33 @@
 
 #pragma once
 
-#include <VirtualRobot/VirtualRobot.h>
-#include <VirtualRobot/Nodes/RobotNodeRevolute.h>
-#include <VirtualRobot/Nodes/RobotNodePrismatic.h>
-#include <VirtualRobot/Nodes/RobotNodeFixed.h>
-#include <VirtualRobot/Robot.h>
-#include <VirtualRobot/VirtualRobotException.h>
-#include <VirtualRobot/Nodes/RobotNode.h>
-#include <VirtualRobot/XML/SceneIO.h>
-#include <VirtualRobot/Visualization/VisualizationFactory.h>
-#include <VirtualRobot/Visualization/CoinVisualization/CoinVisualization.h>
-#include <VirtualRobot/Obstacle.h>
-#include <VirtualRobot/ManipulationObject.h>
 #include <string.h>
-#include <QtGui>
-#include <QtWidgets/QtWidgets>
-#include <QtCore/QtCore>
-
-#include <Inventor/sensors/SoTimerSensor.h>
-#include <Inventor/nodes/SoEventCallback.h>
-#include <Inventor/Qt/viewers/SoQtExaminerViewer.h>
-#include <Inventor/Qt/SoQt.h>
-#include <Inventor/nodes/SoSeparator.h>
 
 #include <filesystem>
 #include <vector>
+
+#include <QtCore/QtCore>
+#include <QtGui>
+#include <QtWidgets/QtWidgets>
+
+#include <VirtualRobot/ManipulationObject.h>
+#include <VirtualRobot/Nodes/RobotNode.h>
+#include <VirtualRobot/Nodes/RobotNodeFixed.h>
+#include <VirtualRobot/Nodes/RobotNodePrismatic.h>
+#include <VirtualRobot/Nodes/RobotNodeRevolute.h>
+#include <VirtualRobot/Obstacle.h>
+#include <VirtualRobot/Robot.h>
+#include <VirtualRobot/VirtualRobot.h>
+#include <VirtualRobot/VirtualRobotException.h>
+#include <VirtualRobot/Visualization/CoinVisualization/CoinVisualization.h>
+#include <VirtualRobot/Visualization/VisualizationFactory.h>
+#include <VirtualRobot/XML/SceneIO.h>
+
+#include <Inventor/Qt/SoQt.h>
+#include <Inventor/Qt/viewers/SoQtExaminerViewer.h>
+#include <Inventor/nodes/SoEventCallback.h>
+#include <Inventor/nodes/SoSeparator.h>
+#include <Inventor/sensors/SoTimerSensor.h>
 
 // #include "ui_GraspEditor.h"
 
@@ -34,7 +36,6 @@ namespace Ui
     class MainWindowGraspEditor;
 }
 
-
 namespace VirtualRobot
 {
 
@@ -42,7 +43,9 @@ namespace VirtualRobot
     {
         Q_OBJECT
     public:
-        GraspEditorWindow(std::string& objFile, std::string& robotFile, bool embeddedGraspEditor = false);
+        GraspEditorWindow(std::string& objFile,
+                          std::string& robotFile,
+                          bool embeddedGraspEditor = false);
         ~GraspEditorWindow() override;
 
         /*!< Executes the SoQt mainLoop. You need to call this in order to execute the application. */
@@ -88,7 +91,6 @@ namespace VirtualRobot
         void showCoordSystem();
 
     protected:
-
         void setupUI();
         QString formatString(const char* s, float f);
 
@@ -107,7 +109,8 @@ namespace VirtualRobot
         // Indicates whether this program is started embedded
         bool embeddedGraspEditor;
 
-        SoQtExaminerViewer* m_pExViewer; /*!< Viewer to display the 3D model of the robot and the environment. */
+        SoQtExaminerViewer*
+            m_pExViewer; /*!< Viewer to display the 3D model of the robot and the environment. */
 
         SoSeparator* sceneSep;
         SoSeparator* robotSep;
@@ -140,4 +143,4 @@ namespace VirtualRobot
         QSettings settings;
     };
 
-}
+} // namespace VirtualRobot

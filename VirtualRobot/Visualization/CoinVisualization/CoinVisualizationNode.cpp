@@ -5,41 +5,42 @@
 */
 
 #include "CoinVisualizationNode.h"
-#include "CoinVisualizationFactory.h"
-#include "../../MathTools.h"
-#include "../TriMeshModel.h"
-#include "../../VirtualRobotException.h"
-#include "../../XML/BaseIO.h"
-
-#include <Inventor/SoPrimitiveVertex.h>
-#include <Inventor/SbLinear.h>
-#include <Inventor/nodes/SoShape.h>
-#include <Inventor/nodes/SoNode.h>
-#include <Inventor/actions/SoCallbackAction.h>
-#include <Inventor/actions/SoLineHighlightRenderAction.h>
-#include <Inventor/nodes/SoSeparator.h>
-#include <Inventor/nodes/SoMatrixTransform.h>
-#include <Inventor/nodes/SoScale.h>
-#include <Inventor/actions/SoWriteAction.h>
-
-#include <Inventor/actions/SoToVRML2Action.h>
-
-#include <Inventor/VRMLnodes/SoVRMLGroup.h>
 
 #include <SimoxUtility/filesystem/remove_trailing_separator.h>
 
+#include "../../MathTools.h"
+#include "../../VirtualRobotException.h"
+#include "../../XML/BaseIO.h"
+#include "../TriMeshModel.h"
+#include "CoinVisualizationFactory.h"
+#include <Inventor/SbLinear.h>
+#include <Inventor/SoPrimitiveVertex.h>
+#include <Inventor/VRMLnodes/SoVRMLGroup.h>
+#include <Inventor/actions/SoCallbackAction.h>
+#include <Inventor/actions/SoLineHighlightRenderAction.h>
+#include <Inventor/actions/SoToVRML2Action.h>
+#include <Inventor/actions/SoWriteAction.h>
+#include <Inventor/nodes/SoMatrixTransform.h>
+#include <Inventor/nodes/SoNode.h>
+#include <Inventor/nodes/SoScale.h>
+#include <Inventor/nodes/SoSeparator.h>
+#include <Inventor/nodes/SoShape.h>
 
 namespace VirtualRobot
 {
     using std::cout;
     using std::endl;
-    CoinVisualizationNode::CoinVisualizationNode(const TriMeshModelPtr& tri):
+
+    CoinVisualizationNode::CoinVisualizationNode(const TriMeshModelPtr& tri) :
         CoinVisualizationNode(CoinVisualizationFactory::getCoinVisualization(tri))
-    {}
+    {
+    }
 
     CoinVisualizationNode::CoinVisualizationNode(const TriMeshModel& tri) :
         CoinVisualizationNode(std::make_shared<TriMeshModel>(tri))
-    {}
+    {
+    }
+
     /**
      * Store a reference to \p visualizationNode in the member
      * CoinVisualizationNode::visualization.
@@ -73,9 +74,7 @@ namespace VirtualRobot
         scaledVisualization->addChild(scaling);
         scaledVisualization->addChild(visualization);
         visualizationAtGlobalPose->addChild(scaledVisualization);
-
     }
-
 
     /**
      * If CoinVisualizationNode::visualization is a valid object call SoNode::unref()
@@ -140,7 +139,8 @@ namespace VirtualRobot
      * If the model doesn't exist construct it by calling
      * CoinVisualizationNode::createTriMeshModel().
      */
-    TriMeshModelPtr CoinVisualizationNode::getTriMeshModel()
+    TriMeshModelPtr
+    CoinVisualizationNode::getTriMeshModel()
     {
         if (!triMeshModel)
         {
@@ -151,6 +151,7 @@ namespace VirtualRobot
     }
 
     typedef std::map<const SoPrimitiveVertex*, int> CoinVertexIndexMap;
+
     /**
      * This method constructs an instance of TriMeshModel and stores it in
      * CoinVisualizationNode::triMeshModel.
@@ -159,9 +160,11 @@ namespace VirtualRobot
      * Otherwise CoinVisualizationNode::InventorTriangleCB() is called on the
      * Inventor graph stored in CoinVisualizationNode::visualization.
      */
-    void CoinVisualizationNode::createTriMeshModel()
+    void
+    CoinVisualizationNode::createTriMeshModel()
     {
-        THROW_VR_EXCEPTION_IF(!visualization, "CoinVisualizationNode::createTriMeshModel(): no Coin model present!");
+        THROW_VR_EXCEPTION_IF(
+            !visualization, "CoinVisualizationNode::createTriMeshModel(): no Coin model present!");
 
         if (triMeshModel)
         {
@@ -173,22 +176,25 @@ namespace VirtualRobot
         }
 
         SoCallbackAction ca;
-        ca.addTriangleCallback(SoShape::getClassTypeId(), &CoinVisualizationNode::InventorTriangleCB, triMeshModel.get());
+        ca.addTriangleCallback(SoShape::getClassTypeId(),
+                               &CoinVisualizationNode::InventorTriangleCB,
+                               triMeshModel.get());
         ca.apply(visualization);
     }
-
 
     /**
      * This method extracts the triangle given by \p v1, \p v2, \p v3 and stores
      * it in the TriMeshModel instance passed in through \p data by calling
      * TriMeshModel::addTriangleWithFace() with the extracted triangle.
      */
-    void CoinVisualizationNode::InventorTriangleCB(void* data, SoCallbackAction* action,
-            const SoPrimitiveVertex* v1,
-            const SoPrimitiveVertex* v2,
-            const SoPrimitiveVertex* v3)
+    void
+    CoinVisualizationNode::InventorTriangleCB(void* data,
+                                              SoCallbackAction* action,
+                                              const SoPrimitiveVertex* v1,
+                                              const SoPrimitiveVertex* v2,
+                                              const SoPrimitiveVertex* v3)
     {
-        TriMeshModel* triangleMeshModel  = static_cast<TriMeshModel*>(data);
+        TriMeshModel* triangleMeshModel = static_cast<TriMeshModel*>(data);
         if (!triangleMeshModel)
         {
             VR_INFO << ": Internal error, NULL data" << std::endl;
@@ -223,19 +229,19 @@ namespace VirtualRobot
 
         // add new triangle to the model
         triangleMeshModel->addTriangleWithFace(a, b, c, n);
-
     }
-
 
     /**
      * This mehtod returns the internal CoinVisualizationNode::visualization.
      */
-    SoNode* CoinVisualizationNode::getCoinVisualization()
+    SoNode*
+    CoinVisualizationNode::getCoinVisualization()
     {
         return visualizationAtGlobalPose;
     }
 
-    void CoinVisualizationNode::setGlobalPose(const Eigen::Matrix4f& m)
+    void
+    CoinVisualizationNode::setGlobalPose(const Eigen::Matrix4f& m)
     {
         Base::setGlobalPose(m);
 
@@ -250,7 +256,8 @@ namespace VirtualRobot
         }
     }
 
-    void CoinVisualizationNode::print()
+    void
+    CoinVisualizationNode::print()
     {
         std::cout << "  CoinVisualization: ";
 
@@ -266,16 +273,20 @@ namespace VirtualRobot
 
             if (triMeshModel->faces.size() > 0)
             {
-                std::cout << triMeshModel->faces.size() << " triangles" << std::endl;// Extend: " << ma[0]-mi[0] << ", " << ma[1] - mi[1] << ", " << ma[2] - mi[2] << std::endl;
+                std::cout
+                    << triMeshModel->faces.size() << " triangles"
+                    << std::
+                           endl; // Extend: " << ma[0]-mi[0] << ", " << ma[1] - mi[1] << ", " << ma[2] - mi[2] << std::endl;
                 triMeshModel->getSize(mi, ma);
-                std::cout << "    Min point: (" << mi[0] << "," << mi[1] << "," << mi[2] << ")" << std::endl;
-                std::cout << "    Max point: (" << ma[0] << "," << ma[1] << "," << ma[2] << ")" << std::endl;
+                std::cout << "    Min point: (" << mi[0] << "," << mi[1] << "," << mi[2] << ")"
+                          << std::endl;
+                std::cout << "    Max point: (" << ma[0] << "," << ma[1] << "," << ma[2] << ")"
+                          << std::endl;
             }
             else
             {
                 std::cout << "No model" << std::endl;
             }
-
         }
         else
         {
@@ -283,23 +294,27 @@ namespace VirtualRobot
         }
     }
 
-    void CoinVisualizationNode::attachVisualization(const std::string& name, VisualizationNodePtr v)
+    void
+    CoinVisualizationNode::attachVisualization(const std::string& name, VisualizationNodePtr v)
     {
         VisualizationNode::attachVisualization(name, v);
 
-        std::shared_ptr<CoinVisualizationNode> coinVisualizationNode = std::dynamic_pointer_cast<CoinVisualizationNode>(v);
+        std::shared_ptr<CoinVisualizationNode> coinVisualizationNode =
+            std::dynamic_pointer_cast<CoinVisualizationNode>(v);
 
         if (coinVisualizationNode && coinVisualizationNode->getCoinVisualization())
         {
             attachedCoinVisualizations[name] = coinVisualizationNode->getCoinVisualization();
-            attachedVisualizationsSeparator->addChild(coinVisualizationNode->getCoinVisualization());
+            attachedVisualizationsSeparator->addChild(
+                coinVisualizationNode->getCoinVisualization());
         }
     }
 
-    void CoinVisualizationNode::detachVisualization(const std::string& name)
+    void
+    CoinVisualizationNode::detachVisualization(const std::string& name)
     {
         VisualizationNode::detachVisualization(name);
-        std::map< std::string, SoNode* >::const_iterator i = attachedCoinVisualizations.begin();
+        std::map<std::string, SoNode*>::const_iterator i = attachedCoinVisualizations.begin();
 
         while (i != attachedCoinVisualizations.end())
         {
@@ -314,8 +329,8 @@ namespace VirtualRobot
         }
     }
 
-
-    VirtualRobot::VisualizationNodePtr CoinVisualizationNode::clone(bool deepCopy, float scaling)
+    VirtualRobot::VisualizationNodePtr
+    CoinVisualizationNode::clone(bool deepCopy, float scaling)
     {
         THROW_VR_EXCEPTION_IF(scaling <= 0, "Scaling must be >0");
 
@@ -362,7 +377,8 @@ namespace VirtualRobot
         p->setFilename(filename, boundingBox);
 
         // clone attached visualizations
-        std::map< std::string, VisualizationNodePtr >::const_iterator i = attachedVisualizations.begin();
+        std::map<std::string, VisualizationNodePtr>::const_iterator i =
+            attachedVisualizations.begin();
 
         while (i != attachedVisualizations.end())
         {
@@ -376,7 +392,9 @@ namespace VirtualRobot
         return p;
     }
 
-    void CoinVisualizationNode::setupVisualization(bool showVisualization, bool showAttachedVisualizations)
+    void
+    CoinVisualizationNode::setupVisualization(bool showVisualization,
+                                              bool showAttachedVisualizations)
     {
         VisualizationNode::setupVisualization(showVisualization, showAttachedVisualizations);
 
@@ -385,12 +403,14 @@ namespace VirtualRobot
             return;
         }
 
-        if (showAttachedVisualizations && visualizationAtGlobalPose->findChild(attachedVisualizationsSeparator) < 0)
+        if (showAttachedVisualizations &&
+            visualizationAtGlobalPose->findChild(attachedVisualizationsSeparator) < 0)
         {
             visualizationAtGlobalPose->addChild(attachedVisualizationsSeparator);
         }
 
-        if (!showAttachedVisualizations && visualizationAtGlobalPose->findChild(attachedVisualizationsSeparator) >= 0)
+        if (!showAttachedVisualizations &&
+            visualizationAtGlobalPose->findChild(attachedVisualizationsSeparator) >= 0)
         {
             visualizationAtGlobalPose->removeChild(attachedVisualizationsSeparator);
         }
@@ -407,7 +427,8 @@ namespace VirtualRobot
         }
     }
 
-    void CoinVisualizationNode::setVisualization(SoNode* newVisu)
+    void
+    CoinVisualizationNode::setVisualization(SoNode* newVisu)
     {
         if (!newVisu)
         {
@@ -422,7 +443,6 @@ namespace VirtualRobot
             {
                 scaledVisualization->removeChild(indx);
             }
-
         }
 
         visualization->unref();
@@ -437,9 +457,8 @@ namespace VirtualRobot
         }
     }
 
-
-
-    bool CoinVisualizationNode::saveModel(const std::string& modelPath, const std::string& filename)
+    bool
+    CoinVisualizationNode::saveModel(const std::string& modelPath, const std::string& filename)
     {
         std::string outFile = filename;
         bool vrml = true; // may be changed later according to file extension
@@ -462,7 +481,8 @@ namespace VirtualRobot
 
         if (!so->openFile(completeFile.string().c_str()))
         {
-            VR_ERROR << "Could not open file " << completeFile.string() << " for writing." << std::endl;
+            VR_ERROR << "Could not open file " << completeFile.string() << " for writing."
+                     << std::endl;
         }
 
         std::filesystem::path extension = completeFile.extension();
@@ -510,7 +530,8 @@ namespace VirtualRobot
         return true;
     }
 
-    void CoinVisualizationNode::shrinkFatten(float offset)
+    void
+    CoinVisualizationNode::shrinkFatten(float offset)
     {
         if (offset != 0.0f)
         {
@@ -526,7 +547,8 @@ namespace VirtualRobot
         }
     }
 
-    void CoinVisualizationNode::scale(const Eigen::Vector3f& scaleFactor)
+    void
+    CoinVisualizationNode::scale(const Eigen::Vector3f& scaleFactor)
     {
         scaling->scaleFactor.setValue(scaleFactor(0), scaleFactor(1), scaleFactor(2));
         triMeshModel.reset();

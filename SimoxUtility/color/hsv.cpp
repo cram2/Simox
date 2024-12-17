@@ -1,7 +1,7 @@
 #include "hsv.h"
 
-
-Eigen::Vector3f simox::color::rgb_to_hsv(const Eigen::Vector3f& rgb)
+Eigen::Vector3f
+simox::color::rgb_to_hsv(const Eigen::Vector3f& rgb)
 {
     // source: https://stackoverflow.com/a/6930407
 
@@ -9,12 +9,12 @@ Eigen::Vector3f simox::color::rgb_to_hsv(const Eigen::Vector3f& rgb)
     float min, max, delta;
 
     min = rgb(0) < rgb(1) ? rgb(0) : rgb(1);
-    min = min  < rgb(2) ? min  : rgb(2);
+    min = min < rgb(2) ? min : rgb(2);
 
     max = rgb(0) > rgb(1) ? rgb(0) : rgb(1);
-    max = max  > rgb(2) ? max  : rgb(2);
+    max = max > rgb(2) ? max : rgb(2);
 
-    hsv(2) = max;  // v
+    hsv(2) = max; // v
     delta = max - min;
     if (delta < 1e-5f)
     {
@@ -32,26 +32,26 @@ Eigen::Vector3f simox::color::rgb_to_hsv(const Eigen::Vector3f& rgb)
         // if max is 0, then r = g = b = 0
         // s = 0, h is undefined
         hsv(1) = 0.0;
-        hsv(0) = std::nanf("");  // its now undefined
+        hsv(0) = std::nanf(""); // its now undefined
         return hsv;
     }
-    if (rgb(0) >= max)  // > is bogus, just keeps compilor happy
+    if (rgb(0) >= max) // > is bogus, just keeps compilor happy
     {
-        hsv(0) = (rgb(1) - rgb(2)) / delta;              // between yellow & magenta
+        hsv(0) = (rgb(1) - rgb(2)) / delta; // between yellow & magenta
     }
     else
     {
         if (rgb(1) >= max)
         {
-            hsv(0) = 2.f + (rgb(2) - rgb(0)) / delta;    // between cyan & yellow
+            hsv(0) = 2.f + (rgb(2) - rgb(0)) / delta; // between cyan & yellow
         }
         else
         {
-            hsv(0) = 4.f + (rgb(0) - rgb(1)) / delta;    // between magenta & cyan
+            hsv(0) = 4.f + (rgb(0) - rgb(1)) / delta; // between magenta & cyan
         }
     }
 
-    hsv(0) *= 60.0f;  // degrees
+    hsv(0) *= 60.0f; // degrees
 
     if (hsv(0) < 0.f)
     {
@@ -61,13 +61,13 @@ Eigen::Vector3f simox::color::rgb_to_hsv(const Eigen::Vector3f& rgb)
     return hsv;
 }
 
-
-Eigen::Vector3f simox::color::hsv_to_rgb(const Eigen::Vector3f& hsv)
+Eigen::Vector3f
+simox::color::hsv_to_rgb(const Eigen::Vector3f& hsv)
 {
     // source: https://stackoverflow.com/a/6930407
 
     float hh, p, q, t, ff;
-    long  i;
+    long i;
     Eigen::Vector3f rgb;
 
     if (hsv(1) <= 0.f) // < is bogus, just shuts up warnings

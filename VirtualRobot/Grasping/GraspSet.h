@@ -22,12 +22,12 @@
 */
 #pragma once
 
-#include "../VirtualRobot.h"
-
 #include <string>
 #include <vector>
 
 #include <Eigen/Core>
+
+#include "../VirtualRobot.h"
 
 namespace VirtualRobot
 {
@@ -35,10 +35,12 @@ namespace VirtualRobot
     class VIRTUAL_ROBOT_IMPORT_EXPORT GraspSet
     {
     public:
-
         /*!
         */
-        GraspSet(const std::string& name, const std::string& robotType, const std::string& eef, const std::vector< GraspPtr >& grasps = std::vector< GraspPtr >());
+        GraspSet(const std::string& name,
+                 const std::string& robotType,
+                 const std::string& eef,
+                 const std::vector<GraspPtr>& grasps = std::vector<GraspPtr>());
 
         /*!
         */
@@ -77,32 +79,35 @@ namespace VirtualRobot
 
         GraspSetPtr clone() const;
 
-        std::vector< GraspPtr > getGrasps() const;
+        std::vector<GraspPtr> getGrasps() const;
 
         //! Sets preshape string of all grasps
         void setPreshape(const std::string& preshape);
-        
-        auto begin() const
+
+        auto
+        begin() const
         {
             return grasps.begin();
         }
-        auto end() const
+
+        auto
+        end() const
         {
             return grasps.end();
         }
 
-        bool operator==(const GraspSet& rhs) const
+        bool
+        operator==(const GraspSet& rhs) const
         {
-            return (name == rhs.name) and (robotType == rhs.robotType) 
-                and (eef == rhs.eef) and (grasps.size() == rhs.grasps.size());
+            return (name == rhs.name) and (robotType == rhs.robotType) and (eef == rhs.eef) and
+                   (grasps.size() == rhs.grasps.size());
         }
-        
+
     protected:
-        std::vector< GraspPtr > grasps;
+        std::vector<GraspPtr> grasps;
         std::string name;
         std::string robotType;
         std::string eef;
-
     };
 
-} // namespace
+} // namespace VirtualRobot
