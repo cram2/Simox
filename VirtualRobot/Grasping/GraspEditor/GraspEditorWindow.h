@@ -1,14 +1,14 @@
 
 #pragma once
 
-#include <string.h>
-
-#include <filesystem>
 #include <vector>
 
 #include <QtCore/QtCore>
 #include <QtGui>
 #include <QtWidgets/QtWidgets>
+
+// Bug in Qt: <filesystem must come after Qt includes
+#include <filesystem>
 
 #include <VirtualRobot/ManipulationObject.h>
 #include <VirtualRobot/Nodes/RobotNode.h>
