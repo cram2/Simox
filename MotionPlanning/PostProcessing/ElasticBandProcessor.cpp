@@ -1,22 +1,26 @@
 
 #include "ElasticBandProcessor.h"
-#include "MotionPlanning/CSpace/CSpaceSampled.h"
-#include "MotionPlanning/CSpace/CSpacePath.h"
-#include "VirtualRobot/CollisionDetection/CollisionChecker.h"
-#include <vector>
-#include <ctime>
+
 #include <cmath>
+#include <ctime>
+#include <vector>
+
+#include "MotionPlanning/CSpace/CSpacePath.h"
+#include "MotionPlanning/CSpace/CSpaceSampled.h"
+#include "VirtualRobot/CollisionDetection/CollisionChecker.h"
 
 namespace Saba
 {
-using namespace VirtualRobot;
+    using namespace VirtualRobot;
 
-    ElasticBandProcessor::ElasticBandProcessor(CSpacePathPtr path,
-                                               CSpaceSampledPtr cspace,
-                                               VirtualRobot::RobotNodePtr node,               // the distance for this node is considered
-                                               VirtualRobot::SceneObjectSetPtr obstacles,     // these obstacles are considered for path smoothing
-                                               bool verbose
-                                               ) : PathProcessor(path, verbose), cspace(cspace), node(node), obstacles(obstacles)
+    ElasticBandProcessor::ElasticBandProcessor(
+        CSpacePathPtr path,
+        CSpaceSampledPtr cspace,
+        VirtualRobot::RobotNodePtr node, // the distance for this node is considered
+        VirtualRobot::SceneObjectSetPtr
+            obstacles, // these obstacles are considered for path smoothing
+        bool verbose) :
+        PathProcessor(path, verbose), cspace(cspace), node(node), obstacles(obstacles)
     {
         VR_ASSERT(node);
         VR_ASSERT(node->getCollisionModel());
@@ -27,7 +31,7 @@ using namespace VirtualRobot;
         VR_ASSERT(cspace);
 
         rns = path->getCSpace()->getRobotNodeSet();
-        VR_ASSERT(rns && rns->getSize()>0);
+        VR_ASSERT(rns && rns->getSize() > 0);
         VR_INFO << "using rns " << rns->getName() << std::endl;
 
         stopOptimization = false;
@@ -45,10 +49,10 @@ using namespace VirtualRobot;
         weights.setConstant(1.0f);
     }
 
-    ElasticBandProcessor::~ElasticBandProcessor()
-    = default;
+    ElasticBandProcessor::~ElasticBandProcessor() = default;
 
-    bool ElasticBandProcessor::initSolution()
+    bool
+    ElasticBandProcessor::initSolution()
     {
         if (!path)
         {
@@ -69,7 +73,8 @@ using namespace VirtualRobot;
         return true;
     }
 
-    bool ElasticBandProcessor::getObstacleForce(Eigen::Vector3f& f)
+    bool
+    ElasticBandProcessor::getObstacleForce(Eigen::Vector3f& f)
     {
         Eigen::Vector3f _P1;
         Eigen::Vector3f _P2;
@@ -83,10 +88,11 @@ using namespace VirtualRobot;
         }
 
 
-        float d = (float)colChecker->calculateDistance(node->getCollisionModel(), obstacles, _P1, _P2, &_trID1, &_trID2);
+        float d = (float)colChecker->calculateDistance(
+            node->getCollisionModel(), obstacles, _P1, _P2, &_trID1, &_trID2);
 
 
-        if (d>minObstacleDistance)
+        if (d > minObstacleDistance)
         {
             f.setZero();
             return true;
@@ -96,25 +102,28 @@ using namespace VirtualRobot;
         {
             VR_INFO << "Obstacle dist:" << d << std::endl;
         }
-        if (d==0)
+        if (d == 0)
         {
             VR_ERROR << "Collision..." << std::endl;
             return false;
         }
 
-        d = 1/d;
+        d = 1 / d;
 
 
         //f = _P2 - _P1;
         f = _P1 - _P2;
         f.normalize();
-        f*= d;
+        f *= d;
 
         return true;
     }
 
-
-    bool ElasticBandProcessor::getCSpaceForce(const Eigen::Vector3f& f, Eigen::VectorXf &fc, float factor, float maxForce)
+    bool
+    ElasticBandProcessor::getCSpaceForce(const Eigen::Vector3f& f,
+                                         Eigen::VectorXf& fc,
+                                         float factor,
+                                         float maxForce)
     {
         if (ik)
         {
@@ -135,12 +144,13 @@ using namespace VirtualRobot;
         return true;
     }
 
-
-    bool ElasticBandProcessor::getWSpaceForce(const Eigen::VectorXf& fc, Eigen::Vector3f &f)
+    bool
+    ElasticBandProcessor::getWSpaceForce(const Eigen::VectorXf& fc, Eigen::Vector3f& f)
     {
         if (ik)
         {
-            Eigen::MatrixXf jac = ik->getDifferentialIK()->getJacobianMatrix(rns->getTCP(),IKSolver::Position);
+            Eigen::MatrixXf jac =
+                ik->getDifferentialIK()->getJacobianMatrix(rns->getTCP(), IKSolver::Position);
             f = jac * fc; // only force
         }
         else
@@ -149,7 +159,11 @@ using namespace VirtualRobot;
         return true;
     }
 
-    bool ElasticBandProcessor::getNeighborCForce(const Eigen::VectorXf& before, const Eigen::VectorXf& act, const Eigen::VectorXf& next, Eigen::VectorXf &fc)
+    bool
+    ElasticBandProcessor::getNeighborCForce(const Eigen::VectorXf& before,
+                                            const Eigen::VectorXf& act,
+                                            const Eigen::VectorXf& next,
+                                            Eigen::VectorXf& fc)
     {
         Eigen::VectorXf f1 = (before - act);
         Eigen::VectorXf f2 = (next - act);
@@ -167,100 +181,106 @@ using namespace VirtualRobot;
         return true;
     }
 
-    bool ElasticBandProcessor::elasticBandLoop()
+    bool
+    ElasticBandProcessor::elasticBandLoop()
     {
-         Eigen::Vector3f fObstacle;
-         Eigen::VectorXf fcObstacle;
-         Eigen::VectorXf fcNeighbor;
-         Eigen::VectorXf fc;
+        Eigen::Vector3f fObstacle;
+        Eigen::VectorXf fcObstacle;
+        Eigen::VectorXf fcNeighbor;
+        Eigen::VectorXf fc;
 
 
-        for (unsigned int i=1;i<optimizedPath->getNrOfPoints()-1;i++)
+        for (unsigned int i = 1; i < optimizedPath->getNrOfPoints() - 1; i++)
         {
 
-            Eigen::VectorXf& before = optimizedPath->getPointRef(i-1);
+            Eigen::VectorXf& before = optimizedPath->getPointRef(i - 1);
             Eigen::VectorXf& act = optimizedPath->getPointRef(i);
-            Eigen::VectorXf& next = optimizedPath->getPointRef(i+1);
+            Eigen::VectorXf& next = optimizedPath->getPointRef(i + 1);
 
-           rns->setJointValues(act);
+            rns->setJointValues(act);
 
-           if (!getObstacleForce(fObstacle))
-           {
-               VR_WARNING << "Could not get obstacle force " << i << std::endl;
-               continue;
-           }
-           if (verbose)
-               VR_INFO << "obstacle workspace force: " << fObstacle.transpose() << std::endl;
-           if (!getCSpaceForce(fObstacle, fcObstacle, factorCSpaceObstacleForce, maxCSpaceObstacleForce))
-           {
-               VR_WARNING << "Could not get obstacle cspace force " << i << std::endl;
-               continue;
-           }
-           if (verbose)
-               VR_INFO << "obstacle c-space force: " << fcObstacle.transpose() << std::endl;
+            if (!getObstacleForce(fObstacle))
+            {
+                VR_WARNING << "Could not get obstacle force " << i << std::endl;
+                continue;
+            }
+            if (verbose)
+                VR_INFO << "obstacle workspace force: " << fObstacle.transpose() << std::endl;
+            if (!getCSpaceForce(
+                    fObstacle, fcObstacle, factorCSpaceObstacleForce, maxCSpaceObstacleForce))
+            {
+                VR_WARNING << "Could not get obstacle cspace force " << i << std::endl;
+                continue;
+            }
+            if (verbose)
+                VR_INFO << "obstacle c-space force: " << fcObstacle.transpose() << std::endl;
 
-           getNeighborCForce(before, act, next, fcNeighbor);
-           if (verbose)
-           {
-               Eigen::Vector3f fn;
-               getWSpaceForce(fcNeighbor, fn);
-               VR_INFO << "neighbor workspace force: " << fn.transpose() << std::endl;
-               VR_INFO << "neighbor c-space force: " << fcNeighbor.transpose() << std::endl;
-           }
-           fc = fcObstacle + fcNeighbor;
+            getNeighborCForce(before, act, next, fcNeighbor);
+            if (verbose)
+            {
+                Eigen::Vector3f fn;
+                getWSpaceForce(fcNeighbor, fn);
+                VR_INFO << "neighbor workspace force: " << fn.transpose() << std::endl;
+                VR_INFO << "neighbor c-space force: " << fcNeighbor.transpose() << std::endl;
+            }
+            fc = fcObstacle + fcNeighbor;
 
-           fc = fc.cwiseProduct(weights);
-           if (verbose)
-               VR_INFO << "resulting c-space force: " << fc.transpose() << std::endl;
+            fc = fc.cwiseProduct(weights);
+            if (verbose)
+                VR_INFO << "resulting c-space force: " << fc.transpose() << std::endl;
 
-           optimizedPath->getPointRef(i) += fc;
+            optimizedPath->getPointRef(i) += fc;
         }
         return true;
     }
 
-
-    bool ElasticBandProcessor::checkRemoveNodes()
+    bool
+    ElasticBandProcessor::checkRemoveNodes()
     {
-        float ssd = 2 * cspace->getSamplingSize()*cspace->getSamplingSize();
+        float ssd = 2 * cspace->getSamplingSize() * cspace->getSamplingSize();
 
-        for (unsigned int i=1;i<optimizedPath->getNrOfPoints()-2;i++)
+        for (unsigned int i = 1; i < optimizedPath->getNrOfPoints() - 2; i++)
         {
-            Eigen::VectorXf& before = optimizedPath->getPointRef(i-1);
+            Eigen::VectorXf& before = optimizedPath->getPointRef(i - 1);
             Eigen::VectorXf& act = optimizedPath->getPointRef(i);
-            Eigen::VectorXf& next = optimizedPath->getPointRef(i+1);
+            Eigen::VectorXf& next = optimizedPath->getPointRef(i + 1);
 
             float d1 = cspace->calcDist2(before, act);
             float d2 = cspace->calcDist2(act, next);
 
-            if (d1+d2 < ssd)
+            if (d1 + d2 < ssd)
             {
                 optimizedPath->erasePosition(i);
-                before = optimizedPath->getPointRef(i-1);
+                before = optimizedPath->getPointRef(i - 1);
                 act = optimizedPath->getPointRef(i);
-                next = optimizedPath->getPointRef(i+1);
+                next = optimizedPath->getPointRef(i + 1);
             }
-
         }
         return true;
     }
 
-    bool ElasticBandProcessor::checkNewNodes()
+    bool
+    ElasticBandProcessor::checkNewNodes()
     {
 
         return true;
     }
 
-    Eigen::Vector3f ElasticBandProcessor::getWSpacePoint(const Eigen::VectorXf& fc)
+    Eigen::Vector3f
+    ElasticBandProcessor::getWSpacePoint(const Eigen::VectorXf& fc)
     {
-		rns->setJointValues(fc);
-        Eigen::Vector3f r = rns->getTCP()->getGlobalPose().block(0,3,3,1);
+        rns->setJointValues(fc);
+        Eigen::Vector3f r = rns->getTCP()->getGlobalPose().block(0, 3, 3, 1);
         return r;
-	}
+    }
 
-    void ElasticBandProcessor::getForces(unsigned int i, Eigen::Vector3f &internalForce, Eigen::Vector3f &externalForce)
+    void
+    ElasticBandProcessor::getForces(unsigned int i,
+                                    Eigen::Vector3f& internalForce,
+                                    Eigen::Vector3f& externalForce)
     {
         Eigen::VectorXf fcExt;
-        if (!optimizedPath || optimizedPath->getNrOfPoints()<=i)
+        if (!optimizedPath || optimizedPath->getNrOfPoints() <= i)
         {
             VR_WARNING << "no path or wrong index" << std::endl;
             internalForce.setZero();
@@ -269,12 +289,12 @@ using namespace VirtualRobot;
         }
 
         unsigned int a = 0;
-        if (i>0)
-            a=i-1;
+        if (i > 0)
+            a = i - 1;
         unsigned int b = i;
         unsigned int c = i;
-        if (i<optimizedPath->getNrOfPoints()-1)
-            a=i+1;
+        if (i < optimizedPath->getNrOfPoints() - 1)
+            a = i + 1;
 
         Eigen::VectorXf& before = optimizedPath->getPointRef(a);
         Eigen::VectorXf& act = optimizedPath->getPointRef(b);
@@ -285,7 +305,7 @@ using namespace VirtualRobot;
 
         if (!getObstacleForce(externalForce))
         {
-           VR_WARNING << "Could not get obstacle force" << std::endl;
+            VR_WARNING << "Could not get obstacle force" << std::endl;
         }
 
         // we need to apply factors and max -> transform to cspace and back to wspace
@@ -295,19 +315,18 @@ using namespace VirtualRobot;
         getNeighborCForce(before, act, next, fcNeighbor);
         if (!getWSpaceForce(fcNeighbor, internalForce))
         {
-           VR_WARNING << "Could not get internal cspace force " << std::endl;
+            VR_WARNING << "Could not get internal cspace force " << std::endl;
         }
     }
 
-
-
-    CSpacePathPtr ElasticBandProcessor::optimize(int optimizeSteps)
+    CSpacePathPtr
+    ElasticBandProcessor::optimize(int optimizeSteps)
     {
         initSolution();
 
         rns->getRobot()->setUpdateVisualization(false);
 
-        for (int i=0;i<optimizeSteps;i++)
+        for (int i = 0; i < optimizeSteps; i++)
         {
             if (!elasticBandLoop())
             {
@@ -332,10 +351,11 @@ using namespace VirtualRobot;
         return optimizedPath;
     }
 
-    void ElasticBandProcessor::setWeights(Eigen::VectorXf w)
+    void
+    ElasticBandProcessor::setWeights(Eigen::VectorXf w)
     {
         weights = w;
     }
 
 
-} // namespace
+} // namespace Saba

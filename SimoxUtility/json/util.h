@@ -6,7 +6,6 @@
 
 #include "json.h"
 
-
 namespace simox::json
 {
 
@@ -21,19 +20,19 @@ namespace simox::json
      */
     json::const_reference at_any_key(const json& j, const std::vector<std::string>& keys);
 
-
     template <class T>
-    T get_at_any_key(const json& j, const std::vector<std::string>& keys)
+    T
+    get_at_any_key(const json& j, const std::vector<std::string>& keys)
     {
         return at_any_key(j, keys).get<T>();
     }
 
-
     template <class ValueT, class DefaultT = ValueT>
-    void get_to_if_exists(const json& j,
-                          const std::string& key,
-                          ValueT& dest,
-                          const DefaultT& default_ = ValueT{})
+    void
+    get_to_if_exists(const json& j,
+                     const std::string& key,
+                     ValueT& dest,
+                     const DefaultT& default_ = ValueT{})
     {
         if (j.count(key))
         {
@@ -45,4 +44,4 @@ namespace simox::json
         }
     }
 
-}
+} // namespace simox::json

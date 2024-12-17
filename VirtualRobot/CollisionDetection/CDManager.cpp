@@ -1,13 +1,13 @@
 
 #include "CDManager.h"
 
+#include <cfloat>
 #include <iostream>
 #include <set>
-#include <cfloat>
-#include "../Robot.h"
 
-#include "VirtualRobot/Nodes/RobotNode.h"
+#include "../Robot.h"
 #include "CollisionChecker.h"
+#include "VirtualRobot/Nodes/RobotNode.h"
 
 using namespace std;
 
@@ -30,15 +30,20 @@ namespace VirtualRobot
 
     CDManager::~CDManager() = default;
 
-    void CDManager::addCollisionModel(SceneObjectSetPtr m)
+    void
+    CDManager::addCollisionModel(SceneObjectSetPtr m)
     {
         if (m)
         {
             if (m->getCollisionChecker() != colChecker)
             {
-                VR_WARNING << "CollisionModel of SceneObjectSet '" << m->getName() << "' is linked to a different instance of collision checker than this CollisionManager..." << std::endl;
+                VR_WARNING << "CollisionModel of SceneObjectSet '" << m->getName()
+                           << "' is linked to a different instance of collision checker than this "
+                              "CollisionManager..."
+                           << std::endl;
             }
-            auto tmpColModels = colModels; // colModels is changed in the next loop, so we need a copy
+            auto tmpColModels =
+                colModels; // colModels is changed in the next loop, so we need a copy
             for (const auto& colModel : tmpColModels)
             {
                 if (m != colModel)
@@ -54,24 +59,24 @@ namespace VirtualRobot
         }
     }
 
-    void CDManager::addCollisionModel(SceneObjectPtr m)
+    void
+    CDManager::addCollisionModel(SceneObjectPtr m)
     {
         if (m)
         {
-            VirtualRobot::SceneObjectSetPtr cms(new VirtualRobot::SceneObjectSet(m->getName() + "Set", colChecker));
+            VirtualRobot::SceneObjectSetPtr cms(
+                new VirtualRobot::SceneObjectSet(m->getName() + "Set", colChecker));
             cms->addSceneObject(m);
             addCollisionModel(cms);
         }
     }
 
-    void CDManager::addCollisionModel(const std::vector<RobotNodePtr>& nodes, const std::string& setName)
+    void
+    CDManager::addCollisionModel(const std::vector<RobotNodePtr>& nodes, const std::string& setName)
     {
-        VirtualRobot::SceneObjectSetPtr cms(
-            new VirtualRobot::SceneObjectSet(
-                setName.empty() ? "set_" + std::to_string(colModels.size()) : setName,
-                getCollisionChecker()
-            )
-        );
+        VirtualRobot::SceneObjectSetPtr cms(new VirtualRobot::SceneObjectSet(
+            setName.empty() ? "set_" + std::to_string(colModels.size()) : setName,
+            getCollisionChecker()));
         for (const auto& robotNode : nodes)
         {
             cms->addSceneObject(robotNode);
@@ -79,7 +84,8 @@ namespace VirtualRobot
         addCollisionModel(cms);
     }
 
-    bool CDManager::isInCollision(SceneObjectSetPtr m)
+    bool
+    CDManager::isInCollision(SceneObjectSetPtr m)
     {
         if (!m || !colChecker)
         {
@@ -103,8 +109,8 @@ namespace VirtualRobot
         return false;
     }
 
-
-    float CDManager::getDistance(SceneObjectSetPtr m)
+    float
+    CDManager::getDistance(SceneObjectSetPtr m)
     {
         float minDist = FLT_MAX;
         float tmp;
@@ -132,9 +138,8 @@ namespace VirtualRobot
         return minDist;
     }
 
-
-
-    float CDManager::getDistance(SceneObjectSetPtr m, std::vector<SceneObjectSetPtr>& sets)
+    float
+    CDManager::getDistance(SceneObjectSetPtr m, std::vector<SceneObjectSetPtr>& sets)
     {
         float minDist = FLT_MAX;
 
@@ -151,8 +156,8 @@ namespace VirtualRobot
         return minDist;
     }
 
-
-    float CDManager::getDistance()
+    float
+    CDManager::getDistance()
     {
         float minDist = FLT_MAX;
         float tmp;
@@ -162,7 +167,8 @@ namespace VirtualRobot
             return -1.0f;
         }
 
-        std::map< SceneObjectSetPtr, std::vector<SceneObjectSetPtr> >::iterator i = colModelPairs.begin();
+        std::map<SceneObjectSetPtr, std::vector<SceneObjectSetPtr>>::iterator i =
+            colModelPairs.begin();
 
         while (i != colModelPairs.end())
         {
@@ -180,7 +186,13 @@ namespace VirtualRobot
         return minDist;
     }
 
-    float CDManager::getDistance(SceneObjectSetPtr m, std::vector<SceneObjectSetPtr>& sets, Eigen::Vector3f& P1, Eigen::Vector3f& P2, int& trID1, int& trID2)
+    float
+    CDManager::getDistance(SceneObjectSetPtr m,
+                           std::vector<SceneObjectSetPtr>& sets,
+                           Eigen::Vector3f& P1,
+                           Eigen::Vector3f& P2,
+                           int& trID1,
+                           int& trID2)
     {
         float minDist = FLT_MAX;
         Eigen::Vector3f _P1;
@@ -209,7 +221,8 @@ namespace VirtualRobot
         return minDist;
     }
 
-    float CDManager::getDistance(Eigen::Vector3f& P1, Eigen::Vector3f& P2, int& trID1, int& trID2)
+    float
+    CDManager::getDistance(Eigen::Vector3f& P1, Eigen::Vector3f& P2, int& trID1, int& trID2)
     {
         float minDist = FLT_MAX;
         float tmp;
@@ -224,7 +237,8 @@ namespace VirtualRobot
         }
 
 
-        std::map< SceneObjectSetPtr, std::vector<SceneObjectSetPtr> >::iterator i = colModelPairs.begin();
+        std::map<SceneObjectSetPtr, std::vector<SceneObjectSetPtr>>::iterator i =
+            colModelPairs.begin();
 
         while (i != colModelPairs.end())
         {
@@ -249,7 +263,12 @@ namespace VirtualRobot
         return minDist;
     }
 
-    float CDManager::getDistance(SceneObjectSetPtr m, Eigen::Vector3f& P1, Eigen::Vector3f& P2, int& trID1, int& trID2)
+    float
+    CDManager::getDistance(SceneObjectSetPtr m,
+                           Eigen::Vector3f& P1,
+                           Eigen::Vector3f& P2,
+                           int& trID1,
+                           int& trID2)
     {
         float minDist = FLT_MAX;
         float tmp;
@@ -284,9 +303,8 @@ namespace VirtualRobot
         return minDist;
     }
 
-
-
-    bool CDManager::isInCollision(SceneObjectSetPtr m, std::vector<SceneObjectSetPtr>& sets)
+    bool
+    CDManager::isInCollision(SceneObjectSetPtr m, std::vector<SceneObjectSetPtr>& sets)
     {
         for (const auto& set : sets)
         {
@@ -299,14 +317,16 @@ namespace VirtualRobot
         return false;
     }
 
-    bool CDManager::isInCollision()
+    bool
+    CDManager::isInCollision()
     {
         if (!colChecker)
         {
             return false;
         }
 
-        std::map<SceneObjectSetPtr, std::vector<SceneObjectSetPtr>  >::iterator i = colModelPairs.begin();
+        std::map<SceneObjectSetPtr, std::vector<SceneObjectSetPtr>>::iterator i =
+            colModelPairs.begin();
 
         while (i != colModelPairs.end())
         {
@@ -321,20 +341,22 @@ namespace VirtualRobot
         return false;
     }
 
-
-    std::vector<SceneObjectSetPtr> CDManager::getSceneObjectSets()
+    std::vector<SceneObjectSetPtr>
+    CDManager::getSceneObjectSets()
     {
         return colModels;
     }
 
-    CollisionCheckerPtr CDManager::getCollisionChecker()
+    CollisionCheckerPtr
+    CDManager::getCollisionChecker()
     {
         return colChecker;
     }
 
-    bool CDManager::hasSceneObjectSet(SceneObjectSetPtr m)
+    bool
+    CDManager::hasSceneObjectSet(SceneObjectSetPtr m)
     {
-        if(!m)
+        if (!m)
             return false;
         for (const auto& colModel : colModels)
         {
@@ -347,9 +369,10 @@ namespace VirtualRobot
         return false;
     }
 
-    bool CDManager::_hasSceneObjectSet(SceneObjectSetPtr m)
+    bool
+    CDManager::_hasSceneObjectSet(SceneObjectSetPtr m)
     {
-        if(!m)
+        if (!m)
             return false;
         for (auto& colModel : colModels)
         {
@@ -358,7 +381,8 @@ namespace VirtualRobot
                 return true;
             }
 
-            if (m->getSize() == 1 && colModel->getSize() == 1 &&  colModel->getSceneObject(0) == m->getSceneObject(0))
+            if (m->getSize() == 1 && colModel->getSize() == 1 &&
+                colModel->getSceneObject(0) == m->getSceneObject(0))
             {
                 return true;
             }
@@ -367,11 +391,12 @@ namespace VirtualRobot
         return false;
     }
 
-    bool CDManager::hasSceneObject(SceneObjectPtr m)
+    bool
+    CDManager::hasSceneObject(SceneObjectPtr m)
     {
         for (auto& colModel : colModels)
         {
-            if (colModel->getSize() == 1 &&  colModel->getSceneObject(0) == m)
+            if (colModel->getSize() == 1 && colModel->getSceneObject(0) == m)
             {
                 return true;
             }
@@ -380,7 +405,8 @@ namespace VirtualRobot
         return false;
     }
 
-    void CDManager::addCollisionModelPair(SceneObjectSetPtr m1, SceneObjectSetPtr m2)
+    void
+    CDManager::addCollisionModelPair(SceneObjectSetPtr m1, SceneObjectSetPtr m2)
     {
         if (!m1 || !m2)
         {
@@ -399,7 +425,8 @@ namespace VirtualRobot
         colModelPairs[m1].push_back(m2);
     }
 
-    void CDManager::addCollisionModelPair(SceneObjectPtr m1, SceneObjectSetPtr m2)
+    void
+    CDManager::addCollisionModelPair(SceneObjectPtr m1, SceneObjectSetPtr m2)
     {
         if (!m1 || !m2)
         {
@@ -411,19 +438,21 @@ namespace VirtualRobot
         addCollisionModelPair(cms, m2);
     }
 
-    void CDManager::addCollisionModelPair(SceneObjectPtr m1, SceneObjectPtr m2)
+    void
+    CDManager::addCollisionModelPair(SceneObjectPtr m1, SceneObjectPtr m2)
     {
         if (!m1 || !m2)
         {
             return;
         }
 
-        VirtualRobot::SceneObjectSetPtr cms(new VirtualRobot::SceneObjectSet(m1->getName() + "Set", colChecker));
+        VirtualRobot::SceneObjectSetPtr cms(
+            new VirtualRobot::SceneObjectSet(m1->getName() + "Set", colChecker));
         cms->addSceneObject(m1);
-        VirtualRobot::SceneObjectSetPtr cms2(new VirtualRobot::SceneObjectSet(m2->getName() + "Set", colChecker));
+        VirtualRobot::SceneObjectSetPtr cms2(
+            new VirtualRobot::SceneObjectSet(m2->getName() + "Set", colChecker));
         cms2->addSceneObject(m2);
         addCollisionModelPair(cms, cms2);
-
     }
 
-}
+} // namespace VirtualRobot

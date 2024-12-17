@@ -22,12 +22,11 @@
 */
 #pragma once
 
-#include "VirtualRobot.h"
-
+#include <map>
 #include <string>
 #include <vector>
-#include <map>
 
+#include "VirtualRobot.h"
 
 namespace VirtualRobot
 {
@@ -39,11 +38,10 @@ namespace VirtualRobot
     class VIRTUAL_ROBOT_IMPORT_EXPORT RobotConfig
     {
     public:
-
         struct Configuration
         {
-            std::string name;   //!< The name of the robot node
-            float value;        //!< The corresponding value
+            std::string name; //!< The name of the robot node
+            float value; //!< The corresponding value
         };
 
         /*!
@@ -52,10 +50,20 @@ namespace VirtualRobot
             \param name A name, which identifies this object.
         */
         RobotConfig(RobotWeakPtr robot, const std::string& name);
-        RobotConfig(RobotWeakPtr robot, const std::string& name, const std::map< RobotNodePtr, float >& configs);
-        RobotConfig(RobotWeakPtr robot, const std::string& name, const std::vector< Configuration >& configs);
-        RobotConfig(RobotWeakPtr robot, const std::string& name, const std::vector< std::string >& robotNodes, const std::vector< float >& values);
-        RobotConfig(RobotWeakPtr robot, const std::string& name, const std::vector< RobotNodePtr >& robotNodes, const std::vector< float >& values);
+        RobotConfig(RobotWeakPtr robot,
+                    const std::string& name,
+                    const std::map<RobotNodePtr, float>& configs);
+        RobotConfig(RobotWeakPtr robot,
+                    const std::string& name,
+                    const std::vector<Configuration>& configs);
+        RobotConfig(RobotWeakPtr robot,
+                    const std::string& name,
+                    const std::vector<std::string>& robotNodes,
+                    const std::vector<float>& values);
+        RobotConfig(RobotWeakPtr robot,
+                    const std::string& name,
+                    const std::vector<RobotNodePtr>& robotNodes,
+                    const std::vector<float>& values);
 
         /*!
             Creates a copy of this object with the given robot
@@ -114,12 +122,12 @@ namespace VirtualRobot
         /*!
             Return vector of all nodes that are covered by this RobotConfig.
         */
-        std::vector< RobotNodePtr > getNodes() const;
+        std::vector<RobotNodePtr> getNodes() const;
 
         /*!
             Returns map of RobotNodeNames with corresponding joint values.
         */
-        std::map < std::string, float > getRobotNodeJointValueMap();
+        std::map<std::string, float> getRobotNodeJointValueMap();
 
         /*!
             Returns a vector with corresponding joint values.
@@ -130,12 +138,15 @@ namespace VirtualRobot
         */
         std::string toXML(int tabs = 0);
 
-        static std::string createXMLString(const std::map< std::string, float >& config, const std::string& name, const std::string& tcpName = std::string(), int tabs = 0);
+        static std::string createXMLString(const std::map<std::string, float>& config,
+                                           const std::string& name,
+                                           const std::string& tcpName = std::string(),
+                                           int tabs = 0);
 
     protected:
         std::string name;
 
-        std::map< RobotNodePtr, float > configs;
+        std::map<RobotNodePtr, float> configs;
         RobotWeakPtr robot;
         RobotNodePtr tcpNode;
     };

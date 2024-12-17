@@ -1,35 +1,33 @@
 
 #pragma once
 
-#include <VirtualRobot/VirtualRobot.h>
-#include <VirtualRobot/Robot.h>
-#include <VirtualRobot/VirtualRobotException.h>
-#include <VirtualRobot/Nodes/RobotNode.h>
-#include <VirtualRobot/XML/RobotIO.h>
-#include <VirtualRobot/Visualization/VisualizationFactory.h>
-#include <VirtualRobot/Obstacle.h>
-#include "VirtualRobot/Visualization/CoinVisualization/CoinVisualizationNode.h"
-#include "VirtualRobot/Visualization/CoinVisualization/CoinVisualization.h"
-#include <VirtualRobot/Nodes/RobotNodeRevolute.h>
-
-#include "SimDynamics/DynamicsEngine/BulletEngine/BulletCoinQtViewer.h"
-
 #include <string.h>
+
+#include <atomic>
+#include <vector>
+
+#include <QtCore/QtCore>
 #include <QtCore/QtGlobal>
 #include <QtGui/QtGui>
-#include <QtCore/QtCore>
 
-#include <Inventor/sensors/SoTimerSensor.h>
-#include <Inventor/nodes/SoEventCallback.h>
-#include <Inventor/Qt/viewers/SoQtExaminerViewer.h>
-#include <Inventor/Qt/SoQt.h>
-#include <Inventor/nodes/SoSeparator.h>
+#include <VirtualRobot/Nodes/RobotNode.h>
+#include <VirtualRobot/Nodes/RobotNodeRevolute.h>
+#include <VirtualRobot/Obstacle.h>
+#include <VirtualRobot/Robot.h>
+#include <VirtualRobot/VirtualRobot.h>
+#include <VirtualRobot/VirtualRobotException.h>
+#include <VirtualRobot/Visualization/VisualizationFactory.h>
+#include <VirtualRobot/XML/RobotIO.h>
 
-
-#include <vector>
-#include <atomic>
-
+#include "SimDynamics/DynamicsEngine/BulletEngine/BulletCoinQtViewer.h"
+#include "VirtualRobot/Visualization/CoinVisualization/CoinVisualization.h"
+#include "VirtualRobot/Visualization/CoinVisualization/CoinVisualizationNode.h"
 #include "ui_simDynamicsViewer.h"
+#include <Inventor/Qt/SoQt.h>
+#include <Inventor/Qt/viewers/SoQtExaminerViewer.h>
+#include <Inventor/nodes/SoEventCallback.h>
+#include <Inventor/nodes/SoSeparator.h>
+#include <Inventor/sensors/SoTimerSensor.h>
 
 class SimDynamicsWindow : public QMainWindow
 {
@@ -110,11 +108,10 @@ protected:
 
     std::vector<VirtualRobot::RobotNodePtr> robotNodes;
 
-    std::map< VirtualRobot::RobotNodePtr, SoSeparator* > comVisuMap;
+    std::map<VirtualRobot::RobotNodePtr, SoSeparator*> comVisuMap;
 
     bool useColModel;
     std::string robotFilename;
 
     std::atomic_uint_fast64_t simuStepCount{0};
 };
-

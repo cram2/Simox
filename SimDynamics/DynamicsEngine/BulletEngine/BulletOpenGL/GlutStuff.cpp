@@ -23,56 +23,62 @@ static DemoApplication* gDemoApplication = nullptr;
 
 #include "GlutStuff.h"
 
-static  void glutKeyboardCallback(unsigned char key, int x, int y)
+static void
+glutKeyboardCallback(unsigned char key, int x, int y)
 {
     gDemoApplication->keyboardCallback(key, x, y);
 }
 
-static  void glutKeyboardUpCallback(unsigned char key, int x, int y)
+static void
+glutKeyboardUpCallback(unsigned char key, int x, int y)
 {
     gDemoApplication->keyboardUpCallback(key, x, y);
 }
 
-static void glutSpecialKeyboardCallback(int key, int x, int y)
+static void
+glutSpecialKeyboardCallback(int key, int x, int y)
 {
     gDemoApplication->specialKeyboard(key, x, y);
 }
 
-static void glutSpecialKeyboardUpCallback(int key, int x, int y)
+static void
+glutSpecialKeyboardUpCallback(int key, int x, int y)
 {
     gDemoApplication->specialKeyboardUp(key, x, y);
 }
 
-
-static void glutReshapeCallback(int w, int h)
+static void
+glutReshapeCallback(int w, int h)
 {
     gDemoApplication->reshape(w, h);
 }
 
-static void glutMoveAndDisplayCallback()
+static void
+glutMoveAndDisplayCallback()
 {
     gDemoApplication->moveAndDisplay();
 }
 
-static void glutMouseFuncCallback(int button, int state, int x, int y)
+static void
+glutMouseFuncCallback(int button, int state, int x, int y)
 {
     gDemoApplication->mouseFunc(button, state, x, y);
 }
 
-
-static void glutMotionFuncCallback(int x, int y)
+static void
+glutMotionFuncCallback(int x, int y)
 {
     gDemoApplication->mouseMotionFunc(x, y);
 }
 
-
-static void glutDisplayCallback()
+static void
+glutDisplayCallback()
 {
     gDemoApplication->displayCallback();
 }
 
-
-int glutmain(int argc, char** argv, int width, int height, const char* title, DemoApplication* demoApp)
+int
+glutmain(int argc, char** argv, int width, int height, const char* title, DemoApplication* demoApp)
 {
 
     gDemoApplication = demoApp;
@@ -105,12 +111,11 @@ int glutmain(int argc, char** argv, int width, int height, const char* title, De
 
     //enable vsync to avoid tearing on Apple (todo: for Windows)
 
-#if defined(__APPLE__) && !defined (VMDMESA)
+#if defined(__APPLE__) && !defined(VMDMESA)
     int swap_interval = 1;
     CGLContextObj cgl_context = CGLGetCurrentContext();
     CGLSetParameter(cgl_context, kCGLCPSwapInterval, &swap_interval);
 #endif
-
 
 
     glutMainLoop();

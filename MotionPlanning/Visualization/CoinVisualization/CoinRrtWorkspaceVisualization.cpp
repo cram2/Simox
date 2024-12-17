@@ -1,49 +1,51 @@
 
 #include "CoinRrtWorkspaceVisualization.h"
+
+#include "MotionPlanning/CSpace/CSpaceNode.h"
 #include "MotionPlanning/CSpace/CSpacePath.h"
 #include "MotionPlanning/CSpace/CSpaceTree.h"
-#include "MotionPlanning/CSpace/CSpaceNode.h"
-
 #include "VirtualRobot/Nodes/RobotNode.h"
 #include "VirtualRobot/RobotNodeSet.h"
-#include <Inventor/SoPrimitiveVertex.h>
 #include <Inventor/SbLinear.h>
-#include <Inventor/nodes/SoShape.h>
+#include <Inventor/SoPrimitiveVertex.h>
 #include <Inventor/actions/SoCallbackAction.h>
-#include <Inventor/nodes/SoSeparator.h>
-#include <Inventor/nodes/SoMatrixTransform.h>
-
-
+#include <Inventor/nodes/SoBaseColor.h>
 #include <Inventor/nodes/SoComplexity.h>
-#include <Inventor/nodes/SoMaterial.h>
+#include <Inventor/nodes/SoCoordinate3.h>
 #include <Inventor/nodes/SoDrawStyle.h>
 #include <Inventor/nodes/SoLineSet.h>
-
-#include <Inventor/nodes/SoCoordinate3.h>
+#include <Inventor/nodes/SoMaterial.h>
+#include <Inventor/nodes/SoMatrixTransform.h>
+#include <Inventor/nodes/SoSeparator.h>
+#include <Inventor/nodes/SoShape.h>
 #include <Inventor/nodes/SoSphere.h>
-#include <Inventor/nodes/SoBaseColor.h>
 #include <Inventor/nodes/SoTranslation.h>
 #include <Inventor/nodes/SoUnits.h>
-
 
 namespace Saba
 {
 
-    CoinRrtWorkspaceVisualization::CoinRrtWorkspaceVisualization(VirtualRobot::RobotPtr robot, CSpacePtr cspace, const std::string& TCPName) :
+    CoinRrtWorkspaceVisualization::CoinRrtWorkspaceVisualization(VirtualRobot::RobotPtr robot,
+                                                                 CSpacePtr cspace,
+                                                                 const std::string& TCPName) :
         RrtWorkspaceVisualization(robot, cspace, TCPName)
     {
         visualization = nullptr;
         coinInit();
     }
 
-    CoinRrtWorkspaceVisualization::CoinRrtWorkspaceVisualization(VirtualRobot::RobotPtr robot, VirtualRobot::RobotNodeSetPtr robotNodeSet, const std::string& TCPName) :
+    CoinRrtWorkspaceVisualization::CoinRrtWorkspaceVisualization(
+        VirtualRobot::RobotPtr robot,
+        VirtualRobot::RobotNodeSetPtr robotNodeSet,
+        const std::string& TCPName) :
         RrtWorkspaceVisualization(robot, robotNodeSet, TCPName)
     {
         visualization = nullptr;
         coinInit();
     }
 
-    void CoinRrtWorkspaceVisualization::coinInit()
+    void
+    CoinRrtWorkspaceVisualization::coinInit()
     {
         if (visualization)
         {
@@ -66,17 +68,18 @@ namespace Saba
         }
     }
 
-
-
     /**
      * This mehtod returns the internal CoinRrtWorkspaceVisualization::visualization.
      */
-    SoSeparator* CoinRrtWorkspaceVisualization::getCoinVisualization()
+    SoSeparator*
+    CoinRrtWorkspaceVisualization::getCoinVisualization()
     {
         return visualization;
     }
 
-    bool CoinRrtWorkspaceVisualization::addCSpacePath(CSpacePathPtr path, CoinRrtWorkspaceVisualization::ColorSet colorSet)
+    bool
+    CoinRrtWorkspaceVisualization::addCSpacePath(CSpacePathPtr path,
+                                                 CoinRrtWorkspaceVisualization::ColorSet colorSet)
     {
         if (!path || !robotNodeSet || !TCPNode || !robot)
         {
@@ -85,18 +88,23 @@ namespace Saba
 
         if (path->getDimension() != robotNodeSet->getSize())
         {
-            VR_ERROR << " Dimensions do not match: " << path->getDimension() << "!=" << robotNodeSet->getSize() << std::endl;
+            VR_ERROR << " Dimensions do not match: " << path->getDimension()
+                     << "!=" << robotNodeSet->getSize() << std::endl;
             return false;
         }
 
-        float nodeSolutionSize = pathNodeSize;//15.0;//1.0f
-        float lineSolutionSize = pathLineSize;//4.0;
+        float nodeSolutionSize = pathNodeSize; //15.0;//1.0f
+        float lineSolutionSize = pathLineSize; //4.0;
         SoMaterial* materialNodeSolution = new SoMaterial();
         SoMaterial* materialLineSolution = new SoMaterial();
-        materialNodeSolution->ambientColor.setValue(colors[colorSet].nodeR, colors[colorSet].nodeG, colors[colorSet].nodeB);
-        materialNodeSolution->diffuseColor.setValue(colors[colorSet].nodeR, colors[colorSet].nodeG, colors[colorSet].nodeB);
-        materialLineSolution->ambientColor.setValue(colors[colorSet].lineR, colors[colorSet].lineG, colors[colorSet].lineB);
-        materialLineSolution->diffuseColor.setValue(colors[colorSet].lineR, colors[colorSet].lineG, colors[colorSet].lineB);
+        materialNodeSolution->ambientColor.setValue(
+            colors[colorSet].nodeR, colors[colorSet].nodeG, colors[colorSet].nodeB);
+        materialNodeSolution->diffuseColor.setValue(
+            colors[colorSet].nodeR, colors[colorSet].nodeG, colors[colorSet].nodeB);
+        materialLineSolution->ambientColor.setValue(
+            colors[colorSet].lineR, colors[colorSet].lineG, colors[colorSet].lineB);
+        materialLineSolution->diffuseColor.setValue(
+            colors[colorSet].lineR, colors[colorSet].lineG, colors[colorSet].lineB);
         SoSphere* sphereNodeSolution = new SoSphere();
         sphereNodeSolution->radius.setValue(nodeSolutionSize);
         SoDrawStyle* lineSolutionStyle = new SoDrawStyle();
@@ -190,7 +198,9 @@ namespace Saba
         return true;
     }
 
-    bool CoinRrtWorkspaceVisualization::addTree(CSpaceTreePtr tree, CoinRrtWorkspaceVisualization::ColorSet colorSet)
+    bool
+    CoinRrtWorkspaceVisualization::addTree(CSpaceTreePtr tree,
+                                           CoinRrtWorkspaceVisualization::ColorSet colorSet)
     {
         if (!tree)
         {
@@ -199,7 +209,8 @@ namespace Saba
 
         if (tree->getDimension() != robotNodeSet->getSize())
         {
-            VR_ERROR << " Dimensions do not match: " << tree->getDimension() << "!=" << robotNodeSet->getSize() << std::endl;
+            VR_ERROR << " Dimensions do not match: " << tree->getDimension()
+                     << "!=" << robotNodeSet->getSize() << std::endl;
             return false;
         }
 
@@ -217,10 +228,14 @@ namespace Saba
 
         SoMaterial* materialNode = new SoMaterial();
         SoMaterial* materialLine = new SoMaterial();
-        materialLine->ambientColor.setValue(colors[colorSet].lineR, colors[colorSet].lineG, colors[colorSet].lineB);
-        materialLine->diffuseColor.setValue(colors[colorSet].lineR, colors[colorSet].lineG, colors[colorSet].lineB);
-        materialNode->ambientColor.setValue(colors[colorSet].nodeR, colors[colorSet].nodeG, colors[colorSet].nodeB);
-        materialNode->diffuseColor.setValue(colors[colorSet].nodeR, colors[colorSet].nodeG, colors[colorSet].nodeB);
+        materialLine->ambientColor.setValue(
+            colors[colorSet].lineR, colors[colorSet].lineG, colors[colorSet].lineB);
+        materialLine->diffuseColor.setValue(
+            colors[colorSet].lineR, colors[colorSet].lineG, colors[colorSet].lineB);
+        materialNode->ambientColor.setValue(
+            colors[colorSet].nodeR, colors[colorSet].nodeG, colors[colorSet].nodeB);
+        materialNode->diffuseColor.setValue(
+            colors[colorSet].nodeR, colors[colorSet].nodeG, colors[colorSet].nodeB);
         std::map<int, SoMaterial*> statusMaterials;
         std::map<int, ColorSet>::iterator it = treeNodeStatusColor.begin();
         bool considerStatus = false;
@@ -228,8 +243,10 @@ namespace Saba
         while (it != treeNodeStatusColor.end())
         {
             SoMaterial* materialNodeStatus = new SoMaterial();
-            materialNodeStatus->ambientColor.setValue(colors[it->second].nodeR, colors[it->second].nodeG, colors[it->second].nodeB);
-            materialNodeStatus->diffuseColor.setValue(colors[it->second].nodeR, colors[it->second].nodeG, colors[it->second].nodeB);
+            materialNodeStatus->ambientColor.setValue(
+                colors[it->second].nodeR, colors[it->second].nodeG, colors[it->second].nodeB);
+            materialNodeStatus->diffuseColor.setValue(
+                colors[it->second].nodeR, colors[it->second].nodeG, colors[it->second].nodeB);
             statusMaterials[it->first] = materialNodeStatus;
             considerStatus = true;
             it++;
@@ -264,7 +281,7 @@ namespace Saba
         Eigen::Vector3f p;
         Eigen::Vector3f p2;
 
-        for (const auto & node : nodes)
+        for (const auto& node : nodes)
         {
             actualNode = node;
 
@@ -280,7 +297,7 @@ namespace Saba
         }
 
 
-        for (const auto & node : nodes)
+        for (const auto& node : nodes)
         {
 
             actualNode = node;
@@ -350,7 +367,8 @@ namespace Saba
         return true;
     }
 
-    void CoinRrtWorkspaceVisualization::reset()
+    void
+    CoinRrtWorkspaceVisualization::reset()
     {
         if (visualization)
         {
@@ -358,11 +376,16 @@ namespace Saba
         }
     }
 
-    bool CoinRrtWorkspaceVisualization::addConfiguration(const Eigen::VectorXf& c, CoinRrtWorkspaceVisualization::ColorSet colorSet, float nodeSizeFactor)
+    bool
+    CoinRrtWorkspaceVisualization::addConfiguration(
+        const Eigen::VectorXf& c,
+        CoinRrtWorkspaceVisualization::ColorSet colorSet,
+        float nodeSizeFactor)
     {
         if (c.rows() != robotNodeSet->getSize())
         {
-            VR_ERROR << " Dimensions do not match: " << c.rows() << "!=" << robotNodeSet->getSize() << std::endl;
+            VR_ERROR << " Dimensions do not match: " << c.rows() << "!=" << robotNodeSet->getSize()
+                     << std::endl;
             return false;
         }
 
@@ -373,8 +396,10 @@ namespace Saba
 
         float nodeSolutionSize = pathNodeSize * nodeSizeFactor; //15.0;//1.0f
         SoMaterial* materialNodeSolution = new SoMaterial();
-        materialNodeSolution->ambientColor.setValue(colors[colorSet].nodeR, colors[colorSet].nodeG, colors[colorSet].nodeB);
-        materialNodeSolution->diffuseColor.setValue(colors[colorSet].nodeR, colors[colorSet].nodeG, colors[colorSet].nodeB);
+        materialNodeSolution->ambientColor.setValue(
+            colors[colorSet].nodeR, colors[colorSet].nodeG, colors[colorSet].nodeB);
+        materialNodeSolution->diffuseColor.setValue(
+            colors[colorSet].nodeR, colors[colorSet].nodeG, colors[colorSet].nodeB);
         SoSphere* sphereNodeSolution = new SoSphere();
         sphereNodeSolution->radius.setValue(nodeSolutionSize);
 

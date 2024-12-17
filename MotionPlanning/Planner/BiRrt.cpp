@@ -1,11 +1,12 @@
 
 #include "BiRrt.h"
 
-#include "../CSpace/CSpaceNode.h"
-#include "../CSpace/CSpaceTree.h"
-#include "../CSpace/CSpacePath.h"
-#include "VirtualRobot/Robot.h"
 #include <ctime>
+
+#include "../CSpace/CSpaceNode.h"
+#include "../CSpace/CSpacePath.h"
+#include "../CSpace/CSpaceTree.h"
+#include "VirtualRobot/Robot.h"
 
 
 //#define LOCAL_DEBUG(a) {SABA_INFO << a;};
@@ -17,19 +18,18 @@ using namespace VirtualRobot;
 namespace Saba
 {
 
-    BiRrt::BiRrt(CSpacePtr cspace, RrtMethod modeA, RrtMethod modeB, float samplingSize)
-        : Rrt(cspace, modeA, 0.1, samplingSize)
+    BiRrt::BiRrt(CSpacePtr cspace, RrtMethod modeA, RrtMethod modeB, float samplingSize) :
+        Rrt(cspace, modeA, 0.1, samplingSize)
     {
         rrtMode2 = modeB;
         tree2.reset(new CSpaceTree(cspace));
         lastAddedID2 = -1;
     }
 
-    BiRrt::~BiRrt()
-    = default;
+    BiRrt::~BiRrt() = default;
 
-
-    bool BiRrt::plan(bool bQuiet)
+    bool
+    BiRrt::plan(bool bQuiet)
     {
 
         if (!bQuiet)
@@ -220,15 +220,16 @@ namespace Saba
 
             clock_t currentClock = clock();
 
-            long diffClock = (long)(((float)(currentClock - startClock) / (float)CLOCKS_PER_SEC) * 1000.0);
-            if(diffClock > planningTimeout)
+            long diffClock =
+                (long)(((float)(currentClock - startClock) / (float)CLOCKS_PER_SEC) * 1000.0);
+            if (diffClock > planningTimeout)
             {
-                std::cout << "Encountered timeout of " << planningTimeout << " ms - aborting" << std::endl;
+                std::cout << "Encountered timeout of " << planningTimeout << " ms - aborting"
+                          << std::endl;
                 return false;
             }
 
-        }
-        while (!stopSearch && cycles < maxCycles && !found);
+        } while (!stopSearch && cycles < maxCycles && !found);
 
         clock_t endClock = clock();
 
@@ -239,16 +240,21 @@ namespace Saba
         {
             SABA_INFO << "Needed " << diffClock << " ms of processor time." << std::endl;
 
-            SABA_INFO << "Created " << tree->getNrOfNodes() << " + " << tree2->getNrOfNodes() << " = " << tree->getNrOfNodes() + tree2->getNrOfNodes() << " nodes." << std::endl;
-            SABA_INFO << "Collision Checks: " << (cspace->performaceVars_collisionCheck - colChecksStart) << std::endl;
-            SABA_INFO << "Distance Calculations: " << (cspace->performaceVars_distanceCheck - distChecksStart) << std::endl;
+            SABA_INFO << "Created " << tree->getNrOfNodes() << " + " << tree2->getNrOfNodes()
+                      << " = " << tree->getNrOfNodes() + tree2->getNrOfNodes() << " nodes."
+                      << std::endl;
+            SABA_INFO << "Collision Checks: "
+                      << (cspace->performaceVars_collisionCheck - colChecksStart) << std::endl;
+            SABA_INFO << "Distance Calculations: "
+                      << (cspace->performaceVars_distanceCheck - distChecksStart) << std::endl;
 
             int nColChecks = (cspace->performaceVars_collisionCheck - colChecksStart);
 
             if (diffClock > 0)
             {
                 float fPerf = (float)nColChecks / (float)diffClock * 1000.0f;
-                std::cout << "Performance: " << fPerf << " cps (collision-checks per second)." << std::endl;
+                std::cout << "Performance: " << fPerf << " cps (collision-checks per second)."
+                          << std::endl;
             }
         }
 
@@ -281,12 +287,11 @@ namespace Saba
         }
 
         return false;
-
     }
 
-
     // uses lastAddedID and lastAddedID2
-    bool BiRrt::createSolution(bool bQuiet)
+    bool
+    BiRrt::createSolution(bool bQuiet)
     {
         // delete an existing solution if necessary
         solution.reset();
@@ -364,19 +369,22 @@ namespace Saba
 
         if (!bQuiet)
         {
-            SABA_INFO << "Created solution with " << solution->getNrOfPoints() << " nodes." << std::endl;
+            SABA_INFO << "Created solution with " << solution->getNrOfPoints() << " nodes."
+                      << std::endl;
         }
 
         //solution->checkDistance(tree->getColCheckSamplingSize());
         return true;
     }
 
-    bool BiRrt::setStart(const Eigen::VectorXf& c)
+    bool
+    BiRrt::setStart(const Eigen::VectorXf& c)
     {
         return Rrt::setStart(c);
     }
 
-    bool BiRrt::setGoal(const Eigen::VectorXf& c)
+    bool
+    BiRrt::setGoal(const Eigen::VectorXf& c)
     {
         if (!Rrt::setGoal(c))
         {
@@ -389,12 +397,13 @@ namespace Saba
             tree2->removeNode(goalNode);
         }
 
-        goalNode =  tree2->appendNode(c, -1);
+        goalNode = tree2->appendNode(c, -1);
 
         return true;
     }
 
-    void BiRrt::reset()
+    void
+    BiRrt::reset()
     {
         Rrt::reset();
 
@@ -404,7 +413,8 @@ namespace Saba
         }
     }
 
-    void BiRrt::printConfig(bool printOnlyParams)
+    void
+    BiRrt::printConfig(bool printOnlyParams)
     {
         if (!printOnlyParams)
         {
@@ -438,9 +448,10 @@ namespace Saba
         }
     }
 
-    CSpaceTreePtr BiRrt::getTree2()
+    CSpaceTreePtr
+    BiRrt::getTree2()
     {
         return tree2;
     }
 
-} // namespace
+} // namespace Saba

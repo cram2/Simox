@@ -28,41 +28,46 @@
 namespace VirtualRobot
 {
 
-typedef std::shared_ptr<class AbstractSingleChainManipulability> AbstractSingleChainManipulabilityPtr;
+    typedef std::shared_ptr<class AbstractSingleChainManipulability>
+        AbstractSingleChainManipulabilityPtr;
 
-/**
+    /**
  * Implementation of manipulability tracking, see
  * N. Jaquier, L. Rozo, D. G. Caldwell and S. Calinon. Geometry-aware Tracking of Manipulability Ellipsoids, in Robotics: Science and Systems (R:SS), 2018. (http://www.roboticsproceedings.org/rss14/p27.pdf)
  * N. Jaquier, L. Rozo, D. G. Caldwell and S. Calinon. Geometry-aware Manipulability Learning, Tracking and Transfer, International Journal of Robotics Research (IJRR), 2020.
  * @brief The ManipulabilityTracking class
  */
-class SingleChainManipulabilityTracking : public AbstractManipulabilityTracking
-{
-public:
-    SingleChainManipulabilityTracking(AbstractSingleChainManipulabilityPtr manipulability);
+    class SingleChainManipulabilityTracking : public AbstractManipulabilityTracking
+    {
+    public:
+        SingleChainManipulabilityTracking(AbstractSingleChainManipulabilityPtr manipulability);
 
-    Eigen::Tensor<double, 3> computeManipulabilityJacobian(const Eigen::MatrixXd &jacobian);
+        Eigen::Tensor<double, 3> computeManipulabilityJacobian(const Eigen::MatrixXd& jacobian);
 
-    Eigen::VectorXf calculateVelocity(const Eigen::MatrixXd &manipulabilityDesired, const Eigen::MatrixXd &gainMatrix = Eigen::MatrixXd(), bool jointLimitAvoidance = false) override;
+        Eigen::VectorXf calculateVelocity(const Eigen::MatrixXd& manipulabilityDesired,
+                                          const Eigen::MatrixXd& gainMatrix = Eigen::MatrixXd(),
+                                          bool jointLimitAvoidance = false) override;
 
-    virtual int getTaskVars() override;
+        virtual int getTaskVars() override;
 
-    virtual AbstractManipulability::Mode getMode() override;
+        virtual AbstractManipulability::Mode getMode() override;
 
-    AbstractSingleChainManipulabilityPtr getManipulability();
+        AbstractSingleChainManipulabilityPtr getManipulability();
 
-    Eigen::MatrixXd computeCurrentManipulability() override;
+        Eigen::MatrixXd computeCurrentManipulability() override;
 
-    virtual std::vector<std::string> getJointNames() override;
+        virtual std::vector<std::string> getJointNames() override;
 
-    VisualizationNodePtr getManipulabilityVis(const Eigen::MatrixXd &manipulability, const std::string &visualizationType = "", double scaling = 1000) override;
+        VisualizationNodePtr getManipulabilityVis(const Eigen::MatrixXd& manipulability,
+                                                  const std::string& visualizationType = "",
+                                                  double scaling = 1000) override;
 
-    void setConvertMMtoM(bool value) override;
+        void setConvertMMtoM(bool value) override;
 
-protected:
-    AbstractSingleChainManipulabilityPtr manipulability;
-};
+    protected:
+        AbstractSingleChainManipulabilityPtr manipulability;
+    };
 
-typedef std::shared_ptr<SingleChainManipulabilityTracking> SingleChainManipulabilityTrackingPtr;
+    typedef std::shared_ptr<SingleChainManipulabilityTracking> SingleChainManipulabilityTrackingPtr;
 
-}
+} // namespace VirtualRobot

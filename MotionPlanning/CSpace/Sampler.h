@@ -22,9 +22,10 @@
 */
 #pragma once
 
-#include "../Saba.h"
-#include "../CSpace/CSpace.h"
 #include <vector>
+
+#include "../CSpace/CSpace.h"
+#include "../Saba.h"
 
 namespace Saba
 {
@@ -59,17 +60,20 @@ namespace Saba
             that the components of the configuration are uncorrelated.
             The result value is not checked against any boundaries of the configuration space.
         */
-        void getNormalRandomConfig(Eigen::VectorXf& stroreConfig, const Eigen::VectorXf& mean, const Eigen::MatrixXf& variance);
+        void getNormalRandomConfig(Eigen::VectorXf& stroreConfig,
+                                   const Eigen::VectorXf& mean,
+                                   const Eigen::MatrixXf& variance);
 
         /*! Returns a normal distributed random configuration with nDimension components.
             This is a convenience function in case you want to apply the same variance in
             every dimension.
         */
-        void getNormalRandomConfig(Eigen::VectorXf& stroreConfig, const Eigen::VectorXf& mean, float variance);
+        void getNormalRandomConfig(Eigen::VectorXf& stroreConfig,
+                                   const Eigen::VectorXf& mean,
+                                   float variance);
 
         unsigned int dimension;
         Eigen::VectorXf metricWeights;
     };
 
-}
-
+} // namespace Saba

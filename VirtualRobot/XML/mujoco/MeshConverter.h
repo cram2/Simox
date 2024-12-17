@@ -6,7 +6,6 @@
 
 #include "Mesh.h"
 
-
 namespace VirtualRobot::mujoco
 {
     /**
@@ -15,7 +14,6 @@ namespace VirtualRobot::mujoco
     class MeshConverter
     {
     public:
-
         // STATELESS API (static).
 
         // From mujoco::Mesh to VirtualRobot::TriMeshModel
@@ -59,7 +57,6 @@ namespace VirtualRobot::mujoco
 
 
     private:
-
         /// Check whether the command `MESHLABSERVER` is available using `system("which ...")`.
         static bool checkMeshlabserverAvailable();
 
@@ -76,9 +73,7 @@ namespace VirtualRobot::mujoco
         static const std::string MESHLABSERVER;
 
 
-
     private:
-
         /// Private constructor.
         MeshConverter();
 
@@ -125,4 +120,4 @@ namespace VirtualRobot::mujoco
         */
     };
 
-}
+} // namespace VirtualRobot::mujoco

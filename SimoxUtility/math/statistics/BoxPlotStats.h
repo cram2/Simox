@@ -4,7 +4,6 @@
 
 #include "measures.h"
 
-
 namespace simox::math
 {
 
@@ -15,7 +14,6 @@ namespace simox::math
     class BoxPlotStats
     {
     public:
-
         BoxPlotStats() = default;
         BoxPlotStats(const std::vector<Float>& values, bool isSorted = false, Float whisk = 1.5);
 
@@ -32,7 +30,6 @@ namespace simox::math
         Float maximum;
 
         std::vector<Float> outliers;
-
     };
 
     // Explicit template instantiation
@@ -41,15 +38,18 @@ namespace simox::math
     using BoxPlotStatsf = BoxPlotStats<float>;
     using BoxPlotStatsd = BoxPlotStats<double>;
 
-
     template <typename Float>
-    BoxPlotStats<Float>::BoxPlotStats(const std::vector<Float>& values, bool isSorted, Float whisk) :
+    BoxPlotStats<Float>::BoxPlotStats(const std::vector<Float>& values,
+                                      bool isSorted,
+                                      Float whisk) :
         whisk(whisk)
     {
         set(values, isSorted);
     }
+
     template <typename Float>
-    void BoxPlotStats<Float>::set(const std::vector<Float>& _values, bool isSorted)
+    void
+    BoxPlotStats<Float>::set(const std::vector<Float>& _values, bool isSorted)
     {
         const std::vector<Float>& values = isSorted ? _values : math::sorted(_values);
 
@@ -85,5 +85,4 @@ namespace simox::math
     }
 
 
-}
-
+} // namespace simox::math

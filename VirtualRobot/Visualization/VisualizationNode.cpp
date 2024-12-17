@@ -5,16 +5,16 @@
 * @copyright  2010 Manfred Kroehnert
 */
 
+#include "VisualizationNode.h"
+
+#include <fstream>
+
 #include <SimoxUtility/filesystem/remove_trailing_separator.h>
 
-#include "VisualizationNode.h"
 #include "TriMeshModel.h"
-
 #include "VirtualRobot/VirtualRobot.h"
 #include "VirtualRobot/VirtualRobotException.h"
 #include "VirtualRobot/XML/BaseIO.h"
-
-#include <fstream>
 
 namespace VirtualRobot
 {
@@ -33,14 +33,16 @@ namespace VirtualRobot
 
     VisualizationNode::VisualizationNode(const TriMeshModel& triMeshModel) :
         VisualizationNode(std::make_shared<TriMeshModel>(triMeshModel))
-    {}
+    {
+    }
 
     VisualizationNode::~VisualizationNode()
     {
         attachedVisualizations.clear();
     }
 
-    VirtualRobot::VisualizationNodePtr VisualizationNode::clone(bool deepCopy, float scaling)
+    VirtualRobot::VisualizationNodePtr
+    VisualizationNode::clone(bool deepCopy, float scaling)
     {
         THROW_VR_EXCEPTION_IF(scaling <= 0, "Scaling must be >0");
 
@@ -73,51 +75,61 @@ namespace VirtualRobot
         return p;
     }
 
-    VirtualRobot::TriMeshModelPtr VisualizationNode::getTriMeshModel()
+    VirtualRobot::TriMeshModelPtr
+    VisualizationNode::getTriMeshModel()
     {
         return triMeshModel;
     }
 
-    void VisualizationNode::setGlobalPose(const Eigen::Matrix4f& globalPose)
+    void
+    VisualizationNode::setGlobalPose(const Eigen::Matrix4f& globalPose)
     {
         this->globalPose = globalPose;
     }
 
-    const Eigen::Matrix4f& VisualizationNode::getGlobalPose() const
+    const Eigen::Matrix4f&
+    VisualizationNode::getGlobalPose() const
     {
         return globalPose;
     }
 
-    void VisualizationNode::setGlobalParentPose(const Eigen::Matrix4f& globalParentPose)
+    void
+    VisualizationNode::setGlobalParentPose(const Eigen::Matrix4f& globalParentPose)
     {
         setGlobalPose(globalParentPose * localPose);
     }
 
-    void VisualizationNode::setLocalPose(const Eigen::Matrix4f& localPose)
+    void
+    VisualizationNode::setLocalPose(const Eigen::Matrix4f& localPose)
     {
         this->localPose = localPose;
     }
 
-    const Eigen::Matrix4f& VisualizationNode::getLocalPose() const
+    const Eigen::Matrix4f&
+    VisualizationNode::getLocalPose() const
     {
         return localPose;
     }
 
-    void VisualizationNode::attachVisualization(const std::string& name, VisualizationNodePtr v)
+    void
+    VisualizationNode::attachVisualization(const std::string& name, VisualizationNodePtr v)
     {
         THROW_VR_EXCEPTION_IF(!v, "NULL DATA");
 
         attachedVisualizations[name] = v;
     }
 
-    void VisualizationNode::detachVisualization(const std::string& name)
+    void
+    VisualizationNode::detachVisualization(const std::string& name)
     {
         attachedVisualizations.erase(name);
     }
 
-    bool VisualizationNode::hasAttachedVisualization(const std::string& name)
+    bool
+    VisualizationNode::hasAttachedVisualization(const std::string& name)
     {
-        std::map< std::string, VisualizationNodePtr >::const_iterator i = attachedVisualizations.begin();
+        std::map<std::string, VisualizationNodePtr>::const_iterator i =
+            attachedVisualizations.begin();
 
         while (i != attachedVisualizations.end())
         {
@@ -132,7 +144,8 @@ namespace VirtualRobot
         return false;
     }
 
-    VisualizationNodePtr VisualizationNode::getAttachedVisualization(const std::string& name)
+    VisualizationNodePtr
+    VisualizationNode::getAttachedVisualization(const std::string& name)
     {
         if (!hasAttachedVisualization(name))
         {
@@ -142,29 +155,33 @@ namespace VirtualRobot
         return attachedVisualizations[name];
     }
 
-
-    void VisualizationNode::setUpdateVisualization(bool enable)
+    void
+    VisualizationNode::setUpdateVisualization(bool enable)
     {
         updateVisualization = enable;
     }
 
-    bool VisualizationNode::getUpdateVisualizationStatus()
+    bool
+    VisualizationNode::getUpdateVisualizationStatus()
     {
         return updateVisualization;
     }
 
-    void VisualizationNode::print()
+    void
+    VisualizationNode::print()
     {
         std::cout << "Dummy VisualizationNode" << std::endl;
     }
 
-    void VisualizationNode::setupVisualization(bool showVisualization, bool showAttachedVisualizations)
+    void
+    VisualizationNode::setupVisualization(bool showVisualization, bool showAttachedVisualizations)
     {
         this->showVisualization = showVisualization;
         this->showAttachedVisualizations = showAttachedVisualizations;
     }
 
-    int VisualizationNode::getNumFaces()
+    int
+    VisualizationNode::getNumFaces()
     {
         TriMeshModelPtr p = getTriMeshModel();
 
@@ -176,23 +193,27 @@ namespace VirtualRobot
         return 0;
     }
 
-    void VisualizationNode::setFilename(const std::string& filename, bool boundingBox)
+    void
+    VisualizationNode::setFilename(const std::string& filename, bool boundingBox)
     {
         this->filename = filename;
         this->boundingBox = boundingBox;
     }
 
-    bool VisualizationNode::usedBoundingBoxVisu()
+    bool
+    VisualizationNode::usedBoundingBoxVisu()
     {
         return boundingBox;
     }
 
-    std::string VisualizationNode::getFilename()
+    std::string
+    VisualizationNode::getFilename()
     {
         return filename;
     }
 
-    std::string VisualizationNode::toXML(const std::string& basePath, const std::string& filename, int tabs)
+    std::string
+    VisualizationNode::toXML(const std::string& basePath, const std::string& filename, int tabs)
     {
         std::stringstream ss;
         std::string t = "\t";
@@ -236,14 +257,17 @@ namespace VirtualRobot
         return ss.str();
     }
 
-    std::string VisualizationNode::toXML(const std::string& basePath, int tabs)
+    std::string
+    VisualizationNode::toXML(const std::string& basePath, int tabs)
     {
         std::string visualizationFilename = getFilename();
         std::filesystem::path fn(visualizationFilename);
         return toXML(basePath, fn.string(), tabs);
     }
 
-    VirtualRobot::VisualizationNodePtr VisualizationNode::CreateUnitedVisualization(const std::vector<VisualizationNodePtr>& visualizations)
+    VirtualRobot::VisualizationNodePtr
+    VisualizationNode::CreateUnitedVisualization(
+        const std::vector<VisualizationNodePtr>& visualizations)
     {
         if (visualizations.size() == 0)
         {
@@ -275,7 +299,8 @@ namespace VirtualRobot
         return f->createUnitedVisualization(visualizations);
     }
 
-    VirtualRobot::BoundingBox VisualizationNode::getBoundingBox()
+    VirtualRobot::BoundingBox
+    VisualizationNode::getBoundingBox()
     {
         VirtualRobot::BoundingBox bbox;
         TriMeshModelPtr tm = getTriMeshModel();
@@ -290,7 +315,8 @@ namespace VirtualRobot
         return bbox;
     }
 
-    bool VisualizationNode::saveModel(const std::string& modelPath, const std::string& filename)
+    bool
+    VisualizationNode::saveModel(const std::string& modelPath, const std::string& filename)
     {
         const auto completePath = simox::fs::remove_trailing_separator(modelPath);
 
@@ -302,35 +328,38 @@ namespace VirtualRobot
                 return false;
             }
         }
-        const auto completeFile = std::filesystem::absolute(completePath / filename).replace_extension("off");
+        const auto completeFile =
+            std::filesystem::absolute(completePath / filename).replace_extension("off");
 
         const auto& t = *getTriMeshModel();
         VR_INFO << "writing " << completeFile.string() << std::endl;
         std::ofstream out{completeFile.string()};
         out << "OFF\n# num vert / num face / num edge\n"
-            << t.vertices.size() << ' ' << t.faces.size()
-            << " 0\n\n#vert (x y z)\n";
+            << t.vertices.size() << ' ' << t.faces.size() << " 0\n\n#vert (x y z)\n";
         for (const auto& v : t.vertices)
         {
-            out << v.x() <<  ' ' << v.y() <<  ' ' << v.z() <<  '\n';
+            out << v.x() << ' ' << v.y() << ' ' << v.z() << '\n';
         }
         out << "\n# face (num vert N v0idx v1idx ... vNidx)\n";
         for (const auto& f : t.faces)
         {
-            out << "3 " << f.id1 <<  ' ' << f.id2 <<  ' ' << f.id3 <<  '\n';
+            out << "3 " << f.id1 << ' ' << f.id2 << ' ' << f.id3 << '\n';
         }
 
         return true;
     }
 
-    void VisualizationNode::scale(const Eigen::Vector3f& scaleFactor)
+    void
+    VisualizationNode::scale(const Eigen::Vector3f& scaleFactor)
     {
         if (triMeshModel)
         {
             triMeshModel->scale(scaleFactor);
         }
     }
-    void VisualizationNode::scale(float scaleFactor)
+
+    void
+    VisualizationNode::scale(float scaleFactor)
     {
         if (triMeshModel)
         {
@@ -338,7 +367,8 @@ namespace VirtualRobot
         }
     }
 
-    void VisualizationNode::shrinkFatten(float offset)
+    void
+    VisualizationNode::shrinkFatten(float offset)
     {
         if (offset != 0.0f && triMeshModel)
         {
@@ -346,7 +376,8 @@ namespace VirtualRobot
         }
     }
 
-    void VisualizationNode::createTriMeshModel()
+    void
+    VisualizationNode::createTriMeshModel()
     {
     }
 

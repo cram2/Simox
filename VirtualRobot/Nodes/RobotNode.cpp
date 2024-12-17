@@ -7,6 +7,7 @@
 #include <Eigen/Core>
 
 #include <VirtualRobot/CollisionDetection/CollisionModel.h>
+#include <VirtualRobot/Nodes/Sensor.h>
 #include <VirtualRobot/Robot.h>
 #include <VirtualRobot/RobotNodeSet.h>
 #include <VirtualRobot/VirtualRobotException.h>
@@ -16,7 +17,6 @@
 #include <VirtualRobot/Visualization/VisualizationNode.h>
 #include <VirtualRobot/XML/BaseIO.h>
 #include <VirtualRobot/math/Helpers.h>
-#include <VirtualRobot/Nodes/Sensor.h>
 
 namespace VirtualRobot
 {

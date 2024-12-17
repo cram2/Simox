@@ -1,12 +1,14 @@
 
 #include "VirtualRobot.h"
+
 #include "Visualization/VisualizationFactory.h"
 
 namespace VirtualRobot
 {
     std::string globalAppName;
 
-    void init(const std::string &appName)
+    void
+    init(const std::string& appName)
     {
         // cnstruct some standard values
 
@@ -18,7 +20,8 @@ namespace VirtualRobot
         init(argc, argv, appName);
     }
 
-    void init(int &argc, char* argv[], const std::string &appName)
+    void
+    init(int& argc, char* argv[], const std::string& appName)
     {
         globalAppName = appName;
 
@@ -29,4 +32,4 @@ namespace VirtualRobot
         }
     }
 
-}
+} // namespace VirtualRobot

@@ -27,7 +27,7 @@ AbstractFunctionR1Ori::AbstractFunctionR1Ori()
 {
 }
 
-
-Eigen::Quaternionf math::AbstractFunctionR1Ori::Get(float t)
+Eigen::Quaternionf
+math::AbstractFunctionR1Ori::Get(float t)
 {
 }

@@ -22,9 +22,9 @@
 */
 #pragma once
 
-#include "../VirtualRobot.h"
-
 #include <Eigen/Core>
+
+#include "../VirtualRobot.h"
 
 namespace VirtualRobot
 {
@@ -89,4 +89,4 @@ namespace VirtualRobot
         bool verbose;
     };
 
-}
+} // namespace VirtualRobot

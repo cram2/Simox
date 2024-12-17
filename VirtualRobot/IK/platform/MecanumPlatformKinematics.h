@@ -81,7 +81,7 @@ namespace VirtualRobot
 
         using WheelVelocities = Eigen::Vector4f;
 
-        //! \f$ [\dot{x}, \dot{y}, \dot{yaw}] \f$ 
+        //! \f$ [\dot{x}, \dot{y}, \dot{yaw}] \f$
         using CartesianVelocity = Eigen::Vector3f;
 
         MecanumPlatformKinematics(const Params& params);

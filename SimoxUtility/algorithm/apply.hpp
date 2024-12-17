@@ -6,7 +6,6 @@
 #include <type_traits>
 #include <vector>
 
-
 namespace simox::alg
 {
 
@@ -34,7 +33,6 @@ namespace simox::alg
         return result;
     }
 
-
     template <typename Key, typename ValueIn, typename UnaryOp>
     std::map<Key, std::invoke_result_t<UnaryOp, ValueIn>>
     apply(const std::map<Key, ValueIn>& map, const UnaryOp& op)
@@ -49,4 +47,4 @@ namespace simox::alg
     }
 
 
-}
+} // namespace simox::alg

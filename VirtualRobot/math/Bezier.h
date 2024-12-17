@@ -22,40 +22,58 @@
 #pragma once
 
 #include "../VirtualRobot.h"
-#include "MathForwardDefinitions.h"
 #include "AbstractFunctionR1R3.h"
+#include "MathForwardDefinitions.h"
 
 namespace math
 {
 
-    class VIRTUAL_ROBOT_IMPORT_EXPORT Bezier :
-        public AbstractFunctionR1R3
+    class VIRTUAL_ROBOT_IMPORT_EXPORT Bezier : public AbstractFunctionR1R3
     {
     public:
         Bezier(Eigen::Vector3f p0, Eigen::Vector3f p1, Eigen::Vector3f p2, Eigen::Vector3f p3);
 
-        Eigen::Vector3f P0()
+        Eigen::Vector3f
+        P0()
         {
             return p0;
         }
-        Eigen::Vector3f P1()
+
+        Eigen::Vector3f
+        P1()
         {
             return p1;
         }
-        Eigen::Vector3f P2()
+
+        Eigen::Vector3f
+        P2()
         {
             return p2;
         }
-        Eigen::Vector3f P3()
+
+        Eigen::Vector3f
+        P3()
         {
             return p3;
         }
 
         Eigen::Vector3f Get(float t) override;
         Eigen::Vector3f GetDerivative(float t) override;
-        static Eigen::Vector3f CubicBezierPoint(Eigen::Vector3f p0, Eigen::Vector3f p1, Eigen::Vector3f p2, Eigen::Vector3f p3, float t);
-        static std::vector<Eigen::Vector3f> CubicBezier(Eigen::Vector3f p0, Eigen::Vector3f p1, Eigen::Vector3f p2, Eigen::Vector3f p3, int steps);
-        static Eigen::Vector3f CubicBezierDerivative(Eigen::Vector3f p0, Eigen::Vector3f p1, Eigen::Vector3f p2, Eigen::Vector3f p3, float t);
+        static Eigen::Vector3f CubicBezierPoint(Eigen::Vector3f p0,
+                                                Eigen::Vector3f p1,
+                                                Eigen::Vector3f p2,
+                                                Eigen::Vector3f p3,
+                                                float t);
+        static std::vector<Eigen::Vector3f> CubicBezier(Eigen::Vector3f p0,
+                                                        Eigen::Vector3f p1,
+                                                        Eigen::Vector3f p2,
+                                                        Eigen::Vector3f p3,
+                                                        int steps);
+        static Eigen::Vector3f CubicBezierDerivative(Eigen::Vector3f p0,
+                                                     Eigen::Vector3f p1,
+                                                     Eigen::Vector3f p2,
+                                                     Eigen::Vector3f p3,
+                                                     float t);
 
     private:
         Eigen::Vector3f p0;
@@ -66,5 +84,4 @@ namespace math
         static float Pow3(float x);
         static float Pow2(float x);
     };
-}
-
+} // namespace math

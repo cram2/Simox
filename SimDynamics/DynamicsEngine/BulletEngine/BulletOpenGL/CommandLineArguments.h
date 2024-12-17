@@ -24,18 +24,17 @@
 /******************************************************************************
  * Command-line parsing
  ******************************************************************************/
-#include <map>
 #include <algorithm>
-#include <string>
+#include <map>
 #include <sstream>
+#include <string>
+
 class CommandLineArguments
 {
 protected:
-
     std::map<std::string, std::string> pairs;
 
 public:
-
     // Constructor
     CommandLineArguments(int argc, char** argv)
     {
@@ -68,7 +67,8 @@ public:
         }
     }
 
-    bool CheckCmdLineFlag(const char* arg_name)
+    bool
+    CheckCmdLineFlag(const char* arg_name)
     {
         using namespace std;
         map<string, string>::iterator itr;
@@ -84,14 +84,16 @@ public:
     template <typename T>
     void GetCmdLineArgument(const char* arg_name, T& val);
 
-    int ParsedArgc()
+    int
+    ParsedArgc()
     {
         return pairs.size();
     }
 };
 
 template <typename T>
-void CommandLineArguments::GetCmdLineArgument(const char* arg_name, T& val)
+void
+CommandLineArguments::GetCmdLineArgument(const char* arg_name, T& val)
 {
     using namespace std;
     map<string, string>::iterator itr;
@@ -104,7 +106,8 @@ void CommandLineArguments::GetCmdLineArgument(const char* arg_name, T& val)
 }
 
 template <>
-void CommandLineArguments::GetCmdLineArgument<char*>(const char* arg_name, char*& val)
+void
+CommandLineArguments::GetCmdLineArgument<char*>(const char* arg_name, char*& val)
 {
     using namespace std;
     map<string, string>::iterator itr;
@@ -113,13 +116,11 @@ void CommandLineArguments::GetCmdLineArgument<char*>(const char* arg_name, char*
     {
 
         string s = itr->second;
-        val = (char*) malloc(sizeof(char) * (s.length() + 1));
+        val = (char*)malloc(sizeof(char) * (s.length() + 1));
         strcpy(val, s.c_str());
-
     }
     else
     {
         val = NULL;
     }
 }
-

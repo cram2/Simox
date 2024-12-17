@@ -3,12 +3,12 @@
 
 #include "GlutDemoApplication.h"
 
-#include "GlutStuff.h"
-
 #include "BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h"
 #include "BulletDynamics/Dynamics/btRigidBody.h"
+#include "GlutStuff.h"
 
-void    GlutDemoApplication::updateModifierKeys()
+void
+GlutDemoApplication::updateModifierKeys()
 {
     m_modifierKeys = 0;
 
@@ -28,7 +28,8 @@ void    GlutDemoApplication::updateModifierKeys()
     }
 }
 
-void GlutDemoApplication::specialKeyboard(int key, int x, int y)
+void
+GlutDemoApplication::specialKeyboard(int key, int x, int y)
 {
     (void)x;
     (void)y;
@@ -65,38 +66,36 @@ void GlutDemoApplication::specialKeyboard(int key, int x, int y)
                 }
 
                 delete obj;
-
-
             }
 
             break;
         }
 
-        case GLUT_KEY_LEFT :
+        case GLUT_KEY_LEFT:
             stepLeft();
             break;
 
-        case GLUT_KEY_RIGHT :
+        case GLUT_KEY_RIGHT:
             stepRight();
             break;
 
-        case GLUT_KEY_UP :
+        case GLUT_KEY_UP:
             stepFront();
             break;
 
-        case GLUT_KEY_DOWN :
+        case GLUT_KEY_DOWN:
             stepBack();
             break;
 
-        case GLUT_KEY_PAGE_UP :
+        case GLUT_KEY_PAGE_UP:
             zoomIn();
             break;
 
-        case GLUT_KEY_PAGE_DOWN :
+        case GLUT_KEY_PAGE_DOWN:
             zoomOut();
             break;
 
-        case GLUT_KEY_HOME :
+        case GLUT_KEY_HOME:
             toggleIdle();
             break;
 
@@ -106,15 +105,12 @@ void GlutDemoApplication::specialKeyboard(int key, int x, int y)
     }
 
     glutPostRedisplay();
-
 }
 
-void GlutDemoApplication::swapBuffers()
+void
+GlutDemoApplication::swapBuffers()
 {
     glutSwapBuffers();
-
 }
 
 #endif //_WINDOWS
-
-

@@ -5,24 +5,32 @@
 */
 
 #include "EndEffector.h"
-#include "../VirtualRobotException.h"
-#include "../Robot.h"
-#include "../Obstacle.h"
-#include "EndEffectorActor.h"
-#include "../SceneObjectSet.h"
-#include "../SceneObject.h"
-#include "../RobotConfig.h"
+
 #include "../CollisionDetection/CollisionChecker.h"
+#include "../Obstacle.h"
+#include "../Robot.h"
+#include "../RobotConfig.h"
+#include "../SceneObject.h"
+#include "../SceneObjectSet.h"
+#include "../VirtualRobotException.h"
+#include "EndEffectorActor.h"
 #include "Nodes/RobotNode.h"
 #include "VirtualRobot/CollisionDetection/CollisionModel.h"
-
 
 namespace VirtualRobot
 {
     using std::cout;
     using std::endl;
 
-    EndEffector::EndEffector(const std::string& nameString, const std::vector<EndEffectorActorPtr>& actorsVector, const std::vector<RobotNodePtr>& staticPartVector, RobotNodePtr baseNodePtr, RobotNodePtr tcpNodePtr, RobotNodePtr gcpNodePtr, std::vector< RobotConfigPtr > preshapes, const std::optional<ManipulationCapabilities>& manipulationCapabilities) :
+    EndEffector::EndEffector(
+        const std::string& nameString,
+        const std::vector<EndEffectorActorPtr>& actorsVector,
+        const std::vector<RobotNodePtr>& staticPartVector,
+        RobotNodePtr baseNodePtr,
+        RobotNodePtr tcpNodePtr,
+        RobotNodePtr gcpNodePtr,
+        std::vector<RobotConfigPtr> preshapes,
+        const std::optional<ManipulationCapabilities>& manipulationCapabilities) :
         name(nameString),
         actors(actorsVector),
         statics(staticPartVector),
@@ -50,7 +58,8 @@ namespace VirtualRobot
 
     EndEffector::~EndEffector() = default;
 
-    EndEffectorPtr EndEffector::clone(RobotPtr newRobot)
+    EndEffectorPtr
+    EndEffector::clone(RobotPtr newRobot)
     {
         if (!newRobot)
         {
@@ -61,9 +70,12 @@ namespace VirtualRobot
         RobotNodePtr newBase = newRobot->getRobotNode(baseNode->getName());
         RobotNodePtr newTCP = newRobot->getRobotNode(tcpNode->getName());
         RobotNodePtr newGCP = newRobot->getRobotNode(gcpNode->getName());
-        THROW_VR_EXCEPTION_IF(!newBase, " New robot does not own a base node with name " << baseNode->getName());
-        THROW_VR_EXCEPTION_IF(!newTCP, " New robot does not own a tcp node with name " << tcpNode->getName());
-        THROW_VR_EXCEPTION_IF(!newGCP, " New robot does not own a gcp node with name " << gcpNode->getName());
+        THROW_VR_EXCEPTION_IF(
+            !newBase, " New robot does not own a base node with name " << baseNode->getName());
+        THROW_VR_EXCEPTION_IF(
+            !newTCP, " New robot does not own a tcp node with name " << tcpNode->getName());
+        THROW_VR_EXCEPTION_IF(
+            !newGCP, " New robot does not own a gcp node with name " << gcpNode->getName());
         std::vector<RobotNodePtr> newStatics(statics.size());
         std::vector<EndEffectorActorPtr> newActors(actors.size());
         std::vector<RobotConfigPtr> newPreshapes;
@@ -78,7 +90,7 @@ namespace VirtualRobot
             newActors[i] = actors[i]->clone(newRobot);
         }
 
-        std::map< std::string, RobotConfigPtr >::iterator prI = preshapes.begin();
+        std::map<std::string, RobotConfigPtr>::iterator prI = preshapes.begin();
 
         while (prI != preshapes.end())
         {
@@ -87,8 +99,14 @@ namespace VirtualRobot
         }
 
 
-
-        EndEffectorPtr eef(new EndEffector(name, newActors, newStatics, newBase, newTCP, newGCP, newPreshapes, manipulationCapabilities));
+        EndEffectorPtr eef(new EndEffector(name,
+                                           newActors,
+                                           newStatics,
+                                           newBase,
+                                           newTCP,
+                                           newGCP,
+                                           newPreshapes,
+                                           manipulationCapabilities));
         newRobot->registerEndEffector(eef);
 
         // set current config to new eef
@@ -99,33 +117,41 @@ namespace VirtualRobot
         return eef;
     }
 
-
-    std::string EndEffector::getName()
+    std::string
+    EndEffector::getName()
     {
         return name;
     }
 
-    void EndEffector::getActors(std::vector<EndEffectorActorPtr>& actors)
+    void
+    EndEffector::getActors(std::vector<EndEffectorActorPtr>& actors)
     {
         actors = this->actors;
     }
 
-
-    const std::vector<EndEffectorActorPtr>& EndEffector::getActors()
+    const std::vector<EndEffectorActorPtr>&
+    EndEffector::getActors()
     {
         return actors;
     }
 
-    void EndEffector::getStatics(std::vector<RobotNodePtr>& statics)
+    void
+    EndEffector::getStatics(std::vector<RobotNodePtr>& statics)
     {
         statics = this->statics;
     }
-    const std::vector<RobotNodePtr>& EndEffector::getStatics()
+
+    const std::vector<RobotNodePtr>&
+    EndEffector::getStatics()
     {
         return statics;
     }
 
-    EndEffector::ContactInfoVector EndEffector::closeActors(SceneObjectSetPtr obstacles, float stepSize, float stepSizeSpeedFactor, std::uint64_t steps)
+    EndEffector::ContactInfoVector
+    EndEffector::closeActors(SceneObjectSetPtr obstacles,
+                             float stepSize,
+                             float stepSizeSpeedFactor,
+                             std::uint64_t steps)
     {
         const bool hasStepLimit = steps;
         std::vector<char> actorFastMode(actors.size(), stepSizeSpeedFactor > 1);
@@ -155,17 +181,20 @@ namespace VirtualRobot
                     if (fastMode)
                     {
                         const auto fastStepSize = stepSize * stepSizeSpeedFactor;
-                        fastMode = !actors[i]->moveActorCheckCollision(shared_this, fastModeContacts, obstacles, fastStepSize);
+                        fastMode = !actors[i]->moveActorCheckCollision(
+                            shared_this, fastModeContacts, obstacles, fastStepSize);
                         if (!fastMode)
                         {
                             //now in collision if fast mode is used
                             actors[i]->moveActor(-fastStepSize);
-                            actorCollisionStatus[i] = actors[i]->moveActorCheckCollision(shared_this, result, obstacles, stepSize);
+                            actorCollisionStatus[i] = actors[i]->moveActorCheckCollision(
+                                shared_this, result, obstacles, stepSize);
                         }
                     }
                     else
                     {
-                        actorCollisionStatus[i] = actors[i]->moveActorCheckCollision(shared_this, result, obstacles, stepSize);
+                        actorCollisionStatus[i] = actors[i]->moveActorCheckCollision(
+                            shared_this, result, obstacles, stepSize);
                     }
                 }
             }
@@ -195,7 +224,11 @@ namespace VirtualRobot
         return result;
     }
 
-    EndEffector::ContactInfoVector EndEffector::closeActors(SceneObjectPtr obstacle, float stepSize /*= 0.02*/, float stepSizeSpeedFactor, uint64_t steps)
+    EndEffector::ContactInfoVector
+    EndEffector::closeActors(SceneObjectPtr obstacle,
+                             float stepSize /*= 0.02*/,
+                             float stepSizeSpeedFactor,
+                             uint64_t steps)
     {
         if (!obstacle)
         {
@@ -207,17 +240,23 @@ namespace VirtualRobot
         return closeActors(colModels, stepSize, stepSizeSpeedFactor, steps);
     }
 
-    EndEffector::ContactInfoVector EndEffector::closeActors(std::nullptr_t, float stepSize, float stepSizeSpeedFactor, std::uint64_t steps)
+    EndEffector::ContactInfoVector
+    EndEffector::closeActors(std::nullptr_t,
+                             float stepSize,
+                             float stepSizeSpeedFactor,
+                             std::uint64_t steps)
     {
         return closeActors(SceneObjectSetPtr(), stepSize, stepSizeSpeedFactor, steps);
     }
 
-    EndEffector::ContactInfoVector EndEffector::closeActors(float stepSize, float stepSizeSpeedFactor, std::uint64_t steps)
+    EndEffector::ContactInfoVector
+    EndEffector::closeActors(float stepSize, float stepSizeSpeedFactor, std::uint64_t steps)
     {
         return closeActors(SceneObjectSetPtr(), stepSize, stepSizeSpeedFactor, steps);
     }
 
-    bool EndEffector::allActorsClosed() const
+    bool
+    EndEffector::allActorsClosed() const
     {
         for (const auto& actor : actors)
         {
@@ -229,7 +268,8 @@ namespace VirtualRobot
         return true;
     }
 
-    bool EndEffector::allActorsOpen() const
+    bool
+    EndEffector::allActorsOpen() const
     {
         for (const auto& actor : actors)
         {
@@ -241,12 +281,14 @@ namespace VirtualRobot
         return true;
     }
 
-    void EndEffector::openActors(SceneObjectSetPtr obstacles, float stepSize, float stepSizeSpeedFactor)
+    void
+    EndEffector::openActors(SceneObjectSetPtr obstacles, float stepSize, float stepSizeSpeedFactor)
     {
         closeActors(obstacles, -stepSize, stepSizeSpeedFactor);
     }
 
-    VirtualRobot::SceneObjectSetPtr EndEffector::createSceneObjectSet(CollisionCheckerPtr colChecker)
+    VirtualRobot::SceneObjectSetPtr
+    EndEffector::createSceneObjectSet(CollisionCheckerPtr colChecker)
     {
         SceneObjectSetPtr cms(new SceneObjectSet(name, colChecker));
         cms->addSceneObjects(statics);
@@ -257,22 +299,22 @@ namespace VirtualRobot
         }
 
         return cms;
-
     }
 
-
-    std::string EndEffector::getBaseNodeName()
+    std::string
+    EndEffector::getBaseNodeName()
     {
         return baseNode->getName();
     }
 
-
-    std::string EndEffector::getTcpName()
+    std::string
+    EndEffector::getTcpName()
     {
         return tcpNode->getName();
     }
 
-    VirtualRobot::RobotPtr EndEffector::getRobot()
+    VirtualRobot::RobotPtr
+    EndEffector::getRobot()
     {
         if (!baseNode)
         {
@@ -282,7 +324,8 @@ namespace VirtualRobot
         return baseNode->getRobot();
     }
 
-    std::string EndEffector::getRobotType()
+    std::string
+    EndEffector::getRobotType()
     {
         RobotPtr r = getRobot();
 
@@ -294,7 +337,10 @@ namespace VirtualRobot
         return r->getType();
     }
 
-    VirtualRobot::RobotPtr EndEffector::createEefRobot(const std::string& newRobotType, const std::string& newRobotName, CollisionCheckerPtr /*collisionChecker=CollisionCheckerPtr()*/)
+    VirtualRobot::RobotPtr
+    EndEffector::createEefRobot(const std::string& newRobotType,
+                                const std::string& newRobotName,
+                                CollisionCheckerPtr /*collisionChecker=CollisionCheckerPtr()*/)
     {
         RobotPtr r = getRobot();
         THROW_VR_EXCEPTION_IF(!r, "No robot defined in EEF");
@@ -313,7 +359,8 @@ namespace VirtualRobot
         return robo;
     }
 
-    void EndEffector::print()
+    void
+    EndEffector::print()
     {
         std::cout << " **** EndEffector ****" << std::endl;
 
@@ -346,22 +393,26 @@ namespace VirtualRobot
         std::cout << std::endl;
     }
 
-    VirtualRobot::RobotNodePtr EndEffector::getTcp()
+    VirtualRobot::RobotNodePtr
+    EndEffector::getTcp()
     {
         return tcpNode;
     }
 
-    VirtualRobot::RobotNodePtr EndEffector::getGCP()
+    VirtualRobot::RobotNodePtr
+    EndEffector::getGCP()
     {
         return gcpNode;
     }
 
-    VirtualRobot::RobotNodePtr EndEffector::getBase()
+    VirtualRobot::RobotNodePtr
+    EndEffector::getBase()
     {
         return baseNode;
     }
 
-    VirtualRobot::CollisionCheckerPtr EndEffector::getCollisionChecker()
+    VirtualRobot::CollisionCheckerPtr
+    EndEffector::getCollisionChecker()
     {
         if (!baseNode)
         {
@@ -371,10 +422,11 @@ namespace VirtualRobot
         return baseNode->getCollisionChecker();
     }
 
-    void EndEffector::registerPreshape(RobotConfigPtr preshape)
+    void
+    EndEffector::registerPreshape(RobotConfigPtr preshape)
     {
         THROW_VR_EXCEPTION_IF(!preshape, "NULL data...");
-        std::vector< RobotNodePtr > nodes = preshape->getNodes();
+        std::vector<RobotNodePtr> nodes = preshape->getNodes();
         // don't be too strict!
         /*for (size_t i=0;i<nodes.size();i++)
         {
@@ -383,7 +435,8 @@ namespace VirtualRobot
         preshapes[preshape->getName()] = preshape;
     }
 
-    VirtualRobot::RobotConfigPtr EndEffector::getPreshape(const std::string& name)
+    VirtualRobot::RobotConfigPtr
+    EndEffector::getPreshape(const std::string& name)
     {
         if (!hasPreshape(name))
         {
@@ -393,12 +446,14 @@ namespace VirtualRobot
         return (preshapes.find(name))->second;
     }
 
-    bool EndEffector::hasPreshape(const std::string& name)
+    bool
+    EndEffector::hasPreshape(const std::string& name)
     {
         return (preshapes.find(name) != preshapes.end());
     }
 
-    bool EndEffector::setPreshape(const std::string& name)
+    bool
+    EndEffector::setPreshape(const std::string& name)
     {
         if (!hasPreshape(name))
         {
@@ -418,7 +473,8 @@ namespace VirtualRobot
         return false;
     }
 
-    bool EndEffector::hasNode(RobotNodePtr node)
+    bool
+    EndEffector::hasNode(RobotNodePtr node)
     {
         if (node == baseNode || node == tcpNode || node == gcpNode)
         {
@@ -452,10 +508,11 @@ namespace VirtualRobot
         return false;
     }
 
-    VirtualRobot::RobotConfigPtr EndEffector::getConfiguration()
+    VirtualRobot::RobotConfigPtr
+    EndEffector::getConfiguration()
     {
         VirtualRobot::RobotConfigPtr result(new VirtualRobot::RobotConfig(getRobot(), getName()));
-        std::vector< RobotNodePtr > rn = getAllNodes();
+        std::vector<RobotNodePtr> rn = getAllNodes();
 
         for (auto& i : rn)
         {
@@ -468,10 +525,11 @@ namespace VirtualRobot
         return result;
     }
 
-    std::vector< RobotNodePtr > EndEffector::getAllNodes()
+    std::vector<RobotNodePtr>
+    EndEffector::getAllNodes()
     {
         // avoid double entries
-        std::map< RobotNodePtr, RobotNodePtr > mapR;
+        std::map<RobotNodePtr, RobotNodePtr> mapR;
 
         if (baseNode)
         {
@@ -484,7 +542,7 @@ namespace VirtualRobot
 
         while (iA != actors.end())
         {
-            std::vector< RobotNodePtr > rn = (*iA)->getRobotNodes();
+            std::vector<RobotNodePtr> rn = (*iA)->getRobotNodes();
 
             for (const auto& i : rn)
             {
@@ -502,8 +560,8 @@ namespace VirtualRobot
             iS++;
         }
 
-        std::map< RobotNodePtr, RobotNodePtr >::iterator m = mapR.begin();
-        std::vector< RobotNodePtr > result;
+        std::map<RobotNodePtr, RobotNodePtr>::iterator m = mapR.begin();
+        std::vector<RobotNodePtr> result;
 
         while (m != mapR.end())
         {
@@ -514,7 +572,8 @@ namespace VirtualRobot
         return result;
     }
 
-    bool EndEffector::nodesSufficient(std::vector<RobotNodePtr> nodes) const
+    bool
+    EndEffector::nodesSufficient(std::vector<RobotNodePtr> nodes) const
     {
         bool base = false;
         bool tcp = false;
@@ -573,7 +632,8 @@ namespace VirtualRobot
         return true;
     }
 
-    float EndEffector::getApproximatedLength()
+    float
+    EndEffector::getApproximatedLength()
     {
         float maxActor = 0;
 
@@ -606,12 +666,11 @@ namespace VirtualRobot
         return maxStatic + maxActor;
     }
 
-
-
-    std::vector<std::string> EndEffector::getPreshapes()
+    std::vector<std::string>
+    EndEffector::getPreshapes()
     {
         std::vector<std::string> res;
-        std::map< std::string, RobotConfigPtr >::iterator it = preshapes.begin();
+        std::map<std::string, RobotConfigPtr>::iterator it = preshapes.begin();
 
         while (it != preshapes.end())
         {
@@ -622,7 +681,8 @@ namespace VirtualRobot
         return res;
     }
 
-    std::string EndEffector::toXML(int ident /*= 1*/)
+    std::string
+    EndEffector::toXML(int ident /*= 1*/)
     {
         std::stringstream ss;
         std::string t = "\t";
@@ -655,18 +715,19 @@ namespace VirtualRobot
         ss << ">" << std::endl;
 
         // Preshapes
-        std::map< std::string, RobotConfigPtr >::iterator itPre = preshapes.begin();
+        std::map<std::string, RobotConfigPtr>::iterator itPre = preshapes.begin();
 
         while (itPre != preshapes.end())
         {
             ss << tt << "<Preshape name='" << itPre->first << "'>" << std::endl;
-            std::map < std::string, float > jv = itPre->second->getRobotNodeJointValueMap();
+            std::map<std::string, float> jv = itPre->second->getRobotNodeJointValueMap();
 
-            std::map< std::string, float >::const_iterator i = jv.begin();
+            std::map<std::string, float>::const_iterator i = jv.begin();
 
             while (i != jv.end())
             {
-                ss << ttt << "<Node name='" << i->first << "' unit='radian' value='" << i->second << "'/>\n";
+                ss << ttt << "<Node name='" << i->first << "' unit='radian' value='" << i->second
+                   << "'/>\n";
                 i++;
             }
 
@@ -698,7 +759,11 @@ namespace VirtualRobot
         return ss.str();
     }
 
-    int EndEffector::addStaticPartContacts(SceneObjectPtr obstacle, EndEffector::ContactInfoVector& contacts, const Eigen::Vector3f& approachDirGlobal, float maxDistance)
+    int
+    EndEffector::addStaticPartContacts(SceneObjectPtr obstacle,
+                                       EndEffector::ContactInfoVector& contacts,
+                                       const Eigen::Vector3f& approachDirGlobal,
+                                       float maxDistance)
     {
         if (!obstacle)
         {
@@ -715,7 +780,8 @@ namespace VirtualRobot
             }
             int id1, id2;
             Eigen::Vector3f p1, p2;
-            float dist = this->getCollisionChecker()->calculateDistance(n->getCollisionModel(), obstacle->getCollisionModel(), p1, p2, &id1, &id2);
+            float dist = this->getCollisionChecker()->calculateDistance(
+                n->getCollisionModel(), obstacle->getCollisionModel(), p1, p2, &id1, &id2);
             //VR_INFO << n->getName() << " - DIST: " << dist << std::endl;
             if (dist <= maxDistance)
             {
@@ -736,7 +802,6 @@ namespace VirtualRobot
                 contacts.push_back(ci);
                 contactCount++;
             }
-
         }
 
         return contactCount;

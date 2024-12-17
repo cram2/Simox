@@ -22,10 +22,10 @@
 */
 #pragma once
 
+#include "../ManipulationObject.h"
 #include "../VirtualRobot.h"
 #include "AdvancedIKSolver.h"
 #include "DifferentialIK.h"
-#include "../ManipulationObject.h"
 
 namespace VirtualRobot
 {
@@ -34,13 +34,13 @@ namespace VirtualRobot
     class VIRTUAL_ROBOT_IMPORT_EXPORT GenericIKSolver : public AdvancedIKSolver
     {
     public:
-
         /*!
             @brief Initialize an IK solver without collision detection.
             \param rns The robotNodes (i.e., joints) for which the Jacobians should be calculated.
             \param invJacMethod The method that should be used to compute the inverse of the Jacobian.
         */
-        GenericIKSolver(RobotNodeSetPtr rns, JacobiProvider::InverseJacobiMethod invJacMethod = JacobiProvider::eSVD);
+        GenericIKSolver(RobotNodeSetPtr rns,
+                        JacobiProvider::InverseJacobiMethod invJacMethod = JacobiProvider::eSVD);
 
         /*!
             This method solves the IK up to the specified max error. On success, the joints of the the corresponding RobotNodeSet are set to the IK solution.
@@ -49,7 +49,9 @@ namespace VirtualRobot
             \param maxLoops How often should we try.
             \return true on success
         */
-        bool solve(const Eigen::Matrix4f& globalPose, CartesianSelection selection = All, int maxLoops = 1) override;
+        bool solve(const Eigen::Matrix4f& globalPose,
+                   CartesianSelection selection = All,
+                   int maxLoops = 1) override;
 
         /*!
             This method solves the IK up to the specified max error. On success, the joints of the the corresponding RobotNodeSet are set to the IK solution.
@@ -58,8 +60,13 @@ namespace VirtualRobot
             \param maxLoops How often should we try.
             \return On success: The grasp for which an IK-solution was found, otherwise an empty GraspPtr
         */
-        GraspPtr solve(ManipulationObjectPtr object, CartesianSelection selection = All, int maxLoops = 1) override;
-        bool solve(ManipulationObjectPtr object, GraspPtr grasp, CartesianSelection selection = All, int maxLoops = 1) override;
+        GraspPtr solve(ManipulationObjectPtr object,
+                       CartesianSelection selection = All,
+                       int maxLoops = 1) override;
+        bool solve(ManipulationObjectPtr object,
+                   GraspPtr grasp,
+                   CartesianSelection selection = All,
+                   int maxLoops = 1) override;
 
         void setupJacobian(float stepSize, int maxLoops);
 
@@ -71,11 +78,12 @@ namespace VirtualRobot
 
 
     protected:
-
         //! This method is called by the constructor and can be used in derived classes for initialization.
         virtual void _init();
 
-        bool _sampleSolution(const Eigen::Matrix4f& globalPose, CartesianSelection selection, int maxLoops = 1) override;
+        bool _sampleSolution(const Eigen::Matrix4f& globalPose,
+                             CartesianSelection selection,
+                             int maxLoops = 1) override;
 
         RobotNodePtr coordSystem;
         JacobiProvider::InverseJacobiMethod invJacMethod;
@@ -92,4 +100,3 @@ namespace VirtualRobot
 
     typedef std::shared_ptr<GenericIKSolver> GenericIKSolverPtr;
 } // namespace VirtualRobot
-

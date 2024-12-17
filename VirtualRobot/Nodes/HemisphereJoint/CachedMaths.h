@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Maths.h"
-
-#include <Eigen/Core>
 #include <limits>
 
+#include <Eigen/Core>
+
+#include "Maths.h"
 
 namespace VirtualRobot::hemisphere
 {
@@ -15,12 +15,12 @@ namespace VirtualRobot::hemisphere
     class CachedMaths
     {
     public:
-
         /**
          * @brief Recompute the maths if the given `actuatorsAngle` differ from
          * the stored `_actuators`.
          */
-        inline void update(const Eigen::Vector2f& actuatorsAngle)
+        inline void
+        update(const Eigen::Vector2f& actuatorsAngle)
         {
             update(actuatorsAngle.cast<double>().eval());
         }
@@ -39,8 +39,8 @@ namespace VirtualRobot::hemisphere
         static constexpr double EQUALITY_PRECISION = 1e-6;
 
         /// The actuator values that were used to compute the joint math.
-        Eigen::Vector2d _actuators = Eigen::Vector2d::Constant(std::numeric_limits<double>::infinity());
-
+        Eigen::Vector2d _actuators =
+            Eigen::Vector2d::Constant(std::numeric_limits<double>::infinity());
     };
 
-}
+} // namespace VirtualRobot::hemisphere

@@ -1,4 +1,5 @@
 #include "ConfigurationConstraint.h"
+
 #include "CSpace.h"
 
 namespace Saba
@@ -9,7 +10,6 @@ namespace Saba
         this->dimension = dimension;
     }
 
-    ConfigurationConstraint::~ConfigurationConstraint()
-    = default;
+    ConfigurationConstraint::~ConfigurationConstraint() = default;
 
-}
+} // namespace Saba

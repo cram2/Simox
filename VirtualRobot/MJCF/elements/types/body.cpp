@@ -6,18 +6,18 @@
 using namespace mjcf;
 
 
-const std::string Inertial::tag     = "inertial";
-const std::string Joint::tag        = "joint";
-const std::string FreeJoint::tag    = "freejoint";
-const std::string Geom::tag         = "geom";
-const std::string Site::tag         = "site";
-const std::string Camera::tag       = "camera";
-const std::string Light::tag        = "light";
-const std::string Body::tag         = "body";
-const std::string Worldbody::tag    = "worldbody";
+const std::string Inertial::tag = "inertial";
+const std::string Joint::tag = "joint";
+const std::string FreeJoint::tag = "freejoint";
+const std::string Geom::tag = "geom";
+const std::string Site::tag = "site";
+const std::string Camera::tag = "camera";
+const std::string Light::tag = "light";
+const std::string Body::tag = "body";
+const std::string Worldbody::tag = "worldbody";
 
-
-void Inertial::inertiaFromMatrix(const Eigen::Matrix3f& matrix)
+void
+Inertial::inertiaFromMatrix(const Eigen::Matrix3f& matrix)
 {
     if (matrix.isDiagonal(1e-9f))
     {
@@ -32,18 +32,20 @@ void Inertial::inertiaFromMatrix(const Eigen::Matrix3f& matrix)
          */
 
         Eigen::Vector6f inertia;
-        inertia << matrix(0, 0), matrix(1, 1), matrix(2, 2),
-                matrix(0, 1), matrix(0, 2), matrix(1, 2);
+        inertia << matrix(0, 0), matrix(1, 1), matrix(2, 2), matrix(0, 1), matrix(0, 2),
+            matrix(1, 2);
         this->fullinertia = inertia;
     }
 }
 
-bool Body::hasMass() const
+bool
+Body::hasMass() const
 {
     return hasChild<Geom>() || hasChild<Inertial>();
 }
 
-Body Body::addBody(const std::string& name)
+Body
+Body::addBody(const std::string& name)
 {
     Body body = addChild<Body>();
 
@@ -55,13 +57,14 @@ Body Body::addBody(const std::string& name)
     return body;
 }
 
-Inertial Body::addInertial(bool front)
+Inertial
+Body::addInertial(bool front)
 {
     return addChild<Inertial>("", front);
 }
 
-Inertial Body::addInertial(const Eigen::Vector3f& pos, float mass, const Eigen::Matrix3f& matrix,
-                           bool front)
+Inertial
+Body::addInertial(const Eigen::Vector3f& pos, float mass, const Eigen::Matrix3f& matrix, bool front)
 {
     Inertial inertial = addInertial(front);
 
@@ -79,15 +82,16 @@ Inertial Body::addInertial(const Eigen::Vector3f& pos, float mass, const Eigen::
          * specified using only 6 numbers in the following order:
          * M(1,1), M(2,2), M(3,3), M(1,2), M(1,3), M(2,3)." */
         Eigen::Vector6f inertia;
-        inertia << matrix(0, 0), matrix(1, 1), matrix(2, 2),
-                matrix(0, 1), matrix(0, 2), matrix(1, 2);
+        inertia << matrix(0, 0), matrix(1, 1), matrix(2, 2), matrix(0, 1), matrix(0, 2),
+            matrix(1, 2);
         inertial.fullinertia = inertia;
     }
 
     return inertial;
 }
 
-Inertial Body::addDummyInertial(bool front)
+Inertial
+Body::addDummyInertial(bool front)
 {
     Inertial inertial = addInertial(front);
 
@@ -98,28 +102,32 @@ Inertial Body::addDummyInertial(bool front)
     return inertial;
 }
 
-Joint Body::addJoint()
+Joint
+Body::addJoint()
 {
     return addChild<Joint>();
 }
 
-FreeJoint Body::addFreeJoint()
+FreeJoint
+Body::addFreeJoint()
 {
     return addChild<FreeJoint>();
-
 }
 
-bool Body::hasJoint() const
+bool
+Body::hasJoint() const
 {
     return hasChild<FreeJoint>() || hasChild<Joint>();
 }
 
-bool Body::hasFreeJoint() const
+bool
+Body::hasFreeJoint() const
 {
     return hasChild<FreeJoint>() || hasChild<Joint>("type", "free");
 }
 
-Geom Body::addGeom(const std::string& type)
+Geom
+Body::addGeom(const std::string& type)
 {
     Geom geom = addChild<Geom>();
 
@@ -128,14 +136,16 @@ Geom Body::addGeom(const std::string& type)
     return geom;
 }
 
-Geom Body::addGeom(const std::string& type, const Eigen::Vector3f& size)
+Geom
+Body::addGeom(const std::string& type, const Eigen::Vector3f& size)
 {
     Geom geom = addGeom(type);
     geom.size = size;
     return geom;
 }
 
-Geom Body::addGeomMesh(const std::string& meshName, const std::string& materialName)
+Geom
+Body::addGeomMesh(const std::string& meshName, const std::string& materialName)
 {
     Geom geom = addGeom("mesh");
 
@@ -148,15 +158,16 @@ Geom Body::addGeomMesh(const std::string& meshName, const std::string& materialN
     return geom;
 }
 
-Site Body::addSite(const std::string& type)
+Site
+Body::addSite(const std::string& type)
 {
     Site site = addChild<Site>();
     site.type = type;
     return site;
 }
 
-
-Body Worldbody::addMocapBody(const std::string& name, float geomSize)
+Body
+Worldbody::addMocapBody(const std::string& name, float geomSize)
 {
     Body mocap = addBody(name);
     mocap.mocap = true;
@@ -170,7 +181,8 @@ Body Worldbody::addMocapBody(const std::string& name, float geomSize)
     return mocap;
 }
 
-Body Worldbody::addBody(const std::string& name, const std::string& childClass)
+Body
+Worldbody::addBody(const std::string& name, const std::string& childClass)
 {
     Body body = addChild<Body>();
 

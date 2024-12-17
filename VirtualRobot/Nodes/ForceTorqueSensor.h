@@ -24,13 +24,11 @@
 
 #include "Sensor.h"
 
-
 namespace VirtualRobot
 {
 
     class ForceTorqueSensor;
     typedef std::shared_ptr<ForceTorqueSensor> ForceTorqueSensorPtr;
-
 
     /*!
         This is a force torque sensor in a joint
@@ -49,8 +47,7 @@ namespace VirtualRobot
         */
         ForceTorqueSensor(GraspableSensorizedObjectWeakPtr node,
                           const std::string& name,
-                          const Eigen::Matrix4f& rnTrafo = Eigen::Matrix4f::Identity()
-                         );
+                          const Eigen::Matrix4f& rnTrafo = Eigen::Matrix4f::Identity());
 
         /*!
         */
@@ -77,18 +74,19 @@ namespace VirtualRobot
         std::string toXML(const std::string& modelPath, int tabs) override;
 
     protected:
-
-        ForceTorqueSensor() {}
-
+        ForceTorqueSensor()
+        {
+        }
 
         /*!
         Derived classes must implement their clone method here.
         */
-        SensorPtr _clone(const GraspableSensorizedObjectPtr newParentNode, const VisualizationNodePtr visualizationModel, float scaling) override;
+        SensorPtr _clone(const GraspableSensorizedObjectPtr newParentNode,
+                         const VisualizationNodePtr visualizationModel,
+                         float scaling) override;
         Eigen::VectorXf forceTorqueValues;
     };
 
     typedef std::shared_ptr<ForceTorqueSensor> ForceTorqueSensorPtr;
 
 } // namespace VirtualRobot
-

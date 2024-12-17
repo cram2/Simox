@@ -2,9 +2,8 @@
 
 #include <Eigen/Geometry>
 
-#include <VirtualRobot/math/AbstractFunctionR1R6.h>
-
 #include <GeometricPlanning/types.h>
+#include <VirtualRobot/math/AbstractFunctionR1R6.h>
 
 namespace simox::geometric_planning
 {

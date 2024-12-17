@@ -1,23 +1,24 @@
 
-#include <VirtualRobot/Robot.h>
+#include <iostream>
+#include <string>
+
+#include <VirtualRobot/Nodes/RobotNode.h>
 #include <VirtualRobot/Obstacle.h>
+#include <VirtualRobot/Robot.h>
+#include <VirtualRobot/RobotNodeSet.h>
 #include <VirtualRobot/RuntimeEnvironment.h>
 #include <VirtualRobot/SceneObjectSet.h>
-#include <VirtualRobot/Nodes/RobotNode.h>
-#include <VirtualRobot/RobotNodeSet.h>
-#include <VirtualRobot/XML/RobotIO.h>
-#include <VirtualRobot/Visualization/VisualizationFactory.h>
 #include <VirtualRobot/Visualization/CoinVisualization/CoinVisualization.h>
-#include <MotionPlanning/Saba.h>
-#include <MotionPlanning/Planner/Rrt.h>
-#include <MotionPlanning/Planner/BiRrt.h>
-#include <MotionPlanning/Visualization/CoinVisualization/CoinRrtWorkspaceVisualization.h>
+#include <VirtualRobot/Visualization/VisualizationFactory.h>
+#include <VirtualRobot/XML/RobotIO.h>
+
+#include <Inventor/Qt/SoQt.h>
 #include <Inventor/Qt/viewers/SoQtExaminerViewer.h>
 #include <Inventor/nodes/SoSeparator.h>
-#include <Inventor/Qt/SoQt.h>
-
-#include <string>
-#include <iostream>
+#include <MotionPlanning/Planner/BiRrt.h>
+#include <MotionPlanning/Planner/Rrt.h>
+#include <MotionPlanning/Saba.h>
+#include <MotionPlanning/Visualization/CoinVisualization/CoinRrtWorkspaceVisualization.h>
 
 using std::cout;
 using std::endl;
@@ -29,7 +30,8 @@ using namespace Saba;
 bool useColModel = false;
 QWidget* win;
 
-void show(SoNode* n)
+void
+show(SoNode* n)
 {
     if (win == nullptr)
     {
@@ -69,7 +71,8 @@ void show(SoNode* n)
     delete viewer;
 }
 
-void startRRTVisualization()
+void
+startRRTVisualization()
 {
 
     // create robot
@@ -87,7 +90,8 @@ void startRRTVisualization()
     float sampling_extend_stepsize = 0.04f;
 
     // create environment
-    float posX = 0.0f, posY = -400.0f, posZ = 400.0f, sizeX = 100.0f, sizeY = 300.0f, sizeZ = 1000.0f;
+    float posX = 0.0f, posY = -400.0f, posZ = 400.0f, sizeX = 100.0f, sizeY = 300.0f,
+          sizeZ = 1000.0f;
     ObstaclePtr o = Obstacle::createBox(sizeX, sizeY, sizeZ);
 
     Eigen::Affine3f tmpT(Eigen::Translation3f(posX, posY, posZ));
@@ -116,12 +120,12 @@ void startRRTVisualization()
     Eigen::VectorXf start(3);
     start(0) = (float)M_PI / 4.0f;
     start(1) = (float)M_PI / 4.0f * 1.5f;
-    start(2) = (float) - M_PI / 4.0f;
+    start(2) = (float)-M_PI / 4.0f;
 
     Eigen::VectorXf goal(3);
-    goal(0) = (float) - M_PI / 4.0f;
+    goal(0) = (float)-M_PI / 4.0f;
     goal(1) = (float)M_PI / 4.0f * 1.5f;
-    goal(2) = (float) - M_PI / 4.0f;
+    goal(2) = (float)-M_PI / 4.0f;
 
     for (int i = 0; i < loops; i++)
     {
@@ -168,7 +172,6 @@ void startRRTVisualization()
     CSpaceTreePtr tree = rrt->getTree();
 
 
-
     robot->setJointValues(planningNodes, start);
 
     // display robot
@@ -194,7 +197,8 @@ void startRRTVisualization()
     sep->addChild(obstacleSoNode);
 
     // show rrt visu
-    std::shared_ptr<CoinRrtWorkspaceVisualization> w(new CoinRrtWorkspaceVisualization(robot, cspace, "EndPoint"));
+    std::shared_ptr<CoinRrtWorkspaceVisualization> w(
+        new CoinRrtWorkspaceVisualization(robot, cspace, "EndPoint"));
     w->addTree(tree);
 #ifdef USE_BIRRT
     CSpaceTreePtr tree2 = rrt->getTree2();
@@ -209,7 +213,8 @@ void startRRTVisualization()
     show(sep);
 }
 
-int main(int /*argc*/, char** /*argv*/)
+int
+main(int /*argc*/, char** /*argv*/)
 {
     SoDB::init();
     win = SoQt::init("RRT Demo", "RRT Demo");
@@ -219,13 +224,13 @@ int main(int /*argc*/, char** /*argv*/)
     {
         startRRTVisualization();
     }
-    catch(const VirtualRobot::VirtualRobotException &v)
+    catch (const VirtualRobot::VirtualRobotException& v)
     {
-        std::cout << "VirtualRobot Exception: " << v.what() << std::endl ;
+        std::cout << "VirtualRobot Exception: " << v.what() << std::endl;
     }
-    catch(const std::exception &e)
+    catch (const std::exception& e)
     {
-        std::cout << "Exception: " << e.what() << std::endl ;
+        std::cout << "Exception: " << e.what() << std::endl;
     }
     catch (...)
     {

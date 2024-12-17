@@ -1,10 +1,11 @@
 #pragma once
 
 
-#include "pugixml/pugixml.hpp"
 #include <map>
-#include <vector>
 #include <memory>
+#include <vector>
+
+#include "pugixml/pugixml.hpp"
 
 #define COLLADA_IMPORT_USE_SENSORS
 
@@ -19,7 +20,7 @@ namespace Collada
     typedef std::vector<ColladaRobotNodePtr> ColladaRobotNodeSet;
     typedef std::map<pugi::xml_node, ColladaRobotNodePtr> StructureMap;
     typedef std::map<pugi::xml_node, pugi::xml_node> XmlMap;
-    typedef std::map<pugi::xml_node, std::vector<pugi::xml_node> > XmlVectorMap;
+    typedef std::map<pugi::xml_node, std::vector<pugi::xml_node>> XmlVectorMap;
 
     struct ColladaRobotNode
     {
@@ -28,6 +29,7 @@ namespace Collada
             ePRISMATIC,
             eREVOLUTE
         } JointType;
+
         JointType type;
         std::string name;
         float value;
@@ -48,24 +50,28 @@ namespace Collada
     /// Basse class for traversing tree structures in the Collada document (visual and kinematics models)
     struct ColladaWalker : pugi::xml_tree_walker
     {
-        ColladaWalker(StructureMap structureMap, XmlMap physicsMap) : structureMap(structureMap), physicsMap(physicsMap) {}
+        ColladaWalker(StructureMap structureMap, XmlMap physicsMap) :
+            structureMap(structureMap), physicsMap(physicsMap)
+        {
+        }
+
         bool for_each(pugi::xml_node& node) override = 0;
         StructureMap structureMap;
         XmlMap physicsMap;
     };
-    typedef std::shared_ptr<ColladaWalker> ColladaWalkerPtr;
 
+    typedef std::shared_ptr<ColladaWalker> ColladaWalkerPtr;
 
     class ColladaRobot
     {
     public:
-
         void parse(std::string fileName);
         ColladaRobotNodePtr getRoot();
         ColladaRobotNodePtr getNode(std::string name);
         ColladaRobotNodeSet getNodeSet();
         virtual ColladaRobotNodePtr robotNodeFactory() = 0;
-        virtual ColladaWalkerPtr visualSceneWalkerFactory(StructureMap structureMap, XmlMap physicsMap) = 0;
+        virtual ColladaWalkerPtr visualSceneWalkerFactory(StructureMap structureMap,
+                                                          XmlMap physicsMap) = 0;
         /// Reads an <instance_geometry> in <rigid_body><shape>
         virtual void addCollisionModel(ColladaRobotNodePtr robotNode, pugi::xml_node shapeNode) = 0;
 
@@ -73,9 +79,6 @@ namespace Collada
         std::string name;
         ColladaRobotNodeSet robotNodeSet;
     };
-
-
-
 
     // Helper functions to resolve
 
@@ -97,34 +100,39 @@ namespace Collada
      * to be clearly stated in the COLLADA specs), if one of the selected child elements is an instance node (e.g., `<instance_joint>`),
      * the instance is resolved and the search is continued in the referee node.
      */
-    pugi::xml_node resolveSIDREF(pugi::xml_node node, std::string sidref, std::string root = "/*[1]");
+    pugi::xml_node
+    resolveSIDREF(pugi::xml_node node, std::string sidref, std::string root = "/*[1]");
 
     /// Obtains a vector by casting each of the strings values (separated by spaces)
     std::vector<float> getFloatVector(std::string text);
     std::vector<int> getIntVector(std::string text);
 
-    template<typename T>
+    template <typename T>
     struct TraversalStack
     {
-        std::vector<std::pair<unsigned int, T> > stack;
-        inline void push_back(unsigned int depth, T t)
+        std::vector<std::pair<unsigned int, T>> stack;
+
+        inline void
+        push_back(unsigned int depth, T t)
         {
             stack.push_back(std::make_pair(depth, t));
         }
 
-        inline void pop_back(unsigned int depth)
+        inline void
+        pop_back(unsigned int depth)
         {
             while (depth > stack.back().first)
             {
                 stack.pop_back();
             }
         }
+
         /// Make sure that depth is greater or equal than the depth of the last element on the stack.
-        inline T back()
+        inline T
+        back()
         {
             return stack.back().second;
         }
     };
 
-}
-
+} // namespace Collada

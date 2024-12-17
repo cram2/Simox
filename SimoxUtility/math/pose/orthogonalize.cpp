@@ -4,14 +4,14 @@
 
 #include "pose.h"
 
-
-Eigen::Matrix3f simox::math::orthogonalize(const Eigen::Matrix3f& matrix)
+Eigen::Matrix3f
+simox::math::orthogonalize(const Eigen::Matrix3f& matrix)
 {
     return orthogonalize_svd(matrix);
 }
 
-
-Eigen::Matrix3f simox::math::orthogonalize_svd(const Eigen::Matrix3f& matrix)
+Eigen::Matrix3f
+simox::math::orthogonalize_svd(const Eigen::Matrix3f& matrix)
 {
     auto svd = matrix.jacobiSvd(Eigen::ComputeFullU | Eigen::ComputeFullV);
 
@@ -26,8 +26,8 @@ Eigen::Matrix3f simox::math::orthogonalize_svd(const Eigen::Matrix3f& matrix)
     }
 }
 
-
-Eigen::Matrix3f simox::math::orthogonalize_qr(const Eigen::Matrix3f& matrix)
+Eigen::Matrix3f
+simox::math::orthogonalize_qr(const Eigen::Matrix3f& matrix)
 {
     auto householder = matrix.householderQr();
     Eigen::Matrix3f orth = householder.householderQ();
@@ -45,8 +45,8 @@ Eigen::Matrix3f simox::math::orthogonalize_qr(const Eigen::Matrix3f& matrix)
     return orth;
 }
 
-
-Eigen::Matrix4f simox::math::orthogonalize_pose(const Eigen::Matrix4f& pose)
+Eigen::Matrix4f
+simox::math::orthogonalize_pose(const Eigen::Matrix4f& pose)
 {
     Eigen::Matrix4f orth = pose;
     orientation(orth) = orthogonalize(orientation(orth).eval());

@@ -25,18 +25,19 @@
 
 #include "VirtualRobot/IK/constraints/ReferenceConfigurationConstraint.h"
 
-
 namespace VirtualRobot
 {
-    class VIRTUAL_ROBOT_IMPORT_EXPORT JointLimitAvoidanceConstraint : public ReferenceConfigurationConstraint, public std::enable_shared_from_this<JointLimitAvoidanceConstraint>
+    class VIRTUAL_ROBOT_IMPORT_EXPORT JointLimitAvoidanceConstraint :
+        public ReferenceConfigurationConstraint,
+        public std::enable_shared_from_this<JointLimitAvoidanceConstraint>
     {
     public:
         JointLimitAvoidanceConstraint(const RobotPtr& robot, const RobotNodeSetPtr& nodeSet);
+
     protected:
         double optimizationFunction(unsigned int) override;
         Eigen::VectorXf optimizationGradient(unsigned int) override;
     };
 
     typedef std::shared_ptr<JointLimitAvoidanceConstraint> JointLimitAvoidanceConstraintPtr;
-}
-
+} // namespace VirtualRobot

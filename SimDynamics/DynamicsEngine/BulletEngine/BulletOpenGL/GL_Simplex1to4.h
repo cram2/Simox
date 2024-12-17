@@ -15,26 +15,23 @@ subject to the following restrictions:
 #pragma once
 
 #include "BulletCollision/CollisionShapes/btTetrahedronShape.h"
-
 #include "BulletCollision/NarrowPhaseCollision/btSimplexSolverInterface.h"
 
 ///GL_Simplex1to4 is a class to debug a Simplex Solver with 1 to 4 points.
 ///Can be used by GJK.
 class GL_Simplex1to4 : public btBU_Simplex1to4
 {
-    btSimplexSolverInterface*   m_simplexSolver;
+    btSimplexSolverInterface* m_simplexSolver;
 
 public:
-
     GL_Simplex1to4();
     ~GL_Simplex1to4() override;
 
-    void    calcClosest(btScalar* m);
+    void calcClosest(btScalar* m);
 
-    void    setSimplexSolver(btSimplexSolverInterface* simplexSolver)
+    void
+    setSimplexSolver(btSimplexSolverInterface* simplexSolver)
     {
         m_simplexSolver = simplexSolver;
     }
-
 };
-

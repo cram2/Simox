@@ -28,44 +28,53 @@
 namespace VirtualRobot
 {
 
-class BimanualManipulability;
-typedef std::shared_ptr<BimanualManipulability> BimanualManipulabilityPtr;
+    class BimanualManipulability;
+    typedef std::shared_ptr<BimanualManipulability> BimanualManipulabilityPtr;
 
-/**
+    /**
  * Implementation of manipulability tracking, see
  * N. Jaquier, L. Rozo, D. G. Caldwell and S. Calinon. Geometry-aware Tracking of Manipulability Ellipsoids, in Robotics: Science and Systems (R:SS), 2018. (http://www.roboticsproceedings.org/rss14/p27.pdf)
  * N. Jaquier, L. Rozo, D. G. Caldwell and S. Calinon. Geometry-aware Manipulability Learning, Tracking and Transfer, International Journal of Robotics Research (IJRR), 2020.
  * @brief The ManipulabilityTracking class
  */
-class BimanualManipulabilityTracking : public AbstractManipulabilityTracking
-{
-public:
-    BimanualManipulabilityTracking(BimanualManipulabilityPtr manipulability);
+    class BimanualManipulabilityTracking : public AbstractManipulabilityTracking
+    {
+    public:
+        BimanualManipulabilityTracking(BimanualManipulabilityPtr manipulability);
 
-    Eigen::VectorXf calculateVelocity(const Eigen::MatrixXd &manipulabilityDesired, const Eigen::MatrixXd &gainMatrix=Eigen::MatrixXd(), bool jointLimitAvoidance = false) override;
+        Eigen::VectorXf calculateVelocity(const Eigen::MatrixXd& manipulabilityDesired,
+                                          const Eigen::MatrixXd& gainMatrix = Eigen::MatrixXd(),
+                                          bool jointLimitAvoidance = false) override;
 
-    Eigen::Tensor<double, 3> computeBimanualManipulabilityJacobian(const Eigen::MatrixXd &jacobianLeft, const Eigen::MatrixXd &jacobianRight, const Eigen::MatrixXd &bimanualGraspMatrix);
+        Eigen::Tensor<double, 3>
+        computeBimanualManipulabilityJacobian(const Eigen::MatrixXd& jacobianLeft,
+                                              const Eigen::MatrixXd& jacobianRight,
+                                              const Eigen::MatrixXd& bimanualGraspMatrix);
 
-    Eigen::Tensor<double, 3> computeBimanualJacobianDerivative(const Eigen::MatrixXd &jacobianLeft, const Eigen::MatrixXd &jacobianRight);
+        Eigen::Tensor<double, 3>
+        computeBimanualJacobianDerivative(const Eigen::MatrixXd& jacobianLeft,
+                                          const Eigen::MatrixXd& jacobianRight);
 
-    virtual int getTaskVars() override;
+        virtual int getTaskVars() override;
 
-    virtual AbstractManipulability::Mode getMode() override;
+        virtual AbstractManipulability::Mode getMode() override;
 
-    BimanualManipulabilityPtr getManipulability();
+        BimanualManipulabilityPtr getManipulability();
 
-    Eigen::MatrixXd computeCurrentManipulability() override;
+        Eigen::MatrixXd computeCurrentManipulability() override;
 
-    virtual std::vector<std::string> getJointNames() override;
+        virtual std::vector<std::string> getJointNames() override;
 
-    VisualizationNodePtr getManipulabilityVis(const Eigen::MatrixXd &manipulability, const std::string &visualizationType = "", double scaling = 1000.0) override;
+        VisualizationNodePtr getManipulabilityVis(const Eigen::MatrixXd& manipulability,
+                                                  const std::string& visualizationType = "",
+                                                  double scaling = 1000.0) override;
 
-    void setConvertMMtoM(bool value) override;
+        void setConvertMMtoM(bool value) override;
 
-protected:
-    BimanualManipulabilityPtr manipulability;
-};
+    protected:
+        BimanualManipulabilityPtr manipulability;
+    };
 
-typedef std::shared_ptr<BimanualManipulabilityTracking> BimanualManipulabilityTrackingPtr;
+    typedef std::shared_ptr<BimanualManipulabilityTracking> BimanualManipulabilityTrackingPtr;
 
-}
+} // namespace VirtualRobot

@@ -15,13 +15,14 @@ subject to the following restrictions:
 
 
 #include "GL_DialogDynamicsWorld.h"
-#include "GL_DialogWindow.h"
-#include "btBulletDynamicsCommon.h"
+
 #include "BulletCollision/CollisionDispatch/btBox2dBox2dCollisionAlgorithm.h"
 #include "BulletCollision/CollisionDispatch/btConvex2dConvex2dAlgorithm.h"
 #include "BulletCollision/CollisionShapes/btBox2dShape.h"
 #include "BulletCollision/CollisionShapes/btConvex2dShape.h"
 #include "BulletCollision/NarrowPhaseCollision/btMinkowskiPenetrationDepthSolver.h"
+#include "GL_DialogWindow.h"
+#include "btBulletDynamicsCommon.h"
 
 GL_DialogDynamicsWorld::GL_DialogDynamicsWorld()
 {
@@ -36,20 +37,27 @@ GL_DialogDynamicsWorld::GL_DialogDynamicsWorld()
     m_broadphase = new btDbvtBroadphase();
     m_constraintSolver = new btSequentialImpulseConstraintSolver();
     m_dispatcher = new btCollisionDispatcher(m_collisionConfiguration);
-    m_dynamicsWorld = new btDiscreteDynamicsWorld(m_dispatcher, m_broadphase, m_constraintSolver, m_collisionConfiguration);
-    m_dynamicsWorld ->getSolverInfo().m_splitImpulse = true;
+    m_dynamicsWorld = new btDiscreteDynamicsWorld(
+        m_dispatcher, m_broadphase, m_constraintSolver, m_collisionConfiguration);
+    m_dynamicsWorld->getSolverInfo().m_splitImpulse = true;
     //m_dynamicsWorld->setGravity(btVector3(0,10,0));
     m_dynamicsWorld->setGravity(btVector3(0, 0, 0));
 
     m_simplexSolver = new btVoronoiSimplexSolver();
     m_pdSolver = new btMinkowskiPenetrationDepthSolver();
 
-    btConvex2dConvex2dAlgorithm::CreateFunc* convexAlgo2d = new btConvex2dConvex2dAlgorithm::CreateFunc(m_simplexSolver, m_pdSolver);
+    btConvex2dConvex2dAlgorithm::CreateFunc* convexAlgo2d =
+        new btConvex2dConvex2dAlgorithm::CreateFunc(m_simplexSolver, m_pdSolver);
 
-    m_dispatcher->registerCollisionCreateFunc(CONVEX_2D_SHAPE_PROXYTYPE, CONVEX_2D_SHAPE_PROXYTYPE, convexAlgo2d);
-    m_dispatcher->registerCollisionCreateFunc(BOX_2D_SHAPE_PROXYTYPE, CONVEX_2D_SHAPE_PROXYTYPE, convexAlgo2d);
-    m_dispatcher->registerCollisionCreateFunc(CONVEX_2D_SHAPE_PROXYTYPE, BOX_2D_SHAPE_PROXYTYPE, convexAlgo2d);
-    m_dispatcher->registerCollisionCreateFunc(BOX_2D_SHAPE_PROXYTYPE, BOX_2D_SHAPE_PROXYTYPE, new btBox2dBox2dCollisionAlgorithm::CreateFunc());
+    m_dispatcher->registerCollisionCreateFunc(
+        CONVEX_2D_SHAPE_PROXYTYPE, CONVEX_2D_SHAPE_PROXYTYPE, convexAlgo2d);
+    m_dispatcher->registerCollisionCreateFunc(
+        BOX_2D_SHAPE_PROXYTYPE, CONVEX_2D_SHAPE_PROXYTYPE, convexAlgo2d);
+    m_dispatcher->registerCollisionCreateFunc(
+        CONVEX_2D_SHAPE_PROXYTYPE, BOX_2D_SHAPE_PROXYTYPE, convexAlgo2d);
+    m_dispatcher->registerCollisionCreateFunc(BOX_2D_SHAPE_PROXYTYPE,
+                                              BOX_2D_SHAPE_PROXYTYPE,
+                                              new btBox2dBox2dCollisionAlgorithm::CreateFunc());
 
     ///enable boarders, to avoid 'loosing' menus
 #if 1
@@ -94,7 +102,6 @@ GL_DialogDynamicsWorld::GL_DialogDynamicsWorld()
         m_dynamicsWorld->addCollisionObject(m_rightBorder);
     }
 #endif
-
 }
 
 GL_DialogDynamicsWorld::~GL_DialogDynamicsWorld()
@@ -106,7 +113,8 @@ GL_DialogDynamicsWorld::~GL_DialogDynamicsWorld()
     delete m_collisionConfiguration;
 }
 
-void GL_DialogDynamicsWorld::setScreenSize(int width, int height)
+void
+GL_DialogDynamicsWorld::setScreenSize(int width, int height)
 {
 
 
@@ -120,14 +128,21 @@ void GL_DialogDynamicsWorld::setScreenSize(int width, int height)
         if (body)
         {
             m_dynamicsWorld->removeRigidBody(body);
-            btVector3 newPos = colObj->getWorldTransform().getOrigin() + btVector3(btScalar(m_screenWidth / 2.), btScalar(m_screenHeight / 2), btScalar(0)) - btVector3(btScalar(width / 2.), btScalar(height / 2.), btScalar(0));
+            btVector3 newPos =
+                colObj->getWorldTransform().getOrigin() +
+                btVector3(btScalar(m_screenWidth / 2.), btScalar(m_screenHeight / 2), btScalar(0)) -
+                btVector3(btScalar(width / 2.), btScalar(height / 2.), btScalar(0));
             colObj->getWorldTransform().setOrigin(newPos);
             m_dynamicsWorld->addRigidBody(body);
         }
         else
         {
             m_dynamicsWorld->removeCollisionObject(colObj);
-            btVector3 newPos = colObj->getWorldTransform().getOrigin() + btVector3(btScalar(m_screenWidth / 2.), btScalar(m_screenHeight / 2.), btScalar(0)) - btVector3(btScalar(width / 2.), btScalar(height / 2.), btScalar(0));
+            btVector3 newPos = colObj->getWorldTransform().getOrigin() +
+                               btVector3(btScalar(m_screenWidth / 2.),
+                                         btScalar(m_screenHeight / 2.),
+                                         btScalar(0)) -
+                               btVector3(btScalar(width / 2.), btScalar(height / 2.), btScalar(0));
             colObj->getWorldTransform().setOrigin(newPos);
             m_dynamicsWorld->addCollisionObject(colObj);
         }
@@ -180,9 +195,7 @@ void GL_DialogDynamicsWorld::setScreenSize(int width, int height)
             tr.setOrigin(btVector3(btScalar(width / 2.), btScalar(0), btScalar(0)));
             m_rightBorder->setWorldTransform(tr);
             m_dynamicsWorld->addCollisionObject(m_rightBorder);
-
         }
-
     }
 
 
@@ -190,9 +203,15 @@ void GL_DialogDynamicsWorld::setScreenSize(int width, int height)
     m_screenHeight = height;
 }
 
-GL_DialogWindow*    GL_DialogDynamicsWorld::createDialog(int horPos, int vertPos, int dialogWidth, int dialogHeight, const char* dialogTitle)
+GL_DialogWindow*
+GL_DialogDynamicsWorld::createDialog(int horPos,
+                                     int vertPos,
+                                     int dialogWidth,
+                                     int dialogHeight,
+                                     const char* dialogTitle)
 {
-    btBox2dShape* boxShape = new btBox2dShape(btVector3(dialogWidth / 2.f, dialogHeight / 2.f, 0.4f));
+    btBox2dShape* boxShape =
+        new btBox2dShape(btVector3(dialogWidth / 2.f, dialogHeight / 2.f, 0.4f));
     btScalar mass = 100.f;
     btVector3 localInertia;
     boxShape->calculateLocalInertia(mass, localInertia);
@@ -201,8 +220,9 @@ GL_DialogWindow*    GL_DialogDynamicsWorld::createDialog(int horPos, int vertPos
     btTransform trans;
     trans.setIdentity();
     //  trans.setOrigin(btVector3(btScalar(horPos-m_screenWidth/2+dialogWidth/2), btScalar(vertPos+m_screenHeight/2.+dialogHeight/2),btScalar(0.)));
-    trans.setOrigin(btVector3(btScalar(horPos - m_screenWidth / 2 + dialogWidth / 2), btScalar(vertPos - m_screenHeight / 2. + dialogHeight / 2), btScalar(0.)));
-
+    trans.setOrigin(btVector3(btScalar(horPos - m_screenWidth / 2 + dialogWidth / 2),
+                              btScalar(vertPos - m_screenHeight / 2. + dialogHeight / 2),
+                              btScalar(0.)));
 
 
     body->setWorldTransform(trans);
@@ -213,15 +233,18 @@ GL_DialogWindow*    GL_DialogDynamicsWorld::createDialog(int horPos, int vertPos
     //body->setAngularFactor(btVector3(0,0,1));
     body->setAngularFactor(btVector3(0, 0, 0));
 
-    GL_DialogWindow* dialogWindow = new GL_DialogWindow(horPos, vertPos, dialogWidth, dialogHeight, body, dialogTitle);
+    GL_DialogWindow* dialogWindow =
+        new GL_DialogWindow(horPos, vertPos, dialogWidth, dialogHeight, body, dialogTitle);
     m_dialogs.push_back(dialogWindow);
     m_dynamicsWorld->addRigidBody(body);
 
     return dialogWindow;
-
 }
 
-GL_SliderControl* GL_DialogDynamicsWorld::createSlider(GL_DialogWindow* dialog, const char* sliderText, btScalar initialFraction)
+GL_SliderControl*
+GL_DialogDynamicsWorld::createSlider(GL_DialogWindow* dialog,
+                                     const char* sliderText,
+                                     btScalar initialFraction)
 {
     btBox2dShape* boxShape = new btBox2dShape(btVector3(6.f, 6.f, 0.4f));
     btScalar mass = .1f;
@@ -233,8 +256,9 @@ GL_SliderControl* GL_DialogDynamicsWorld::createSlider(GL_DialogWindow* dialog, 
     trans.setIdentity();
     int sliderX = dialog->getDialogHorPos() - m_screenWidth / 2 + dialog->getDialogWidth() / 2;
     //  int sliderY = dialog->getDialogVertPos() + m_screenHeight/2 + dialog->getDialogHeight()/2 + dialog->getNumControls()*20;
-    int sliderY = dialog->getDialogVertPos() - m_screenHeight / 2 + dialog->getDialogHeight() / 2 + dialog->getNumControls() * 20;
-    trans.setOrigin(btVector3((btScalar)sliderX, (btScalar)sliderY, (btScalar) - 0.2f));
+    int sliderY = dialog->getDialogVertPos() - m_screenHeight / 2 + dialog->getDialogHeight() / 2 +
+                  dialog->getNumControls() * 20;
+    trans.setOrigin(btVector3((btScalar)sliderX, (btScalar)sliderY, (btScalar)-0.2f));
 
     body->setWorldTransform(trans);
     //body->setDamping(0.999,0.99);
@@ -249,7 +273,6 @@ GL_SliderControl* GL_DialogDynamicsWorld::createSlider(GL_DialogWindow* dialog, 
 
     btRigidBody* dialogBody = btRigidBody::upcast(dialog->getCollisionObject());
     btAssert(dialogBody);
-
 
 
     btTransform frameInA;
@@ -279,7 +302,8 @@ GL_SliderControl* GL_DialogDynamicsWorld::createSlider(GL_DialogWindow* dialog, 
     m_dynamicsWorld->addConstraint(constraint, true);
     constraint->setLimit(0, lowerLimit, upperLimit);
 #else
-    btSliderConstraint* sliderConstraint = new btSliderConstraint(*dialogBody, *body, frameInA, frameInB, true); //useFrameA);
+    btSliderConstraint* sliderConstraint =
+        new btSliderConstraint(*dialogBody, *body, frameInA, frameInB, true); //useFrameA);
     sliderConstraint->setLowerLinLimit(actualLimit);
     sliderConstraint->setUpperLinLimit(actualLimit);
     m_dynamicsWorld->addConstraint(sliderConstraint, true);
@@ -287,7 +311,8 @@ GL_SliderControl* GL_DialogDynamicsWorld::createSlider(GL_DialogWindow* dialog, 
 #endif
 
 
-    GL_SliderControl* slider = new GL_SliderControl(sliderText, body, dialog, lowerLimit, upperLimit, sliderConstraint);
+    GL_SliderControl* slider =
+        new GL_SliderControl(sliderText, body, dialog, lowerLimit, upperLimit, sliderConstraint);
     body->setUserPointer(slider);
     dialog->addControl(slider);
 
@@ -296,9 +321,8 @@ GL_SliderControl* GL_DialogDynamicsWorld::createSlider(GL_DialogWindow* dialog, 
     return slider;
 }
 
-
-
-GL_ToggleControl* GL_DialogDynamicsWorld::createToggle(GL_DialogWindow* dialog, const char* toggleText)
+GL_ToggleControl*
+GL_DialogDynamicsWorld::createToggle(GL_DialogWindow* dialog, const char* toggleText)
 {
 
 
@@ -313,8 +337,9 @@ GL_ToggleControl* GL_DialogDynamicsWorld::createToggle(GL_DialogWindow* dialog, 
 
     int toggleX = dialog->getDialogHorPos() - m_screenWidth / 2 + dialog->getDialogWidth() / 2;
     //  int toggleY = dialog->getDialogVertPos() + m_screenHeight/2 + dialog->getDialogHeight()/2 + dialog->getNumControls()*20;
-    int toggleY = dialog->getDialogVertPos() - m_screenHeight / 2 + dialog->getDialogHeight() / 2 + dialog->getNumControls() * 20;
-    trans.setOrigin(btVector3((btScalar)toggleX, (btScalar)toggleY, (btScalar) - 0.2f));
+    int toggleY = dialog->getDialogVertPos() - m_screenHeight / 2 + dialog->getDialogHeight() / 2 +
+                  dialog->getNumControls() * 20;
+    trans.setOrigin(btVector3((btScalar)toggleX, (btScalar)toggleY, (btScalar)-0.2f));
 
     body->setWorldTransform(trans);
     body->setDamping(0.999f, 0.99f);
@@ -331,10 +356,12 @@ GL_ToggleControl* GL_DialogDynamicsWorld::createToggle(GL_DialogWindow* dialog, 
     btAssert(dialogBody);
 
 
-
     btTransform frameInA;
     frameInA.setIdentity();
-    btVector3 offset(btVector3(+dialog->getDialogWidth() / 2.f - 32.f, -dialog->getDialogHeight() / 2.f + dialog->getNumControls() * 20.f + 36.f, 0.2f));
+    btVector3 offset(
+        btVector3(+dialog->getDialogWidth() / 2.f - 32.f,
+                  -dialog->getDialogHeight() / 2.f + dialog->getNumControls() * 20.f + 36.f,
+                  0.2f));
     frameInA.setOrigin(offset);
 
 
@@ -343,7 +370,8 @@ GL_ToggleControl* GL_DialogDynamicsWorld::createToggle(GL_DialogWindow* dialog, 
     //frameInB.setOrigin(-offset/2);
     bool useFrameA = true;
 
-    btGeneric6DofConstraint* constraint = new btGeneric6DofConstraint(*dialogBody, *body, frameInA, frameInB, useFrameA);
+    btGeneric6DofConstraint* constraint =
+        new btGeneric6DofConstraint(*dialogBody, *body, frameInA, frameInB, useFrameA);
     m_dynamicsWorld->addConstraint(constraint, true);
 
 
@@ -353,7 +381,8 @@ GL_ToggleControl* GL_DialogDynamicsWorld::createToggle(GL_DialogWindow* dialog, 
     return toggle;
 }
 
-void    GL_DialogDynamicsWorld::draw(btScalar timeStep)
+void
+GL_DialogDynamicsWorld::draw(btScalar timeStep)
 {
     if (timeStep)
     {
@@ -366,16 +395,17 @@ void    GL_DialogDynamicsWorld::draw(btScalar timeStep)
     }
 }
 
-static btRigidBody* pickedBody = nullptr;//for deactivation state
+static btRigidBody* pickedBody = nullptr; //for deactivation state
 static btScalar mousePickClamping = 111130.f;
 
 //static int gPickingConstraintId = 0;
 static btVector3 gOldPickingPos;
 static btVector3 gHitPos(-1, -1, -1);
 
-static btScalar gOldPickingDist  = 0.f;
+static btScalar gOldPickingDist = 0.f;
 
-bool GL_DialogDynamicsWorld::mouseFunc(int button, int state, int x, int y)
+bool
+GL_DialogDynamicsWorld::mouseFunc(int button, int state, int x, int y)
 {
     if (state == 0)
     {
@@ -431,13 +461,9 @@ bool GL_DialogDynamicsWorld::mouseFunc(int button, int state, int x, int y)
                 }
 
 #endif
-
-
-
             }
             else
             {
-
             }
 
             break;
@@ -455,7 +481,7 @@ bool GL_DialogDynamicsWorld::mouseFunc(int button, int state, int x, int y)
 
                     btVector3 rayFrom;
 
-                    if (true)//m_ortho)
+                    if (true) //m_ortho)
                     {
                         rayFrom = rayTo;
                         rayFrom.setZ(-100.f);
@@ -475,7 +501,8 @@ bool GL_DialogDynamicsWorld::mouseFunc(int button, int state, int x, int y)
 
                         btScalar maxPickingClamp = mousePickClamping;
 
-                        btRigidBody* body = (btRigidBody*)btRigidBody::upcast(rayCallback.m_collisionObject);
+                        btRigidBody* body =
+                            (btRigidBody*)btRigidBody::upcast(rayCallback.m_collisionObject);
 
                         if (body)
                         {
@@ -490,7 +517,7 @@ bool GL_DialogDynamicsWorld::mouseFunc(int button, int state, int x, int y)
                                 {
                                     case GL_TOGGLE_CONTROL:
                                     {
-                                        GL_ToggleControl* toggle = (GL_ToggleControl*) ctrl;
+                                        GL_ToggleControl* toggle = (GL_ToggleControl*)ctrl;
                                         toggle->m_active = !toggle->m_active;
                                         doPick = false;
                                         break;
@@ -498,14 +525,18 @@ bool GL_DialogDynamicsWorld::mouseFunc(int button, int state, int x, int y)
 
                                     case GL_SLIDER_CONTROL:
                                     {
-                                        GL_SliderControl* slider = (GL_SliderControl*) ctrl;
+                                        GL_SliderControl* slider = (GL_SliderControl*)ctrl;
                                         btTypedConstraint* constraint = slider->getConstraint();
 
-                                        if (constraint->getConstraintType() == SLIDER_CONSTRAINT_TYPE)
+                                        if (constraint->getConstraintType() ==
+                                            SLIDER_CONSTRAINT_TYPE)
                                         {
-                                            btSliderConstraint* sliderConstraint = (btSliderConstraint*) constraint;
-                                            sliderConstraint->setLowerLinLimit(slider->getLowerLimit());
-                                            sliderConstraint->setUpperLinLimit(slider->getUpperLimit());
+                                            btSliderConstraint* sliderConstraint =
+                                                (btSliderConstraint*)constraint;
+                                            sliderConstraint->setLowerLinLimit(
+                                                slider->getLowerLimit());
+                                            sliderConstraint->setUpperLinLimit(
+                                                slider->getUpperLimit());
                                         }
 
                                         maxPickingClamp = 100;
@@ -515,7 +546,6 @@ bool GL_DialogDynamicsWorld::mouseFunc(int button, int state, int x, int y)
                                     {
                                     }
                                 };
-
                             };
 
                             if (doPick)
@@ -527,14 +557,15 @@ bool GL_DialogDynamicsWorld::mouseFunc(int button, int state, int x, int y)
                                     pickedBody->setActivationState(DISABLE_DEACTIVATION);
 
 
-
                                     btVector3 pickPos = rayCallback.m_hitPointWorld;
                                     //printf("pickPos=%f,%f,%f\n",pickPos.getX(),pickPos.getY(),pickPos.getZ());
 
 
-                                    btVector3 localPivot = body->getCenterOfMassTransform().inverse() * pickPos;
+                                    btVector3 localPivot =
+                                        body->getCenterOfMassTransform().inverse() * pickPos;
 
-                                    btPoint2PointConstraint* p2p = new btPoint2PointConstraint(*body, localPivot);
+                                    btPoint2PointConstraint* p2p =
+                                        new btPoint2PointConstraint(*body, localPivot);
                                     p2p->m_setting.m_impulseClamp = maxPickingClamp;
 
                                     m_dynamicsWorld->addConstraint(p2p);
@@ -544,7 +575,7 @@ bool GL_DialogDynamicsWorld::mouseFunc(int button, int state, int x, int y)
                                     gOldPickingPos = rayTo;
                                     gHitPos = pickPos;
 
-                                    gOldPickingDist  = (pickPos - rayFrom).length();
+                                    gOldPickingDist = (pickPos - rayFrom).length();
 
                                     //very weak constraint for picking
                                     p2p->m_setting.m_tau = 0.1f;
@@ -555,7 +586,6 @@ bool GL_DialogDynamicsWorld::mouseFunc(int button, int state, int x, int y)
                         }
                     }
                 }
-
             }
             else
             {
@@ -577,7 +607,7 @@ bool GL_DialogDynamicsWorld::mouseFunc(int button, int state, int x, int y)
 
                         if (ctrl->getType() == GL_SLIDER_CONTROL)
                         {
-                            GL_SliderControl* sliderControl = (GL_SliderControl*) ctrl;
+                            GL_SliderControl* sliderControl = (GL_SliderControl*)ctrl;
 
                             btSliderConstraint* slider = nullptr;
                             btTypedConstraint* constraint = sliderControl->getConstraint();
@@ -611,19 +641,13 @@ bool GL_DialogDynamicsWorld::mouseFunc(int button, int state, int x, int y)
                                 }
                             }
                         }
-
                     }
 
                     pickedBody = nullptr;
-
                 }
-
-
-
             }
 
             break;
-
         }
 
         default:
@@ -632,18 +656,16 @@ bool GL_DialogDynamicsWorld::mouseFunc(int button, int state, int x, int y)
     }
 
     return false;
-
 }
 
-
-
-btVector3   GL_DialogDynamicsWorld::getRayTo(int x, int y)
+btVector3
+GL_DialogDynamicsWorld::getRayTo(int x, int y)
 {
     float cameraDistance = m_screenHeight / 2.f; //m_screenWidth/2;//1.f;
     btVector3 cameraTargetPosition(0, 0, 0);
     btVector3 cameraUp(0, -1, 0);
 
-    if (true)//_ortho)
+    if (true) //_ortho)
     {
 
         btScalar aspect;
@@ -663,7 +685,6 @@ btVector3   GL_DialogDynamicsWorld::getRayTo(int x, int y)
         }
 
 
-
         extents *= cameraDistance;
         btVector3 lower = cameraTargetPosition - extents;
         btVector3 upper = cameraTargetPosition + extents;
@@ -671,11 +692,10 @@ btVector3   GL_DialogDynamicsWorld::getRayTo(int x, int y)
         btScalar u = x / btScalar(m_screenWidth);
         btScalar v = (m_screenHeight - y) / btScalar(m_screenHeight);
 
-        btVector3   p(0, 0, 0);
-        p.setValue(
-            (1.0f - u) * lower.getX() + u * upper.getX(),
-            -((1.0f - v) * lower.getY() + v * upper.getY()),
-            cameraTargetPosition.getZ());
+        btVector3 p(0, 0, 0);
+        p.setValue((1.0f - u) * lower.getX() + u * upper.getX(),
+                   -((1.0f - v) * lower.getY() + v * upper.getY()),
+                   cameraTargetPosition.getZ());
         return p;
     }
 
@@ -686,7 +706,7 @@ btVector3   GL_DialogDynamicsWorld::getRayTo(int x, int y)
     float fov = 2 * atanf(tanFov);
 
     btVector3 cameraPosition(0, 0, -100);
-    btVector3   rayFrom = cameraPosition;
+    btVector3 rayFrom = cameraPosition;
     btVector3 rayForward = (cameraTargetPosition - cameraPosition);
     rayForward.normalize();
     float farPlane = 10000.f;
@@ -735,9 +755,8 @@ btVector3   GL_DialogDynamicsWorld::getRayTo(int x, int y)
     return rayTo;
 }
 
-
-
-void    GL_DialogDynamicsWorld::mouseMotionFunc(int x, int y)
+void
+GL_DialogDynamicsWorld::mouseMotionFunc(int x, int y)
 {
 
     if (m_pickConstraint)
@@ -754,7 +773,7 @@ void    GL_DialogDynamicsWorld::mouseMotionFunc(int x, int y)
             btVector3 oldPivotInB = p2p->getPivotInB();
             btVector3 newPivotB;
 
-            if (true)//_ortho)
+            if (true) //_ortho)
             {
                 newPivotB = oldPivotInB;
                 newPivotB.setX(newRayTo.getX());
@@ -771,17 +790,11 @@ void    GL_DialogDynamicsWorld::mouseMotionFunc(int x, int y)
             }
 
 
-
             p2p->setPivotB(newPivotB);
         }
-
     }
 
     m_mouseOldX = x;
     m_mouseOldY = y;
     //  updateCamera();
-
-
 }
-
-

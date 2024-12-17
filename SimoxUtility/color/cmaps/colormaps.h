@@ -2,7 +2,6 @@
 
 #include <SimoxUtility/color/ColorMap.h>
 
-
 namespace simox::color::cmaps
 {
 
@@ -103,5 +102,4 @@ namespace simox::color::cmaps
     ColorMap tab20b();
     ColorMap tab20c();
 
-}
-
+} // namespace simox::color::cmaps

@@ -7,21 +7,21 @@
 #include "VirtualRobotException.h"
 #define BOOST_TEST_MODULE VirtualRobot_CoordinatesTest
 
-#include <VirtualRobot/VirtualRobotTest.h>
-#include <VirtualRobot/VirtualRobot.h>
-#include <VirtualRobot/XML/RobotIO.h>
-#include <VirtualRobot/Robot.h>
-#include <VirtualRobot/LinkedCoordinate.h>
-#include <VirtualRobot/Nodes/RobotNode.h>
 #include <string>
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
+#include <VirtualRobot/LinkedCoordinate.h>
+#include <VirtualRobot/Nodes/RobotNode.h>
+#include <VirtualRobot/Robot.h>
+#include <VirtualRobot/VirtualRobot.h>
+#include <VirtualRobot/VirtualRobotTest.h>
+#include <VirtualRobot/XML/RobotIO.h>
+
 BOOST_AUTO_TEST_SUITE(RobotNode)
 
 #define FLOAT_CLOSE_TO_DIFF 1e-7f
-
 
 BOOST_AUTO_TEST_CASE(testIntelligentCoordinate)
 {
@@ -69,7 +69,8 @@ BOOST_AUTO_TEST_CASE(testIntelligentCoordinate)
     VirtualRobot::LinkedCoordinate coord(rob);
 
     BOOST_REQUIRE_THROW(coord.set("Joint4", origin), VirtualRobot::VirtualRobotException);
-    BOOST_REQUIRE_THROW(coord.set(VirtualRobot::RobotNodePtr()), VirtualRobot::VirtualRobotException);
+    BOOST_REQUIRE_THROW(coord.set(VirtualRobot::RobotNodePtr()),
+                        VirtualRobot::VirtualRobotException);
 
     BOOST_REQUIRE_NO_THROW(coord.set(r2));
     BOOST_REQUIRE_NO_THROW(coord.changeFrame(r1));

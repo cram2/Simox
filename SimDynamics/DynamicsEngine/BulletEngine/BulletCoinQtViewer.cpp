@@ -1,16 +1,15 @@
 #include "BulletCoinQtViewer.h"
 
-#include <Inventor/nodes/SoCamera.h>
-#include <Inventor/sensors/SoTimerSensor.h>
-#include <Inventor/nodes/SoEventCallback.h>
-#include <Inventor/nodes/SoDrawStyle.h>
-#include "Inventor/actions/SoBoxHighlightRenderAction.h"
-#include <Inventor/nodes/SoSelection.h>
-
+#include <VirtualRobot/Visualization/CoinVisualization/CoinVisualization.h>
 #include <VirtualRobot/Visualization/CoinVisualization/CoinVisualizationFactory.h>
 #include <VirtualRobot/Visualization/CoinVisualization/CoinVisualizationNode.h>
-#include <VirtualRobot/Visualization/CoinVisualization/CoinVisualization.h>
 
+#include "Inventor/actions/SoBoxHighlightRenderAction.h"
+#include <Inventor/nodes/SoCamera.h>
+#include <Inventor/nodes/SoDrawStyle.h>
+#include <Inventor/nodes/SoEventCallback.h>
+#include <Inventor/nodes/SoSelection.h>
+#include <Inventor/sensors/SoTimerSensor.h>
 
 
 using namespace VirtualRobot;
@@ -19,8 +18,8 @@ namespace SimDynamics
 {
 
 
-    BulletCoinQtViewer::BulletCoinQtViewer(DynamicsWorldPtr world)
-        : simModeFixedTimeStep(false), warned_norealtime(false)
+    BulletCoinQtViewer::BulletCoinQtViewer(DynamicsWorldPtr world) :
+        simModeFixedTimeStep(false), warned_norealtime(false)
     {
         bulletTimeStepMsec = 16; // 60FPS
         bulletMaxSubSteps = 1;
@@ -69,7 +68,8 @@ namespace SimDynamics
         sceneGraphRoot = nullptr;
     }
 
-    void BulletCoinQtViewer::selectionCB(void* userdata, SoPath* path)
+    void
+    BulletCoinQtViewer::selectionCB(void* userdata, SoPath* path)
     {
         BulletCoinQtViewer* bulletViewer = static_cast<BulletCoinQtViewer*>(userdata);
         VR_ASSERT(bulletViewer);
@@ -80,7 +80,9 @@ namespace SimDynamics
 
         bulletViewer->scheduleRedraw();
     }
-    void BulletCoinQtViewer::deselectionCB(void* userdata, SoPath* path)
+
+    void
+    BulletCoinQtViewer::deselectionCB(void* userdata, SoPath* path)
     {
         BulletCoinQtViewer* bulletViewer = static_cast<BulletCoinQtViewer*>(userdata);
         VR_ASSERT(bulletViewer);
@@ -92,7 +94,8 @@ namespace SimDynamics
         bulletViewer->scheduleRedraw();
     }
 
-    void BulletCoinQtViewer::timerCB(void* data, SoSensor* /*sensor*/)
+    void
+    BulletCoinQtViewer::timerCB(void* data, SoSensor* /*sensor*/)
     {
         BulletCoinQtViewer* bulletViewer = static_cast<BulletCoinQtViewer*>(data);
         VR_ASSERT(bulletViewer);
@@ -104,10 +107,12 @@ namespace SimDynamics
         bulletViewer->customUpdate();
 
         bulletViewer->scheduleRedraw();
-
     }
 
-    void BulletCoinQtViewer::initSceneGraph(QFrame* embedViewer, SoNode* scene, int antiAliasingSteps /* =0 */)
+    void
+    BulletCoinQtViewer::initSceneGraph(QFrame* embedViewer,
+                                       SoNode* scene,
+                                       int antiAliasingSteps /* =0 */)
     {
         viewer = new SoQtExaminerViewer(embedViewer, "", TRUE, SoQtExaminerViewer::BUILD_POPUP);
 
@@ -135,7 +140,8 @@ namespace SimDynamics
             double floorExtendMM;
             double floorDepthMM;
             bulletEngine->getFloorInfo(floorPos, floorUp, floorExtendMM, floorDepthMM);
-            SoNode* n = (SoNode*)CoinVisualizationFactory::CreatePlaneVisualization(floorPos, floorUp, floorExtendMM, 0.0f);
+            SoNode* n = (SoNode*)CoinVisualizationFactory::CreatePlaneVisualization(
+                floorPos, floorUp, floorExtendMM, 0.0f);
 
             if (n)
             {
@@ -165,12 +171,14 @@ namespace SimDynamics
         viewer->viewAll();
     }
 
-    void BulletCoinQtViewer::scheduleRedraw()
+    void
+    BulletCoinQtViewer::scheduleRedraw()
     {
         sceneGraphRoot->touch();
     }
 
-    void BulletCoinQtViewer::stepPhysics()
+    void
+    BulletCoinQtViewer::stepPhysics()
     {
         MutexLockPtr lock = getScopedLock();
 
@@ -193,7 +201,9 @@ namespace SimDynamics
                 {
                     if (!warned_norealtime)
                     {
-                        VR_INFO << "Elapsed time (" << (ms / 1000.0f) << "ms) too long: Simulation is not running in realtime." << std::endl;
+                        VR_INFO << "Elapsed time (" << (ms / 1000.0f)
+                                << "ms) too long: Simulation is not running in realtime."
+                                << std::endl;
                         warned_norealtime = true;
                     }
                 }
@@ -203,7 +213,8 @@ namespace SimDynamics
                 }
 
                 btScalar dt1 = btScalar(ms / 1000000.0f);
-                bulletEngine->stepSimulation(dt1, bulletMaxSubSteps, float(bulletTimeStepMsec) / 1000.0f);
+                bulletEngine->stepSimulation(
+                    dt1, bulletMaxSubSteps, float(bulletTimeStepMsec) / 1000.0f);
             }
             else
             {
@@ -223,28 +234,33 @@ namespace SimDynamics
         }
     }
 
-
-    btScalar BulletCoinQtViewer::getDeltaTimeMicroseconds()
+    btScalar
+    BulletCoinQtViewer::getDeltaTimeMicroseconds()
     {
         btScalar dt = (btScalar)m_clock.getTimeMicroseconds();
         m_clock.reset();
         return dt;
     }
 
-    void BulletCoinQtViewer::viewAll()
+    void
+    BulletCoinQtViewer::viewAll()
     {
 
         viewer->getCamera()->viewAll(sceneGraph, viewer->getViewportRegion());
         //viewer->viewAll();
     }
 
-    void BulletCoinQtViewer::addVisualization(RobotPtr robot, VirtualRobot::SceneObject::VisualizationType visuType, SoSeparator* container)
+    void
+    BulletCoinQtViewer::addVisualization(RobotPtr robot,
+                                         VirtualRobot::SceneObject::VisualizationType visuType,
+                                         SoSeparator* container)
     {
         MutexLockPtr lock = getScopedLock();
         //VR_ASSERT(so);
         removeVisualization(robot);
 
-        std::shared_ptr<VirtualRobot::CoinVisualization> visualization = robot->getVisualization(visuType);
+        std::shared_ptr<VirtualRobot::CoinVisualization> visualization =
+            robot->getVisualization(visuType);
         SoNode* n = visualization->getCoinVisualization();
 
         if (n)
@@ -264,7 +280,10 @@ namespace SimDynamics
         }
     }
 
-    void BulletCoinQtViewer::addVisualization(SceneObjectPtr so, VirtualRobot::SceneObject::VisualizationType visuType, SoSeparator* container)
+    void
+    BulletCoinQtViewer::addVisualization(SceneObjectPtr so,
+                                         VirtualRobot::SceneObject::VisualizationType visuType,
+                                         SoSeparator* container)
     {
         MutexLockPtr lock = getScopedLock();
         VR_ASSERT(so);
@@ -288,7 +307,10 @@ namespace SimDynamics
         }
     }
 
-    void BulletCoinQtViewer::addVisualization(DynamicsObjectPtr o, VirtualRobot::SceneObject::VisualizationType visuType, SoSeparator* container)
+    void
+    BulletCoinQtViewer::addVisualization(DynamicsObjectPtr o,
+                                         VirtualRobot::SceneObject::VisualizationType visuType,
+                                         SoSeparator* container)
     {
         MutexLockPtr lock = getScopedLock();
         VR_ASSERT(o);
@@ -314,12 +336,16 @@ namespace SimDynamics
         }
     }
 
-    void BulletCoinQtViewer::addStepCallback(BulletStepCallback callback, void* data)
+    void
+    BulletCoinQtViewer::addStepCallback(BulletStepCallback callback, void* data)
     {
         bulletEngine->addExternalCallback(callback, data);
     }
 
-    void BulletCoinQtViewer::addVisualization(DynamicsRobotPtr r, VirtualRobot::SceneObject::VisualizationType visuType, SoSeparator* container)
+    void
+    BulletCoinQtViewer::addVisualization(DynamicsRobotPtr r,
+                                         VirtualRobot::SceneObject::VisualizationType visuType,
+                                         SoSeparator* container)
     {
         MutexLockPtr lock = getScopedLock();
         VR_ASSERT(r);
@@ -339,7 +365,8 @@ namespace SimDynamics
         SoSeparator* n = new SoSeparator();
         for (VisualizationNodePtr const& visualizationNode : collectedVisualizationNodes)
         {
-            std::shared_ptr<CoinVisualizationNode> coinVisualizationNode = std::dynamic_pointer_cast<CoinVisualizationNode>(visualizationNode);
+            std::shared_ptr<CoinVisualizationNode> coinVisualizationNode =
+                std::dynamic_pointer_cast<CoinVisualizationNode>(visualizationNode);
 
             if (coinVisualizationNode && coinVisualizationNode->getCoinVisualization())
             {
@@ -358,7 +385,8 @@ namespace SimDynamics
         addedRobotVisualizations[r] = rootNode;
     }
 
-    void BulletCoinQtViewer::removeVisualization(RobotPtr o)
+    void
+    BulletCoinQtViewer::removeVisualization(RobotPtr o)
     {
         MutexLockPtr lock = getScopedLock();
         VR_ASSERT(o);
@@ -370,7 +398,8 @@ namespace SimDynamics
         }
     }
 
-    void BulletCoinQtViewer::removeVisualization(SceneObjectPtr o)
+    void
+    BulletCoinQtViewer::removeVisualization(SceneObjectPtr o)
     {
         MutexLockPtr lock = getScopedLock();
         VR_ASSERT(o);
@@ -382,7 +411,8 @@ namespace SimDynamics
         }
     }
 
-    void BulletCoinQtViewer::removeVisualization(DynamicsObjectPtr o)
+    void
+    BulletCoinQtViewer::removeVisualization(DynamicsObjectPtr o)
     {
         MutexLockPtr lock = getScopedLock();
         VR_ASSERT(o);
@@ -394,7 +424,8 @@ namespace SimDynamics
         }
     }
 
-    void BulletCoinQtViewer::removeVisualization(DynamicsRobotPtr r)
+    void
+    BulletCoinQtViewer::removeVisualization(DynamicsRobotPtr r)
     {
         MutexLockPtr lock = getScopedLock();
         VR_ASSERT(r);
@@ -406,7 +437,8 @@ namespace SimDynamics
         }
     }
 
-    void BulletCoinQtViewer::stopCB()
+    void
+    BulletCoinQtViewer::stopCB()
     {
         MutexLockPtr lock = getScopedLock();
 
@@ -425,37 +457,44 @@ namespace SimDynamics
         }
     }
 
-    void BulletCoinQtViewer::setBulletSimTimeStepMsec(int msec)
+    void
+    BulletCoinQtViewer::setBulletSimTimeStepMsec(int msec)
     {
         MutexLockPtr lock = getScopedLock();
         VR_ASSERT(msec > 0);
         bulletTimeStepMsec = msec;
     }
 
-    void BulletCoinQtViewer::setBulletSimMaxSubSteps(int n)
+    void
+    BulletCoinQtViewer::setBulletSimMaxSubSteps(int n)
     {
         MutexLockPtr lock = getScopedLock();
         VR_ASSERT(n > 0);
         bulletMaxSubSteps = n;
     }
 
-    bool BulletCoinQtViewer::engineRunning()
+    bool
+    BulletCoinQtViewer::engineRunning()
     {
         return enablePhysicsUpdates;
     }
 
-    void BulletCoinQtViewer::stopEngine()
+    void
+    BulletCoinQtViewer::stopEngine()
     {
         MutexLockPtr lock = getScopedLock();
         enablePhysicsUpdates = false;
     }
-    void BulletCoinQtViewer::startEngine()
+
+    void
+    BulletCoinQtViewer::startEngine()
     {
         MutexLockPtr lock = getScopedLock();
         enablePhysicsUpdates = true;
     }
 
-    void BulletCoinQtViewer::updatePhysics()
+    void
+    BulletCoinQtViewer::updatePhysics()
     {
         if (enablePhysicsUpdates)
         {
@@ -463,17 +502,20 @@ namespace SimDynamics
         }
     }
 
-    void BulletCoinQtViewer::setSimModeRealTime()
+    void
+    BulletCoinQtViewer::setSimModeRealTime()
     {
         simModeFixedTimeStep = false;
     }
 
-    void BulletCoinQtViewer::setSimModeFixedTimeStep()
+    void
+    BulletCoinQtViewer::setSimModeFixedTimeStep()
     {
         simModeFixedTimeStep = true;
     }
 
-    void BulletCoinQtViewer::setUpdateInterval(int updateTimerIntervalMS)
+    void
+    BulletCoinQtViewer::setUpdateInterval(int updateTimerIntervalMS)
     {
         this->updateTimerIntervalMS = updateTimerIntervalMS;
 
@@ -483,14 +525,16 @@ namespace SimDynamics
         }
     }
 
-    void BulletCoinQtViewer::setMutex(std::shared_ptr<std::recursive_mutex> engineMutexPtr)
+    void
+    BulletCoinQtViewer::setMutex(std::shared_ptr<std::recursive_mutex> engineMutexPtr)
     {
         this->engineMutexPtr = engineMutexPtr;
     }
 
-    BulletCoinQtViewer::MutexLockPtr BulletCoinQtViewer::getScopedLock()
+    BulletCoinQtViewer::MutexLockPtr
+    BulletCoinQtViewer::getScopedLock()
     {
-        std::shared_ptr< std::scoped_lock<std::recursive_mutex> > scoped_lock;
+        std::shared_ptr<std::scoped_lock<std::recursive_mutex>> scoped_lock;
 
         if (engineMutexPtr)
         {
@@ -500,10 +544,11 @@ namespace SimDynamics
         return scoped_lock;
     }
 
-    void BulletCoinQtViewer::setAntiAliasing(int steps)
+    void
+    BulletCoinQtViewer::setAntiAliasing(int steps)
     {
         MutexLockPtr lock = getScopedLock();
         viewer->setAntialiasing(steps > 0, steps);
     }
 
-}
+} // namespace SimDynamics

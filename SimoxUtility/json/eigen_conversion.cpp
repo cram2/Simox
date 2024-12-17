@@ -1,11 +1,11 @@
 #include "eigen_conversion.h"
 
-#include <SimoxUtility/math/pose/pose.h>
-
 #include <Eigen/Geometry>
 
+#include <SimoxUtility/math/pose/pose.h>
 
-void Eigen::from_json(const ::simox::json::json& j, Eigen::Vector3f& vector)
+void
+Eigen::from_json(const ::simox::json::json& j, Eigen::Vector3f& vector)
 {
     if (j.is_object())
     {
@@ -13,14 +13,14 @@ void Eigen::from_json(const ::simox::json::json& j, Eigen::Vector3f& vector)
         vector.y() = j.at("y").get<float>();
         vector.z() = j.at("z").get<float>();
     }
-    else  // j.is_array()
+    else // j.is_array()
     {
         jsonbase::from_json(j, vector);
     }
 }
 
-
-void Eigen::from_json(const ::simox::json::json& j, Eigen::Matrix4f& matrix)
+void
+Eigen::from_json(const ::simox::json::json& j, Eigen::Matrix4f& matrix)
 {
     if (j.is_object())
     {

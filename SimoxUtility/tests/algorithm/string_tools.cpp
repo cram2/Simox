@@ -4,7 +4,7 @@
 * @copyright  2020 Andre Meixner
 */
 
-#define BOOST_TEST_MODULE SimoxUtility/algorithm/string_tools
+#define BOOST_TEST_MODULE SimoxUtility / algorithm / string_tools
 
 #include <boost/test/included/unit_test.hpp>
 
@@ -19,7 +19,7 @@ BOOST_AUTO_TEST_CASE(split)
 {
     std::string testString = "   test       20 50   30 ";
     std::string testString2 = "   test   ;   20,50 ; 30 ";
-    std::vector<std::string> expectedResult = { "test", "20", "50", "30" };
+    std::vector<std::string> expectedResult = {"test", "20", "50", "30"};
     BOOST_CHECK(simox::alg::split(testString) == expectedResult);
     BOOST_CHECK(simox::alg::split(testString2, ";,") == expectedResult);
     BOOST_CHECK_THROW(simox::alg::split_check_size(testString, 3), simox::error::SimoxError);
@@ -53,7 +53,6 @@ BOOST_AUTO_TEST_CASE(to_string)
     BOOST_CHECK_EQUAL(simox::alg::to_string(testVector), "5 3.5 -1");
     BOOST_CHECK_EQUAL(simox::alg::to_string(testVectorI, ";"), "1;-2;3");
     BOOST_CHECK_EQUAL(simox::alg::to_string(testVectorStr), "Hello World!");
-
 }
 
 BOOST_AUTO_TEST_CASE(from_string)
@@ -80,8 +79,10 @@ BOOST_AUTO_TEST_CASE(from_string)
     BOOST_CHECK((simox::alg::to_eigen_vec<float, 3>(testVector)) == expectedVector3f);
     BOOST_CHECK(simox::alg::to_eigen_vec(testVector2, ";") == expectedVector3f);
     BOOST_CHECK(simox::alg::to_eigen_vec<double>(testVector3, ",") == expectedVectorXd);
-    BOOST_CHECK((simox::alg::to_eigen_vec_check_rows<double>(testVector3, 9, ",")) == expectedVectorXd);
-    BOOST_CHECK_THROW((simox::alg::to_eigen_vec_check_rows<double>(testVector3, 10, ",")), simox::error::SimoxError);
+    BOOST_CHECK((simox::alg::to_eigen_vec_check_rows<double>(testVector3, 9, ",")) ==
+                expectedVectorXd);
+    BOOST_CHECK_THROW((simox::alg::to_eigen_vec_check_rows<double>(testVector3, 10, ",")),
+                      simox::error::SimoxError);
     BOOST_CHECK((simox::alg::to_eigen_vec<double, 9>(testVector3, ",")) == expectedVector9d);
 }
 
@@ -95,8 +96,10 @@ BOOST_AUTO_TEST_CASE(capitalize_words)
     BOOST_CHECK_EQUAL(simox::alg::capitalize_words("  hello world! "), "  Hello World! ");
     BOOST_CHECK_EQUAL(simox::alg::capitalize_words("cap\neach\n - line"), "Cap\nEach\n - Line");
 
-    const std::string in = "\nthis is a Partly CaPiTaLiZed sTrInG _with 0some #strange +occurences.right?yes";
-    const std::string ex = "\nThis Is A Partly CaPiTaLiZed STrInG _with 0some #strange +occurences.right?yes";
+    const std::string in =
+        "\nthis is a Partly CaPiTaLiZed sTrInG _with 0some #strange +occurences.right?yes";
+    const std::string ex =
+        "\nThis Is A Partly CaPiTaLiZed STrInG _with 0some #strange +occurences.right?yes";
     const std::string out = simox::alg::capitalize_words(in);
     BOOST_CHECK_EQUAL(out, ex);
     BOOST_CHECK_EQUAL_COLLECTIONS(out.begin(), out.end(), ex.begin(), ex.end());
@@ -129,8 +132,10 @@ BOOST_AUTO_TEST_CASE(remove_prefix_suffix)
 
     // Change nothing:
 
-    BOOST_CHECK_EQUAL(simox::alg::remove_prefix("inc_omplete-prefix", "incomplete"), "inc_omplete-prefix");
-    BOOST_CHECK_EQUAL(simox::alg::remove_suffix("suffix-inc_omplete", "incomplete"), "suffix-inc_omplete");
+    BOOST_CHECK_EQUAL(simox::alg::remove_prefix("inc_omplete-prefix", "incomplete"),
+                      "inc_omplete-prefix");
+    BOOST_CHECK_EQUAL(simox::alg::remove_suffix("suffix-inc_omplete", "incomplete"),
+                      "suffix-inc_omplete");
 
     BOOST_CHECK_EQUAL(simox::alg::remove_prefix("one two three", "four"), "one two three");
     BOOST_CHECK_EQUAL(simox::alg::remove_suffix("one two three", "four"), "one two three");

@@ -24,15 +24,17 @@
 
 #include "ConstrainedOptimizationIK.h"
 
-#include <nlopt.hpp>
-
-#include "RobotNodeSet.h"
 #include "Nodes/RobotNode.h"
+#include "RobotNodeSet.h"
 #include "VirtualRobotException.h"
+#include <nlopt.hpp>
 
 using namespace VirtualRobot;
 
-ConstrainedOptimizationIK::ConstrainedOptimizationIK(RobotPtr& robot, const RobotNodeSetPtr& nodeSet, float timeout, float globalTolerance) :
+ConstrainedOptimizationIK::ConstrainedOptimizationIK(RobotPtr& robot,
+                                                     const RobotNodeSetPtr& nodeSet,
+                                                     float timeout,
+                                                     float globalTolerance) :
     ConstrainedIK(robot, nodeSet, 30),
     nodeSet(nodeSet),
     timeout(timeout),
@@ -42,8 +44,6 @@ ConstrainedOptimizationIK::ConstrainedOptimizationIK(RobotPtr& robot, const Robo
 {
 
 
-
-
     setRandomSamplingDisplacementFactor(1);
 
     clearSeeds();
@@ -51,7 +51,8 @@ ConstrainedOptimizationIK::ConstrainedOptimizationIK(RobotPtr& robot, const Robo
     addSeed(eSeedZero);
 }
 
-bool ConstrainedOptimizationIK::initialize()
+bool
+ConstrainedOptimizationIK::initialize()
 {
     int size = nodeSet->getSize();
     nodeSet->getJointValues(initialConfig);
@@ -61,9 +62,9 @@ bool ConstrainedOptimizationIK::initialize()
     std::vector<double> low(size);
     std::vector<double> high(size);
 
-    for(int i = 0; i < size; i++)
+    for (int i = 0; i < size; i++)
     {
-        if(nodeSet->getNode(i)->isLimitless())
+        if (nodeSet->getNode(i)->isLimitless())
         {
             // see https://nlopt.readthedocs.io/en/latest/NLopt_Reference/#bound-constraints
             low.at(i) = -HUGE_VAL;
@@ -79,7 +80,7 @@ bool ConstrainedOptimizationIK::initialize()
     optimizer->set_lower_bounds(low);
     optimizer->set_upper_bounds(high);
 
-    if(!std::isnan(globalTolerance))
+    if (!std::isnan(globalTolerance))
     {
         optimizer->set_stopval(globalTolerance * globalTolerance);
     }
@@ -90,22 +91,29 @@ bool ConstrainedOptimizationIK::initialize()
 
     optimizer->set_min_objective(optimizationFunctionWrapper, this);
 
-    for(auto &constraint : constraints)
+    for (auto& constraint : constraints)
     {
-        for(auto &c : constraint->getEqualityConstraints())
+        for (auto& c : constraint->getEqualityConstraints())
         {
-            optimizer->add_equality_constraint(optimizationConstraintWrapper, new std::pair<OptimizationFunctionSetup, ConstrainedOptimizationIK *>(c, this), 1e-6);
+            optimizer->add_equality_constraint(
+                optimizationConstraintWrapper,
+                new std::pair<OptimizationFunctionSetup, ConstrainedOptimizationIK*>(c, this),
+                1e-6);
         }
 
-        for(auto &c : constraint->getInequalityConstraints())
+        for (auto& c : constraint->getInequalityConstraints())
         {
-            optimizer->add_inequality_constraint(optimizationConstraintWrapper, new std::pair<OptimizationFunctionSetup, ConstrainedOptimizationIK *>(c, this), 1e-6);
+            optimizer->add_inequality_constraint(
+                optimizationConstraintWrapper,
+                new std::pair<OptimizationFunctionSetup, ConstrainedOptimizationIK*>(c, this),
+                1e-6);
         }
     }
     return true;
 }
 
-bool ConstrainedOptimizationIK::solve(bool stepwise)
+bool
+ConstrainedOptimizationIK::solve(bool stepwise)
 {
     THROW_VR_EXCEPTION_IF(stepwise, "Stepwise solving not possible with optimization IK");
     THROW_VR_EXCEPTION_IF(!optimizer, "IK not initialized, did you forget to call initialize()?");
@@ -115,7 +123,7 @@ bool ConstrainedOptimizationIK::solve(bool stepwise)
 
     robot->setUpdateVisualization(false);
     bool collisionModelUsed = false;
-    for(auto& c : constraints)
+    for (auto& c : constraints)
     {
         collisionModelUsed |= c->usingCollisionModel();
     }
@@ -125,7 +133,7 @@ bool ConstrainedOptimizationIK::solve(bool stepwise)
     double currentMinError = std::numeric_limits<double>::max();
     AdditionalOutputData currentMinOutput;
     assert(maxIterations >= 0);
-    for(unsigned int attempt = 0; attempt < static_cast<std::size_t>(maxIterations); attempt++)
+    for (unsigned int attempt = 0; attempt < static_cast<std::size_t>(maxIterations); attempt++)
     {
         numIterations = 0;
 
@@ -134,51 +142,63 @@ bool ConstrainedOptimizationIK::solve(bool stepwise)
         int size = nodeSet->getSize();
         std::vector<double> x(size);
 
-        if(attempt >= seeds.size())
+        if (attempt >= seeds.size())
         {
             // Try random configurations sampled around initial config
-            for(int i = 0; i < size; i++)
+            for (int i = 0; i < size; i++)
             {
-                float t = (rand()%1001) / 1000.0;
-                x[i] = initialConfig(i) + randomSamplingDisplacementFactor * (nodeSet->getNode(i)->getJointLimitLo() + t * (nodeSet->getNode(i)->getJointLimitHi() - nodeSet->getNode(i)->getJointLimitLo()) - initialConfig(i));
+                float t = (rand() % 1001) / 1000.0;
+                x[i] = initialConfig(i) + randomSamplingDisplacementFactor *
+                                              (nodeSet->getNode(i)->getJointLimitLo() +
+                                               t * (nodeSet->getNode(i)->getJointLimitHi() -
+                                                    nodeSet->getNode(i)->getJointLimitLo()) -
+                                               initialConfig(i));
             }
         }
         else
         {
-            switch(seeds[attempt].first)
+            switch (seeds[attempt].first)
             {
                 case eSeedZero:
                     // Try zero configuration
-                    for(int i = 0; i < size; i++)
+                    for (int i = 0; i < size; i++)
                     {
-                        x[i] = std::max(nodeSet->getNode(i)->getJointLimitLo(), std::min(nodeSet->getNode(i)->getJointLimitHi(), 0.0f));
+                        x[i] = std::max(nodeSet->getNode(i)->getJointLimitLo(),
+                                        std::min(nodeSet->getNode(i)->getJointLimitHi(), 0.0f));
                     }
                     break;
 
                 case eSeedInitial:
                     // Try initial configuration
-                    for(int i = 0; i < size; i++)
+                    for (int i = 0; i < size; i++)
                     {
-                        x[i] = std::max(nodeSet->getNode(i)->getJointLimitLo(), std::min(nodeSet->getNode(i)->getJointLimitHi(), initialConfig(i)));
+                        x[i] = std::max(
+                            nodeSet->getNode(i)->getJointLimitLo(),
+                            std::min(nodeSet->getNode(i)->getJointLimitHi(), initialConfig(i)));
                     }
                     break;
 
                 case eSeedOther:
                     // Try used specified seed
                     Eigen::VectorXf s = seeds[attempt].second;
-                    for(int i = 0; i < size; i++)
+                    for (int i = 0; i < size; i++)
                     {
-                        x[i] = std::max(nodeSet->getNode(i)->getJointLimitLo(), std::min(nodeSet->getNode(i)->getJointLimitHi(), s(i)));
+                        x[i] = std::max(nodeSet->getNode(i)->getJointLimitLo(),
+                                        std::min(nodeSet->getNode(i)->getJointLimitHi(), s(i)));
                     }
                     break;
             }
 
             // Check initial configuration against joint limits
-            for(unsigned int i = 0; i < nodeSet->getSize(); i++)
+            for (unsigned int i = 0; i < nodeSet->getSize(); i++)
             {
-                if(x[i] < nodeSet->getNode(i)->getJointLimitLo() || x[i] > nodeSet->getNode(i)->getJointLimitHi())
+                if (x[i] < nodeSet->getNode(i)->getJointLimitLo() ||
+                    x[i] > nodeSet->getNode(i)->getJointLimitHi())
                 {
-                    THROW_VR_EXCEPTION("Initial configuration outside of joint limits: joints['" << nodeSet->getNode(i)->getName() << "'] = " << x[i] << ", Limits = [" << nodeSet->getNode(i)->getJointLimitLo() << ", " << nodeSet->getNode(i)->getJointLimitHi() << "]");
+                    THROW_VR_EXCEPTION("Initial configuration outside of joint limits: joints['"
+                                       << nodeSet->getNode(i)->getName() << "'] = " << x[i]
+                                       << ", Limits = [" << nodeSet->getNode(i)->getJointLimitLo()
+                                       << ", " << nodeSet->getNode(i)->getJointLimitHi() << "]");
                 }
             }
         }
@@ -187,21 +207,21 @@ bool ConstrainedOptimizationIK::solve(bool stepwise)
 
         try
         {
-            /*nlopt::result result =*/ optimizer->optimize(x, min_f);
+            /*nlopt::result result =*/optimizer->optimize(x, min_f);
         }
-        catch(const nlopt::roundoff_limited &/*e*/)
+        catch (const nlopt::roundoff_limited& /*e*/)
         {
             // This means that we optimize below the precision limit
             // The result might still be usable though
         }
-        catch(const std::exception &e)
+        catch (const std::exception& e)
         {
             // This is something more severe, we still check the result and proceed
             // with the next attempt.
             VR_INFO << "Warning: NLOPT exception while optimizing: " << e.what() << std::endl;
         }
 
-        for(int i = 0; i < size; i++)
+        for (int i = 0; i < size; i++)
         {
             nodeSet->getNode(i)->setJointValue(x[i]);
         }
@@ -209,7 +229,7 @@ bool ConstrainedOptimizationIK::solve(bool stepwise)
         AdditionalOutputData d;
         bool success = hardOptimizationFunction(x, currentError, d);
         // We determine success based on hard constraints only
-        if(success)
+        if (success)
         {
             // Success
             robot->setUpdateVisualization(updateVisualization);
@@ -218,14 +238,14 @@ bool ConstrainedOptimizationIK::solve(bool stepwise)
             nodeSet->setJointValues(std::vector<float>(x.begin(), x.end()));
             return true;
         }
-        else if(currentMinError > currentError)
+        else if (currentMinError > currentError)
         {
             currentMinError = currentError;
             bestJointValues = x;
             currentMinOutput = d;
         }
     }
-    if(bestJointValues.size() > 0)
+    if (bestJointValues.size() > 0)
     {
         nodeSet->setJointValues(std::vector<float>(bestJointValues.begin(), bestJointValues.end()));
     }
@@ -240,21 +260,25 @@ bool ConstrainedOptimizationIK::solve(bool stepwise)
     return false;
 }
 
-bool ConstrainedOptimizationIK::solveStep()
+bool
+ConstrainedOptimizationIK::solveStep()
 {
     THROW_VR_EXCEPTION("Stepwise solving not possible with optimization IK");
 }
 
-void ConstrainedOptimizationIK::setRandomSamplingDisplacementFactor(float displacementFactor)
+void
+ConstrainedOptimizationIK::setRandomSamplingDisplacementFactor(float displacementFactor)
 {
     randomSamplingDisplacementFactor = displacementFactor;
 }
 
-double ConstrainedOptimizationIK::optimizationFunction(const std::vector<double> &x, std::vector<double> &gradient)
+double
+ConstrainedOptimizationIK::optimizationFunction(const std::vector<double>& x,
+                                                std::vector<double>& gradient)
 {
     numIterations++;
 
-    if(x != currentX)
+    if (x != currentX)
     {
         std::vector<float> q(x.begin(), x.end());
         nodeSet->setJointValues(q);
@@ -268,20 +292,20 @@ double ConstrainedOptimizationIK::optimizationFunction(const std::vector<double>
     if (size == nodeSet->getSize())
     {
         int i = 0;
-        for(const VirtualRobot::RobotNodePtr & node : nodeSet->getAllRobotNodes())
+        for (const VirtualRobot::RobotNodePtr& node : nodeSet->getAllRobotNodes())
         {
-            scalingVec(i) = node->isRotationalJoint() ? 1 : 1.0f/57.f;
+            scalingVec(i) = node->isRotationalJoint() ? 1 : 1.0f / 57.f;
             i++;
         }
     }
 
-    for(auto &constraint : constraints)
+    for (auto& constraint : constraints)
     {
-        for(auto &function : constraint->getOptimizationFunctions())
+        for (auto& function : constraint->getOptimizationFunctions())
         {
             value += function.constraint->optimizationFunction(function.id);
 
-            if(size > 0)
+            if (size > 0)
             {
                 Eigen::VectorXf g = function.constraint->optimizationGradient(function.id);
                 for (int i = 0; i < g.size(); i++)
@@ -294,11 +318,11 @@ double ConstrainedOptimizationIK::optimizationFunction(const std::vector<double>
         }
     }
 
-    if(size > 0)
+    if (size > 0)
     {
         grad.normalize();
 
-        for(unsigned int i = 0; i < gradient.size(); i++)
+        for (unsigned int i = 0; i < gradient.size(); i++)
         {
             gradient[i] = grad(i);
         }
@@ -309,22 +333,25 @@ double ConstrainedOptimizationIK::optimizationFunction(const std::vector<double>
     return value;
 }
 
-double ConstrainedOptimizationIK::optimizationConstraint(const std::vector<double> &x, std::vector<double> &gradient, const OptimizationFunctionSetup &setup)
+double
+ConstrainedOptimizationIK::optimizationConstraint(const std::vector<double>& x,
+                                                  std::vector<double>& gradient,
+                                                  const OptimizationFunctionSetup& setup)
 {
     numIterations++;
 
-    if(x != currentX)
+    if (x != currentX)
     {
         std::vector<float> q(x.begin(), x.end());
         nodeSet->setJointValues(q);
         currentX = x;
     }
 
-    if(gradient.size() > 0)
+    if (gradient.size() > 0)
     {
         Eigen::VectorXf g = setup.constraint->optimizationGradient(setup.id);
 
-        for(unsigned int i = 0; i < gradient.size(); i++)
+        for (unsigned int i = 0; i < gradient.size(); i++)
         {
             gradient[i] = g(i);
         }
@@ -333,9 +360,12 @@ double ConstrainedOptimizationIK::optimizationConstraint(const std::vector<doubl
     return setup.constraint->optimizationFunction(setup.id);
 }
 
-bool ConstrainedOptimizationIK::hardOptimizationFunction(const std::vector<double> &x, double & error, AdditionalOutputData &data)
+bool
+ConstrainedOptimizationIK::hardOptimizationFunction(const std::vector<double>& x,
+                                                    double& error,
+                                                    AdditionalOutputData& data)
 {
-    if(x != currentX)
+    if (x != currentX)
     {
         std::vector<float> q(x.begin(), x.end());
         nodeSet->setJointValues(q);
@@ -344,11 +374,11 @@ bool ConstrainedOptimizationIK::hardOptimizationFunction(const std::vector<doubl
     bool result = true;
     error = 0;
 
-    for(auto &constraint : constraints)
+    for (auto& constraint : constraints)
     {
-        for(auto &function : constraint->getOptimizationFunctions())
+        for (auto& function : constraint->getOptimizationFunctions())
         {
-            if(function.soft)
+            if (function.soft)
             {
                 // Soft constraints do not count for hard optimization value
                 continue;
@@ -366,14 +396,24 @@ bool ConstrainedOptimizationIK::hardOptimizationFunction(const std::vector<doubl
     return result;
 }
 
-
-double ConstrainedOptimizationIK::optimizationFunctionWrapper(const std::vector<double> &x, std::vector<double> &gradient, void *data)
+double
+ConstrainedOptimizationIK::optimizationFunctionWrapper(const std::vector<double>& x,
+                                                       std::vector<double>& gradient,
+                                                       void* data)
 {
-    return static_cast<ConstrainedOptimizationIK *>(data)->optimizationFunction(x, gradient);
+    return static_cast<ConstrainedOptimizationIK*>(data)->optimizationFunction(x, gradient);
 }
 
-double ConstrainedOptimizationIK::optimizationConstraintWrapper(const std::vector<double> &x, std::vector<double> &gradient, void *data)
+double
+ConstrainedOptimizationIK::optimizationConstraintWrapper(const std::vector<double>& x,
+                                                         std::vector<double>& gradient,
+                                                         void* data)
 {
-    return (static_cast<std::pair<OptimizationFunctionSetup, ConstrainedOptimizationIK *> *>(data)->second)->optimizationConstraint(
-                x, gradient, static_cast<std::pair<OptimizationFunctionSetup, ConstrainedOptimizationIK *> *>(data)->first);
+    return (static_cast<std::pair<OptimizationFunctionSetup, ConstrainedOptimizationIK*>*>(data)
+                ->second)
+        ->optimizationConstraint(
+            x,
+            gradient,
+            static_cast<std::pair<OptimizationFunctionSetup, ConstrainedOptimizationIK*>*>(data)
+                ->first);
 }

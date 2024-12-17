@@ -49,6 +49,7 @@ namespace VirtualRobot
 
             EIGEN_MAKE_ALIGNED_OPERATOR_NEW
         };
+
         struct ContactFrame
         {
             std::vector<ContactForce> forces;
@@ -71,7 +72,8 @@ namespace VirtualRobot
         /*!
          * Returns contact frame
          */
-        const ContactSensor::ContactFrame& getContacts()
+        const ContactSensor::ContactFrame&
+        getContacts()
         {
             return frame;
         }
@@ -79,7 +81,8 @@ namespace VirtualRobot
         /*!
          * Returns true of this node as contact with another object.
          */
-        bool hasContact()
+        bool
+        hasContact()
         {
             return (frame.forces.size() > 0);
         }
@@ -93,17 +96,19 @@ namespace VirtualRobot
         std::string toXML(const std::string& modelPath, int tabs) override;
 
     protected:
-
-        ContactSensor() {}
+        ContactSensor()
+        {
+        }
 
         /*!
         Derived classes must implement their clone method here.
         */
-        SensorPtr _clone(const GraspableSensorizedObjectPtr newParentNode, const VisualizationNodePtr visualizationModel, float scaling) override;
+        SensorPtr _clone(const GraspableSensorizedObjectPtr newParentNode,
+                         const VisualizationNodePtr visualizationModel,
+                         float scaling) override;
 
         ContactFrame frame;
         double timestamp;
     };
 
 } // namespace VirtualRobot
-

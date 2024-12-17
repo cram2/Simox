@@ -25,7 +25,7 @@ namespace Saba
         planningTimeout = std::numeric_limits<float>::max();
 
         stopSearch = false;
-        maxCycles = 50000;              // stop if cycles are exceeded
+        maxCycles = 50000; // stop if cycles are exceeded
         cycles = 0;
 
         startValid = false;
@@ -39,18 +39,20 @@ namespace Saba
         reset();
     }
 
-    void MotionPlanner::setName(std::string sName)
+    void
+    MotionPlanner::setName(std::string sName)
     {
         this->name = sName;
     }
 
-    std::string MotionPlanner::getName()
+    std::string
+    MotionPlanner::getName()
     {
         return name;
     }
 
-
-    void MotionPlanner::printConfig(bool printOnlyParams)
+    void
+    MotionPlanner::printConfig(bool printOnlyParams)
     {
         if (!printOnlyParams)
         {
@@ -92,10 +94,8 @@ namespace Saba
         }
     }
 
-
-
-
-    bool MotionPlanner::setStart(const Eigen::VectorXf& c)
+    bool
+    MotionPlanner::setStart(const Eigen::VectorXf& c)
     {
         this->startConfig = c;
         startValid = false;
@@ -123,8 +123,8 @@ namespace Saba
         return true;
     }
 
-
-    bool MotionPlanner::setGoal(const Eigen::VectorXf& c)
+    bool
+    MotionPlanner::setGoal(const Eigen::VectorXf& c)
     {
         this->goalConfig = c;
         goalValid = false;
@@ -152,9 +152,8 @@ namespace Saba
         return true;
     }
 
-
-
-    bool MotionPlanner::isInitialized()
+    bool
+    MotionPlanner::isInitialized()
     {
         if (!startValid)
         {
@@ -169,18 +168,20 @@ namespace Saba
         return true;
     }
 
-    void MotionPlanner::setPlanningTimeout(float timeoutMs)
+    void
+    MotionPlanner::setPlanningTimeout(float timeoutMs)
     {
         this->planningTimeout = timeoutMs;
     }
 
-    void MotionPlanner::setMaxCycles(unsigned int mc)
+    void
+    MotionPlanner::setMaxCycles(unsigned int mc)
     {
         maxCycles = mc;
     }
 
-
-    CSpacePathPtr MotionPlanner::getSolution()
+    CSpacePathPtr
+    MotionPlanner::getSolution()
     {
         if (!solution)
         {
@@ -190,7 +191,8 @@ namespace Saba
         return solution;
     }
 
-    void MotionPlanner::reset()
+    void
+    MotionPlanner::reset()
     {
         startConfig.setZero(1);
         goalConfig.setZero(1);
@@ -206,4 +208,4 @@ namespace Saba
         cycles = 0;
     }
 
-} // namespace
+} // namespace Saba

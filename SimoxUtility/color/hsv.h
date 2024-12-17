@@ -4,7 +4,6 @@
 
 #include "Color.h"
 
-
 namespace simox::color
 {
 
@@ -31,4 +30,4 @@ namespace simox::color
      */
     Eigen::Vector3f hsv_to_rgb(const Eigen::Vector3f& hsv);
 
-}
+} // namespace simox::color

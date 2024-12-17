@@ -5,7 +5,6 @@
 
 #include <SimoxUtility/meta/eigen/enable_if_compile_time_size.h>
 
-
 namespace simox::math
 {
 
@@ -26,7 +25,6 @@ namespace simox::math
         return Eigen::Block<Derived, 3, 1>(pose.derived(), 0, 3);
     }
 
-
     /// Get the position block from the given pose.
     template <typename Derived>
     const Eigen::Block<const Derived, 3, 1>
@@ -35,7 +33,6 @@ namespace simox::math
         EIGEN_STATIC_ASSERT_MATRIX_SPECIFIC_SIZE(Eigen::MatrixBase<Derived>, 4, 4);
         return Eigen::Block<const Derived, 3, 1>(pose.derived(), 0, 3);
     }
-
 
     /**
     * @brief Get the orientation block from the given pose.
@@ -56,7 +53,6 @@ namespace simox::math
         return Eigen::Block<Derived, 3, 3>(pose.derived(), 0, 0);
     }
 
-
     /// Get the orientation block from the given pose.
     template <typename Derived>
     const Eigen::Block<const Derived, 3, 3>
@@ -66,10 +62,11 @@ namespace simox::math
         return Eigen::Block<const Derived, 3, 3>(pose.derived(), 0, 0);
     }
 
-
     /// Build a pose matrix from the given position and orientation.
-    template <typename PosDerived, typename OriDerived,
-              typename = std::enable_if_t<std::is_same_v<typename PosDerived::Scalar, typename OriDerived::Scalar>> >
+    template <typename PosDerived,
+              typename OriDerived,
+              typename = std::enable_if_t<
+                  std::is_same_v<typename PosDerived::Scalar, typename OriDerived::Scalar>>>
     Eigen::Matrix<typename PosDerived::Scalar, 4, 4>
     pose(const Eigen::MatrixBase<PosDerived>& pos, const Eigen::MatrixBase<OriDerived>& ori)
     {
@@ -81,16 +78,16 @@ namespace simox::math
         return pose;
     }
 
-
     /// Build a pose matrix from the given position and orientation.
-    template <typename PosDerived, typename OriDerived,
-              typename = std::enable_if_t<std::is_same_v<typename PosDerived::Scalar, typename OriDerived::Scalar>> >
+    template <typename PosDerived,
+              typename OriDerived,
+              typename = std::enable_if_t<
+                  std::is_same_v<typename PosDerived::Scalar, typename OriDerived::Scalar>>>
     Eigen::Matrix<typename PosDerived::Scalar, 4, 4>
     pose(const Eigen::MatrixBase<PosDerived>& pos, const Eigen::RotationBase<OriDerived, 3>& ori)
     {
         return pose(pos, ori.toRotationMatrix());
     }
-
 
     /// Build a pose matrix from the given position with identity orientation.
     template <typename Derived, simox::meta::enable_if_vec3<Derived, int> = 0>
@@ -100,7 +97,6 @@ namespace simox::math
         return pose(position, Eigen::Matrix<typename Derived::Scalar, 3, 3>::Identity());
     }
 
-
     /// Build a pose matrix from the given orientation matrix and zero position.
     template <typename Derived, simox::meta::enable_if_mat3<Derived, int> = 0>
     Eigen::Matrix<typename Derived::Scalar, 4, 4>
@@ -108,7 +104,6 @@ namespace simox::math
     {
         return pose(Eigen::Matrix<typename Derived::Scalar, 3, 1>::Zero(), orientation);
     }
-
 
     /// Build a pose matrix from the given orientation and zero position.
     template <typename OriDerived>
@@ -118,14 +113,12 @@ namespace simox::math
         return pose(Eigen::Matrix<typename OriDerived::Scalar, 3, 1>::Zero(), ori);
     }
 
-
     template <class Derived>
     simox::meta::enable_if_mat4<Derived>
     scale_position(Eigen::MatrixBase<Derived>& pose, float factor)
     {
         pose.template topRightCorner<3, 1>() *= factor;
     }
-
 
     template <class Derived>
     simox::meta::enable_if_mat4<Derived, Eigen::Matrix<typename Derived::Scalar, 4, 4>>
@@ -135,4 +128,4 @@ namespace simox::math
         scale_position(m, factor);
         return m;
     }
-}
+} // namespace simox::math

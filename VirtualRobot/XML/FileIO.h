@@ -22,8 +22,8 @@
 */
 #pragma once
 
-#include <vector>
 #include <fstream>
+#include <vector>
 
 #include <Eigen/Core>
 
@@ -34,24 +34,32 @@ namespace VirtualRobot
     namespace FileIO
     {
 
-        template<typename T> inline T read(std::ifstream& file)
+        template <typename T>
+        inline T
+        read(std::ifstream& file)
         {
             T t;
             file.read((char*)&t, sizeof(T));
             return t;
         }
 
-        template<typename T> inline void readArray(T* res, int num, std::ifstream& file)
+        template <typename T>
+        inline void
+        readArray(T* res, int num, std::ifstream& file)
         {
             file.read((char*)res, num * sizeof(T));
         }
 
-        template<typename T> inline void write(std::ofstream& file, T value)
+        template <typename T>
+        inline void
+        write(std::ofstream& file, T value)
         {
             file.write((char*)&value, sizeof(T));
         }
 
-        template<typename T> inline void writeArray(std::ofstream& file, const T* value, int num)
+        template <typename T>
+        inline void
+        writeArray(std::ofstream& file, const T* value, int num)
         {
             file.write((char*)value, num * sizeof(T));
         }
@@ -71,7 +79,8 @@ namespace VirtualRobot
             \param separator Separator character. Standard space, but comma or semicolon could be passed here.
             \return Vector of points.
         */
-        std::vector< Eigen::Vector3f > VIRTUAL_ROBOT_IMPORT_EXPORT readPts(const std::string& filename, const char separator = ' ');
-    }
+        std::vector<Eigen::Vector3f> VIRTUAL_ROBOT_IMPORT_EXPORT
+        readPts(const std::string& filename, const char separator = ' ');
+    } // namespace FileIO
 
 } // namespace VirtualRobot

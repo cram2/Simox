@@ -1,19 +1,20 @@
-#include <random>
 #include <filesystem>
 #include <fstream>
+#include <random>
 
-#include <VirtualRobot/Nodes/RobotNodeFixedFactory.h>
-#include <VirtualRobot/RuntimeEnvironment.h>
-#include <VirtualRobot/Robot.h>
 #include <VirtualRobot/CollisionDetection/CollisionModel.h>
-#include <VirtualRobot/Visualization/TriMeshModel.h>
-#include <VirtualRobot/Visualization/CoinVisualization/CoinVisualizationNode.h>
-#include <VirtualRobot/XML/RobotIO.h>
+#include <VirtualRobot/Nodes/RobotNodeFixedFactory.h>
+#include <VirtualRobot/Robot.h>
 #include <VirtualRobot/RobotFactory.h>
+#include <VirtualRobot/RuntimeEnvironment.h>
+#include <VirtualRobot/Visualization/CoinVisualization/CoinVisualizationNode.h>
+#include <VirtualRobot/Visualization/TriMeshModel.h>
+#include <VirtualRobot/XML/RobotIO.h>
 
-int main(int argc, char* argv[])
+int
+main(int argc, char* argv[])
 {
-    std::mt19937 gen{std::random_device {}()};
+    std::mt19937 gen{std::random_device{}()};
 
     VirtualRobot::init(argc, argv, "RGBOffscreenRendering");
 
@@ -26,13 +27,13 @@ int main(int argc, char* argv[])
     VirtualRobot::RobotPtr robot(new VirtualRobot::LocalRobot(robotName, robotType));
 
     std::vector<VirtualRobot::RobotNodePtr> allNodes;
-    std::map< VirtualRobot::RobotNodePtr, std::vector<std::string> > childrenMap;
+    std::map<VirtualRobot::RobotNodePtr, std::vector<std::string>> childrenMap;
     const std::size_t numNodes = std::uniform_int_distribution<std::size_t>(2, 10)(gen);
     std::cout << "generating " << numNodes << " nodes\n";
 
     std::uniform_real_distribution<float> d(50, 500);
 
-    const auto createBodyNode = [&](VirtualRobot::RobotNodePtr last, const std::string & name)
+    const auto createBodyNode = [&](VirtualRobot::RobotNodePtr last, const std::string& name)
     {
         std::cout << "generating node " << name << "\n";
         Eigen::Matrix4f preJointTransform = Eigen::Matrix4f::Identity();
@@ -46,20 +47,24 @@ int main(int argc, char* argv[])
         const auto cvisu = std::make_shared<VirtualRobot::CoinVisualizationNode>(model);
         auto rnCol = std::make_shared<VirtualRobot::CollisionModel>(cvisu);
 
-        auto  rnVisu = rnCol->getVisualization()->clone();
+        auto rnVisu = rnCol->getVisualization()->clone();
 
         auto fixedNodeFactory = VirtualRobot::RobotNodeFactory::fromName(
-                                    VirtualRobot::RobotNodeFixedFactory::getName(), NULL);
+            VirtualRobot::RobotNodeFixedFactory::getName(), NULL);
 
         VirtualRobot::SceneObject::Physics physics;
         physics.massKg = 1;
         physics.inertiaMatrix.setIdentity();
         physics.comLocation = VirtualRobot::SceneObject::Physics::eVisuBBoxCenter;
 
-        VirtualRobot::RobotNodePtr node = fixedNodeFactory->createRobotNode(
-                                              robot, name,
-                                              rnVisu, rnCol,
-                                              0, 0, 0, //limits
+        VirtualRobot::RobotNodePtr node =
+            fixedNodeFactory->createRobotNode(robot,
+                                              name,
+                                              rnVisu,
+                                              rnCol,
+                                              0,
+                                              0,
+                                              0, //limits
                                               preJointTransform,
                                               Eigen::Vector3f::Zero(), //axis
                                               Eigen::Vector3f::Zero(), //translation direction
@@ -80,14 +85,9 @@ int main(int argc, char* argv[])
         lastNode = createBodyNode(lastNode, std::to_string(i));
     }
     std::cout << "assemble robot\n";
-    VirtualRobot::RobotFactory::initializeRobot(
-        robot,
-        allNodes,
-        childrenMap,
-        allNodes.front());
+    VirtualRobot::RobotFactory::initializeRobot(robot, allNodes, childrenMap, allNodes.front());
 
     std::cout << "save robot\n";
-    VirtualRobot::RobotIO::saveXML(robot, robotName + ".xml", "", "models",
-                                   true, true, true, true);
+    VirtualRobot::RobotIO::saveXML(robot, robotName + ".xml", "", "models", true, true, true, true);
     return 0;
 }

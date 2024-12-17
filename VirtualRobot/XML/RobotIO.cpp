@@ -12,12 +12,6 @@
 #include <VirtualRobot/Import/RobotImporterFactory.h>
 #include <VirtualRobot/Nodes/FourBar/Joint.h>
 
-#include "VirtualRobot/EndEffector/EndEffectorActor.h"
-#include "VirtualRobot/VirtualRobot.h"
-#include "VirtualRobot/XML/BaseIO.h"
-#include "VirtualRobot/Robot.h"
-#include "VirtualRobot/Nodes/RobotNode.h"
-
 #include "../CollisionDetection/CollisionModel.h"
 #include "../EndEffector/EndEffector.h"
 #include "../EndEffector/EndEffectorActor.h"
@@ -36,6 +30,11 @@
 #include "../Visualization/VisualizationNode.h"
 #include "Nodes/RobotNodeFourBar.h"
 #include "VirtualRobot.h"
+#include "VirtualRobot/EndEffector/EndEffectorActor.h"
+#include "VirtualRobot/Nodes/RobotNode.h"
+#include "VirtualRobot/Robot.h"
+#include "VirtualRobot/VirtualRobot.h"
+#include "VirtualRobot/XML/BaseIO.h"
 #include "mujoco/RobotMjcf.h"
 #include "rapidxml.hpp"
 
@@ -1277,7 +1276,7 @@ namespace VirtualRobot
         robo->setAffordances(affordances);
 
 
-        for(const auto& [name, configuration]: configurations)
+        for (const auto& [name, configuration] : configurations)
         {
             // VR_INFO << "Registering configuration `" << name << "`." << std::endl;
             robo->registerConfiguration(name, configuration);
@@ -1530,7 +1529,8 @@ namespace VirtualRobot
             {
                 auto [name, configuration] = processConfigurationNode(XMLNode);
 
-                THROW_VR_EXCEPTION_IF(configurations.count(name)> 0, "Configuration `" << name << "` specified multiple times!");
+                THROW_VR_EXCEPTION_IF(configurations.count(name) > 0,
+                                      "Configuration `" << name << "` specified multiple times!");
                 configurations.emplace(name, configuration);
             }
             else if (nodeName == "affordances")
@@ -1688,7 +1688,7 @@ namespace VirtualRobot
             {
                 manipulationCapabilities.emplace();
                 processManipulationCapabilities(node, manipulationCapabilities.value());
-            
+
                 // VR_INFO << "End effector `" << endeffectorName << "` has " << manipulationCapabilities.value().capabilities.size() << " predefined manipulation capabilities." << std::endl;
             }
             else
@@ -1710,8 +1710,14 @@ namespace VirtualRobot
             gcpNode = tcpNode;
         }
 
-        EndEffectorPtr endEffector(
-            new EndEffector(endeffectorName, actors, staticParts, baseNode, tcpNode, gcpNode, {}, manipulationCapabilities));
+        EndEffectorPtr endEffector(new EndEffector(endeffectorName,
+                                                   actors,
+                                                   staticParts,
+                                                   baseNode,
+                                                   tcpNode,
+                                                   gcpNode,
+                                                   {},
+                                                   manipulationCapabilities));
 
         // create & register configs
         THROW_VR_EXCEPTION_IF(configDefinitions.size() != configNames.size(),

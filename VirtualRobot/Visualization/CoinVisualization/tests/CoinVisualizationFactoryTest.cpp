@@ -6,9 +6,10 @@
 
 #define BOOST_TEST_MODULE VirtualRobot_CoinVisualizationFactoryTest
 
+#include <string>
+
 #include <VirtualRobot/VirtualRobotTest.h>
 #include <VirtualRobot/Visualization/CoinVisualization/CoinVisualizationFactory.h>
-#include <string>
 
 BOOST_AUTO_TEST_CASE(testVirtualRobotCoinVisualizationFactory)
 {

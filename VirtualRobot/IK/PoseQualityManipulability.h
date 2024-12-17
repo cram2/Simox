@@ -23,7 +23,6 @@
 #pragma once
 
 #include "../VirtualRobot.h"
-
 #include "PoseQualityMeasurement.h"
 
 namespace VirtualRobot
@@ -37,18 +36,19 @@ namespace VirtualRobot
     * Two modes are offered: Either all singular values are multiplied
     * or the ratio of minimum and maximum singular value is returned (also known as (inverted) Condition number).
     */
-    class VIRTUAL_ROBOT_IMPORT_EXPORT PoseQualityManipulability :  public PoseQualityMeasurement
+    class VIRTUAL_ROBOT_IMPORT_EXPORT PoseQualityManipulability : public PoseQualityMeasurement
     {
     public:
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
         enum ManipulabilityIndexType
         {
-            eMultiplySV,    // multiply all singular values
-            eMinMaxRatio    // ratio of max and min singular value (aka (inverted) Condition number)
+            eMultiplySV, // multiply all singular values
+            eMinMaxRatio // ratio of max and min singular value (aka (inverted) Condition number)
         };
 
-        PoseQualityManipulability(VirtualRobot::RobotNodeSetPtr rns, ManipulabilityIndexType i = eMinMaxRatio);
+        PoseQualityManipulability(VirtualRobot::RobotNodeSetPtr rns,
+                                  ManipulabilityIndexType i = eMinMaxRatio);
         ~PoseQualityManipulability();
 
         /*!
@@ -101,7 +101,6 @@ namespace VirtualRobot
         PoseQualityMeasurementPtr clone(RobotPtr newRobot) override;
 
     protected:
-
         float getJointLimitPenalizationFactor();
 
         VirtualRobot::DifferentialIKPtr jacobian;
@@ -116,5 +115,4 @@ namespace VirtualRobot
         bool convertMMtoM;
     };
 
-}
-
+} // namespace VirtualRobot

@@ -3,7 +3,6 @@
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
-
 #include "VirtualRobot.h"
 
 namespace VirtualRobot
@@ -16,5 +15,5 @@ namespace VirtualRobot
     };
 
     Circle projectedBoundingCircle(const Robot& robot);
-    
+
 } // namespace VirtualRobot

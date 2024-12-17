@@ -22,10 +22,10 @@
 */
 #pragma once
 
-#include <VirtualRobot/VirtualRobot.h>
-#include <VirtualRobot/Robot.h>
 #include <VirtualRobot/Nodes/RobotNode.h>
+#include <VirtualRobot/Robot.h>
 #include <VirtualRobot/RobotNodeSet.h>
+#include <VirtualRobot/VirtualRobot.h>
 
 namespace VirtualRobot
 {
@@ -48,8 +48,7 @@ namespace VirtualRobot
                     RobotNodePtr baseNode,
                     RobotNodePtr leftTCP = RobotNodePtr(),
                     RobotNodePtr rightTCP = RobotNodePtr(),
-                    RobotNodeSetPtr rnsLeft2RightFoot = RobotNodeSetPtr()
-                   );
+                    RobotNodeSetPtr rnsLeft2RightFoot = RobotNodeSetPtr());
 
         virtual ~FeetPosture();
 
@@ -74,8 +73,8 @@ namespace VirtualRobot
         void setRNSLeft2RightFoot(RobotNodeSetPtr rns);
 
         void print();
-    protected:
 
+    protected:
         RobotNodeSetPtr leftLeg;
         RobotNodeSetPtr rightLeg;
         RobotNodeSetPtr leftLegCol;
@@ -85,10 +84,8 @@ namespace VirtualRobot
         RobotNodePtr leftTCP;
         RobotNodePtr rightTCP;
         RobotNodePtr baseNode;
-
     };
 
     typedef std::shared_ptr<FeetPosture> FeetPosturePtr;
 
 } // namespace VirtualRobot
-

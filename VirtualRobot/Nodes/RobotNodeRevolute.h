@@ -22,15 +22,13 @@
 */
 #pragma once
 
-#include "../VirtualRobot.h"
-
-#include "RobotNode.h"
-
-#include <Eigen/Core>
-
 #include <string>
 #include <vector>
 
+#include <Eigen/Core>
+
+#include "../VirtualRobot.h"
+#include "RobotNode.h"
 
 namespace VirtualRobot
 {
@@ -44,36 +42,44 @@ namespace VirtualRobot
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
 
-        RobotNodeRevolute(RobotWeakPtr rob,                                      //!< The robot
-                          const std::string& name,                            //!< The name
-                          float jointLimitLo,                                 //!< lower joint limit
-                          float jointLimitHi,                                 //!< upper joint limit
-                          const Eigen::Matrix4f& preJointTransform,           //!< This transformation is applied before the translation of the joint is done
-                          const Eigen::Vector3f& axis,                        //!< The rotation axis (in local joint coord system)
-                          VisualizationNodePtr visualization = VisualizationNodePtr(),    //!< A visualization model
-                          CollisionModelPtr collisionModel = CollisionModelPtr(),         //!< A collision model
-                          float jointValueOffset = 0.0f,                                  //!< An offset that is internally added to the joint value
-                          const SceneObject::Physics& p = SceneObject::Physics(),         //!< physics information
-                          CollisionCheckerPtr colChecker = CollisionCheckerPtr(),         //!< A collision checker instance (if not set, the global col checker is used)
-                          RobotNodeType type = Generic);
-        RobotNodeRevolute(RobotWeakPtr rob,                                      //!< The robot
-                          const std::string& name,                            //!< The name
-                          float jointLimitLo,                                 //!< lower joint limit
-                          float jointLimitHi,                                 //!< upper joint limit
-                          float a,                                            //!< dh paramters
-                          float d,                                            //!< dh paramters
-                          float alpha,                                        //!< dh paramters
-                          float theta,                                        //!< dh paramters
-                          VisualizationNodePtr visualization = VisualizationNodePtr(),//!< A visualization model
-                          CollisionModelPtr collisionModel = CollisionModelPtr(),     //!< A collision model
-                          float jointValueOffset = 0.0f,                              //!< An offset that is internally added to the joint value
-                          const SceneObject::Physics& p = SceneObject::Physics(),     //!< physics information
-                          CollisionCheckerPtr colChecker = CollisionCheckerPtr(),     //!< A collision checker instance (if not set, the global col checker is used)
-                          RobotNodeType type = Generic);
+        RobotNodeRevolute(
+            RobotWeakPtr rob, //!< The robot
+            const std::string& name, //!< The name
+            float jointLimitLo, //!< lower joint limit
+            float jointLimitHi, //!< upper joint limit
+            const Eigen::Matrix4f&
+                preJointTransform, //!< This transformation is applied before the translation of the joint is done
+            const Eigen::Vector3f& axis, //!< The rotation axis (in local joint coord system)
+            VisualizationNodePtr visualization = VisualizationNodePtr(), //!< A visualization model
+            CollisionModelPtr collisionModel = CollisionModelPtr(), //!< A collision model
+            float jointValueOffset =
+                0.0f, //!< An offset that is internally added to the joint value
+            const SceneObject::Physics& p = SceneObject::Physics(), //!< physics information
+            CollisionCheckerPtr colChecker =
+                CollisionCheckerPtr(), //!< A collision checker instance (if not set, the global col checker is used)
+            RobotNodeType type = Generic);
+        RobotNodeRevolute(
+            RobotWeakPtr rob, //!< The robot
+            const std::string& name, //!< The name
+            float jointLimitLo, //!< lower joint limit
+            float jointLimitHi, //!< upper joint limit
+            float a, //!< dh paramters
+            float d, //!< dh paramters
+            float alpha, //!< dh paramters
+            float theta, //!< dh paramters
+            VisualizationNodePtr visualization = VisualizationNodePtr(), //!< A visualization model
+            CollisionModelPtr collisionModel = CollisionModelPtr(), //!< A collision model
+            float jointValueOffset =
+                0.0f, //!< An offset that is internally added to the joint value
+            const SceneObject::Physics& p = SceneObject::Physics(), //!< physics information
+            CollisionCheckerPtr colChecker =
+                CollisionCheckerPtr(), //!< A collision checker instance (if not set, the global col checker is used)
+            RobotNodeType type = Generic);
 
         ~RobotNodeRevolute() override;
 
-        bool initialize(SceneObjectPtr parent = nullptr, const std::vector<SceneObjectPtr>& children = {}) override;
+        bool initialize(SceneObjectPtr parent = nullptr,
+                        const std::vector<SceneObjectPtr>& children = {}) override;
 
         //! Print status information.
         void print(bool printChildren = false, bool printDecoration = true) const override;
@@ -108,8 +114,7 @@ namespace VirtualRobot
 
 
     protected:
-
-        RobotNodeRevolute() {};
+        RobotNodeRevolute(){};
 
         //! Derived classes add custom XML tags here
         std::string _toXML(const std::string& modelPath) override;
@@ -120,23 +125,24 @@ namespace VirtualRobot
             \param globalPose The new global pose. The joint value is *not* determined from this pose. The RobotNodeActuator is responsible for setting the corresponding joint value
             \param updateChildren Usually it is assumed that all RobotNodes are updated this way (updateChildren=false). If not, the children poses can be updated according to this node (updateCHildren=true).
         */
-        void updateVisualizationPose(const Eigen::Matrix4f& globalPose, bool updateChildren = false) override;
+        void updateVisualizationPose(const Eigen::Matrix4f& globalPose,
+                                     bool updateChildren = false) override;
 
         //! Checks if nodeType constraints are fulfilled. Otherwise an exception is thrown. Called on initialization.
         void checkValidRobotNodeType() override;
 
         void updateTransformationMatrices(const Eigen::Matrix4f& parentPose) override;
 
-        RobotNodePtr _clone(const RobotPtr newRobot, const VisualizationNodePtr visualizationModel,
-                            const CollisionModelPtr collisionModel, CollisionCheckerPtr colChecker,
+        RobotNodePtr _clone(const RobotPtr newRobot,
+                            const VisualizationNodePtr visualizationModel,
+                            const CollisionModelPtr collisionModel,
+                            CollisionCheckerPtr colChecker,
                             float scaling) override;
 
 
     protected:
-
-        Eigen::Vector3f jointRotationAxis;  // eRevoluteJoint  (given in local joint coord system)
+        Eigen::Vector3f jointRotationAxis; // eRevoluteJoint  (given in local joint coord system)
         Eigen::Matrix4f tmpRotMat;
-
     };
 
     typedef std::shared_ptr<RobotNodeRevolute> RobotNodeRevolutePtr;

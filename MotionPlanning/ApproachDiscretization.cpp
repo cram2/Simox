@@ -1,8 +1,10 @@
 #include "ApproachDiscretization.h"
-#include <iostream>
-#include <ctime>
+
 #include <algorithm>
 #include <climits>
+#include <ctime>
+#include <iostream>
+
 #include "VirtualRobot/MathTools.h"
 
 using namespace std;
@@ -17,15 +19,15 @@ namespace Saba
 
         //clock_t tStart = clock();
         sphereGenerator.reset(new VirtualRobot::SphereApproximator());
-        sphereGenerator->generateGraph(sphere, VirtualRobot::SphereApproximator::eOctahedron, steps, radius);
+        sphereGenerator->generateGraph(
+            sphere, VirtualRobot::SphereApproximator::eOctahedron, steps, radius);
         //buildIVModel();
         //clock_t tEnd = clock();
         //long diffClock = (long)(((float)(tEnd - tStart) / (float)CLOCKS_PER_SEC) * 1000.0);
         //cout << __FUNCTION__ << " Created Sphere in " << diffClock << "ms with " << sphere.m_Vertices.size() << " vertices and " << sphere.faces.size() << " faces "<< std::endl;
     }
 
-    ApproachDiscretization::~ApproachDiscretization()
-    = default;
+    ApproachDiscretization::~ApproachDiscretization() = default;
 
     /*
     void ApproachDiscretization::buildIVModel()
@@ -43,23 +45,27 @@ namespace Saba
     }
     */
 
-    Eigen::Matrix4f ApproachDiscretization::getGlobalPose() const
+    Eigen::Matrix4f
+    ApproachDiscretization::getGlobalPose() const
     {
         return globalPose;
     }
 
-    void ApproachDiscretization::setGlobalPose(const Eigen::Matrix4f& pose)
+    void
+    ApproachDiscretization::setGlobalPose(const Eigen::Matrix4f& pose)
     {
         globalPose.setIdentity();
         globalPose.block(0, 3, 3, 1) = pose.block(0, 3, 3, 1);
     }
 
-    int ApproachDiscretization::getNearestVertexId(const Eigen::Matrix4f& pose)
+    int
+    ApproachDiscretization::getNearestVertexId(const Eigen::Matrix4f& pose)
     {
         return getNearestVertexIdVec(pose.block(0, 3, 3, 1));
     }
 
-    int ApproachDiscretization::getNearestVertexIdVec(const Eigen::Vector3f& pos)
+    int
+    ApproachDiscretization::getNearestVertexIdVec(const Eigen::Vector3f& pos)
     {
         Eigen::Vector3f dir = pos - globalPose.block(0, 3, 3, 1);
 
@@ -73,12 +79,14 @@ namespace Saba
         return nIndex;
     }
 
-    int ApproachDiscretization::getNearestFaceId(const Eigen::Matrix4f& pose)
+    int
+    ApproachDiscretization::getNearestFaceId(const Eigen::Matrix4f& pose)
     {
         return getNearestFaceIdVec(pose.block(0, 3, 3, 1));
     }
 
-    int ApproachDiscretization::getNearestFaceIdVec(const Eigen::Vector3f& pos)
+    int
+    ApproachDiscretization::getNearestFaceIdVec(const Eigen::Vector3f& pos)
     {
         Eigen::Vector3f dir = pos - globalPose.block(0, 3, 3, 1);
 
@@ -91,14 +99,20 @@ namespace Saba
 
         Eigen::Vector3f zeroPt, storeIntPoint;
         zeroPt.setZero();
-        VirtualRobot::SphereApproximator::FaceIndex faceIndx = sphere.mapVerticeIndxToFaceIndx[nIndex];
+        VirtualRobot::SphereApproximator::FaceIndex faceIndx =
+            sphere.mapVerticeIndxToFaceIndx[nIndex];
 
         for (int faceId : faceIndx.faceIds)
         {
             VirtualRobot::MathTools::TriangleFace f = sphere.faces[faceId];
 
             //if  (sphereGenerator->check_intersect_tri(sphere.vertices[f.n1],sphere.m_Vertices[f.m_n2],sphere.m_Vertices[f.m_n3],zeroPt,Pose1,storeIntPoint))
-            if (sphereGenerator->check_intersect_tri(sphere.vertices[f.id1], sphere.vertices[f.id2], sphere.vertices[f.id3], zeroPt, dir, storeIntPoint))
+            if (sphereGenerator->check_intersect_tri(sphere.vertices[f.id1],
+                                                     sphere.vertices[f.id2],
+                                                     sphere.vertices[f.id3],
+                                                     zeroPt,
+                                                     dir,
+                                                     storeIntPoint))
             {
                 //MarkFace(FaceIndx.m_faceIds[i],true);
                 return faceId;
@@ -109,7 +123,8 @@ namespace Saba
         return -1;
     }
 
-    void ApproachDiscretization::removeCSpaceNode(int faceId, CSpaceNodePtr node)
+    void
+    ApproachDiscretization::removeCSpaceNode(int faceId, CSpaceNodePtr node)
     {
         if (faceId < 0 || faceId > (int)sphere.faces.size())
         {
@@ -119,11 +134,15 @@ namespace Saba
 
         if (faceIdToCSpaceNodesMapping.find(faceId) != faceIdToCSpaceNodesMapping.end())
         {
-            std::vector<CSpaceNodePtr>::iterator iter = find(faceIdToCSpaceNodesMapping[faceId].cspaceNodes.begin(), faceIdToCSpaceNodesMapping[faceId].cspaceNodes.end(), node);
+            std::vector<CSpaceNodePtr>::iterator iter =
+                find(faceIdToCSpaceNodesMapping[faceId].cspaceNodes.begin(),
+                     faceIdToCSpaceNodesMapping[faceId].cspaceNodes.end(),
+                     node);
 
             if (iter == faceIdToCSpaceNodesMapping[faceId].cspaceNodes.end())
             {
-                std::cout << __FUNCTION__ << " Warning: Node " << node->ID << " is not mapped to face with id " << faceId << std::endl;
+                std::cout << __FUNCTION__ << " Warning: Node " << node->ID
+                          << " is not mapped to face with id " << faceId << std::endl;
             }
             else
             {
@@ -132,11 +151,13 @@ namespace Saba
         }
         else
         {
-            std::cout << __FUNCTION__ << " Warning: Node " << node->ID << " is not mapped to face with id " << faceId << std::endl;
+            std::cout << __FUNCTION__ << " Warning: Node " << node->ID
+                      << " is not mapped to face with id " << faceId << std::endl;
         }
     }
 
-    void ApproachDiscretization::removeCSpaceNode(const Eigen::Vector3f& cartPos, CSpaceNodePtr node)
+    void
+    ApproachDiscretization::removeCSpaceNode(const Eigen::Vector3f& cartPos, CSpaceNodePtr node)
     {
         if (!node)
         {
@@ -148,7 +169,8 @@ namespace Saba
         removeCSpaceNode(faceId, node);
     }
 
-    void ApproachDiscretization::addCSpaceNode(int faceId, CSpaceNodePtr node)
+    void
+    ApproachDiscretization::addCSpaceNode(int faceId, CSpaceNodePtr node)
     {
         if (faceId < 0 || faceId > (int)sphere.faces.size())
         {
@@ -158,11 +180,15 @@ namespace Saba
 
         if (faceIdToCSpaceNodesMapping.find(faceId) != faceIdToCSpaceNodesMapping.end())
         {
-            std::vector<CSpaceNodePtr>::iterator iter = find(faceIdToCSpaceNodesMapping[faceId].cspaceNodes.begin(), faceIdToCSpaceNodesMapping[faceId].cspaceNodes.end(), node);
+            std::vector<CSpaceNodePtr>::iterator iter =
+                find(faceIdToCSpaceNodesMapping[faceId].cspaceNodes.begin(),
+                     faceIdToCSpaceNodesMapping[faceId].cspaceNodes.end(),
+                     node);
 
             if (iter != faceIdToCSpaceNodesMapping[faceId].cspaceNodes.end())
             {
-                std::cout << __FUNCTION__ << " Warning: Node " << node->ID << " is already mapped to face with id " << faceId << std::endl;
+                std::cout << __FUNCTION__ << " Warning: Node " << node->ID
+                          << " is already mapped to face with id " << faceId << std::endl;
             }
             else
             {
@@ -177,7 +203,8 @@ namespace Saba
         }
     }
 
-    void ApproachDiscretization::addCSpaceNode(const Eigen::Vector3f& pos, CSpaceNodePtr node)
+    void
+    ApproachDiscretization::addCSpaceNode(const Eigen::Vector3f& pos, CSpaceNodePtr node)
     {
         if (!node)
         {
@@ -189,13 +216,15 @@ namespace Saba
         addCSpaceNode(faceId, node);
     }
 
-    void ApproachDiscretization::clearCSpaceNodeMapping()
+    void
+    ApproachDiscretization::clearCSpaceNodeMapping()
     {
         faceIdToCSpaceNodesMapping.clear();
         activeFaces.clear();
     }
 
-    CSpaceNodePtr ApproachDiscretization::getGoodRatedNode(int loops)
+    CSpaceNodePtr
+    ApproachDiscretization::getGoodRatedNode(int loops)
     {
         int nSize = (int)activeFaces.size();
 
@@ -214,7 +243,8 @@ namespace Saba
         {
             nRandFaceId = activeFaces[(rand() % nSize)];
 
-            if (faceIdToCSpaceNodesMapping[nRandFaceId].count < nBestRanking && faceIdToCSpaceNodesMapping[nRandFaceId].cspaceNodes.size() > 0)
+            if (faceIdToCSpaceNodesMapping[nRandFaceId].count < nBestRanking &&
+                faceIdToCSpaceNodesMapping[nRandFaceId].cspaceNodes.size() > 0)
             {
                 nBestRanking = faceIdToCSpaceNodesMapping[nRandFaceId].count;
                 nBestFace = nRandFaceId;
@@ -253,4 +283,4 @@ namespace Saba
         return node;
     }
 
-}
+} // namespace Saba

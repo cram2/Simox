@@ -22,13 +22,11 @@
 */
 #pragma once
 
-#include "../VirtualRobot.h"
 #include "../Nodes/RobotNode.h"
 #include "../RobotNodeSet.h"
-#include "JacobiProvider.h"
+#include "../VirtualRobot.h"
 #include "DifferentialIK.h"
-
-
+#include "JacobiProvider.h"
 
 namespace VirtualRobot
 {
@@ -40,13 +38,17 @@ namespace VirtualRobot
         /*!
             Initialize with a rns that contains joints and one that contains the bodies.
         */
-        CoMIK(RobotNodeSetPtr rnsJoints, RobotNodeSetPtr rnsBodies, RobotNodePtr coordSystem = RobotNodePtr(), int dimensions = 2);
+        CoMIK(RobotNodeSetPtr rnsJoints,
+              RobotNodeSetPtr rnsBodies,
+              RobotNodePtr coordSystem = RobotNodePtr(),
+              int dimensions = 2);
 
         void setGoal(const Eigen::VectorXf& goal, float tolerance = 5.0f);
 
         Eigen::MatrixXf getJacobianOfCoM(RobotNodePtr node);
         Eigen::MatrixXf getJacobianMatrix() override;
-        Eigen::MatrixXf getJacobianMatrix(SceneObjectPtr tcp) override; // ignored for CoM IK but needed for interface
+        Eigen::MatrixXf getJacobianMatrix(
+            SceneObjectPtr tcp) override; // ignored for CoM IK but needed for interface
 
         Eigen::VectorXf getError(float stepSize = 1.0f) override;
 
@@ -66,12 +68,14 @@ namespace VirtualRobot
         bool solveIK(float stepSize = 0.2f, float minChange = 0.0f, int maxSteps = 50);
 
         void print() override;
+
     private:
         RobotNodePtr coordSystem;
         RobotNodeSetPtr rnsBodies;
 
-        std::vector< RobotNodePtr > bodyNodes;
-        std::map< VirtualRobot::RobotNodePtr, std::vector<VirtualRobot::RobotNodePtr> > bodyNodeParents;
+        std::vector<RobotNodePtr> bodyNodes;
+        std::map<VirtualRobot::RobotNodePtr, std::vector<VirtualRobot::RobotNodePtr>>
+            bodyNodeParents;
 
         float tolerance;
         bool checkImprovement;
@@ -82,9 +86,6 @@ namespace VirtualRobot
         int numDimensions;
     };
 
-
     typedef std::shared_ptr<CoMIK> CoMIKPtr;
 
-}
-
-
+} // namespace VirtualRobot

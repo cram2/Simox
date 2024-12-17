@@ -3,7 +3,6 @@
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
-
 #include "MathTools.h"
 #include "Nodes/RobotNode.h"
 #include "Robot.h"

@@ -1,17 +1,18 @@
 #include <SimoxUtility/algorithm/ordered_circular_buffer.h>
 
-#define BOOST_TEST_MODULE SimoxUtility/algorithm/ordered_circular_buffer
-#include <boost/test/included/unit_test.hpp>
-
+#define BOOST_TEST_MODULE SimoxUtility / algorithm / ordered_circular_buffer
 #include <chrono>
 #include <random>
+
+#include <boost/test/included/unit_test.hpp>
 
 using Clock = std::chrono::high_resolution_clock;
 using Time = Clock::time_point;
 using Duration = Time::duration;
 using MicroSeconds = std::chrono::microseconds;
 
-float toMilliseconds(Duration duration)
+float
+toMilliseconds(Duration duration)
 {
     MicroSeconds microSeconds = std::chrono::duration_cast<MicroSeconds>(duration);
     return 0.001f * microSeconds.count();
@@ -78,10 +79,12 @@ BOOST_AUTO_TEST_CASE(test_emplace)
 }
 
 template <typename ContainerT>
-void measureFindRuntime(ContainerT const& buffer,
-                        int findElements,
-                        std::string containerName,
-                        int startI, int maxElements)
+void
+measureFindRuntime(ContainerT const& buffer,
+                   int findElements,
+                   std::string containerName,
+                   int startI,
+                   int maxElements)
 {
     std::minstd_rand engine;
     // Allow for 10% of the keys to not be found in the container
@@ -104,13 +107,13 @@ void measureFindRuntime(ContainerT const& buffer,
     Time timeEnd = Clock::now();
     float duration = toMilliseconds(timeEnd - timeStart);
 
-    std::cout << containerName << " find duration: " << duration
-              << "ms  (sum = " << sum << ")" << std::endl;
+    std::cout << containerName << " find duration: " << duration << "ms  (sum = " << sum << ")"
+              << std::endl;
 }
 
 template <typename ContainerT>
-void measureForeachRuntime(ContainerT const& buffer,
-                           std::string containerName)
+void
+measureForeachRuntime(ContainerT const& buffer, std::string containerName)
 {
     Time timeStart = Clock::now();
 
@@ -123,8 +126,8 @@ void measureForeachRuntime(ContainerT const& buffer,
     Time timeEnd = Clock::now();
     float duration = toMilliseconds(timeEnd - timeStart);
 
-    std::cout << containerName << " foreach duration: " << duration
-              << "ms  (sum = " << sum << ")" << std::endl;
+    std::cout << containerName << " foreach duration: " << duration << "ms  (sum = " << sum << ")"
+              << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(test_emplace_performance)
@@ -177,7 +180,8 @@ BOOST_AUTO_TEST_CASE(test_emplace_performance)
             Time timeEnd = Clock::now();
             float duration = toMilliseconds(timeEnd - timeStart);
 
-            std::cout << "OrderedCircularBuffer emplace duration: " << duration << "ms" << std::endl;
+            std::cout << "OrderedCircularBuffer emplace duration: " << duration << "ms"
+                      << std::endl;
         }
 
         measureFindRuntime(buffer, findElements, "OrderedCircularBuffer", findStartI, maxElements);

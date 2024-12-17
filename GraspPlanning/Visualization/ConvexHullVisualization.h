@@ -22,11 +22,13 @@
 */
 #pragma once
 
-#include "../GraspStudio.h"
-#include <VirtualRobot/VirtualRobot.h>
-#include <VirtualRobot/MathTools.h>
 #include <Eigen/Core>
 #include <Eigen/Geometry>
+
+#include <VirtualRobot/MathTools.h>
+#include <VirtualRobot/VirtualRobot.h>
+
+#include "../GraspStudio.h"
 
 namespace GraspStudio
 {
@@ -44,7 +46,8 @@ namespace GraspStudio
         /*!
             Constructor
         */
-        ConvexHullVisualization(VirtualRobot::MathTools::ConvexHull6DPtr convHull, bool useFirst3Coords = true);
+        ConvexHullVisualization(VirtualRobot::MathTools::ConvexHull6DPtr convHull,
+                                bool useFirst3Coords = true);
         ConvexHullVisualization(VirtualRobot::MathTools::ConvexHull3DPtr convHull);
 
         /*!
@@ -52,12 +55,9 @@ namespace GraspStudio
         virtual ~ConvexHullVisualization();
 
     protected:
-
         VirtualRobot::MathTools::ConvexHull3DPtr convHull3D;
         VirtualRobot::MathTools::ConvexHull6DPtr convHull6D;
         bool useFirst3Coords;
-
     };
 
 } // namespace GraspStudio
-

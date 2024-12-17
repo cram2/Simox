@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Eigen/Dense>
+
 #include <VirtualRobot/RobotNodeSet.h>
 
 #include "BulletEngine.h"
@@ -19,14 +20,14 @@ namespace SimDynamics
         BulletRobotLogger(BulletEnginePtr engine,
                           const BulletRobotPtr robot,
                           const VirtualRobot::RobotNodeSetPtr& jointNodes,
-                          const VirtualRobot::RobotNodeSetPtr& bodyNodes)
-            : robot(robot)
-            , running(false)
-            , jointNodes(jointNodes)
-            , bodyNodes(bodyNodes)
-            , max_samples(1024 * 1024)
-            , timestamp(0.0f)
-            , logPath("")
+                          const VirtualRobot::RobotNodeSetPtr& bodyNodes) :
+            robot(robot),
+            running(false),
+            jointNodes(jointNodes),
+            bodyNodes(bodyNodes),
+            max_samples(1024 * 1024),
+            timestamp(0.0f),
+            logPath("")
         {
             int dof = jointNodes->getSize();
             actualAngle.resize(dof);
@@ -35,7 +36,7 @@ namespace SimDynamics
             targetVelocity.resize(dof);
             actualTorque.resize(dof);
             actualForces.resize(3, dof);
-            engine->addExternalCallback(logCB, (void*) this);
+            engine->addExternalCallback(logCB, (void*)this);
         }
 
         ~BulletRobotLogger()
@@ -46,7 +47,8 @@ namespace SimDynamics
             }
         }
 
-        void setLogPath(const std::string& path)
+        void
+        setLogPath(const std::string& path)
         {
             logPath = path;
         }
@@ -60,14 +62,17 @@ namespace SimDynamics
         bool running;
         VirtualRobot::RobotNodeSetPtr jointNodes;
         VirtualRobot::RobotNodeSetPtr bodyNodes;
-        std::vector<Eigen::VectorXf, Eigen::aligned_allocator<Eigen::VectorXf> > targetAngleLog;
-        std::vector<Eigen::VectorXf, Eigen::aligned_allocator<Eigen::VectorXf> > targetVelocityLog;
-        std::vector<Eigen::VectorXf, Eigen::aligned_allocator<Eigen::VectorXf> > actualAngleLog;
-        std::vector<Eigen::VectorXf, Eigen::aligned_allocator<Eigen::VectorXf> > actualVelocityLog;
-        std::vector<Eigen::VectorXf, Eigen::aligned_allocator<Eigen::VectorXf> > actualJointTorquesLog;
-        std::vector<Eigen::Matrix3Xf, Eigen::aligned_allocator<Eigen::Matrix3Xf> > actualJointForcesLog;
-        std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f> > actualCoMLog;
-        std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f> > actualCoMVelocityLog;
+        std::vector<Eigen::VectorXf, Eigen::aligned_allocator<Eigen::VectorXf>> targetAngleLog;
+        std::vector<Eigen::VectorXf, Eigen::aligned_allocator<Eigen::VectorXf>> targetVelocityLog;
+        std::vector<Eigen::VectorXf, Eigen::aligned_allocator<Eigen::VectorXf>> actualAngleLog;
+        std::vector<Eigen::VectorXf, Eigen::aligned_allocator<Eigen::VectorXf>> actualVelocityLog;
+        std::vector<Eigen::VectorXf, Eigen::aligned_allocator<Eigen::VectorXf>>
+            actualJointTorquesLog;
+        std::vector<Eigen::Matrix3Xf, Eigen::aligned_allocator<Eigen::Matrix3Xf>>
+            actualJointForcesLog;
+        std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> actualCoMLog;
+        std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>
+            actualCoMVelocityLog;
         std::vector<double> timestamps;
         int max_samples;
         double timestamp;
@@ -86,5 +91,4 @@ namespace SimDynamics
 
     typedef std::shared_ptr<BulletRobotLogger> BulletRobotLoggerPtr;
 
-}
-
+} // namespace SimDynamics

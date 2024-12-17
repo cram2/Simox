@@ -22,12 +22,15 @@
 */
 #pragma once
 
-#include "GraspStudio.h"
-#include <VirtualRobot/VirtualRobot.h>
-#include <VirtualRobot/Robot.h>
-#include <vector>
 #include <string>
+#include <vector>
+
 #include <Eigen/Core>
+
+#include <VirtualRobot/Robot.h>
+#include <VirtualRobot/VirtualRobot.h>
+
+#include "GraspStudio.h"
 
 namespace GraspStudio
 {
@@ -48,7 +51,9 @@ namespace GraspStudio
             \param eef The eef.
             \param graspPreshape An optional preshape that can be used in order to "open" the eef.
         */
-        ApproachMovementGenerator(VirtualRobot::SceneObjectPtr object, VirtualRobot::EndEffectorPtr eef, const std::string& graspPreshape = "");
+        ApproachMovementGenerator(VirtualRobot::SceneObjectPtr object,
+                                  VirtualRobot::EndEffectorPtr eef,
+                                  const std::string& graspPreshape = "");
 
         //! destructor
         virtual ~ApproachMovementGenerator();
@@ -92,8 +97,6 @@ namespace GraspStudio
         void setVerbose(bool v);
 
     protected:
-
-
         VirtualRobot::SceneObjectPtr object;
         VirtualRobot::TriMeshModelPtr objectModel;
         VirtualRobot::EndEffectorPtr eef;
@@ -110,5 +113,4 @@ namespace GraspStudio
         bool verbose = false;
     };
 
-}
-
+} // namespace GraspStudio

@@ -6,4 +6,4 @@
 using namespace mjcf;
 
 
-const std::string VisualSection::tag    = "visual";
+const std::string VisualSection::tag = "visual";

@@ -4,10 +4,10 @@
 * @copyright  2019 Raphael Grimm
 */
 
-#define BOOST_TEST_MODULE SimoxUtility/math/Normal
+#define BOOST_TEST_MODULE SimoxUtility / math / Normal
 
-#include <random>
 #include <iostream>
+#include <random>
 
 #include <boost/test/included/unit_test.hpp>
 
@@ -35,7 +35,6 @@ BOOST_AUTO_TEST_CASE(test_normal_orth)
     }
 }
 
-
 BOOST_AUTO_TEST_CASE(test_valid_mx)
 {
 
@@ -45,15 +44,21 @@ BOOST_AUTO_TEST_CASE(test_valid_mx)
         if (v.norm() <= 1e-9) //has to be 1e-9 (internal epsilon
         {
             //has to fail
-            BOOST_CHECK_THROW(simox::math::normal_to_mat3(v, simox::math::CoordinateSystemAxis::X), std::invalid_argument);
-            BOOST_CHECK_THROW(simox::math::normal_to_mat3(v, simox::math::CoordinateSystemAxis::Y), std::invalid_argument);
-            BOOST_CHECK_THROW(simox::math::normal_to_mat3(v, simox::math::CoordinateSystemAxis::Z), std::invalid_argument);
+            BOOST_CHECK_THROW(simox::math::normal_to_mat3(v, simox::math::CoordinateSystemAxis::X),
+                              std::invalid_argument);
+            BOOST_CHECK_THROW(simox::math::normal_to_mat3(v, simox::math::CoordinateSystemAxis::Y),
+                              std::invalid_argument);
+            BOOST_CHECK_THROW(simox::math::normal_to_mat3(v, simox::math::CoordinateSystemAxis::Z),
+                              std::invalid_argument);
         }
         else
         {
-            const Eigen::Matrix3f mx = simox::math::normal_to_mat3(v, simox::math::CoordinateSystemAxis::X);
-            const Eigen::Matrix3f my = simox::math::normal_to_mat3(v, simox::math::CoordinateSystemAxis::Y);
-            const Eigen::Matrix3f mz = simox::math::normal_to_mat3(v, simox::math::CoordinateSystemAxis::Z);
+            const Eigen::Matrix3f mx =
+                simox::math::normal_to_mat3(v, simox::math::CoordinateSystemAxis::X);
+            const Eigen::Matrix3f my =
+                simox::math::normal_to_mat3(v, simox::math::CoordinateSystemAxis::Y);
+            const Eigen::Matrix3f mz =
+                simox::math::normal_to_mat3(v, simox::math::CoordinateSystemAxis::Z);
 
             const Eigen::Vector3f vn = v.normalized();
 

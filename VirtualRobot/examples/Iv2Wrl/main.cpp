@@ -1,23 +1,18 @@
 #include <filesystem>
 
 #include <VirtualRobot/RuntimeEnvironment.h>
-
 #include <VirtualRobot/XML/ObjectIO.h>
-
-#include <Inventor/nodes/SoFile.h>
-#include <Inventor/nodes/SoNode.h>
-#include <Inventor/nodes/SoNode.h>
-#include <Inventor/nodes/SoSeparator.h>
 
 #include <Inventor/SoDB.h>
 #include <Inventor/SoInput.h>
-#include <Inventor/SoOutput.h>
 #include <Inventor/SoInteraction.h>
-
+#include <Inventor/SoOutput.h>
+#include <Inventor/VRMLnodes/SoVRMLGroup.h>
 #include <Inventor/actions/SoToVRML2Action.h>
 #include <Inventor/actions/SoWriteAction.h>
-
-#include <Inventor/VRMLnodes/SoVRMLGroup.h>
+#include <Inventor/nodes/SoFile.h>
+#include <Inventor/nodes/SoNode.h>
+#include <Inventor/nodes/SoSeparator.h>
 
 
 using namespace VirtualRobot;
@@ -25,7 +20,8 @@ using VirtualRobot::RuntimeEnvironment;
 
 namespace fs = std::filesystem;
 
-static SoGroup* convertSoFileChildren(SoGroup* orig)
+static SoGroup*
+convertSoFileChildren(SoGroup* orig)
 {
     if (!orig)
     {
@@ -79,8 +75,8 @@ static SoGroup* convertSoFileChildren(SoGroup* orig)
     return storeResult;
 }
 
-
-bool exportToVRML(SoNode* node, fs::path const& exportFilePath)
+bool
+exportToVRML(SoNode* node, fs::path const& exportFilePath)
 {
     SoOutput* so = new SoOutput();
     if (!so->openFile(exportFilePath.c_str()))
@@ -127,24 +123,22 @@ bool exportToVRML(SoNode* node, fs::path const& exportFilePath)
  * The converted file is stored in a directory mjcf/ placed in the directory
  * of the input file.
  */
-int main(int argc, char* argv[])
+int
+main(int argc, char* argv[])
 {
     SoDB::init();
     SoInteraction::init();
 
     RuntimeEnvironment::setCaption("Convert .iv to .wrl files");
 
-    RuntimeEnvironment::considerKey(
-                "input", ".iv file containing the (textured) mesh");
-    RuntimeEnvironment::considerKey(
-                "output", ".wrl file converted from the input .iv file");
+    RuntimeEnvironment::considerKey("input", ".iv file containing the (textured) mesh");
+    RuntimeEnvironment::considerKey("output", ".wrl file converted from the input .iv file");
 
     RuntimeEnvironment::processCommandLine(argc, argv);
 
 
-    if (RuntimeEnvironment::hasHelpFlag()
-            || !RuntimeEnvironment::hasValue("input")
-            || !RuntimeEnvironment::hasValue("output"))
+    if (RuntimeEnvironment::hasHelpFlag() || !RuntimeEnvironment::hasValue("input") ||
+        !RuntimeEnvironment::hasValue("output"))
     {
         RuntimeEnvironment::printOptions();
         return 0;
@@ -169,7 +163,7 @@ int main(int argc, char* argv[])
 
     if (!fileInput.openFile(inputFilename.c_str()))
     {
-        std::cerr <<  "Cannot open file " << inputFilename << std::endl;
+        std::cerr << "Cannot open file " << inputFilename << std::endl;
         return -1;
     }
 

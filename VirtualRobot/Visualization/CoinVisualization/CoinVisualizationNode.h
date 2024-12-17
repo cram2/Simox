@@ -27,7 +27,6 @@
 #include "CoinVisualizationFactory.h"
 
 
-
 class SoNode;
 class SoSeparator;
 class SoScale;
@@ -43,8 +42,9 @@ namespace VirtualRobot
     {
         using Base = VisualizationNode;
         friend class CoinVisualizationFactory;
+
     public:
-        CoinVisualizationNode(const TriMeshModelPtr &tri);
+        CoinVisualizationNode(const TriMeshModelPtr& tri);
         CoinVisualizationNode(const TriMeshModel& tri);
         CoinVisualizationNode(SoNode* visualizationNode, float margin = 0.0f);
         ~CoinVisualizationNode() override;
@@ -85,7 +85,8 @@ namespace VirtualRobot
             */
         VisualizationNodePtr clone(bool deepCopy = true, float scaling = 1.0f) override;
 
-        std::string getType() override
+        std::string
+        getType() override
         {
             return CoinVisualizationFactory::getName();
         }
@@ -100,8 +101,6 @@ namespace VirtualRobot
         void createTriMeshModel() override;
 
     protected:
-
-
         /*!
             Replace current visualization of this node.
             Be careful: any former grabbed trimeshmodels do no longer represent the new datastructure!
@@ -112,12 +111,14 @@ namespace VirtualRobot
         SoSeparator* visualizationAtGlobalPose;
         SoSeparator* attachedVisualizationsSeparator;
         SoSeparator* scaledVisualization;
-        std::map< std::string, SoNode* > attachedCoinVisualizations;    //< These optional visualizations will not show up in the TriMeshModel
+        std::map<std::string, SoNode*>
+            attachedCoinVisualizations; //< These optional visualizations will not show up in the TriMeshModel
 
         SoMatrixTransform* globalPoseTransform;
         SoScale* scaling;
         float margin = 0.0f;
-        static void InventorTriangleCB(void* data, SoCallbackAction* action,
+        static void InventorTriangleCB(void* data,
+                                       SoCallbackAction* action,
                                        const SoPrimitiveVertex* v1,
                                        const SoPrimitiveVertex* v2,
                                        const SoPrimitiveVertex* v3);
@@ -126,4 +127,3 @@ namespace VirtualRobot
     typedef std::shared_ptr<CoinVisualizationNode> CoinVisualizationNodePtr;
 
 } // namespace VirtualRobot
-

@@ -20,6 +20,7 @@
  */
 
 #include <cmath>
+
 #include <boost/test/tools/old/interface.hpp>
 #define BOOST_TEST_MODULE VirtualRobot_OmniPlatformKinematics
 
@@ -30,7 +31,7 @@
 
 #include "MathTools.h"
 
-// 
+//
 
 #include <VirtualRobot/IK/platform/OmniWheelPlatformKinematics.h>
 // #include <VirtualRobot/VirtualRobotTest.h>
@@ -38,8 +39,8 @@
 BOOST_AUTO_TEST_SUITE(OmniPlatformKinematics)
 
 const inline VirtualRobot::OmniWheelPlatformKinematics::Params ARMAR7_OMNI_PLATFORM_CONFIG{
-    .L = 326,                                      // [mm]
-    .R = 125 / 2,                                  // [mm]
+    .L = 326, // [mm]
+    .R = 125 / 2, // [mm]
     .delta = VirtualRobot::MathTools::deg2rad(30), // [rad]
     .n = 1,
     .relativeAngle = M_PI / 3,
@@ -77,9 +78,7 @@ BOOST_AUTO_TEST_CASE(testInv)
     BOOST_CHECK_CLOSE(vAngle, velocities(2), 0.001);
 }
 
-
 #define VAROUT(var) #var " = " << var
-
 
 BOOST_AUTO_TEST_CASE(testMoveForward)
 {

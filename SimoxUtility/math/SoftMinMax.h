@@ -2,7 +2,6 @@
 
 #include <queue>
 
-
 namespace simox::math
 {
 
@@ -17,7 +16,6 @@ namespace simox::math
     class SoftMinMax
     {
     public:
-
         /// No initialization constructor.
         SoftMinMax();
 
@@ -54,7 +52,6 @@ namespace simox::math
 
 
     private:
-
         /// Returns the number of elements that are allowed to be <= softMin / >= softMax.
         std::size_t numOutsideSoftMinMax() const;
 
@@ -71,8 +68,8 @@ namespace simox::math
 
 
         using Container = std::vector<float>;
-        using MaxCompare = std::less<float>;     // Results in max heap.
-        using MinCompare = std::greater<float>;  // Results in min heap.
+        using MaxCompare = std::less<float>; // Results in max heap.
+        using MinCompare = std::greater<float>; // Results in min heap.
 
         using MinQueue = std::priority_queue<float, Container, MaxCompare>;
         using MaxQueue = std::priority_queue<float, Container, MinCompare>;
@@ -82,7 +79,6 @@ namespace simox::math
         /// Stores all elements >= softMax == top()
         MaxQueue maxQueue;
         // Invariant: minQueue.size() == maxQueue.size()
-
     };
 
-}
+} // namespace simox::math

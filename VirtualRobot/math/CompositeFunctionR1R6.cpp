@@ -20,72 +20,93 @@
  */
 
 #include "CompositeFunctionR1R6.h"
+
+#include <Eigen/Geometry>
+
 #include "Helpers.h"
 #include "Line.h"
 #include "LinearInterpolatedOrientation.h"
 
-#include <Eigen/Geometry>
-
-
 namespace math
 {
-    CompositeFunctionR1R6::CompositeFunctionR1R6(const AbstractFunctionR1R3Ptr& position, const AbstractFunctionR1OriPtr& orientation, float startT, float endT)
-        : position(position), orientation(orientation), startT(startT), endT(endT)
-    { }
+    CompositeFunctionR1R6::CompositeFunctionR1R6(const AbstractFunctionR1R3Ptr& position,
+                                                 const AbstractFunctionR1OriPtr& orientation,
+                                                 float startT,
+                                                 float endT) :
+        position(position), orientation(orientation), startT(startT), endT(endT)
+    {
+    }
 
-
-    Eigen::Vector3f CompositeFunctionR1R6::GetPosition(float t)
+    Eigen::Vector3f
+    CompositeFunctionR1R6::GetPosition(float t)
     {
         return position->Get(Helpers::ILerp(startT, endT, t));
     }
 
-
-    Eigen::Quaternionf CompositeFunctionR1R6::GetOrientation(float t)
+    Eigen::Quaternionf
+    CompositeFunctionR1R6::GetOrientation(float t)
     {
         return orientation->Get(Helpers::ILerp(startT, endT, t));
     }
 
-    Eigen::Vector3f CompositeFunctionR1R6::GetPositionDerivative(float t)
+    Eigen::Vector3f
+    CompositeFunctionR1R6::GetPositionDerivative(float t)
     {
         return position->GetDerivative(Helpers::ILerp(startT, endT, t)) / (endT - startT);
     }
 
-    Eigen::Vector3f CompositeFunctionR1R6::GetOrientationDerivative(float t)
+    Eigen::Vector3f
+    CompositeFunctionR1R6::GetOrientationDerivative(float t)
     {
         return orientation->GetDerivative(Helpers::ILerp(startT, endT, t)) / (endT - startT);
     }
 
-    class ConstantOrientation
-        : public AbstractFunctionR1Ori
+    class ConstantOrientation : public AbstractFunctionR1Ori
     {
     public:
-        ConstantOrientation(const Eigen::Quaternionf& ori)
-            : ori(ori)
-        { }
-        Eigen::Quaternionf Get(float /*t*/) override
+        ConstantOrientation(const Eigen::Quaternionf& ori) : ori(ori)
+        {
+        }
+
+        Eigen::Quaternionf
+        Get(float /*t*/) override
         {
             return ori;
         }
-        Eigen::Vector3f GetDerivative(float /*t*/) override
+
+        Eigen::Vector3f
+        GetDerivative(float /*t*/) override
         {
             return Eigen::Vector3f::Zero();
         }
+
     private:
         Eigen::Quaternionf ori;
     };
 
-
-    CompositeFunctionR1R6Ptr CompositeFunctionR1R6::CreateLine(const Eigen::Vector3f& startPos, const Eigen::Vector3f& endPos, const Eigen::Quaternionf& startOri, const Eigen::Quaternionf& endOri, float startT, float endT)
+    CompositeFunctionR1R6Ptr
+    CompositeFunctionR1R6::CreateLine(const Eigen::Vector3f& startPos,
+                                      const Eigen::Vector3f& endPos,
+                                      const Eigen::Quaternionf& startOri,
+                                      const Eigen::Quaternionf& endOri,
+                                      float startT,
+                                      float endT)
     {
 
         LinePtr line(new Line(startPos, endPos - startPos));
-        LinearInterpolatedOrientationPtr ori(new LinearInterpolatedOrientation(startOri, endOri, 0, 1, true));
+        LinearInterpolatedOrientationPtr ori(
+            new LinearInterpolatedOrientation(startOri, endOri, 0, 1, true));
 
         CompositeFunctionR1R6Ptr func(new CompositeFunctionR1R6(line, ori, startT, endT));
         return func;
     }
 
-    CompositeFunctionR1R6Ptr CompositeFunctionR1R6::CreateLine(const Eigen::Vector3f& startPos, const Eigen::Vector3f& endPos, const Eigen::Quaternionf& ori, float startT, float endT)
+    CompositeFunctionR1R6Ptr
+    CompositeFunctionR1R6::CreateLine(const Eigen::Vector3f& startPos,
+                                      const Eigen::Vector3f& endPos,
+                                      const Eigen::Quaternionf& ori,
+                                      float startT,
+                                      float endT)
     {
         LinePtr line(new Line(startPos, endPos - startPos));
         std::shared_ptr<ConstantOrientation> constOri(new ConstantOrientation(ori));
@@ -93,4 +114,4 @@ namespace math
         CompositeFunctionR1R6Ptr func(new CompositeFunctionR1R6(line, constOri, startT, endT));
         return func;
     }
-}
+} // namespace math

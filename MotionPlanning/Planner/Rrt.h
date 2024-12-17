@@ -22,9 +22,9 @@
 */
 #pragma once
 
-#include "../Saba.h"
-#include "../CSpace/CSpaceSampled.h"
 #include "../CSpace/CSpacePath.h"
+#include "../CSpace/CSpaceSampled.h"
+#include "../Saba.h"
 #include "MotionPlanner.h"
 
 namespace Saba
@@ -50,17 +50,17 @@ namespace Saba
 
         enum RrtMethod
         {
-            eExtend,                            // extend
-            eConnect,                           // extend path until collision is determined
-            eConnectCompletePath                // all or nothing: connect only when complete path is valid
+            eExtend, // extend
+            eConnect, // extend path until collision is determined
+            eConnectCompletePath // all or nothing: connect only when complete path is valid
         };
 
         enum ExtensionResult
         {
-            eError,         // an error occurred
-            eFailed,        // the extend failed (e.g. a collision was detected)
-            eSuccess,       // the extension succeeded completely
-            ePartial,       // the extension was performed only partially
+            eError, // an error occurred
+            eFailed, // the extend failed (e.g. a collision was detected)
+            eSuccess, // the extension succeeded completely
+            ePartial, // the extension was performed only partially
         };
 
         /*!
@@ -70,7 +70,10 @@ namespace Saba
             \param probabilityExtendToGoal Specify how often the goal node should be used instead of a random config (value must be between 0 and 1)
             \param samplingSize
         */
-        Rrt(CSpacePtr cspace, RrtMethod mode = eConnect, float probabilityExtendToGoal = 0.1f, float samplingSize = -1);
+        Rrt(CSpacePtr cspace,
+            RrtMethod mode = eConnect,
+            float probabilityExtendToGoal = 0.1f,
+            float samplingSize = -1);
         ~Rrt() override;
 
         /*!
@@ -96,29 +99,31 @@ namespace Saba
         CSpaceTreePtr getTree();
 
     protected:
-
         bool createSolution(bool bQuiet = false) override;
 
-        CSpaceTreePtr tree;                 //!< the rrt on which are operating
+        CSpaceTreePtr tree; //!< the rrt on which are operating
 
 
-        virtual ExtensionResult extend(Eigen::VectorXf& c, CSpaceTreePtr tree, int& storeLastAddedID);
-        virtual ExtensionResult connectComplete(Eigen::VectorXf& c, CSpaceTreePtr tree, int& storeLastAddedID);
-        virtual ExtensionResult connectUntilCollision(Eigen::VectorXf& c, CSpaceTreePtr tree, int& storeLastAddedID);
+        virtual ExtensionResult
+        extend(Eigen::VectorXf& c, CSpaceTreePtr tree, int& storeLastAddedID);
+        virtual ExtensionResult
+        connectComplete(Eigen::VectorXf& c, CSpaceTreePtr tree, int& storeLastAddedID);
+        virtual ExtensionResult
+        connectUntilCollision(Eigen::VectorXf& c, CSpaceTreePtr tree, int& storeLastAddedID);
 
-        CSpaceNodePtr startNode;        //!< start node (root of RRT)
-        CSpaceNodePtr goalNode;         //!< goal node (set when RRT weas successfully connected to goalConfig)
+        CSpaceNodePtr startNode; //!< start node (root of RRT)
+        CSpaceNodePtr
+            goalNode; //!< goal node (set when RRT weas successfully connected to goalConfig)
 
-        Eigen::VectorXf tmpConfig;      //!< tmp config
+        Eigen::VectorXf tmpConfig; //!< tmp config
 
-        float extendGoToGoal;           //!< the probability that the goal config is used instead of a randomly created configuration
+        float
+            extendGoToGoal; //!< the probability that the goal config is used instead of a randomly created configuration
 
-        float extendStepSize;           //!< step size for one rrt extend (copied from cspace)
-        int lastAddedID;                //!< ID of last added node
+        float extendStepSize; //!< step size for one rrt extend (copied from cspace)
+        int lastAddedID; //!< ID of last added node
 
         RrtMethod rrtMode;
     };
 
-} // namespace
-
-
+} // namespace Saba

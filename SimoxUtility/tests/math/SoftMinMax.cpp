@@ -4,15 +4,14 @@
 * @copyright  2019 Raphael Grimm
 */
 
-#define BOOST_TEST_MODULE SimoxUtility/math/SoftMinMax
+#define BOOST_TEST_MODULE SimoxUtility / math / SoftMinMax
 
-#include <random>
 #include <iostream>
+#include <random>
 
 #include <boost/test/included/unit_test.hpp>
 
 #include <SimoxUtility/math/SoftMinMax.h>
-
 
 BOOST_AUTO_TEST_CASE(test_soft_min_max_of_random)
 {
@@ -26,7 +25,7 @@ BOOST_AUTO_TEST_CASE(test_soft_min_max_of_random)
     std::vector<float> values;
     for (size_t i = 0; i < num; ++i)
     {
-//        values.emplace_back(100 - i);
+        //        values.emplace_back(100 - i);
         values.emplace_back(distrib(gen));
     }
 
@@ -40,10 +39,9 @@ BOOST_AUTO_TEST_CASE(test_soft_min_max_of_random)
 
     BOOST_TEST_MESSAGE(num * percentile);
 
-    BOOST_CHECK_EQUAL(smm.getSoftMin(), values.at(20));  // Values 00-19 discarded.
-    BOOST_CHECK_EQUAL(smm.getSoftMax(), values.at(79));  // Values 80-99 discarded.
+    BOOST_CHECK_EQUAL(smm.getSoftMin(), values.at(20)); // Values 00-19 discarded.
+    BOOST_CHECK_EQUAL(smm.getSoftMax(), values.at(79)); // Values 80-99 discarded.
 }
-
 
 BOOST_AUTO_TEST_CASE(test_exceptions)
 {
@@ -55,6 +53,6 @@ BOOST_AUTO_TEST_CASE(test_exceptions)
 
     BOOST_CHECK_THROW(simox::math::SoftMinMax(-1.0f, 10), std::invalid_argument);
     BOOST_CHECK_THROW(simox::math::SoftMinMax(-0.1f, 10), std::invalid_argument);
-    BOOST_CHECK_THROW(simox::math::SoftMinMax( 0.6f, 10), std::invalid_argument);
-    BOOST_CHECK_THROW(simox::math::SoftMinMax( 1.0f, 10), std::invalid_argument);
+    BOOST_CHECK_THROW(simox::math::SoftMinMax(0.6f, 10), std::invalid_argument);
+    BOOST_CHECK_THROW(simox::math::SoftMinMax(1.0f, 10), std::invalid_argument);
 }

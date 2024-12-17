@@ -15,7 +15,7 @@
  */
 
 #ifdef USE_DOCTEST
-  #include <GeometricPlanning/assert/doctest/assert.h>
+#include <GeometricPlanning/assert/doctest/assert.h>
 #else
-  #include <GeometricPlanning/assert/virtual_robot/assert.h>
+#include <GeometricPlanning/assert/virtual_robot/assert.h>
 #endif // USE_DOCTEST

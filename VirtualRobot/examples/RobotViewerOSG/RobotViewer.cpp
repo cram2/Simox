@@ -1,9 +1,9 @@
-#include <VirtualRobot/Robot.h>
-#include <VirtualRobot/VirtualRobotException.h>
-#include <VirtualRobot/RuntimeEnvironment.h>
-
-#include <string>
 #include <iostream>
+#include <string>
+
+#include <VirtualRobot/Robot.h>
+#include <VirtualRobot/RuntimeEnvironment.h>
+#include <VirtualRobot/VirtualRobotException.h>
 
 using std::cout;
 using std::endl;
@@ -16,8 +16,8 @@ using namespace VirtualRobot;
 
 bool useColModel = false;
 
-
-int main(int argc, char* argv[])
+int
+main(int argc, char* argv[])
 {
     VirtualRobot::RuntimeEnvironment::considerKey("robot");
     VirtualRobot::RuntimeEnvironment::processCommandLine(argc, argv);

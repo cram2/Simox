@@ -22,10 +22,10 @@
 */
 #pragma once
 
-#include "../Saba.h"
 #include "../CSpace/CSpace.h"
 #include "../CSpace/CSpaceNode.h"
 #include "../CSpace/CSpaceTree.h"
+#include "../Saba.h"
 
 namespace Saba
 {
@@ -64,13 +64,15 @@ namespace Saba
         void setMaxCycles(unsigned int mc);
 
         //! return start configuration
-        Eigen::VectorXf getStartConfig()
+        Eigen::VectorXf
+        getStartConfig()
         {
             return startConfig;
         }
 
         //! return goal configuration
-        Eigen::VectorXf getGoalConfig()
+        Eigen::VectorXf
+        getGoalConfig()
         {
             return goalConfig;
         }
@@ -90,7 +92,8 @@ namespace Saba
         /*!
             Return number of cycles that were needed for motion planning
         */
-        unsigned int getNrOfCycles()
+        unsigned int
+        getNrOfCycles()
         {
             return cycles;
         }
@@ -102,7 +105,8 @@ namespace Saba
         virtual void printConfig(bool printOnlyParams = false);
 
         //! The CSpace
-        CSpacePtr getCSpace()
+        CSpacePtr
+        getCSpace()
         {
             return cspace;
         }
@@ -111,7 +115,8 @@ namespace Saba
             Sets stop flag, so that this planner can be notified to abort the search.
             Only useful for threaded planners.
         */
-        virtual void stopExecution()
+        virtual void
+        stopExecution()
         {
             stopSearch = true;
         }
@@ -125,7 +130,8 @@ namespace Saba
         /*!
             Returns the time needed for planning (in milliseconds).
         */
-        float getPlanningTimeMS()
+        float
+        getPlanningTimeMS()
         {
             return planningTime;
         }
@@ -136,28 +142,26 @@ namespace Saba
         void setPlanningTimeout(float timeoutMs);
 
     protected:
-
         //! create the solution
         virtual bool createSolution(bool bQuiet = false) = 0;
-        CSpacePtr cspace;                   //!< the cspace on which are operating
-        CSpacePathPtr solution;             //!< the solution
+        CSpacePtr cspace; //!< the cspace on which are operating
+        CSpacePathPtr solution; //!< the solution
 
-        bool stopSearch;                    //!< indicates that the search should be interrupted
+        bool stopSearch; //!< indicates that the search should be interrupted
 
-        unsigned int dimension;             //!< dimension of c-space
+        unsigned int dimension; //!< dimension of c-space
 
-        Eigen::VectorXf startConfig;        //!< start config
+        Eigen::VectorXf startConfig; //!< start config
         bool startValid;
-        Eigen::VectorXf goalConfig;         //!< goal config
+        Eigen::VectorXf goalConfig; //!< goal config
         bool goalValid;
 
-        unsigned int maxCycles;             //!< maximum cycles for searching
-        unsigned int cycles;                //!< current cycles done in the run method
+        unsigned int maxCycles; //!< maximum cycles for searching
+        unsigned int cycles; //!< current cycles done in the run method
 
-        std::string name;                   //!< Name of this planner (standard: "Motion Planner")
+        std::string name; //!< Name of this planner (standard: "Motion Planner")
 
-        float planningTime;                 //! Planning time in milliseconds
-        float planningTimeout;              //! Timeout after which the planning aboits
+        float planningTime; //! Planning time in milliseconds
+        float planningTimeout; //! Timeout after which the planning aboits
     };
-}
-
+} // namespace Saba

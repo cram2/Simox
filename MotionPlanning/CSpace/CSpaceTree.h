@@ -22,11 +22,12 @@
 */
 #pragma once
 
-#include "../Saba.h"
 #include <iostream>
-#include <vector>
-#include <mutex>
 #include <map>
+#include <mutex>
+#include <vector>
+
+#include "../Saba.h"
 
 namespace Saba
 {
@@ -73,7 +74,8 @@ namespace Saba
             \param fillPath Stores all configs.
             \return true on success.
         */
-        virtual bool createPath(CSpaceNodePtr startNode, CSpaceNodePtr goalNode, CSpacePathPtr fillPath);
+        virtual bool
+        createPath(CSpaceNodePtr startNode, CSpaceNodePtr goalNode, CSpacePathPtr fillPath);
 
         //! set the number of nodes to zero
         virtual void reset();
@@ -86,15 +88,17 @@ namespace Saba
             (standard: false)
             @see CSpaceNode
         */
-        void setUpdateChildren(bool enable)
+        void
+        setUpdateChildren(bool enable)
         {
             updateChildren = enable;
         };
-        bool getUpdateChildren()
+
+        bool
+        getUpdateChildren()
         {
             return updateChildren;
         }
-
 
         //! creates new CSpaceNode with configuration config and parentID
         /*!
@@ -103,7 +107,8 @@ namespace Saba
           \param calcDistance if set, the distance to obstacles is calculated and stored in the node (be careful: expensive), otherwise the dist is set to -1.0
           \return pointer to the new node on success, otherwise NULL
         */
-        virtual CSpaceNodePtr appendNode(const Eigen::VectorXf& config, int parentID, bool calcDistance = false);
+        virtual CSpaceNodePtr
+        appendNode(const Eigen::VectorXf& config, int parentID, bool calcDistance = false);
 
         //! remove tree node
         virtual void removeNode(CSpaceNodePtr n);
@@ -114,8 +119,10 @@ namespace Saba
           \param storeDist pointer to float for storing the distance (if not NULL)
           \return ID of nearest neighbor
         */
-        virtual unsigned int getNearestNeighborID(const Eigen::VectorXf& config, float* storeDist = NULL);
-        virtual CSpaceNodePtr getNearestNeighbor(const Eigen::VectorXf& config, float* storeDist = NULL);
+        virtual unsigned int getNearestNeighborID(const Eigen::VectorXf& config,
+                                                  float* storeDist = NULL);
+        virtual CSpaceNodePtr getNearestNeighbor(const Eigen::VectorXf& config,
+                                                 float* storeDist = NULL);
 
         /*!
             append a path to the tree (without any checks)
@@ -124,12 +131,15 @@ namespace Saba
           \param config
           \param storeLastAddedID if given, the id of the last added node is stored here
         */
-        virtual bool appendPath(CSpaceNodePtr startNode, const Eigen::VectorXf& config, int* storeLastAddedID = NULL);
+        virtual bool appendPath(CSpaceNodePtr startNode,
+                                const Eigen::VectorXf& config,
+                                int* storeLastAddedID = NULL);
 
         /*!
         Append the given path to this tree. No checks are performed.
         */
-        virtual bool appendPath(CSpaceNodePtr startNode, CSpacePathPtr path, int* storeLastAddedID = NULL);
+        virtual bool
+        appendPath(CSpaceNodePtr startNode, CSpacePathPtr path, int* storeLastAddedID = NULL);
 
         /*!
             Append a path to the tree until a collision is detected
@@ -138,7 +148,9 @@ namespace Saba
           \param config
           \param storeLastAddedID if given, the id of the last added node is stored here
         */
-        virtual bool appendPathUntilCollision(CSpaceNodePtr startNode, const Eigen::VectorXf& config, int* storeLastAddedID);
+        virtual bool appendPathUntilCollision(CSpaceNodePtr startNode,
+                                              const Eigen::VectorXf& config,
+                                              int* storeLastAddedID);
 
         virtual std::vector<CSpaceNodePtr> getNodes();
 
@@ -162,28 +174,26 @@ namespace Saba
         bool hasNode(CSpaceNodePtr n);
 
     protected:
-
         //! get distance of path start to end
         virtual float getPathDist(unsigned int idStart, unsigned int idEnd, bool useMetricWeights);
 
         //! shutdown tree, reset all data
         //virtual void shutdown();
-        unsigned int dimension;             //!< dimension of the cspace
+        unsigned int dimension; //!< dimension of the cspace
 
         CSpacePtr cspace;
 
 
         Eigen::VectorXf tmpConfig;
 
-        std::vector< CSpaceNodePtr > nodes;             //! vector with pointers to all used nodes
+        std::vector<CSpaceNodePtr> nodes; //! vector with pointers to all used nodes
 
 
-        bool updateChildren;                    // CSpaceNode child management
+        bool updateChildren; // CSpaceNode child management
 
-        std::map<unsigned int, CSpaceNodePtr > idNodeMapping; // mapping id<->node
+        std::map<unsigned int, CSpaceNodePtr> idNodeMapping; // mapping id<->node
 
         std::mutex mutex;
     };
 
 } // namespace Saba
-

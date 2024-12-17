@@ -377,7 +377,7 @@ namespace VirtualRobot
         {
             throw VirtualRobotException("No second data");
         }
-        
+
         return secondData.value();
     }
 

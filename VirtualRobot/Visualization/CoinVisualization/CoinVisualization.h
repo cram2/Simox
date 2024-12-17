@@ -59,11 +59,12 @@ namespace VirtualRobot
 
         VisualizationPtr clone() override;
 
-        SoNode* getCoinVisualization(bool selectable=true);
+        SoNode* getCoinVisualization(bool selectable = true);
 
-        void exportToVRML2(std::string filename, bool useRotation=true);
+        void exportToVRML2(std::string filename, bool useRotation = true);
 
-        static std::string getFactoryName()
+        static std::string
+        getFactoryName()
         {
             return "inventor";
         }
@@ -75,7 +76,7 @@ namespace VirtualRobot
         SoSelection* selection;
         SoSeparator* visuRoot;
 
-        SoMaterial *color;
+        SoMaterial* color;
     };
 
     using CoinVisualizationPtr = std::shared_ptr<CoinVisualization>;

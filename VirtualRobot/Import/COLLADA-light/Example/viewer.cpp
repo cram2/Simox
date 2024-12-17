@@ -1,5 +1,6 @@
-#include "../inventor.h"
 #include <boost/foreach.hpp>
+
+#include "../inventor.h"
 #include <Inventor/Qt/SoQt.h>
 #include <Inventor/Qt/viewers/SoQtExaminerViewer.h>
 #include <Inventor/actions/SoWriteAction.h>
@@ -7,7 +8,8 @@
 using namespace std;
 using namespace Collada;
 
-int main(int argc, char** argv)
+int
+main(int argc, char** argv)
 {
     QWidget* mainwin = SoQt::init(argc, argv, argv[0]);
 

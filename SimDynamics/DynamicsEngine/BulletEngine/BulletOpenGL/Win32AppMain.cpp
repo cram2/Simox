@@ -15,21 +15,17 @@ subject to the following restrictions:
 */
 
 
-#include <windows.h>
-#include <gl/gl.h>
-
-
+#include "BulletDynamics/Dynamics/btDynamicsWorld.h"
 #include "DemoApplication.h"
-
 #include "GLDebugDrawer.h"
 #include "GLDebugFont.h"
-
-#include "BulletDynamics/Dynamics/btDynamicsWorld.h"
+#include <gl/gl.h>
+#include <windows.h>
 
 /// This Win32AppMain is shared code between all demos.
 /// The actual demo, derived from DemoApplication is created using 'createDemo', in a separate .cpp file
 DemoApplication* gDemoApplication = 0;
-DemoApplication*    createDemo();
+DemoApplication* createDemo();
 
 
 // Function Declarations
@@ -48,18 +44,16 @@ static int quitRequest = 0;
 #ifdef USE_AMD_OPENCL
 
 
-
 #include "btOpenCLUtils.h"
-
 #include <LinearMath/btScalar.h>
 
-cl_context        g_cxMainContext;
-cl_device_id      g_cdDevice;
-cl_command_queue  g_cqCommandQue;
-
+cl_context g_cxMainContext;
+cl_device_id g_cdDevice;
+cl_command_queue g_cqCommandQue;
 
 // Returns true if OpenCL is initialized properly, false otherwise.
-bool initCL(void* glCtx, void* glDC)
+bool
+initCL(void* glCtx, void* glDC)
 {
     const char* vendorSDK = btOpenCLUtils::getSdkVendorName();
     printf("This program was compiled using the %s OpenCL SDK\n", vendorSDK);
@@ -96,7 +90,7 @@ bool initCL(void* glCtx, void* glDC)
         return false;
     }
 
-    g_cdDevice =  btOpenCLUtils::getDevice(g_cxMainContext, 0);
+    g_cdDevice = btOpenCLUtils::getDevice(g_cxMainContext, 0);
 
     btOpenCLDeviceInfo clInfo;
     btOpenCLUtils::getDeviceInfo(g_cdDevice, clInfo);
@@ -112,24 +106,15 @@ bool initCL(void* glCtx, void* glDC)
 #endif //#ifdef USE_AMD_OPENCL
 
 
-
-
-
-
-
-
-
-#include <windows.h>
-
 #include <stdio.h>
+
+#include <fstream>
+#include <iostream>
 
 #include <fcntl.h>
 
 #include <io.h>
-
-#include <iostream>
-
-#include <fstream>
+#include <windows.h>
 
 using namespace std;
 
@@ -148,7 +133,8 @@ std::streambuf* m_old_cout;
 std::streambuf* m_old_cerr;
 std::streambuf* m_old_cin;
 
-void RedirectIOToConsole()
+void
+RedirectIOToConsole()
 
 {
 
@@ -234,20 +220,17 @@ void RedirectIOToConsole()
     // point to console as well
 
     ios::sync_with_stdio();
-
 }
 #else
-void RedirectIOToConsole()
+void
+RedirectIOToConsole()
 {
-
 }
 #endif
 
 
-
-
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
-                   LPSTR lpCmdLine, int iCmdShow)
+int WINAPI
+WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int iCmdShow)
 {
     WNDCLASS wc;
     HWND hWnd;
@@ -279,12 +262,18 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     RegisterClass(&wc);
 
     // create main window
-    hWnd = CreateWindow(
-               "BulletPhysics", "Bullet Physics Sample. http://bulletphysics.org",
-               WS_CAPTION | WS_VISIBLE | WS_OVERLAPPEDWINDOW,
-               //      0, 0, 640, 480,
-               0, 0, 1024, 768,
-               NULL, NULL, hInstance, NULL);
+    hWnd = CreateWindow("BulletPhysics",
+                        "Bullet Physics Sample. http://bulletphysics.org",
+                        WS_CAPTION | WS_VISIBLE | WS_OVERLAPPEDWINDOW,
+                        //      0, 0, 640, 480,
+                        0,
+                        0,
+                        1024,
+                        768,
+                        NULL,
+                        NULL,
+                        hInstance,
+                        NULL);
 
     // enable OpenGL for the window
     EnableOpenGL(hWnd, &hDC, &hRC);
@@ -324,8 +313,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
             }
 
             //          gDemoApplication->displayCallback();
-
-
         };
 
         // OpenGL animation code goes here
@@ -338,10 +325,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
         SwapBuffers(hDC);
 
         theta += 1.0f;
-
-
     }
-
 
 
     // shutdown OpenGL
@@ -353,14 +337,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     delete gDemoApplication;
 
     return msg.wParam;
-
 }
 
 // Window Procedure
 
-LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK
+WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-
 
 
     switch (message)
@@ -391,14 +374,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         }
 
 
-        case WM_SIZE:                                                   // Size Action Has Taken Place
+        case WM_SIZE: // Size Action Has Taken Place
 
-            switch (wParam)                                             // Evaluate Size Action
+            switch (wParam) // Evaluate Size Action
             {
-                case SIZE_MINIMIZED:                                    // Was Window Minimized?
-                    return 0;                                               // Return
+                case SIZE_MINIMIZED: // Was Window Minimized?
+                    return 0; // Return
 
-                case SIZE_MAXIMIZED:                                    // Was Window Maximized?
+                case SIZE_MAXIMIZED: // Was Window Maximized?
                     sWidth = LOWORD(lParam);
                     sHeight = HIWORD(lParam);
 
@@ -407,9 +390,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                         gDemoApplication->reshape(sWidth, sHeight);
                     }
 
-                    return 0;                                               // Return
+                    return 0; // Return
 
-                case SIZE_RESTORED:                                     // Was Window Restored?
+                case SIZE_RESTORED: // Was Window Restored?
                     sWidth = LOWORD(lParam);
                     sHeight = HIWORD(lParam);
 
@@ -418,7 +401,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                         gDemoApplication->reshape(sWidth, sHeight);
                     }
 
-                    return 0;                                               // Return
+                    return 0; // Return
             }
 
             break;
@@ -450,10 +433,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             break;
         }
 
-        case 0x020A://WM_MOUSEWHEEL:
+        case 0x020A: //WM_MOUSEWHEEL:
         {
 
-            int  zDelta = (short)HIWORD(wParam);
+            int zDelta = (short)HIWORD(wParam);
             int xPos = LOWORD(lParam);
             int yPos = HIWORD(lParam);
 
@@ -501,7 +484,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             break;
         }
 
-        /*#define WM_LBUTTONUP                    0x0202
+            /*#define WM_LBUTTONUP                    0x0202
         #define WM_LBUTTONDBLCLK                0x0203
         #define WM_RBUTTONDOWN                  0x0204
         #define WM_RBUTTONUP                    0x0205
@@ -510,7 +493,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         #define WM_MBUTTONUP                    0x0208
         #define WM_MBUTTONDBLCLK                0x0209
         */
-
 
 
         case WM_CLOSE:
@@ -546,7 +528,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     gDemoApplication->keyboardUpCallback(tolower(wParam), 0, 0);
                 }
 
-                return DefWindowProc(hWnd, message, wParam, lParam);
+                    return DefWindowProc(hWnd, message, wParam, lParam);
             }
 
         case WM_KEYDOWN:
@@ -589,8 +571,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     PostQuitMessage(0);
                 }
 
-                return 0;
-
+                    return 0;
             }
 
             return 0;
@@ -605,7 +586,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
         default:
             return DefWindowProc(hWnd, message, wParam, lParam);
-
     }
 
     return 0;
@@ -613,7 +593,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 // Enable OpenGL
 
-void EnableOpenGL(HWND hWnd, HDC* hDC, HGLRC* hRC)
+void
+EnableOpenGL(HWND hWnd, HDC* hDC, HGLRC* hRC)
 {
     PIXELFORMATDESCRIPTOR pfd;
     int format;
@@ -638,13 +619,12 @@ void EnableOpenGL(HWND hWnd, HDC* hDC, HGLRC* hRC)
     *hRC = wglCreateContext(*hDC);
     wglMakeCurrent(*hDC, *hRC);
     sOpenGLInitialized = true;
-
-
 }
 
 // Disable OpenGL
 
-void DisableOpenGL(HWND hWnd, HDC hDC, HGLRC hRC)
+void
+DisableOpenGL(HWND hWnd, HDC hDC, HGLRC hRC)
 {
     sOpenGLInitialized = false;
 

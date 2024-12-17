@@ -1,32 +1,28 @@
 #include "inventor.h"
 
-
-
-
-#include <Inventor/nodes/SoSphere.h>
-#include <Inventor/nodes/SoSeparator.h>
-#include <Inventor/nodes/SoRotation.h>
-#include <Inventor/nodes/SoTranslation.h>
-#include <Inventor/nodes/SoMatrixTransform.h>
-#include <Inventor/nodes/SoMaterial.h>
-#include <Inventor/nodes/SoIndexedFaceSet.h>
-#include <Inventor/nodes/SoCoordinate3.h>
-#include <Inventor/nodes/SoPendulum.h>
-#include <Inventor/nodes/SoRotor.h>
-#include <Inventor/nodes/SoCube.h>
-#include <Inventor/nodes/SoTransform.h>
-#include <Inventor/nodes/SoDrawStyle.h>
-
+#include <iostream>
 
 #include <Inventor/actions/SoGetBoundingBoxAction.h>
-
-#include <iostream>
+#include <Inventor/nodes/SoCoordinate3.h>
+#include <Inventor/nodes/SoCube.h>
+#include <Inventor/nodes/SoDrawStyle.h>
+#include <Inventor/nodes/SoIndexedFaceSet.h>
+#include <Inventor/nodes/SoMaterial.h>
+#include <Inventor/nodes/SoMatrixTransform.h>
+#include <Inventor/nodes/SoPendulum.h>
+#include <Inventor/nodes/SoRotation.h>
+#include <Inventor/nodes/SoRotor.h>
+#include <Inventor/nodes/SoSeparator.h>
+#include <Inventor/nodes/SoSphere.h>
+#include <Inventor/nodes/SoTransform.h>
+#include <Inventor/nodes/SoTranslation.h>
 
 namespace Collada
 {
 
 
-    void addTransform(SoGroup* root, pugi::xml_node node)
+    void
+    addTransform(SoGroup* root, pugi::xml_node node)
     {
         if (std::string("rotate").compare(node.name()) == 0)
         {
@@ -47,11 +43,22 @@ namespace Collada
             SoMatrixTransform* transform = new SoMatrixTransform;
             root->addChild(transform);
             std::vector<float> v = getFloatVector(node.child_value());
-            transform->matrix.setValue(SbMatrix(
-                                           v[0],    v[4],    v[8],   v[12],
-                                           v[1],    v[5],    v[9],   v[13],
-                                           v[2],    v[6],   v[10],   v[14],
-                                           v[3],    v[7],   v[11],   v[15]));
+            transform->matrix.setValue(SbMatrix(v[0],
+                                                v[4],
+                                                v[8],
+                                                v[12],
+                                                v[1],
+                                                v[5],
+                                                v[9],
+                                                v[13],
+                                                v[2],
+                                                v[6],
+                                                v[10],
+                                                v[14],
+                                                v[3],
+                                                v[7],
+                                                v[11],
+                                                v[15]));
         }
     }
 
@@ -81,7 +88,8 @@ namespace Collada
         }
     }
 
-    void InventorRobotNode::visualizeBoundingBox()
+    void
+    InventorRobotNode::visualizeBoundingBox()
     {
 
         SbViewportRegion vpReg;
@@ -97,10 +105,11 @@ namespace Collada
         if (getBBoxAction.getBoundingBox().hasVolume())
         {
             SoTransform* center = new SoTransform;
-            SbVec3f bounds = getBBoxAction.getBoundingBox().getMax() - getBBoxAction.getBoundingBox().getMin();
+            SbVec3f bounds =
+                getBBoxAction.getBoundingBox().getMax() - getBBoxAction.getBoundingBox().getMin();
             separator->addChild(center);
             center->translation = getBBoxAction.getBoundingBox().getCenter();
-            SoCube*  BB = new SoCube;
+            SoCube* BB = new SoCube;
             separator->addChild(BB);
             BB->width.setValue(bounds[0]);
             BB->height.setValue(bounds[1]);
@@ -108,12 +117,14 @@ namespace Collada
         }
     }
 
-    void InventorRobotNode::initialize()
+    void
+    InventorRobotNode::initialize()
     {
         if (this->parent)
         {
             std::cout << "Parent of " << this->name << " is " << this->parent->name << std::endl;
-            std::dynamic_pointer_cast<InventorRobotNode>(this->parent)->visualization->addChild(this->visualization);
+            std::dynamic_pointer_cast<InventorRobotNode>(this->parent)
+                ->visualization->addChild(this->visualization);
         }
         else
         {
@@ -142,11 +153,11 @@ namespace Collada
         //pendulum->rotation.setValue(SbVec3f(1,0,0),0);
         pendulum->speed = 0.01;
         pendulum->on = true;*/
-
     }
 
-    template<typename T>
-    std::vector<T> offsetSelection(std::vector<T> v, int offset, int stride)
+    template <typename T>
+    std::vector<T>
+    offsetSelection(std::vector<T> v, int offset, int stride)
     {
         assert(v.size() % stride == 0);
         std::vector<T> result(v.size() / stride);
@@ -161,9 +172,10 @@ namespace Collada
         return result;
     }
 
-    std::map<std::string, std::vector<float> > addMaterials(const pugi::xml_node& igeometry)
+    std::map<std::string, std::vector<float>>
+    addMaterials(const pugi::xml_node& igeometry)
     {
-        std::map<std::string, std::vector<float> > colormap;
+        std::map<std::string, std::vector<float>> colormap;
         for (pugi::xpath_node const& imaterial : igeometry.select_nodes(".//instance_material"))
         {
             std::vector<float> diffuse_color = {0.5, 0.5, 0.5, 1};
@@ -172,10 +184,12 @@ namespace Collada
             pugi::xml_node ieffect = material.child("instance_effect");
             pugi::xml_node effect = resolveURL(ieffect, "//library_effects");
 
-            pugi::xml_node shader_phong = effect.child("profile_COMMON").child("technique").child("phong");
-            pugi::xml_node shader_lambert = effect.child("profile_COMMON").child("technique").child("lambert");
+            pugi::xml_node shader_phong =
+                effect.child("profile_COMMON").child("technique").child("phong");
+            pugi::xml_node shader_lambert =
+                effect.child("profile_COMMON").child("technique").child("lambert");
 
-            if(shader_phong && !shader_lambert)
+            if (shader_phong && !shader_lambert)
             {
                 pugi::xml_node diffuse = shader_phong.child("diffuse").child("color");
                 diffuse_color = getFloatVector(diffuse.child_value());
@@ -190,10 +204,11 @@ namespace Collada
         return colormap;
     }
 
-    void addGeometry(SoSeparator* separator, const pugi::xml_node& node)
+    void
+    addGeometry(SoSeparator* separator, const pugi::xml_node& node)
     {
 
-        std::map<std::string, std::vector<float> > colormap = addMaterials(node);
+        std::map<std::string, std::vector<float>> colormap = addMaterials(node);
         pugi::xml_node geometry = resolveURL(node, "//library_geometries");
         pugi::xml_node mesh = geometry.child("mesh");
 
@@ -202,7 +217,8 @@ namespace Collada
 
         if (nPolylist > 5)
         {
-            std::cout << "More than five (" << nPolylist << ") seperated meshes .. skipping (" << geometry.attribute("id").value() << ")\n";
+            std::cout << "More than five (" << nPolylist << ") seperated meshes .. skipping ("
+                      << geometry.attribute("id").value() << ")\n";
             //                return;
         }
 
@@ -211,7 +227,8 @@ namespace Collada
             //std::cout << "id: " << geometry.attribute("id").value() << std::endl;
             std::vector<float> color;
 
-            if (polylist.node().attribute("material") && polylist.node().attribute("material").value() && colormap.size() > 0)
+            if (polylist.node().attribute("material") &&
+                polylist.node().attribute("material").value() && colormap.size() > 0)
             {
                 color = colormap.at(polylist.node().attribute("material").value());
             }
@@ -220,7 +237,7 @@ namespace Collada
                 color = std::vector<float>(3, 0.5);
             }
 
-            SoMaterial* mat  = new SoMaterial;
+            SoMaterial* mat = new SoMaterial;
             separator->addChild(mat);
             mat->diffuseColor.setValue(color[0], color[1], color[2]);
             //std::cout << "color: " << color[0] << "," << color[1] << "," << color[2] << "," << color[3] << std::endl;
@@ -235,7 +252,8 @@ namespace Collada
 
             std::vector<int> p = getIntVector(polylist.node().child_value("p"));
             std::vector<int> vcount = getIntVector(polylist.node().child_value("vcount"));
-            pugi::xml_node vertexInputNode = polylist.node().select_single_node(".//input[@semantic='VERTEX']").node();
+            pugi::xml_node vertexInputNode =
+                polylist.node().select_single_node(".//input[@semantic='VERTEX']").node();
 
             // get number of input nodes
             int stride = polylist.node().select_nodes(".//input").size();
@@ -246,14 +264,15 @@ namespace Collada
             pugi::xml_node vertices = resolveURL(vertexInputNode);
             pugi::xml_node source = resolveURL(vertices.child("input"));
             std::vector<float> floats = getFloatVector(source.child_value("float_array"));
-            coordinates->point.setValues(0, floats.size() / 3, (const float(*)[3]) &floats[0]);
+            coordinates->point.setValues(0, floats.size() / 3, (const float(*)[3]) & floats[0]);
 
             /* Explanation:
              * Collada stores indices in one single vector: (vertex1, normal1, color1, vertex2 ...)
              * Inventor stores vertices in a vector with a -1 between vertices of different faces: (vertex11, vertex12, vertex13, -1, vertex21, vertex22, ...)
              * This leads to the follwing loop that creates the vertex indices for InventorRobot
              */
-            for (int pInd = vertexOffset, vOffset = 0, vInd = 0, countInd = 0; pInd < int(p.size()); pInd += stride, vInd++)
+            for (int pInd = vertexOffset, vOffset = 0, vInd = 0, countInd = 0; pInd < int(p.size());
+                 pInd += stride, vInd++)
             {
                 if (vInd >= vcount[countInd])
                 {
@@ -268,15 +287,15 @@ namespace Collada
                 //vertexIndices[vInd+vOffset] = p[pInd];
                 //assert(vertexIndices[vInd+vOffset]<=floats.size()/3);
             }
-
-
         }
     }
 
-
-    bool InventorWalker::for_each(pugi::xml_node& node)
+    bool
+    InventorWalker::for_each(pugi::xml_node& node)
     {
-        if (depth() + 1 > int(stack.size())) {}
+        if (depth() + 1 > int(stack.size()))
+        {
+        }
 
         while (depth() + 1 < int(stack.size()))
         {
@@ -324,7 +343,8 @@ namespace Collada
 
         if (structureMap.count(node))
         {
-            stack.back() = std::dynamic_pointer_cast<InventorRobotNode>(structureMap[node])->visualization;
+            stack.back() =
+                std::dynamic_pointer_cast<InventorRobotNode>(structureMap[node])->visualization;
             parents.push_back(structureMap[node]);
         }
         else
@@ -340,30 +360,31 @@ namespace Collada
         return true;
     }
 
-    void InventorRobot::addCollisionModel(ColladaRobotNodePtr robotNode, pugi::xml_node RigidBodyNode)
+    void
+    InventorRobot::addCollisionModel(ColladaRobotNodePtr robotNode, pugi::xml_node RigidBodyNode)
     {
 
-        std::shared_ptr<InventorRobotNode> inventorRobotNode = std::dynamic_pointer_cast<InventorRobotNode>(robotNode);
+        std::shared_ptr<InventorRobotNode> inventorRobotNode =
+            std::dynamic_pointer_cast<InventorRobotNode>(robotNode);
         SoSeparator* rigidBodySep = new SoSeparator;
         inventorRobotNode->collisionModel->addChild(rigidBodySep);
         // An additional Separator is necessary if there are multiple rigid bodies attached to the same joint
 
 
-        for (pugi::xpath_node const& transformation : RigidBodyNode.select_nodes(".//mass_frame/translate|.//mass_frame/rotate"))
+        for (pugi::xpath_node const& transformation :
+             RigidBodyNode.select_nodes(".//mass_frame/translate|.//mass_frame/rotate"))
             addTransform(rigidBodySep, transformation.node());
 
         for (pugi::xpath_node const& shape : RigidBodyNode.select_nodes(".//shape"))
         {
-            SoSeparator* separator  = new SoSeparator;
+            SoSeparator* separator = new SoSeparator;
             rigidBodySep->addChild(separator);
-            for (pugi::xpath_node const& transformation : shape.node().select_nodes(".//translate|.//rotate"))
+            for (pugi::xpath_node const& transformation :
+                 shape.node().select_nodes(".//translate|.//rotate"))
                 addTransform(separator, transformation.node());
             addGeometry(separator, shape.node().child("instance_geometry"));
         }
     }
 
 
-
-
-
-} // namespace
+} // namespace Collada

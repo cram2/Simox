@@ -23,21 +23,26 @@
 
 #include "TSRConstraint.h"
 
+#include <Eigen/Dense>
+
 #include <VirtualRobot/MathTools.h>
 
 #include "Nodes/RobotNode.h"
 #include "RobotNodeSet.h"
 
-#include <Eigen/Dense>
-
 using namespace VirtualRobot;
 
-#define POSITION_COMPONENT      0
-#define ORIENTATION_COMPONENT   1
+#define POSITION_COMPONENT 0
+#define ORIENTATION_COMPONENT 1
 
-TSRConstraint::TSRConstraint(const RobotPtr& robot, const RobotNodeSetPtr& nodeSet, const RobotNodePtr& eef,
-                             const Eigen::Matrix4f& transformation, const Eigen::Matrix4f& eefOffset, const Eigen::Matrix<float, 6, 2>& bounds,
-                             float tolerancePosition, float toleranceRotation) :
+TSRConstraint::TSRConstraint(const RobotPtr& robot,
+                             const RobotNodeSetPtr& nodeSet,
+                             const RobotNodePtr& eef,
+                             const Eigen::Matrix4f& transformation,
+                             const Eigen::Matrix4f& eefOffset,
+                             const Eigen::Matrix<float, 6, 2>& bounds,
+                             float tolerancePosition,
+                             float toleranceRotation) :
     Constraint(nodeSet),
     robot(robot),
     nodeSet(nodeSet),
@@ -62,22 +67,26 @@ TSRConstraint::TSRConstraint(const RobotPtr& robot, const RobotNodeSetPtr& nodeS
     initialized = true;
 }
 
-Eigen::MatrixXf TSRConstraint::getJacobianMatrix()
+Eigen::MatrixXf
+TSRConstraint::getJacobianMatrix()
 {
     return ik->getJacobianMatrix();
 }
 
-Eigen::MatrixXf TSRConstraint::getJacobianMatrix(SceneObjectPtr tcp)
+Eigen::MatrixXf
+TSRConstraint::getJacobianMatrix(SceneObjectPtr tcp)
 {
     if (tcp->getName() != eef->getName())
     {
-        VR_WARNING << "EndEffectorPoseConstraing Jacobian calculation for differing EEF ('" << tcp->getName() << "' instead of '" << eef->getName() << "')" << std::endl;
+        VR_WARNING << "EndEffectorPoseConstraing Jacobian calculation for differing EEF ('"
+                   << tcp->getName() << "' instead of '" << eef->getName() << "')" << std::endl;
     }
 
     return getJacobianMatrix();
 }
 
-Eigen::VectorXf TSRConstraint::getError(float stepSize)
+Eigen::VectorXf
+TSRConstraint::getError(float stepSize)
 {
     float d_w[6];
     Eigen::MatrixXf eef_global = eef->getGlobalPose();
@@ -88,7 +97,9 @@ Eigen::VectorXf TSRConstraint::getError(float stepSize)
     Eigen::VectorXf target(6);
     for (int i = 0; i < 6; i++)
     {
-        target(i) = (d_w[i] >= bounds(i, 0) && d_w[i] <= bounds(i, 1)) ? d_w[i] : ((d_w[i] <= bounds(i, 0)) ? bounds(i, 0) : bounds(i, 1));
+        target(i) = (d_w[i] >= bounds(i, 0) && d_w[i] <= bounds(i, 1))
+                        ? d_w[i]
+                        : ((d_w[i] <= bounds(i, 0)) ? bounds(i, 0) : bounds(i, 1));
     }
 
     Eigen::Matrix4f T_dx;
@@ -102,34 +113,36 @@ Eigen::VectorXf TSRConstraint::getError(float stepSize)
 
     Eigen::VectorXf dx(6);
     dx.head(3) = Eigen::Vector3f(
-                     P_target(0, 3) - P_eef(0, 3),
-                     P_target(1, 3) - P_eef(1, 3),
-                     P_target(2, 3) - P_eef(2, 3)
-                 );
+        P_target(0, 3) - P_eef(0, 3), P_target(1, 3) - P_eef(1, 3), P_target(2, 3) - P_eef(2, 3));
     dx.tail(3) = P_delta_AA.axis() * P_delta_AA.angle();
 
     return dx * stepSize;
 }
 
-bool TSRConstraint::checkTolerances()
+bool
+TSRConstraint::checkTolerances()
 {
     Eigen::VectorXf error = getError(1);
-    return (error.head(3).norm() < toleranceTranslation) && (error.tail(3).norm() < toleranceRotation);
+    return (error.head(3).norm() < toleranceTranslation) &&
+           (error.tail(3).norm() < toleranceRotation);
 }
 
-const Eigen::Matrix4f& TSRConstraint::getTransformation()
+const Eigen::Matrix4f&
+TSRConstraint::getTransformation()
 {
     return transformation;
 }
 
-const Eigen::Matrix<float, 6, 2>& TSRConstraint::getBounds()
+const Eigen::Matrix<float, 6, 2>&
+TSRConstraint::getBounds()
 {
     return bounds;
 }
 
-double TSRConstraint::optimizationFunction(unsigned int id)
+double
+TSRConstraint::optimizationFunction(unsigned int id)
 {
-    switch(id)
+    switch (id)
     {
         case POSITION_COMPONENT:
             return optimizationFunctionFactor * positionOptimizationFunction();
@@ -142,9 +155,10 @@ double TSRConstraint::optimizationFunction(unsigned int id)
     }
 }
 
-Eigen::VectorXf TSRConstraint::optimizationGradient(unsigned int id)
+Eigen::VectorXf
+TSRConstraint::optimizationGradient(unsigned int id)
 {
-    switch(id)
+    switch (id)
     {
         case POSITION_COMPONENT:
             return optimizationFunctionFactor * positionOptimizationGradient();
@@ -157,26 +171,30 @@ Eigen::VectorXf TSRConstraint::optimizationGradient(unsigned int id)
     }
 }
 
-double TSRConstraint::positionOptimizationFunction()
+double
+TSRConstraint::positionOptimizationFunction()
 {
     Eigen::VectorXf e = posRotTradeoff * getPositionError();
     return e.dot(e);
 }
 
-Eigen::VectorXf TSRConstraint::positionOptimizationGradient()
+Eigen::VectorXf
+TSRConstraint::positionOptimizationGradient()
 {
     Eigen::MatrixXf J = ik->getJacobianMatrix(eef).block(0, 0, 3, nodeSet->getSize());
     Eigen::VectorXf e = posRotTradeoff * getPositionError();
     return 2 * e.transpose() * J;
 }
 
-double TSRConstraint::orientationOptimizationFunction()
+double
+TSRConstraint::orientationOptimizationFunction()
 {
     Eigen::VectorXf e = getOrientationError();
     return e.dot(e);
 }
 
-Eigen::VectorXf TSRConstraint::orientationOptimizationGradient()
+Eigen::VectorXf
+TSRConstraint::orientationOptimizationGradient()
 {
     Eigen::MatrixXf J = ik->getJacobianMatrix(eef).block(3, 0, 3, nodeSet->getSize());
     Eigen::VectorXf e = getOrientationError();
@@ -184,22 +202,29 @@ Eigen::VectorXf TSRConstraint::orientationOptimizationGradient()
     return result;
 }
 
-Eigen::Vector3f TSRConstraint::getPositionError()
+Eigen::Vector3f
+TSRConstraint::getPositionError()
 {
     Eigen::MatrixXf eef_global = eef->getGlobalPose();
     Eigen::MatrixXf T = transformation.inverse() * eef_global * eefOffset;
 
-    Eigen::Vector3f current = T.block<3,1>(0,3);
+    Eigen::Vector3f current = T.block<3, 1>(0, 3);
     Eigen::Vector3f target;
-    target <<
-        ((current.x() <= bounds(0, 0)) ? bounds(0,0) : (current.x() >= bounds(0,1) ? bounds(0,1) : current.x())),
-        ((current.y() <= bounds(1, 0)) ? bounds(1,0) : (current.y() >= bounds(1,1) ? bounds(1,1) : current.y())),
-        ((current.z() <= bounds(2, 0)) ? bounds(2,0) : (current.z() >= bounds(2,1) ? bounds(2,1) : current.z()));
+    target << ((current.x() <= bounds(0, 0))
+                   ? bounds(0, 0)
+                   : (current.x() >= bounds(0, 1) ? bounds(0, 1) : current.x())),
+        ((current.y() <= bounds(1, 0))
+             ? bounds(1, 0)
+             : (current.y() >= bounds(1, 1) ? bounds(1, 1) : current.y())),
+        ((current.z() <= bounds(2, 0))
+             ? bounds(2, 0)
+             : (current.z() >= bounds(2, 1) ? bounds(2, 1) : current.z()));
 
     return current - target;
 }
 
-Eigen::Vector3f TSRConstraint::getOrientationError()
+Eigen::Vector3f
+TSRConstraint::getOrientationError()
 {
     Eigen::MatrixXf eef_global = eef->getGlobalPose();
     Eigen::MatrixXf T = transformation.inverse() * eef_global * eefOffset;
@@ -209,10 +234,15 @@ Eigen::Vector3f TSRConstraint::getOrientationError()
     Eigen::Vector3f current = aa.axis() * aa.angle();
 
     Eigen::Vector3f target;
-    target <<
-        ((current.x() <= bounds(3, 0)) ? bounds(3,0) : (current.x() >= bounds(3,1) ? bounds(3,1) : current.x())),
-        ((current.y() <= bounds(4, 0)) ? bounds(4,0) : (current.y() >= bounds(4,1) ? bounds(4,1) : current.y())),
-        ((current.z() <= bounds(5, 0)) ? bounds(5,0) : (current.z() >= bounds(5,1) ? bounds(5,1) : current.z()));
+    target << ((current.x() <= bounds(3, 0))
+                   ? bounds(3, 0)
+                   : (current.x() >= bounds(3, 1) ? bounds(3, 1) : current.x())),
+        ((current.y() <= bounds(4, 0))
+             ? bounds(4, 0)
+             : (current.y() >= bounds(4, 1) ? bounds(4, 1) : current.y())),
+        ((current.z() <= bounds(5, 0))
+             ? bounds(5, 0)
+             : (current.z() >= bounds(5, 1) ? bounds(5, 1) : current.z()));
 
     return current - target;
 }

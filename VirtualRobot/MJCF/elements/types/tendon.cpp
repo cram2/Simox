@@ -6,5 +6,4 @@
 using namespace mjcf;
 
 
-const std::string TendonSection::tag    = "tendon";
-
+const std::string TendonSection::tag = "tendon";

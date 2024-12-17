@@ -6,12 +6,11 @@
 
 #define BOOST_TEST_MODULE VirtualRobot_VirtualRobotChecksTests
 
-#include <VirtualRobot/VirtualRobotTest.h>
 #include <VirtualRobot/VirtualRobotChecks.h>
+#include <VirtualRobot/VirtualRobotTest.h>
 
 
 using namespace VirtualRobot;
-
 
 BOOST_AUTO_TEST_CASE(test_VR_CHECK_true)
 {
@@ -24,7 +23,6 @@ BOOST_AUTO_TEST_CASE(test_VR_CHECK_true)
     BOOST_CHECK_NO_THROW(VR_CHECK_HINT(tru, "Must be true."));
 }
 
-
 BOOST_AUTO_TEST_CASE(test_VR_CHECK_false)
 {
     bool fals = false;
@@ -36,7 +34,6 @@ BOOST_AUTO_TEST_CASE(test_VR_CHECK_false)
     BOOST_CHECK_THROW(VR_CHECK_HINT(fals, "Must throw."), VirtualRobotCheckException);
 }
 
-
 struct Fixture
 {
     int a = -1, a2 = a, b = 5, c = 10, z = 0;
@@ -44,7 +41,6 @@ struct Fixture
 
 
 BOOST_FIXTURE_TEST_SUITE(Comparison, Fixture)
-
 
 BOOST_AUTO_TEST_CASE(test_VR_CHECK_COMPARISON)
 {
@@ -54,7 +50,6 @@ BOOST_AUTO_TEST_CASE(test_VR_CHECK_COMPARISON)
     BOOST_CHECK_NO_THROW(VR_CHECK_COMPARISON(2, 4, !=));
     BOOST_CHECK_THROW(VR_CHECK_COMPARISON(4, 4, !=), VirtualRobotCheckException);
 }
-
 
 BOOST_AUTO_TEST_CASE(test_VR_CHECK_EQUAL)
 {

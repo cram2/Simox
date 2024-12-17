@@ -23,18 +23,15 @@
 
 #pragma once
 
-#include "../VirtualRobot.h"
-
-#include "JacobiProvider.h"
-#include "IKSolver.h"
+#include <map>
+#include <vector>
 
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
 
-#include <map>
-#include <vector>
-
-
+#include "../VirtualRobot.h"
+#include "IKSolver.h"
+#include "JacobiProvider.h"
 
 namespace VirtualRobot
 {
@@ -105,7 +102,9 @@ namespace VirtualRobot
         @endcode
     */
 
-    class VIRTUAL_ROBOT_IMPORT_EXPORT DifferentialIK : public JacobiProvider, public std::enable_shared_from_this<DifferentialIK>
+    class VIRTUAL_ROBOT_IMPORT_EXPORT DifferentialIK :
+        public JacobiProvider,
+        public std::enable_shared_from_this<DifferentialIK>
     {
     public:
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -117,7 +116,10 @@ namespace VirtualRobot
             \param invJacMethod The method for inverting the Jacobian
             \param invParam Only used when != 0.0f
         */
-        DifferentialIK(RobotNodeSetPtr rns, RobotNodePtr coordSystem = RobotNodePtr(), JacobiProvider::InverseJacobiMethod invJacMethod = eSVD, float invParam = 0.0f);
+        DifferentialIK(RobotNodeSetPtr rns,
+                       RobotNodePtr coordSystem = RobotNodePtr(),
+                       JacobiProvider::InverseJacobiMethod invJacMethod = eSVD,
+                       float invParam = 0.0f);
 
         /*! @brief Sets the target position for (one of) the tcp(s).
             \param goal Target pose of the tcp.
@@ -127,7 +129,12 @@ namespace VirtualRobot
             @param toleranceRotation The threshold when to accept a solution in radians.
             @param performInitialization If multiple goals will be set, the internal initialization can be omitted in order to speed up the setup procedure (Ensure, to call initialize() after setting all goals).
         */
-        virtual void setGoal(const Eigen::Matrix4f& goal, SceneObjectPtr tcp = SceneObjectPtr(), IKSolver::CartesianSelection mode = IKSolver::All, float tolerancePosition = 5.0f, float toleranceRotation = 3.0f / 180.0f * M_PI, bool performInitialization = true);
+        virtual void setGoal(const Eigen::Matrix4f& goal,
+                             SceneObjectPtr tcp = SceneObjectPtr(),
+                             IKSolver::CartesianSelection mode = IKSolver::All,
+                             float tolerancePosition = 5.0f,
+                             float toleranceRotation = 3.0f / 180.0f * M_PI,
+                             bool performInitialization = true);
 
 
         /*! @brief Sets the target position for (one of) the tcp(s).
@@ -138,7 +145,12 @@ namespace VirtualRobot
             @param toleranceRotation The threshold when to accept a solution in radians.
             @param performInitialization If multiple goals will be set, the internal initialization can be omitted in order to speed up the setup procedure (Ensure, to call initialize() after setting all goals).
         */
-        virtual void setGoal(const Eigen::Vector3f& goal, SceneObjectPtr tcp = SceneObjectPtr(), IKSolver::CartesianSelection mode = IKSolver::Position, float tolerancePosition = 5.0f, float toleranceRotation = 3.0f / 180.0f * M_PI, bool performInitialization = true);
+        virtual void setGoal(const Eigen::Vector3f& goal,
+                             SceneObjectPtr tcp = SceneObjectPtr(),
+                             IKSolver::CartesianSelection mode = IKSolver::Position,
+                             float tolerancePosition = 5.0f,
+                             float toleranceRotation = 3.0f / 180.0f * M_PI,
+                             bool performInitialization = true);
 
 
         /*! @brief Returns the Jacobian matrix for a given tcp.
@@ -176,7 +188,8 @@ namespace VirtualRobot
             All this is done within computeSteps(). For more information regarding the differential inverse kinematics,
             see <a href="http://graphics.ucsd.edu/courses/cse169_w05/CSE169_13.ppt">this lecture</a>.
         */
-        virtual Eigen::MatrixXf getJacobianMatrix(SceneObjectPtr tcp, IKSolver::CartesianSelection mode);
+        virtual Eigen::MatrixXf getJacobianMatrix(SceneObjectPtr tcp,
+                                                  IKSolver::CartesianSelection mode);
         Eigen::MatrixXf getJacobianMatrix(SceneObjectPtr tcp) override;
         virtual Eigen::MatrixXf getJacobianMatrix(IKSolver::CartesianSelection mode);
 
@@ -196,12 +209,16 @@ namespace VirtualRobot
          * @details The pseudo inverse \f$J^{+}\f$ can be calculated from the Jacobian matrix \f$ J \f$ using the following formula:
          * \f[ J^t \cdot \left( J \cdot J^t \right)^{-1}.\f]. Update: In order to improve stability, we are now using singular value decomposition (SVD).
          */
-        virtual Eigen::MatrixXf getPseudoInverseJacobianMatrix(SceneObjectPtr tcp, IKSolver::CartesianSelection mode = IKSolver::All);
+        virtual Eigen::MatrixXf
+        getPseudoInverseJacobianMatrix(SceneObjectPtr tcp,
+                                       IKSolver::CartesianSelection mode = IKSolver::All);
         virtual Eigen::MatrixXf getPseudoInverseJacobianMatrix();
         virtual Eigen::MatrixXf getPseudoInverseJacobianMatrix(IKSolver::CartesianSelection mode);
 
         void updateJacobianMatrix(Eigen::MatrixXf& jac);
-        void updateJacobianMatrix(Eigen::MatrixXf& jac, SceneObjectPtr tcp, IKSolver::CartesianSelection mode);
+        void updateJacobianMatrix(Eigen::MatrixXf& jac,
+                                  SceneObjectPtr tcp,
+                                  IKSolver::CartesianSelection mode);
         //Eigen::MatrixXf computePseudoInverseJacobianMatrix(const Eigen::MatrixXf &m);
 
 
@@ -265,8 +282,12 @@ namespace VirtualRobot
             Returns 6D workspace delta that is used for Jacobi calculation.
             Updates the currentDeltaToGoal vector
         */
-        virtual void updateDeltaToGoal(Eigen::VectorXf& delta, SceneObjectPtr tcp = SceneObjectPtr());
-        virtual void updateDelta(Eigen::VectorXf& delta, const Eigen::Matrix4f& current, const Eigen::Matrix4f& goal, IKSolver::CartesianSelection mode = IKSolver::All);
+        virtual void updateDeltaToGoal(Eigen::VectorXf& delta,
+                                       SceneObjectPtr tcp = SceneObjectPtr());
+        virtual void updateDelta(Eigen::VectorXf& delta,
+                                 const Eigen::Matrix4f& current,
+                                 const Eigen::Matrix4f& goal,
+                                 IKSolver::CartesianSelection mode = IKSolver::All);
         /*!
         Returns 6D workspace delta that is used for Jacobi calculation.
         */
@@ -274,7 +295,9 @@ namespace VirtualRobot
             Returns 6D workspace delta that is used for Jacobi calculation.
         */
         virtual Eigen::VectorXf getDeltaToGoal(SceneObjectPtr tcp = SceneObjectPtr());
-        virtual Eigen::VectorXf getDelta(const Eigen::Matrix4f& current, const Eigen::Matrix4f& goal, IKSolver::CartesianSelection mode = IKSolver::All);
+        virtual Eigen::VectorXf getDelta(const Eigen::Matrix4f& current,
+                                         const Eigen::Matrix4f& goal,
+                                         IKSolver::CartesianSelection mode = IKSolver::All);
 
 
         //! When considering large errors, the translational part can be cut to this length. Set to <= 0 to ignore cutting (standard)
@@ -288,6 +311,7 @@ namespace VirtualRobot
         virtual void initialize();
 
         void print() override;
+
     protected:
         virtual void setNRows();
 
@@ -295,22 +319,32 @@ namespace VirtualRobot
         std::vector<SceneObjectPtr> tcp_set;
         RobotNodePtr coordSystem;
 
-        bool checkImprovement; //!< Indicates if the jacobian steps must improve the result, otherwise the loop is canceld.
+        bool
+            checkImprovement; //!< Indicates if the jacobian steps must improve the result, otherwise the loop is canceld.
 
         std::size_t nRows;
         std::size_t nDoF;
 
         // need a specialized Eigen allocator here, see http://eigen.tuxfamily.org/dox/TopicStlContainers.html
-        std::map<SceneObjectPtr, Eigen::Matrix4f, std::less<SceneObjectPtr>, Eigen::aligned_allocator<std::pair<const SceneObjectPtr, Eigen::Matrix4f> > > targets;
-        std::map<SceneObjectPtr, Eigen::MatrixXf, std::less<SceneObjectPtr>, Eigen::aligned_allocator<std::pair<const SceneObjectPtr, Eigen::MatrixXf> > > partJacobians;
+        std::map<SceneObjectPtr,
+                 Eigen::Matrix4f,
+                 std::less<SceneObjectPtr>,
+                 Eigen::aligned_allocator<std::pair<const SceneObjectPtr, Eigen::Matrix4f>>>
+            targets;
+        std::map<SceneObjectPtr,
+                 Eigen::MatrixXf,
+                 std::less<SceneObjectPtr>,
+                 Eigen::aligned_allocator<std::pair<const SceneObjectPtr, Eigen::MatrixXf>>>
+            partJacobians;
         std::map<SceneObjectPtr, IKSolver::CartesianSelection> modes;
         std::map<SceneObjectPtr, float> tolerancePosition;
         std::map<SceneObjectPtr, float> toleranceRotation;
 
-        bool convertMMtoM; // if set, the distances for Jacobian computations are scaled with 1/1000, otherwise the scaling of the model is used (which usually is mm)
+        bool
+            convertMMtoM; // if set, the distances for Jacobian computations are scaled with 1/1000, otherwise the scaling of the model is used (which usually is mm)
 
-        std::vector <RobotNodePtr> nodes;
-        std::map< RobotNodePtr, std::vector<RobotNodePtr> > parents;
+        std::vector<RobotNodePtr> nodes;
+        std::map<RobotNodePtr, std::vector<RobotNodePtr>> parents;
 
         Eigen::VectorXf currentError;
         Eigen::MatrixXf currentJacobian;
@@ -330,10 +364,8 @@ namespace VirtualRobot
         Eigen::VectorXf tmpComputeStepTheta;
 
 
-
         float positionMaxStep;
         bool verbose;
-
     };
 
     typedef std::shared_ptr<DifferentialIK> DifferentialIKPtr;

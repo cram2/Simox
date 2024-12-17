@@ -1,20 +1,21 @@
 #include "Trajectory.h"
-#include "Robot.h"
-#include "VirtualRobotException.h"
-#include <VirtualRobot/Visualization/VisualizationFactory.h>
-#include "VirtualRobot/Nodes/RobotNode.h"
-#include "VirtualRobot/RobotNodeSet.h"
 
 #include <iostream>
 #include <sstream>
+
+#include <VirtualRobot/Visualization/VisualizationFactory.h>
+
+#include "Robot.h"
+#include "VirtualRobot/Nodes/RobotNode.h"
+#include "VirtualRobot/RobotNodeSet.h"
+#include "VirtualRobotException.h"
 
 namespace VirtualRobot
 {
     using std::cout;
     using std::endl;
 
-    Trajectory::Trajectory(RobotNodeSetPtr rns, const std::string& name)
-        : rns(rns), name(name)
+    Trajectory::Trajectory(RobotNodeSetPtr rns, const std::string& name) : rns(rns), name(name)
     {
         THROW_VR_EXCEPTION_IF(!rns, "Need a rns defined...");
         dimension = rns->getSize();
@@ -26,35 +27,39 @@ namespace VirtualRobot
         reset();
     }
 
-    std::vector<Eigen::VectorXf> const& Trajectory::getPoints() const
+    std::vector<Eigen::VectorXf> const&
+    Trajectory::getPoints() const
     {
         return path;
     }
 
-    void Trajectory::reset()
+    void
+    Trajectory::reset()
     {
         path.clear();
     }
 
-    unsigned int Trajectory::getDimension() const
+    unsigned int
+    Trajectory::getDimension() const
     {
         return dimension;
     }
 
-
-    void Trajectory::addPoint(const Eigen::VectorXf& c)
+    void
+    Trajectory::addPoint(const Eigen::VectorXf& c)
     {
         VR_ASSERT(c.rows() == dimension);
         path.push_back(c);
     }
 
-    unsigned int Trajectory::getNrOfPoints() const
+    unsigned int
+    Trajectory::getNrOfPoints() const
     {
         return (unsigned int)path.size();
     }
 
-
-    Eigen::VectorXf Trajectory::getPoint(unsigned int nr) const
+    Eigen::VectorXf
+    Trajectory::getPoint(unsigned int nr) const
     {
         if (nr >= path.size())
         {
@@ -75,7 +80,8 @@ namespace VirtualRobot
         return path[nr];
     }
 
-    TrajectoryPtr Trajectory::clone() const
+    TrajectoryPtr
+    Trajectory::clone() const
     {
         TrajectoryPtr res(new Trajectory(rns, name));
 
@@ -87,8 +93,8 @@ namespace VirtualRobot
         return res;
     }
 
-
-    TrajectoryPtr Trajectory::createSubPath(unsigned int startIndex, unsigned int endIndex) const
+    TrajectoryPtr
+    Trajectory::createSubPath(unsigned int startIndex, unsigned int endIndex) const
     {
         if (startIndex >= getNrOfPoints() || endIndex >= getNrOfPoints())
         {
@@ -106,9 +112,10 @@ namespace VirtualRobot
         return res;
     }
 
-
-
-    bool Trajectory::getPoints(unsigned int start, unsigned int end , std::vector<Eigen::VectorXf>& storePosList) const
+    bool
+    Trajectory::getPoints(unsigned int start,
+                          unsigned int end,
+                          std::vector<Eigen::VectorXf>& storePosList) const
     {
         if (start > end || end >= path.size())
         {
@@ -117,7 +124,7 @@ namespace VirtualRobot
         }
 
         unsigned int i = start;
-        Eigen::VectorXf  data;
+        Eigen::VectorXf data;
 
         while (i <= end)
         {
@@ -129,8 +136,8 @@ namespace VirtualRobot
         return true;
     }
 
-
-    void Trajectory::erasePosition(unsigned int pos)
+    void
+    Trajectory::erasePosition(unsigned int pos)
     {
         if (pos >= path.size())
         {
@@ -144,8 +151,8 @@ namespace VirtualRobot
         path.erase(iter);
     }
 
-
-    unsigned int Trajectory::removePositions(unsigned int startPos, unsigned int endPos)
+    unsigned int
+    Trajectory::removePositions(unsigned int startPos, unsigned int endPos)
     {
         if (startPos >= path.size() || endPos >= path.size())
         {
@@ -179,7 +186,8 @@ namespace VirtualRobot
     }
 
     // inserts at position before pos
-    void Trajectory::insertPosition(unsigned int pos, const Eigen::VectorXf& c)
+    void
+    Trajectory::insertPosition(unsigned int pos, const Eigen::VectorXf& c)
     {
         if (pos > path.size())
         {
@@ -191,10 +199,11 @@ namespace VirtualRobot
         std::vector<Eigen::VectorXf>::iterator iter = path.begin();
         iter += pos;
 
-        path.insert(iter,  c);
+        path.insert(iter, c);
     }
 
-    void Trajectory::insertPosition(unsigned int pos, std::vector<Eigen::VectorXf>& newConfigurations)
+    void
+    Trajectory::insertPosition(unsigned int pos, std::vector<Eigen::VectorXf>& newConfigurations)
     {
         std::vector<Eigen::VectorXf>::iterator iter = newConfigurations.begin();
 
@@ -206,7 +215,8 @@ namespace VirtualRobot
         }
     }
 
-    void Trajectory::insertTrajectory(unsigned int pos, TrajectoryPtr trajectoryToInsert)
+    void
+    Trajectory::insertTrajectory(unsigned int pos, TrajectoryPtr trajectoryToInsert)
     {
         if (!trajectoryToInsert)
         {
@@ -223,9 +233,11 @@ namespace VirtualRobot
         }
     }
 
-
     // returns position on path for time t (0<=t<=1)
-    void Trajectory::interpolate(float t, Eigen::VectorXf& storePathPos, int* storeIndex /*= NULL*/) const
+    void
+    Trajectory::interpolate(float t,
+                            Eigen::VectorXf& storePathPos,
+                            int* storeIndex /*= NULL*/) const
     {
         storePathPos.resize(dimension);
 
@@ -322,15 +334,16 @@ namespace VirtualRobot
         {
             *storeIndex = startIndex;
         }
-
     }
 
-    void Trajectory::reverse()
+    void
+    Trajectory::reverse()
     {
         std::reverse(path.begin(), path.end());
     }
 
-    float Trajectory::getLength() const
+    float
+    Trajectory::getLength() const
     {
         float pathLength = 0.0f;
         Eigen::VectorXf c1, c2;
@@ -348,18 +361,20 @@ namespace VirtualRobot
         return pathLength;
     }
 
-
-    const std::vector <Eigen::VectorXf>& Trajectory::getData() const
+    const std::vector<Eigen::VectorXf>&
+    Trajectory::getData() const
     {
         return path;
     }
 
-    Eigen::VectorXf &Trajectory::getPointRef(unsigned int pos)
+    Eigen::VectorXf&
+    Trajectory::getPointRef(unsigned int pos)
     {
         return path.at(pos);
     }
 
-    std::vector<Eigen::Matrix4f > Trajectory::createWorkspaceTrajectory(VirtualRobot::RobotNodePtr r)
+    std::vector<Eigen::Matrix4f>
+    Trajectory::createWorkspaceTrajectory(VirtualRobot::RobotNodePtr r)
     {
         VR_ASSERT(rns);
 
@@ -376,7 +391,7 @@ namespace VirtualRobot
         Eigen::VectorXf jv;
         rns->getJointValues(jv);
 
-        std::vector<Eigen::Matrix4f > result;
+        std::vector<Eigen::Matrix4f> result;
 
         for (size_t i = 0; i < path.size(); i++)
         {
@@ -390,7 +405,8 @@ namespace VirtualRobot
         return result;
     }
 
-    std::string Trajectory::toXML(int tabs) const
+    std::string
+    Trajectory::toXML(int tabs) const
     {
         std::stringstream ss;
         std::string tab = "";
@@ -405,7 +421,8 @@ namespace VirtualRobot
         THROW_VR_EXCEPTION_IF((!robot || !rns), "Need a valid robot and rns");
 
 
-        ss << tab << "<Trajectory Robot='" << robot->getType() << "' RobotNodeSet='" << rns->getName() << "' name='" << name << "' dim='" << dimension << "'>\n";
+        ss << tab << "<Trajectory Robot='" << robot->getType() << "' RobotNodeSet='"
+           << rns->getName() << "' name='" << name << "' dim='" << dimension << "'>\n";
 
         for (unsigned int i = 0; i < path.size(); i++)
         {
@@ -424,23 +441,27 @@ namespace VirtualRobot
         return ss.str();
     }
 
-    void Trajectory::print() const
+    void
+    Trajectory::print() const
     {
         std::string s = toXML(0);
         VR_INFO << s << std::endl;
     }
 
-    std::string Trajectory::getName() const
+    std::string
+    Trajectory::getName() const
     {
         return name;
     }
 
-    VirtualRobot::RobotNodeSetPtr Trajectory::getRobotNodeSet()
+    VirtualRobot::RobotNodeSetPtr
+    Trajectory::getRobotNodeSet()
     {
         return rns;
     }
 
-    VisualizationNodePtr Trajectory::getVisualization(std::string visualizationFactoryName)
+    VisualizationNodePtr
+    Trajectory::getVisualization(std::string visualizationFactoryName)
     {
         VisualizationFactoryPtr visualizationFactory;
 
@@ -455,17 +476,20 @@ namespace VirtualRobot
 
         if (!visualizationFactory)
         {
-            VR_ERROR << "Could not create factory for visu type " << visualizationFactoryName << std::endl;
+            VR_ERROR << "Could not create factory for visu type " << visualizationFactoryName
+                     << std::endl;
             return VisualizationNodePtr();
         }
 
         return visualizationFactory->createTrajectory(shared_from_this());
     }
 
-    std::string Trajectory::getRobotName() const
+    std::string
+    Trajectory::getRobotName() const
     {
         return rns->getRobot()->getName();
     }
+
     /*
     void Trajectory::apply( float t )
     {
@@ -477,4 +501,4 @@ namespace VirtualRobot
         robot->setJointValues(rns,c);
     }
     */
-}
+} // namespace VirtualRobot

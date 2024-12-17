@@ -23,14 +23,17 @@
 
 #pragma once
 
-#include "DifferentialIK.h"
-
 #include <string>
 #include <vector>
 
+#include "DifferentialIK.h"
+
 namespace VirtualRobot
 {
-    class [[deprecated("MMMTools_LegacyConverter")]] VIRTUAL_ROBOT_IMPORT_EXPORT RobotPoseDifferentialIK : public DifferentialIK, public std::enable_shared_from_this<RobotPoseDifferentialIK>
+    class [[deprecated(
+        "MMMTools_LegacyConverter")]] VIRTUAL_ROBOT_IMPORT_EXPORT RobotPoseDifferentialIK :
+        public DifferentialIK,
+        public std::enable_shared_from_this<RobotPoseDifferentialIK>
     {
     public:
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -40,9 +43,13 @@ namespace VirtualRobot
             \param rns The robotNodes (i.e., joints) for which the Jacobians should be calculated.
             \param coordSystem The coordinate system in which the Jacobians are defined. By default the global coordinate system is used.
         */
-        RobotPoseDifferentialIK(RobotPtr robot,RobotNodeSetPtr rns, RobotNodePtr coordSystem = RobotNodePtr(), JacobiProvider::InverseJacobiMethod invJacMethod = eSVDDamped);
+        RobotPoseDifferentialIK(RobotPtr robot,
+                                RobotNodeSetPtr rns,
+                                RobotNodePtr coordSystem = RobotNodePtr(),
+                                JacobiProvider::InverseJacobiMethod invJacMethod = eSVDDamped);
 
-        Eigen::MatrixXf getJacobianMatrix(SceneObjectPtr tcp, IKSolver::CartesianSelection mode) override;
+        Eigen::MatrixXf getJacobianMatrix(SceneObjectPtr tcp,
+                                          IKSolver::CartesianSelection mode) override;
 
         Eigen::MatrixXf getJacobianMatrix() override;
 
@@ -51,7 +58,7 @@ namespace VirtualRobot
             @return The changes \f$\Delta \theta\f$ in the joint angles.
             \note{Note} This does not affect the joints values of the robot.
         */
-        Eigen::VectorXf computeStep(float stepSize=1.0) override;
+        Eigen::VectorXf computeStep(float stepSize = 1.0) override;
 
         /*!	@brief Computes the complete inverse kinematics.
             @param stepSize Controls the amount of error to be reduced in each step: \f$ 0 < \beta \leq 1 \f$
@@ -70,10 +77,9 @@ namespace VirtualRobot
         void boxConstraints(bool enable);
 
     protected:
-
         bool checkTolerances() override;
 
-        Eigen::MatrixXd computePseudoInverseJacobianMatrixDampedD(const Eigen::MatrixXd &m);
+        Eigen::MatrixXd computePseudoInverseJacobianMatrixDampedD(const Eigen::MatrixXd& m);
         std::vector<Eigen::MatrixXf> localJacobians;
         RobotPtr robot;
 
@@ -83,6 +89,6 @@ namespace VirtualRobot
         Eigen::VectorXf _uLimits;
     };
 
-    [[deprecated("MMMTools_LegacyConverter")]] typedef std::shared_ptr<RobotPoseDifferentialIK> RobotPoseDifferentialIKPtr;
-}
-
+    [[deprecated("MMMTools_LegacyConverter")]] typedef std::shared_ptr<RobotPoseDifferentialIK>
+        RobotPoseDifferentialIKPtr;
+} // namespace VirtualRobot

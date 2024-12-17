@@ -4,7 +4,6 @@
 #include <mutex>
 #include <optional>
 
-
 namespace simox::threads
 {
 
@@ -25,7 +24,6 @@ namespace simox::threads
     class CountingSemaphore
     {
     public:
-
         /// Construct an initially blocking semaphore (initial count 0) without max count.
         CountingSemaphore();
         /**
@@ -67,7 +65,6 @@ namespace simox::threads
 
 
     private:
-
         /// The mutex for _condition and _count.
         std::mutex _mutex;
         /// The condition variable to wake up waking threads.
@@ -78,7 +75,6 @@ namespace simox::threads
 
         /// An optional maximal count. All `notifiy()`s increasing the counter above maxCount are ignored.
         std::optional<unsigned int> _maxCount = std::nullopt;
-
     };
 
-}
+} // namespace simox::threads

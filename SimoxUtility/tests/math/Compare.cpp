@@ -4,15 +4,14 @@
 * @copyright  2020 Raphael Grimm
 */
 
-#define BOOST_TEST_MODULE SimoxUtility/math/Compare
+#define BOOST_TEST_MODULE SimoxUtility / math / Compare
 
-#include <random>
 #include <iostream>
+#include <random>
 
 #include <boost/test/included/unit_test.hpp>
 
 #include <SimoxUtility/math/compare.h>
-
 
 BOOST_AUTO_TEST_CASE(test_normal_orth)
 {

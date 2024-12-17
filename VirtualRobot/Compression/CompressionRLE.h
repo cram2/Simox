@@ -24,9 +24,9 @@
 */
 #pragma once
 
-#include "../VirtualRobot.h"
-
 #include <mutex>
+
+#include "../VirtualRobot.h"
 
 namespace VirtualRobot
 {
@@ -34,7 +34,6 @@ namespace VirtualRobot
     class VIRTUAL_ROBOT_IMPORT_EXPORT CompressionRLE
     {
     public:
-
         /*************************************************************************
         * RLE_Compress() - Compress a block of data using an RLE coder.
         *  in     - Input (uncompressed) buffer.
@@ -52,14 +51,21 @@ namespace VirtualRobot
         *            enough to hold the uncompressed data.
         *  insize  - Number of input bytes.
         *************************************************************************/
-        static void RLE_Uncompress(const unsigned char* in, unsigned char* out, unsigned int insize);
+        static void
+        RLE_Uncompress(const unsigned char* in, unsigned char* out, unsigned int insize);
 
     protected:
-        static void _RLE_WriteRep(unsigned char* out, unsigned int* outpos, unsigned char marker, unsigned char symbol, unsigned int count);
-        static void _RLE_WriteNonRep(unsigned char* out, unsigned int* outpos, unsigned char marker, unsigned char symbol);
+        static void _RLE_WriteRep(unsigned char* out,
+                                  unsigned int* outpos,
+                                  unsigned char marker,
+                                  unsigned char symbol,
+                                  unsigned int count);
+        static void _RLE_WriteNonRep(unsigned char* out,
+                                     unsigned int* outpos,
+                                     unsigned char marker,
+                                     unsigned char symbol);
 
         static std::mutex mutex;
     };
 
 } // namespace VirtualRobot
-

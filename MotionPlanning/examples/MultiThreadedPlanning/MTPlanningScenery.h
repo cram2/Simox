@@ -4,14 +4,13 @@
 #include <string.h>
 #include <time.h>
 
+#include <Inventor/Qt/viewers/SoQtExaminerViewer.h>
+#include <MotionPlanning/CSpace/CSpaceNode.h>
+#include <MotionPlanning/CSpace/CSpaceSampled.h>
+#include <MotionPlanning/Planner/BiRrt.h>
+#include <MotionPlanning/Planner/MotionPlanner.h>
 #include <MotionPlanning/Planner/PlanningThread.h>
 #include <MotionPlanning/PostProcessing/PathProcessingThread.h>
-
-#include <MotionPlanning/CSpace/CSpaceSampled.h>
-#include <MotionPlanning/CSpace/CSpaceNode.h>
-#include <MotionPlanning/Planner/MotionPlanner.h>
-#include <MotionPlanning/Planner/BiRrt.h>
-#include <Inventor/Qt/viewers/SoQtExaminerViewer.h>
 
 #define ROBOT_DIM 3
 #define SHORTEN_LOOP 600
@@ -31,10 +30,13 @@ public:
     void setRobotModelShape(bool collisionModel);
 
     void buildScene();
-    SoSeparator* getScene()
+
+    SoSeparator*
+    getScene()
     {
         return sceneSep;
     }
+
     void reset();
 
     // if bMultiCollisionCheckers is set, more than one collision checker is used
@@ -52,11 +54,14 @@ public:
     void getThreadCount(int& nWorking, int& nIdle);
     void getOptimizeThreadCount(int& nWorking, int& nIdle);
 
-    bool getPlannersStarted()
+    bool
+    getPlannersStarted()
     {
         return this->plannersStarted;
     }
-    bool getOptimizeStarted()
+
+    bool
+    getOptimizeStarted()
     {
         return this->optimizeStarted;
     }
@@ -70,7 +75,6 @@ public:
     //void showSolution(CRrtSolution *solToShow, int solutionIndex);
 
 protected:
-
     void addBBCube(SoSeparator* result);
 
     void getRandomPos(float& x, float& y, float& z);
@@ -96,13 +100,12 @@ protected:
     std::vector<RobotPtr> robots;
     //std::vector<RobotNodeSetPtr> colModelRobots;
 
-    std::vector< Eigen::VectorXf > startPositions;
-    std::vector< Eigen::VectorXf > goalPositions;
+    std::vector<Eigen::VectorXf> startPositions;
+    std::vector<Eigen::VectorXf> goalPositions;
 
 
     SceneObjectSetPtr environment;
     ObstaclePtr environmentUnited;
-
 
 
     bool robotModelVisuColModel;
@@ -123,4 +126,3 @@ protected:
     std::vector<SoSeparator*> m_vVisualizationsForSeq;
     */
 };
-

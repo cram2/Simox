@@ -22,25 +22,24 @@
 */
 #pragma once
 
-#include "VirtualRobot.h"
-#include "SceneObject.h"
-#include "Nodes/ConditionedLock.h"
-#include "BoundingBox.h"
-#include "Visualization/CoinVisualization/CoinVisualization.h"
-
+#include <map>
+#include <optional>
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include <map>
-#include <optional>
 
 #include <Eigen/Core>
+
+#include "BoundingBox.h"
+#include "Nodes/ConditionedLock.h"
+#include "SceneObject.h"
+#include "VirtualRobot.h"
+#include "Visualization/CoinVisualization/CoinVisualization.h"
 
 namespace VirtualRobot
 {
     class Visualization;
     class RobotNode;
-
 
     struct NodeMappingElement
     {
@@ -79,10 +78,10 @@ namespace VirtualRobot
                 float offset;
 
                 /// indicates whether the joint rotates into the opposite direction
-                bool inverted; 
+                bool inverted;
             };
 
-            // key: "NodeName" 
+            // key: "NodeName"
             using JointMapping = std::unordered_map<std::string, HumanJointDescription>;
 
             JointMapping jointMapping;
@@ -94,7 +93,6 @@ namespace VirtualRobot
         ArmDescription rightArm;
     };
 
-
     /*!
         This is the main object defining the kinematic structure of a robot.
 
@@ -103,6 +101,7 @@ namespace VirtualRobot
     class VIRTUAL_ROBOT_IMPORT_EXPORT Robot : public SceneObject
     {
         friend class RobotIO;
+
     public:
         static const RobotPtr NullPtr;
 
@@ -148,7 +147,9 @@ namespace VirtualRobot
                  visualisationNode = visualization->getCoinVisualization();
         */
         // template <typename T> std::shared_ptr<T> getVisualization(SceneObject::VisualizationType visuType = SceneObject::Full, bool sensors = true);
-        std::shared_ptr<CoinVisualization> getVisualization(SceneObject::VisualizationType visuType = SceneObject::Full, bool sensors = true);
+        std::shared_ptr<CoinVisualization>
+        getVisualization(SceneObject::VisualizationType visuType = SceneObject::Full,
+                         bool sensors = true);
         /*!
             Shows the structure of the robot
         */
@@ -164,7 +165,10 @@ namespace VirtualRobot
             \p enableInertial If true, a visualization of the inertial matrix is shown (if given).
             \p comModel If set, this visualization is used to display the CoM location. If not set, a standard marker is used.
         */
-        void showPhysicsInformation(bool enableCoM, bool enableInertial, VisualizationNodePtr comModel = VisualizationNodePtr()) override;
+        void
+        showPhysicsInformation(bool enableCoM,
+                               bool enableInertial,
+                               VisualizationNodePtr comModel = VisualizationNodePtr()) override;
 
         /*!
             Setup the full model visualization.
@@ -210,9 +214,10 @@ namespace VirtualRobot
         virtual bool hasRobotNode(RobotNodePtr node) const = 0;
         virtual bool hasRobotNode(const std::string& robotNodeName) const = 0;
         virtual RobotNodePtr getRobotNode(const std::string& robotNodeName) const = 0;
-        virtual std::vector< RobotNodePtr > getRobotNodes() const;
+        virtual std::vector<RobotNodePtr> getRobotNodes() const;
         virtual std::vector<std::string> getRobotNodeNames() const;
-        virtual void getRobotNodes(std::vector< RobotNodePtr >& storeNodes, bool clearVector = true) const  = 0;
+        virtual void getRobotNodes(std::vector<RobotNodePtr>& storeNodes,
+                                   bool clearVector = true) const = 0;
 
         /*!
             This method is automatically called in RobotNodeSet's initialization routine.
@@ -242,7 +247,7 @@ namespace VirtualRobot
         virtual std::vector<EndEffectorPtr> getEndEffectors() const;
         virtual void getEndEffectors(std::vector<EndEffectorPtr>& storeEEF) const = 0;
 
-        virtual std::vector< CollisionModelPtr > getCollisionModels() const;
+        virtual std::vector<CollisionModelPtr> getCollisionModels() const;
 
         CollisionCheckerPtr getCollisionChecker() override;
 
@@ -266,14 +271,20 @@ namespace VirtualRobot
         void setGlobalPose(const Eigen::Matrix4f& globalPose) override;
 
         //! Get the global pose of this robot so that the RobotNode node is at pose globalPoseNode.
-        virtual Eigen::Matrix4f getGlobalPoseForRobotNode(const RobotNodePtr& node, const Eigen::Matrix4f& globalPoseNode) const;
+        virtual Eigen::Matrix4f
+        getGlobalPoseForRobotNode(const RobotNodePtr& node,
+                                  const Eigen::Matrix4f& globalPoseNode) const;
         //! Set the global pose of this robot so that the RobotNode node is at pose globalPoseNode.
-        virtual void setGlobalPoseForRobotNode(const RobotNodePtr& node, const Eigen::Matrix4f& globalPoseNode);
+        virtual void setGlobalPoseForRobotNode(const RobotNodePtr& node,
+                                               const Eigen::Matrix4f& globalPoseNode);
 
         //! Get the global position of this robot so that the RobotNode node is at position globalPoseNode
-        virtual Eigen::Matrix4f getGlobalPositionForRobotNode(const RobotNodePtr& node, const Eigen::Vector3f& globalPositionNode) const;
+        virtual Eigen::Matrix4f
+        getGlobalPositionForRobotNode(const RobotNodePtr& node,
+                                      const Eigen::Vector3f& globalPositionNode) const;
         //! Set the global position of this robot so that the RobotNode node is at position globalPoseNode
-        virtual void setGlobalPositionForRobotNode(const RobotNodePtr& node, const Eigen::Vector3f& globalPositionNode);
+        virtual void setGlobalPositionForRobotNode(const RobotNodePtr& node,
+                                                   const Eigen::Vector3f& globalPositionNode);
 
         //virtual Eigen::Matrix4f getGlobalPose() = 0;
 
@@ -298,14 +309,15 @@ namespace VirtualRobot
             \param collisionChecker The new robot can be registered to a different collision checker. If not set, the collision checker of the original robot is used.
             \param scaling Can be set to create a scaled version of this robot. Scaling is applied on kinematic, visual, and collision data.
         */
-        virtual RobotPtr extractSubPart(RobotNodePtr startJoint,
-                                        const std::string& newRobotType,
-                                        const std::string& newRobotName,
-                                        bool cloneRNS = true,
-                                        bool cloneEEFs = true,
-                                        CollisionCheckerPtr collisionChecker = CollisionCheckerPtr(),
-                                        std::optional<float> scaling = std::nullopt,
-                                        bool preventCloningMeshesIfScalingIs1 = false);
+        virtual RobotPtr
+        extractSubPart(RobotNodePtr startJoint,
+                       const std::string& newRobotType,
+                       const std::string& newRobotName,
+                       bool cloneRNS = true,
+                       bool cloneEEFs = true,
+                       CollisionCheckerPtr collisionChecker = CollisionCheckerPtr(),
+                       std::optional<float> scaling = std::nullopt,
+                       bool preventCloningMeshesIfScalingIs1 = false);
 
         /*!
             Clones this robot.
@@ -323,8 +335,9 @@ namespace VirtualRobot
                                bool preventCloningMeshesIfScalingIs1 = false);
 
         /*! @brief Clones this robot and keeps the current scaling for the robot and each robot node. */
-        [[deprecated("Use clone() instead. Which now contains scaling as an optional.")]]
-        virtual RobotPtr cloneScaling();
+        [[deprecated(
+            "Use clone() instead. Which now contains scaling as an optional.")]] virtual RobotPtr
+        cloneScaling();
 
         //! Just storing the filename.
         virtual void setFilename(const std::string& filename);
@@ -381,14 +394,14 @@ namespace VirtualRobot
             The complete robot is updated to apply the new joint values.
             \param jointValues A map containing RobotNode names with according values.
         */
-        virtual void setJointValues(const std::map< std::string, float >& jointValues);
+        virtual void setJointValues(const std::map<std::string, float>& jointValues);
         virtual std::map<std::string, float> getJointValues() const;
         /*!
             Set joint values [rad].
             The complete robot is updated to apply the new joint values.
             \param jointValues A map containing RobotNodes with according values.
         */
-        virtual void setJointValues(const std::map< RobotNodePtr, float >& jointValues);
+        virtual void setJointValues(const std::map<RobotNodePtr, float>& jointValues);
         /*!
             Set joint values [rad].
             The subpart of the robot, defined by the start joint (kinematicRoot) of rns, is updated to apply the new joint values.
@@ -402,7 +415,8 @@ namespace VirtualRobot
             \param rn The RobotNodes
             \param jointValues A vector with joint values, size must be equal to rn.
         */
-        virtual void setJointValues(const std::vector<RobotNodePtr> rn, const std::vector<float>& jointValues);
+        virtual void setJointValues(const std::vector<RobotNodePtr> rn,
+                                    const std::vector<float>& jointValues);
         /*!
             Set joint values [rad].
             The subpart of the robot, defined by the start joint (kinematicRoot) of rns, is updated to apply the new joint values.
@@ -443,8 +457,9 @@ namespace VirtualRobot
          */
         virtual SensorPtr getSensor(const std::string& name) const;
 
-        template<class SensorType>
-        std::shared_ptr<SensorType> getSensor(const std::string& name) const
+        template <class SensorType>
+        std::shared_ptr<SensorType>
+        getSensor(const std::string& name) const
         {
             return std::dynamic_pointer_cast<SensorType>(getSensor(name));
         }
@@ -454,10 +469,11 @@ namespace VirtualRobot
         */
         virtual std::vector<SensorPtr> getSensors() const;
 
-        template<class SensorType>
-        std::vector<std::shared_ptr<SensorType> > getSensors() const
+        template <class SensorType>
+        std::vector<std::shared_ptr<SensorType>>
+        getSensors() const
         {
-            std::vector<std::shared_ptr<SensorType> > result;
+            std::vector<std::shared_ptr<SensorType>> result;
             std::vector<SensorPtr> sensors = getSensors();
             result.reserve(sensors.size());
             for (std::size_t i = 0; i < sensors.size(); ++i)
@@ -469,12 +485,18 @@ namespace VirtualRobot
             }
             return result;
         }
+
         /*!
             Creates an XML string that defines the complete robot. Filenames of all visualization models are set to modelPath/RobotNodeName_visu and/or modelPath/RobotNodeName_colmodel.
             @see RobotIO::saveXML.
         */
 
-        virtual std::string toXML(const std::string& basePath = ".", const std::string& modelPath = "models", bool storeEEF = true, bool storeRNS = true, bool storeSensors = true, bool storeModelFiles = true) const;
+        virtual std::string toXML(const std::string& basePath = ".",
+                                  const std::string& modelPath = "models",
+                                  bool storeEEF = true,
+                                  bool storeRNS = true,
+                                  bool storeSensors = true,
+                                  bool storeModelFiles = true) const;
 
         float getScaling() const;
         void setScaling(float scaling);
@@ -490,12 +512,14 @@ namespace VirtualRobot
         bool getPropagatingJointValuesEnabled() const;
         void setPropagatingJointValuesEnabled(bool enabled);
 
-
-        void setPassive(){
+        void
+        setPassive()
+        {
             passive = true;
         }
 
-        bool isPassive() const
+        bool
+        isPassive() const
         {
             return passive;
         }
@@ -508,7 +532,8 @@ namespace VirtualRobot
         void removeAllSensors();
 
 
-        void registerConfiguration(const std::string& name, const std::map<std::string, float>& configuration);
+        void registerConfiguration(const std::string& name,
+                                   const std::map<std::string, float>& configuration);
 
         bool hasConfiguration(const std::string& name) const;
         std::optional<std::map<std::string, float>> getConfiguration(const std::string& name) const;
@@ -551,7 +576,6 @@ namespace VirtualRobot
         std::optional<HumanMapping> humanMapping;
 
         std::map<std::string, std::map<std::string, float>> configurations;
-
     };
 
     class VIRTUAL_ROBOT_IMPORT_EXPORT LocalRobot : public Robot
@@ -568,7 +592,8 @@ namespace VirtualRobot
         bool hasRobotNode(const std::string& robotNodeName) const override;
         bool hasRobotNode(RobotNodePtr node) const override;
         RobotNodePtr getRobotNode(const std::string& robotNodeName) const override;
-        void getRobotNodes(std::vector< RobotNodePtr >& storeNodes, bool clearVector = true) const override;
+        void getRobotNodes(std::vector<RobotNodePtr>& storeNodes,
+                           bool clearVector = true) const override;
 
         void registerRobotNodeSet(RobotNodeSetPtr nodeSet) override;
         void deregisterRobotNodeSet(RobotNodeSetPtr nodeSet) override;
@@ -581,7 +606,8 @@ namespace VirtualRobot
         EndEffectorPtr getEndEffector(const std::string& endEffectorName) const override;
         void getEndEffectors(std::vector<EndEffectorPtr>& storeEEF) const override;
 
-        void setGlobalPose(const Eigen::Matrix4f& globalPose, bool applyJointValues = true) override;
+        void setGlobalPose(const Eigen::Matrix4f& globalPose,
+                           bool applyJointValues = true) override;
         void setGlobalPose(const Eigen::Matrix4f& globalPose) override;
         Eigen::Matrix4f getGlobalPose() const override;
 
@@ -590,12 +616,10 @@ namespace VirtualRobot
         RobotNodePtr rootNode;
         void applyJointValuesNoLock() override;
 
-        std::map< std::string, RobotNodePtr > robotNodeMap;
-        std::map< std::string, RobotNodeSetPtr > robotNodeSetMap;
-        std::map< std::string, EndEffectorPtr > endEffectorMap;
-
+        std::map<std::string, RobotNodePtr> robotNodeMap;
+        std::map<std::string, RobotNodeSetPtr> robotNodeSetMap;
+        std::map<std::string, EndEffectorPtr> endEffectorMap;
     };
-
 
 
 } // namespace VirtualRobot

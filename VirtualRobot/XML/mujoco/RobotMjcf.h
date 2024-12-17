@@ -4,11 +4,10 @@
 
 #include <Eigen/Core>
 
-#include <VirtualRobot/Robot.h>
 #include <VirtualRobot/MJCF/Document.h>
+#include <VirtualRobot/Robot.h>
 
 #include "exceptions.h"
-
 
 namespace VirtualRobot::mujoco
 {
@@ -16,7 +15,10 @@ namespace VirtualRobot::mujoco
     /// Actuator type.
     enum class ActuatorType
     {
-        NONE, MOTOR, POSITION, VELOCITY,
+        NONE,
+        MOTOR,
+        POSITION,
+        VELOCITY,
     };
     ActuatorType toActuatorType(const std::string& string);
 
@@ -24,12 +26,11 @@ namespace VirtualRobot::mujoco
     /// How the robot is mounted at the world body.
     enum class WorldMountMode
     {
-        FIXED,  ///< No joint, i.e. fixed to world body.
-        FREE,   ///< Add a free body at the robot (but no mocap body).
-        MOCAP,  ///< Add a mocap body the robot is attached to.
+        FIXED, ///< No joint, i.e. fixed to world body.
+        FREE, ///< Add a free body at the robot (but no mocap body).
+        MOCAP, ///< Add a mocap body the robot is attached to.
     };
     WorldMountMode toWorldMountMode(const std::string& string);
-
 
     /**
      * @brief The RobotMjcf class allows building a MuJoCo MJCF model from a
@@ -38,7 +39,6 @@ namespace VirtualRobot::mujoco
     class RobotMjcf
     {
     public:
-
         /// Construct with robot.
         RobotMjcf(RobotPtr robot);
 
@@ -160,9 +160,8 @@ namespace VirtualRobot::mujoco
          * @param boundMass If true, set `boundmass` to `document->getDummyMass()`.
          * @param balanceIneratia Value for `balanceinertia`.
          */
-        void addCompiler(bool angleRadian = true,
-                         bool boundMass = true,
-                         bool balanceIneratia = true);
+        void
+        addCompiler(bool angleRadian = true, bool boundMass = true, bool balanceIneratia = true);
 
         /// Add defaults to robot class, using the set mesh scale.
         void addRobotDefaults();
@@ -173,15 +172,17 @@ namespace VirtualRobot::mujoco
         // ASSETS
 
         /// Add skybox texture.
-        void addSkybox(const Eigen::Vector3f& rgb1 = { .8f, .9f, .95f },
-                       const Eigen::Vector3f& rgb2 = { .4f, .6f, .80f });
+        void addSkybox(const Eigen::Vector3f& rgb1 = {.8f, .9f, .95f},
+                       const Eigen::Vector3f& rgb2 = {.4f, .6f, .80f});
 
 
         // ROBOT NODES
 
         /// Add a body for the given robot node as child of `parent`.
-        mjcf::Body addNodeBody(RobotNodePtr node, mjcf::Body parent,
-                               bool addJoint = true, bool addInertial = true);
+        mjcf::Body addNodeBody(RobotNodePtr node,
+                               mjcf::Body parent,
+                               bool addJoint = true,
+                               bool addInertial = true);
 
         /**
          * @brief Add a joint for the given node in `body`.
@@ -329,17 +330,12 @@ namespace VirtualRobot::mujoco
         // SENSORS
 
 
-
-
-
-
     private:
-
         /// The robot.
         RobotPtr robot;
 
         /// The document. Using a pointer allows to easily reset it.
-        mjcf::DocumentPtr document { new mjcf::Document() };
+        mjcf::DocumentPtr document{new mjcf::Document()};
 
 
         // PATHS
@@ -348,11 +344,10 @@ namespace VirtualRobot::mujoco
         bool useRelativePaths = false;
 
         /// The path to the output XML file.
-        std::filesystem::path outputFile { robot->getName() + ".xml" };
+        std::filesystem::path outputFile{robot->getName() + ".xml"};
 
         /// The directory where meshes shall be stored, relative to `outputDirectory()`.
-        std::filesystem::path outputMeshRelDirectory { "meshes" };
-
+        std::filesystem::path outputMeshRelDirectory{"meshes"};
 
 
         // SCALING
@@ -372,7 +367,6 @@ namespace VirtualRobot::mujoco
 
         /// Map of robot node names to XML elements.
         std::map<std::string, mjcf::Body> nodeBodies;
-
     };
 
-}
+} // namespace VirtualRobot::mujoco

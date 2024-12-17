@@ -17,48 +17,61 @@
 */
 
 #include "ManipulabilityNullspaceGradient.h"
-#include <VirtualRobot/Robot.h>
-#include <VirtualRobot/math/Helpers.h>
-#include <VirtualRobot/Nodes/RobotNode.h>
-#include <VirtualRobot/RobotNodeSet.h>
+
 #include <cfloat>
+
+#include <VirtualRobot/Nodes/RobotNode.h>
+#include <VirtualRobot/Robot.h>
+#include <VirtualRobot/RobotNodeSet.h>
+#include <VirtualRobot/math/Helpers.h>
 
 namespace VirtualRobot
 {
 
-NullspaceManipulability::NullspaceManipulability(AbstractManipulabilityTrackingPtr manipulabilityTracking, const Eigen::MatrixXd& manipulabilityDesired,
-                                                 const Eigen::MatrixXd &gainMatrix, bool jointLimitAvoidance) :
-    CompositeDiffIK::NullspaceGradient(manipulabilityTracking->getJointNames()),
-    manipulabilityTracking(manipulabilityTracking),
-    manipulabilityDesired(manipulabilityDesired),
-    gainMatrix(gainMatrix),
-    jointLimitAvoidance(jointLimitAvoidance)
-{
-}
-
-double NullspaceManipulability::computeDistance() {
-    return manipulabilityTracking->computeDistance(manipulabilityDesired);
-}
-
-void NullspaceManipulability::init(CompositeDiffIK::Parameters&)
-{
-    // Does not need any initial parameters
-}
-
-Eigen::VectorXf NullspaceManipulability::getGradient(CompositeDiffIK::Parameters& /*params*/, int /*stepNr*/)
-{
-    Eigen::VectorXf velocities = manipulabilityTracking->calculateVelocity(manipulabilityDesired, gainMatrix, jointLimitAvoidance);
-    // check if nan
-    unsigned int nan = 0;
-    for (unsigned int i = 0; i < velocities.rows(); i++) {
-        if (std::isnan(velocities(i))) {
-            velocities(i) = 0;
-            nan++;
-        }
+    NullspaceManipulability::NullspaceManipulability(
+        AbstractManipulabilityTrackingPtr manipulabilityTracking,
+        const Eigen::MatrixXd& manipulabilityDesired,
+        const Eigen::MatrixXd& gainMatrix,
+        bool jointLimitAvoidance) :
+        CompositeDiffIK::NullspaceGradient(manipulabilityTracking->getJointNames()),
+        manipulabilityTracking(manipulabilityTracking),
+        manipulabilityDesired(manipulabilityDesired),
+        gainMatrix(gainMatrix),
+        jointLimitAvoidance(jointLimitAvoidance)
+    {
     }
-    if (nan > 0)
-        std::cout << "Nan in nullspace manipulability velocities: " << nan << "/" << velocities.rows() << " \n";
-    return velocities;
-}
 
-}
+    double
+    NullspaceManipulability::computeDistance()
+    {
+        return manipulabilityTracking->computeDistance(manipulabilityDesired);
+    }
+
+    void
+    NullspaceManipulability::init(CompositeDiffIK::Parameters&)
+    {
+        // Does not need any initial parameters
+    }
+
+    Eigen::VectorXf
+    NullspaceManipulability::getGradient(CompositeDiffIK::Parameters& /*params*/, int /*stepNr*/)
+    {
+        Eigen::VectorXf velocities = manipulabilityTracking->calculateVelocity(
+            manipulabilityDesired, gainMatrix, jointLimitAvoidance);
+        // check if nan
+        unsigned int nan = 0;
+        for (unsigned int i = 0; i < velocities.rows(); i++)
+        {
+            if (std::isnan(velocities(i)))
+            {
+                velocities(i) = 0;
+                nan++;
+            }
+        }
+        if (nan > 0)
+            std::cout << "Nan in nullspace manipulability velocities: " << nan << "/"
+                      << velocities.rows() << " \n";
+        return velocities;
+    }
+
+} // namespace VirtualRobot

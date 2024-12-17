@@ -1,10 +1,11 @@
 #pragma once
 
-#include <VirtualRobot/VirtualRobot.h>
-
 #include <stdio.h>
-#include <string>
+
 #include <cfloat>
+#include <string>
+
+#include <VirtualRobot/VirtualRobot.h>
 
 struct aiScene;
 class SoNode;
@@ -17,10 +18,12 @@ namespace VirtualRobot
         AssimpReader(float eps = FLT_MIN, float scaling = 1);
         virtual ~AssimpReader() = default;
 
-        static std::string get_description()
+        static std::string
+        get_description()
         {
             return "Open Asset Import Library";
         }
+
         static std::string get_extensions();
         static bool can_load(const std::string& file);
 
@@ -32,8 +35,10 @@ namespace VirtualRobot
         TriMeshModelPtr readBufferAsTriMesh(const std::string_view& v);
         static SoNode* readFileAsSoNode(const std::string& filename);
 
-        ManipulationObjectPtr readFileAsManipulationObject(const std::string& filename, const std::string& name = "");
-        ManipulationObjectPtr readBufferAsManipulationObject(const std::string_view& v, const std::string& name = "");
+        ManipulationObjectPtr readFileAsManipulationObject(const std::string& filename,
+                                                           const std::string& name = "");
+        ManipulationObjectPtr readBufferAsManipulationObject(const std::string_view& v,
+                                                             const std::string& name = "");
 
         struct Parameters
         {
@@ -45,18 +50,18 @@ namespace VirtualRobot
             bool skipInvalidFaces = false;
             bool verbose = true;
         };
+
         Parameters parameters;
 
         struct ResultMetaData
         {
             std::size_t skippedFaces = 0;
-            bool loadingSuccessful  = false;
-            bool regeneratedNormals  = false;
+            bool loadingSuccessful = false;
+            bool regeneratedNormals = false;
         };
 
         ResultMetaData resultMetaData;
     };
 
     typedef std::shared_ptr<AssimpReader> AssimpReaderPtr;
-}
-
+} // namespace VirtualRobot

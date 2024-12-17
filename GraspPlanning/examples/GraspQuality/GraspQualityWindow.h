@@ -1,35 +1,32 @@
 
 #pragma once
 
-#include <VirtualRobot/VirtualRobot.h>
-#include <VirtualRobot/Robot.h>
-#include <VirtualRobot/VirtualRobotException.h>
-#include <VirtualRobot/Nodes/RobotNode.h>
-#include <VirtualRobot/XML/SceneIO.h>
-#include <VirtualRobot/Visualization/VisualizationFactory.h>
-#include <VirtualRobot/Visualization/CoinVisualization/CoinVisualization.h>
-#include <VirtualRobot/Obstacle.h>
-#include <VirtualRobot/ManipulationObject.h>
-#include <VirtualRobot/Obstacle.h>
-
-#include "GraspPlanning/GraspStudio.h"
-#include "GraspPlanning/GraspQuality/GraspQualityMeasureWrenchSpace.h"
-
 #include <string.h>
-#include <QtCore/QtGlobal>
-#include <QtGui/QtGui>
-#include <QtCore/QtCore>
-
-#include <Inventor/sensors/SoTimerSensor.h>
-#include <Inventor/nodes/SoEventCallback.h>
-#include <Inventor/Qt/viewers/SoQtExaminerViewer.h>
-#include <Inventor/Qt/SoQt.h>
-#include <Inventor/nodes/SoSeparator.h>
-
 
 #include <vector>
 
+#include <QtCore/QtCore>
+#include <QtCore/QtGlobal>
+#include <QtGui/QtGui>
+
+#include <VirtualRobot/ManipulationObject.h>
+#include <VirtualRobot/Nodes/RobotNode.h>
+#include <VirtualRobot/Obstacle.h>
+#include <VirtualRobot/Robot.h>
+#include <VirtualRobot/VirtualRobot.h>
+#include <VirtualRobot/VirtualRobotException.h>
+#include <VirtualRobot/Visualization/CoinVisualization/CoinVisualization.h>
+#include <VirtualRobot/Visualization/VisualizationFactory.h>
+#include <VirtualRobot/XML/SceneIO.h>
+
+#include "GraspPlanning/GraspQuality/GraspQualityMeasureWrenchSpace.h"
+#include "GraspPlanning/GraspStudio.h"
 #include "ui_GraspQuality.h"
+#include <Inventor/Qt/SoQt.h>
+#include <Inventor/Qt/viewers/SoQtExaminerViewer.h>
+#include <Inventor/nodes/SoEventCallback.h>
+#include <Inventor/nodes/SoSeparator.h>
+#include <Inventor/sensors/SoTimerSensor.h>
 
 class GraspQualityWindow : public QMainWindow
 {
@@ -81,7 +78,6 @@ public slots:
     void evalRobustnessAll();
 
 protected:
-
     void loadRobot();
     void loadObject();
 
@@ -95,7 +91,8 @@ protected:
     void setGraspComboBox();
 
     Ui::MainWindowGraspQuality UI;
-    SoQtExaminerViewer* m_pExViewer; /*!< Viewer to display the 3D model of the robot and the environment. */
+    SoQtExaminerViewer*
+        m_pExViewer; /*!< Viewer to display the 3D model of the robot and the environment. */
 
     SoSeparator* sceneSep;
     SoSeparator* robotSep;
@@ -110,7 +107,7 @@ protected:
     VirtualRobot::ManipulationObjectPtr object;
 
     VirtualRobot::EndEffectorPtr eef;
-    std::vector< VirtualRobot::EndEffectorPtr > eefs;
+    std::vector<VirtualRobot::EndEffectorPtr> eefs;
     VirtualRobot::GraspPtr grasp;
     VirtualRobot::GraspSetPtr grasps;
 
@@ -128,4 +125,3 @@ protected:
     std::shared_ptr<VirtualRobot::CoinVisualization> visualizationRobot;
     std::shared_ptr<VirtualRobot::CoinVisualization> visualizationObject;
 };
-

@@ -27,12 +27,11 @@
 
 namespace math
 {
-    class VIRTUAL_ROBOT_IMPORT_EXPORT AbstractFunctionR1Ori
-            : public SimpleAbstractFunctionR1Ori
+    class VIRTUAL_ROBOT_IMPORT_EXPORT AbstractFunctionR1Ori : public SimpleAbstractFunctionR1Ori
     {
     public:
         virtual Eigen::Vector3f GetDerivative(float t) = 0;
 
     private:
     };
-}
+} // namespace math

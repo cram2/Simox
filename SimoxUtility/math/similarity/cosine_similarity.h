@@ -3,7 +3,6 @@
 
 #include <Eigen/Core>
 
-
 namespace simox::math
 {
 
@@ -21,9 +20,8 @@ namespace simox::math
      */
     template <int rows>
     float
-    cosine_similarity(
-        const Eigen::Matrix<float, rows, 1>& v1,
-        const Eigen::Matrix<float, rows, 1>& v2)
+    cosine_similarity(const Eigen::Matrix<float, rows, 1>& v1,
+                      const Eigen::Matrix<float, rows, 1>& v2)
     {
         if (v1.isZero() or v2.isZero())
         {
@@ -36,4 +34,4 @@ namespace simox::math
         return std::clamp(cosine_similarity, -1.f, 1.f);
     }
 
-}
+} // namespace simox::math

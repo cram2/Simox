@@ -26,8 +26,7 @@
 
 namespace math
 {
-    class VIRTUAL_ROBOT_IMPORT_EXPORT AbstractFunctionR1R3 :
-        public SimpleAbstractFunctionR1R3
+    class VIRTUAL_ROBOT_IMPORT_EXPORT AbstractFunctionR1R3 : public SimpleAbstractFunctionR1R3
     {
     public:
         AbstractFunctionR1R3();
@@ -37,7 +36,7 @@ namespace math
         float GetLength(float t1, float t2, int steps);
         std::vector<Eigen::Vector3f> Sample(float t1, float t2, int segments);
         std::vector<float> Segments(float t1, float t2, int segments);
+
     private:
     };
-}
-
+} // namespace math

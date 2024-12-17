@@ -1,28 +1,26 @@
-#include <iostream>
-#include <iomanip>
 #include <ctime>
-
-#include <VirtualRobot/Robot.h>
-#include <VirtualRobot/VirtualRobotException.h>
-#include <VirtualRobot/Nodes/RobotNode.h>
-#include <VirtualRobot/XML/RobotIO.h>
-#include <VirtualRobot/Visualization/VisualizationFactory.h>
-#include <VirtualRobot/Visualization/CoinVisualization/CoinVisualization.h>
-#include <VirtualRobot/RuntimeEnvironment.h>
-#include <VirtualRobot/Workspace/Manipulability.h>
-#include <VirtualRobot/IK/PoseQualityExtendedManipulability.h>
-
-#include "VirtualRobot/Workspace/NaturalPosture.h"
-#include <Inventor/Qt/viewers/SoQtExaminerViewer.h>
-#include <Inventor/nodes/SoSeparator.h>
-#include <Inventor/Qt/SoQt.h>
-
-#include <string>
+#include <iomanip>
 #include <iostream>
+#include <string>
+
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
+#include <VirtualRobot/IK/PoseQualityExtendedManipulability.h>
+#include <VirtualRobot/Nodes/RobotNode.h>
+#include <VirtualRobot/Robot.h>
+#include <VirtualRobot/RuntimeEnvironment.h>
+#include <VirtualRobot/VirtualRobotException.h>
+#include <VirtualRobot/Visualization/CoinVisualization/CoinVisualization.h>
+#include <VirtualRobot/Visualization/VisualizationFactory.h>
+#include <VirtualRobot/Workspace/Manipulability.h>
+#include <VirtualRobot/XML/RobotIO.h>
+
+#include "VirtualRobot/Workspace/NaturalPosture.h"
 #include "reachabilityWindow.h"
+#include <Inventor/Qt/SoQt.h>
+#include <Inventor/Qt/viewers/SoQtExaminerViewer.h>
+#include <Inventor/nodes/SoSeparator.h>
 
 // this flag can be used to build a good representation of the workspace
 // the reachability data will be extended in endless mode and
@@ -38,13 +36,14 @@ using std::cout;
 using std::endl;
 using namespace VirtualRobot;
 
-
-
-void endlessExtend(std::string robotFile, std::string reachFile, int steps, unsigned int threads)
+void
+endlessExtend(std::string robotFile, std::string reachFile, int steps, unsigned int threads)
 {
-    if(threads == 0)
+    if (threads == 0)
     {
-        threads = QThread::idealThreadCount() < 1 ? 1 : static_cast<unsigned int>(QThread::idealThreadCount());
+        threads = QThread::idealThreadCount() < 1
+                      ? 1
+                      : static_cast<unsigned int>(QThread::idealThreadCount());
     }
     VR_INFO << "Extending workspace information, saving each " << steps << " steps." << std::endl;
     VirtualRobot::RuntimeEnvironment::getDataFileAbsolute(robotFile);
@@ -138,7 +137,7 @@ void endlessExtend(std::string robotFile, std::string reachFile, int steps, unsi
     time_t time_now = time(nullptr);
     struct tm* timeinfo;
     timeinfo = localtime(&time_now);
-    char buffer [255];
+    char buffer[255];
     strftime(buffer, 255, "ReachabilityData_ENDLESS_%Y_%m_%d__%H_%M_%S_", timeinfo);
     int nr = 0;
 
@@ -168,12 +167,16 @@ void endlessExtend(std::string robotFile, std::string reachFile, int steps, unsi
     }
 }
 
-int main(int argc, char* argv[])
+int
+main(int argc, char* argv[])
 {
     VirtualRobot::init(argc, argv, "Reachability Demo");
 
     std::cout << " --- START --- " << std::endl;
-    std::cout << "Hint: use '--extendReach true' to start a refinement of the reachability data. This is an endless mode which creates intermediate data files and that can be running e.g. over night." << std::endl;
+    std::cout << "Hint: use '--extendReach true' to start a refinement of the reachability data. "
+                 "This is an endless mode which creates intermediate data files and that can be "
+                 "running e.g. over night."
+              << std::endl;
 
     std::string filenameReach;
 #if defined(ICUB)
@@ -184,11 +187,13 @@ int main(int argc, char* argv[])
 #elif defined(ARMAR3B)
 
     std::cout << "Using ARMAR3B" << std::endl;
-    std::string filenameRob("/home/SMBAD/yamanobe/home/armarx/Armar3/data/Armar3/robotmodel/ArmarIIIb.xml");
+    std::string filenameRob(
+        "/home/SMBAD/yamanobe/home/armarx/Armar3/data/Armar3/robotmodel/ArmarIIIb.xml");
     Eigen::Vector3f axisTCP(0, 0, 1.0f);
     //filenameReach = "/home/SMBAD/yamanobe/home/armarx/Armar3/data/Armar3/reachability/ArmarIIIb_LeftArm.bin";
     //filenameReach = "/home/SMBAD/yamanobe/home/armarx/Armar3/data/Armar3/reachability/ArmarIIIb_RightArm.bin";
-    filenameReach = "/home/SMBAD/yamanobe/home/armarx/simox/build_release/ReachabilityData_ENDLESS_2015_04_17__18_03_22__2024.bin";
+    filenameReach = "/home/SMBAD/yamanobe/home/armarx/simox/build_release/"
+                    "ReachabilityData_ENDLESS_2015_04_17__18_03_22__2024.bin";
 #else
     std::cout << "Using ARMAR3" << std::endl;
     std::string filenameRob("robots/ArmarIII/ArmarIII.xml");
@@ -212,7 +217,8 @@ int main(int argc, char* argv[])
 
     filenameRob = VirtualRobot::RuntimeEnvironment::checkValidFileParameter("robot", filenameRob);
 
-    filenameReach = VirtualRobot::RuntimeEnvironment::checkValidFileParameter("reachability", filenameReach);
+    filenameReach =
+        VirtualRobot::RuntimeEnvironment::checkValidFileParameter("reachability", filenameReach);
 
     if (VirtualRobot::RuntimeEnvironment::hasValue("visualizationTCPAxis"))
     {
@@ -232,19 +238,24 @@ int main(int argc, char* argv[])
         int stepsSave = 100000;
         if (VirtualRobot::RuntimeEnvironment::hasValue("extendReachStepsSave"))
         {
-            stepsSave = VirtualRobot::RuntimeEnvironment::toInt(VirtualRobot::RuntimeEnvironment::getValue("extendReachStepsSave"));
+            stepsSave = VirtualRobot::RuntimeEnvironment::toInt(
+                VirtualRobot::RuntimeEnvironment::getValue("extendReachStepsSave"));
         }
-        unsigned int threads = QThread::idealThreadCount() < 1 ? 1 : static_cast<unsigned int>(QThread::idealThreadCount());
-        if(VirtualRobot::RuntimeEnvironment::hasValue("extendReachStepsThreads"))
+        unsigned int threads = QThread::idealThreadCount() < 1
+                                   ? 1
+                                   : static_cast<unsigned int>(QThread::idealThreadCount());
+        if (VirtualRobot::RuntimeEnvironment::hasValue("extendReachStepsThreads"))
         {
-            int val = VirtualRobot::RuntimeEnvironment::toInt(VirtualRobot::RuntimeEnvironment::getValue("extendReachStepsThreads"));
-            if(val > 0)
+            int val = VirtualRobot::RuntimeEnvironment::toInt(
+                VirtualRobot::RuntimeEnvironment::getValue("extendReachStepsThreads"));
+            if (val > 0)
             {
                 threads = static_cast<unsigned int>(val);
             }
             else
             {
-                VR_WARNING << "extendReachStepsThreads was set to the illegal value " << val << "! Using the value " << threads  << " instead";
+                VR_WARNING << "extendReachStepsThreads was set to the illegal value " << val
+                           << "! Using the value " << threads << " instead";
             }
         }
         endlessExtend(filenameRob, filenameReach, stepsSave, threads);

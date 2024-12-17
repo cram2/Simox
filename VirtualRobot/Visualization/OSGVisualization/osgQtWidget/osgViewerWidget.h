@@ -23,29 +23,22 @@
 #pragma once
 
 
-#include "../../../VirtualRobotImportExport.h"
+#include <iostream>
 
+#include <QGLWidget>
 #include <QtCore/QTimer>
 #include <QtGui/QApplication>
 #include <QtGui/QGridLayout>
 #include <QtGui/QKeyEvent>
 
-#include <osgViewer/CompositeViewer>
-#include <osgViewer/ViewerEventHandlers>
-
-#include <osgGA/TrackballManipulator>
-
-#include <osgDB/ReadFile>
-
-#include <osgQt/GraphicsWindowQt>
-
-#include <iostream>
-
-#include <QGLWidget>
-#include <osgViewer/Viewer>
-#include <osgDB/ReadFile>
-#include <osgGA/TrackballManipulator>
+#include "../../../VirtualRobotImportExport.h"
 #include <osg/MatrixTransform>
+#include <osgDB/ReadFile>
+#include <osgGA/TrackballManipulator>
+#include <osgQt/GraphicsWindowQt>
+#include <osgViewer/CompositeViewer>
+#include <osgViewer/Viewer>
+#include <osgViewer/ViewerEventHandlers>
 
 namespace VirtualRobot
 {
@@ -69,7 +62,7 @@ namespace VirtualRobot
             </code>
         ** Now the scene will display your robot, and you can add or remove osg::Nodes to/from osgRoot
     */
-    class VIRTUAL_ROBOT_IMPORT_EXPORT osgViewerWidget: public QGLWidget
+    class VIRTUAL_ROBOT_IMPORT_EXPORT osgViewerWidget : public QGLWidget
     {
         Q_OBJECT
 
@@ -101,7 +94,6 @@ namespace VirtualRobot
         void resizeOSG(int width, int height);
 
     protected:
-
         osg::ref_ptr<osgViewer::Viewer> viewer;
         osg::observer_ptr<osgViewer::GraphicsWindowEmbedded> window;
         osg::ref_ptr<osg::Node> loadedModel;
@@ -115,6 +107,7 @@ namespace VirtualRobot
     };
 
 } // namespace VirtualRobot
+
 /*
 class osgViewerWidget : public QWidget, public osgViewer::CompositeViewer
 {
@@ -134,5 +127,3 @@ protected:
     osg::Camera* camera;
     QTimer _timer;
 };*/
-
-

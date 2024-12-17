@@ -21,19 +21,19 @@
 
 #pragma once
 
+#include <memory>
+
 #include "../VirtualRobot.h"
-#include "MathForwardDefinitions.h"
 #include "DataR3R1.h"
 #include "DataR3R2.h"
-#include "SimpleAbstractFunctionR3R1.h"
 #include "Kernels.h"
-#include <memory>
+#include "MathForwardDefinitions.h"
+#include "SimpleAbstractFunctionR3R1.h"
 
 namespace math
 {
 
-    class VIRTUAL_ROBOT_IMPORT_EXPORT GaussianImplicitSurface3D :
-        public SimpleAbstractFunctionR3R1
+    class VIRTUAL_ROBOT_IMPORT_EXPORT GaussianImplicitSurface3D : public SimpleAbstractFunctionR3R1
     {
     public:
         GaussianImplicitSurface3D(std::unique_ptr<KernelWithDerivatives> kernel);
@@ -52,8 +52,9 @@ namespace math
         std::unique_ptr<KernelWithDerivatives> kernel;
 
         float Predict(const Eigen::Vector3f& pos) const;
-        void CalculateCovariance(const std::vector<Eigen::Vector3f>& points, float R, const std::vector<float>& noise);
+        void CalculateCovariance(const std::vector<Eigen::Vector3f>& points,
+                                 float R,
+                                 const std::vector<float>& noise);
         void MatrixInvert(const Eigen::VectorXd& b);
     };
-}
-
+} // namespace math

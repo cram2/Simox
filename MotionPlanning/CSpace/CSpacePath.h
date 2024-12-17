@@ -22,15 +22,15 @@
 */
 #pragma once
 
-#include "../Saba.h"
-#include <vector>
 #include <string>
+#include <vector>
 
 #include <Eigen/StdVector>
 
-#include "CSpace.h"
-
 #include <VirtualRobot/Trajectory.h>
+
+#include "../Saba.h"
+#include "CSpace.h"
 
 namespace Saba
 {
@@ -54,7 +54,6 @@ namespace Saba
 
         //! Destructor
         ~CSpacePath() override;
-
 
 
         /*!
@@ -84,7 +83,9 @@ namespace Saba
             \param endIndex The end point
             \param useCSpaceWeights When set, the weights that have been specified in the corresponding c-space are used for computing the path length.
         */
-        float getLength(unsigned int startIndex, unsigned int endIndex, bool useCSpaceWeights = true) const;
+        float getLength(unsigned int startIndex,
+                        unsigned int endIndex,
+                        bool useCSpaceWeights = true) const;
 
 
         /*!
@@ -99,12 +100,11 @@ namespace Saba
 
 
         CSpacePtr getCSpace();
-        std::vector<Eigen::Matrix4f > createWorkspacePath(VirtualRobot::RobotNodePtr r = VirtualRobot::RobotNodePtr());
+        std::vector<Eigen::Matrix4f>
+        createWorkspacePath(VirtualRobot::RobotNodePtr r = VirtualRobot::RobotNodePtr());
 
     protected:
         CSpacePtr cspace;
     };
 
 } // namespace Saba
-
-

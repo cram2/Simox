@@ -24,41 +24,44 @@
 namespace VirtualRobot
 {
 
-class SoechtingNullspaceGradient : public CompositeDiffIK::NullspaceGradient
-{
-public:
-    struct ArmJoints
+    class SoechtingNullspaceGradient : public CompositeDiffIK::NullspaceGradient
     {
-        RobotNodePtr clavicula = nullptr;
-        RobotNodePtr shoulder1 = nullptr;
-        RobotNodePtr shoulder2 = nullptr;
-        RobotNodePtr shoulder3 = nullptr;
-        RobotNodePtr elbow = nullptr;
+    public:
+        struct ArmJoints
+        {
+            RobotNodePtr clavicula = nullptr;
+            RobotNodePtr shoulder1 = nullptr;
+            RobotNodePtr shoulder2 = nullptr;
+            RobotNodePtr shoulder3 = nullptr;
+            RobotNodePtr elbow = nullptr;
 
-        RobotNodeSetPtr createRobotNodeSet(const std::string &name) const;
-        std::vector<std::string> getRobotNodeNames() const;
+            RobotNodeSetPtr createRobotNodeSet(const std::string& name) const;
+            std::vector<std::string> getRobotNodeNames() const;
+        };
+
+        struct ShoulderAngles
+        {
+            float SE, SR, E, C;
+        };
+
+        SoechtingNullspaceGradient(const CompositeDiffIK::TargetPtr& target,
+                                   const std::string& shoulderName,
+                                   const Soechting::ArmType& arm,
+                                   const ArmJoints& joints);
+        virtual ~SoechtingNullspaceGradient() = default;
+
+        void init(CompositeDiffIK::Parameters&) override;
+        Eigen::VectorXf getGradient(CompositeDiffIK::Parameters& params, int stepNr) override;
+
+        RobotNodeSetPtr rns;
+        CompositeDiffIK::TargetPtr target;
+        VirtualRobot::RobotNodePtr shoulder;
+        Soechting::ArmType arm;
+        ArmJoints joints;
+
+        ShoulderAngles calcShoulderAngles(const CompositeDiffIK::Parameters& params) const;
     };
 
-    struct ShoulderAngles
-    {
-        float SE, SR, E, C;
-    };
+    typedef std::shared_ptr<SoechtingNullspaceGradient> SoechtingNullspaceGradientPtr;
 
-    SoechtingNullspaceGradient(const CompositeDiffIK::TargetPtr& target, const std::string& shoulderName, const Soechting::ArmType &arm, const ArmJoints& joints);
-    virtual ~SoechtingNullspaceGradient() = default;
-
-    void init(CompositeDiffIK::Parameters&) override;
-    Eigen::VectorXf getGradient(CompositeDiffIK::Parameters& params, int stepNr) override;
-
-    RobotNodeSetPtr rns;
-    CompositeDiffIK::TargetPtr target;
-    VirtualRobot::RobotNodePtr shoulder;
-    Soechting::ArmType arm;
-    ArmJoints joints;
-
-    ShoulderAngles calcShoulderAngles(const CompositeDiffIK::Parameters& params) const;
-};
-
-typedef  std::shared_ptr<SoechtingNullspaceGradient> SoechtingNullspaceGradientPtr;
-
-}
+} // namespace VirtualRobot

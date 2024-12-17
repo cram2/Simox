@@ -6,13 +6,13 @@
 
 #define BOOST_TEST_MODULE VirtualRobot_VirtualRobotMathToolsTest
 
-#include <VirtualRobot/VirtualRobotTest.h>
-#include <VirtualRobot/MathTools.h>
-#include <VirtualRobot/VirtualRobotException.h>
+#include <string>
 
 #include <Eigen/Geometry>
 
-#include <string>
+#include <VirtualRobot/MathTools.h>
+#include <VirtualRobot/VirtualRobotException.h>
+#include <VirtualRobot/VirtualRobotTest.h>
 
 #ifndef M_PIf
 #define M_PIf (static_cast<float>(M_PI))
@@ -20,106 +20,107 @@
 
 BOOST_AUTO_TEST_SUITE(MathTools)
 
-
-    BOOST_AUTO_TEST_CASE(testMathToolsHopf)
+BOOST_AUTO_TEST_CASE(testMathToolsHopf)
+{
+    Eigen::Matrix4f m = Eigen::Matrix4f::Identity();
+    const int NR_TESTS = 100;
+    for (int i = 0; i < NR_TESTS; i++)
     {
-        Eigen::Matrix4f m = Eigen::Matrix4f::Identity();
-        const int NR_TESTS = 100;
-        for (int i = 0; i < NR_TESTS; i++)
+        Eigen::Vector3f ax = Eigen::Vector3f::Random();
+        ax.normalize();
+        float ang = rand() % 1000 / 1000.0f * 2.0f * M_PIf - M_PIf;
+        Eigen::Matrix3f m3 = Eigen::AngleAxisf(ang, ax).matrix();
+        m.block(0, 0, 3, 3) = m3;
+
+        VirtualRobot::MathTools::Quaternion q = VirtualRobot::MathTools::eigen4f2quat(m);
+        Eigen::Vector3f h = VirtualRobot::MathTools::quat2hopf(q);
+
+        BOOST_CHECK_LE(h(0), 2.0f * M_PIf);
+        BOOST_CHECK_LE(h(1), 2.0f * M_PIf);
+        BOOST_CHECK_LE(h(2), M_PIf * 0.5f);
+
+        BOOST_CHECK_GE(h(0), 0.0f);
+        BOOST_CHECK_GE(h(1), 0.0f);
+        BOOST_CHECK_GE(h(2), 0.0f);
+
+        VirtualRobot::MathTools::Quaternion q2 = VirtualRobot::MathTools::hopf2quat(h);
+
+        VirtualRobot::MathTools::Quaternion qDelta = VirtualRobot::MathTools::getDelta(q, q2);
+        float a = std::abs(VirtualRobot::MathTools::getAngle(qDelta));
+        BOOST_CHECK_SMALL(a, 0.01f);
+        if (a > 0.01f)
         {
-            Eigen::Vector3f ax = Eigen::Vector3f::Random();
-            ax.normalize();
-            float ang = rand() % 1000 / 1000.0f * 2.0f * M_PIf - M_PIf;
-            Eigen::Matrix3f m3 = Eigen::AngleAxisf(ang, ax).matrix();
-            m.block(0, 0, 3, 3) = m3;
-
-            VirtualRobot::MathTools::Quaternion q = VirtualRobot::MathTools::eigen4f2quat(m);
-            Eigen::Vector3f h = VirtualRobot::MathTools::quat2hopf(q);
-
-            BOOST_CHECK_LE(h(0), 2.0f*M_PIf);
-            BOOST_CHECK_LE(h(1), 2.0f*M_PIf);
-            BOOST_CHECK_LE(h(2), M_PIf*0.5f);
-
-            BOOST_CHECK_GE(h(0), 0.0f);
-            BOOST_CHECK_GE(h(1), 0.0f);
-            BOOST_CHECK_GE(h(2), 0.0f);
-
-            VirtualRobot::MathTools::Quaternion q2 = VirtualRobot::MathTools::hopf2quat(h);
-
-            VirtualRobot::MathTools::Quaternion qDelta = VirtualRobot::MathTools::getDelta(q, q2);
-            float a = std::abs(VirtualRobot::MathTools::getAngle(qDelta));
-            BOOST_CHECK_SMALL(a, 0.01f);
-            if (a > 0.01f)
-            {
-                std::cout << "H:" << h.transpose() << ", Q:" << q.w << ", " << q.x << "," << q.y << "," << q.z << " / Q2:" << q2.w << ", " << q2.x << "," << q2.y << "," << q2.z << std::endl;
-            }
+            std::cout << "H:" << h.transpose() << ", Q:" << q.w << ", " << q.x << "," << q.y << ","
+                      << q.z << " / Q2:" << q2.w << ", " << q2.x << "," << q2.y << "," << q2.z
+                      << std::endl;
         }
     }
+}
 
-
-    BOOST_AUTO_TEST_CASE(testMathToolsHopfNeighborhood)
+BOOST_AUTO_TEST_CASE(testMathToolsHopfNeighborhood)
+{
+    Eigen::Matrix4f m = Eigen::Matrix4f::Identity();
+    const int NR_TESTS = 500;
+    const float maxAngHopf = 0.01f;
+    const float maxAngQuat = 2.5f * maxAngHopf;
+    for (int i = 0; i < NR_TESTS; i++)
     {
-        Eigen::Matrix4f m = Eigen::Matrix4f::Identity();
-        const int NR_TESTS = 500;
-        const float maxAngHopf = 0.01f;
-        const float maxAngQuat = 2.5f * maxAngHopf;
-        for (int i = 0; i < NR_TESTS; i++)
+        Eigen::Vector3f ax = Eigen::Vector3f::Random();
+        ax.normalize();
+        float ang = rand() % 1000 / 1000.0f * 2.0f * M_PIf - M_PIf;
+        Eigen::Matrix3f m3 = Eigen::AngleAxisf(ang, ax).matrix();
+        m.block(0, 0, 3, 3) = m3;
+        VirtualRobot::MathTools::Quaternion q = VirtualRobot::MathTools::eigen4f2quat(m);
+        Eigen::Vector3f h0 = VirtualRobot::MathTools::quat2hopf(q);
+
+        ax = Eigen::Vector3f::Random();
+        ax.normalize();
+        ax *= maxAngHopf;
+
+        Eigen::Vector3f h = h0 + ax;
+
+        if (h(0) < 0)
+            continue;
+        //h(0) = float(2.0f*M_PI) - h(0);
+        if (h(0) > 2.0f * M_PIf)
+            continue;
+        //h(0) = h(0) - float(2.0f*M_PI);
+        if (h(1) < 0)
+            continue;
+        //h(1) = float(2.0f*M_PI) - h(1);
+        if (h(1) > 2.0f * M_PIf)
+            continue;
+        //h(1) = h(1) - float(2.0f*M_PI);
+        if (h(2) < 0)
+            continue;
+        //h(2) = float(M_PI*0.5f) - h(2);
+        if (h(2) > M_PIf * 0.5f)
+            continue;
+        //h(2) = h(2) - float(M_PI*0.5f);
+
+
+        BOOST_CHECK_GE(h(0), 0.0f);
+        BOOST_CHECK_GE(h(1), 0.0f);
+        BOOST_CHECK_GE(h(2), 0.0f);
+        BOOST_CHECK_LE(h(0), 2.0f * M_PIf);
+        BOOST_CHECK_LE(h(1), 2.0f * M_PIf);
+        BOOST_CHECK_LE(h(2), M_PIf * 0.5f);
+
+        VirtualRobot::MathTools::Quaternion q2 = VirtualRobot::MathTools::hopf2quat(h);
+
+        VirtualRobot::MathTools::Quaternion qDelta = VirtualRobot::MathTools::getDelta(q, q2);
+        float a = std::abs(VirtualRobot::MathTools::getAngle(qDelta));
+        BOOST_CHECK_SMALL(a, maxAngQuat);
+
+        if (a > maxAngQuat)
         {
-            Eigen::Vector3f ax = Eigen::Vector3f::Random();
-            ax.normalize();
-            float ang = rand() % 1000 / 1000.0f * 2.0f * M_PIf - M_PIf;
-            Eigen::Matrix3f m3 = Eigen::AngleAxisf(ang, ax).matrix();
-            m.block(0, 0, 3, 3) = m3;
-            VirtualRobot::MathTools::Quaternion q = VirtualRobot::MathTools::eigen4f2quat(m);
-            Eigen::Vector3f h0 = VirtualRobot::MathTools::quat2hopf(q);
-
-            ax = Eigen::Vector3f::Random();
-            ax.normalize();
-            ax *= maxAngHopf;
-
-            Eigen::Vector3f h = h0 + ax;
-
-            if (h(0) < 0)
-                continue;
-            //h(0) = float(2.0f*M_PI) - h(0);
-            if (h(0) > 2.0f * M_PIf)
-                continue;
-            //h(0) = h(0) - float(2.0f*M_PI);
-            if (h(1) < 0)
-                continue;
-            //h(1) = float(2.0f*M_PI) - h(1);
-            if (h(1) > 2.0f * M_PIf)
-                continue;
-            //h(1) = h(1) - float(2.0f*M_PI);
-            if (h(2) < 0)
-                continue;
-                //h(2) = float(M_PI*0.5f) - h(2);
-            if (h(2) > M_PIf * 0.5f)
-                continue;
-                //h(2) = h(2) - float(M_PI*0.5f);
-
-
-            BOOST_CHECK_GE(h(0), 0.0f);
-            BOOST_CHECK_GE(h(1), 0.0f);
-            BOOST_CHECK_GE(h(2), 0.0f);
-            BOOST_CHECK_LE(h(0), 2.0f * M_PIf);
-            BOOST_CHECK_LE(h(1), 2.0f * M_PIf);
-            BOOST_CHECK_LE(h(2), M_PIf * 0.5f);
-
-            VirtualRobot::MathTools::Quaternion q2 = VirtualRobot::MathTools::hopf2quat(h);
-
-            VirtualRobot::MathTools::Quaternion qDelta = VirtualRobot::MathTools::getDelta(q, q2);
-            float a = std::abs(VirtualRobot::MathTools::getAngle(qDelta));
-            BOOST_CHECK_SMALL(a, maxAngQuat);
-
-            if (a>maxAngQuat)
-            {
-                std::cout << "H0:" << h0.transpose() << ", " << "h-new:" << h.transpose() << std::endl;
-                std::cout << "Q:" << q.w << ", " << q.x << "," << q.y << "," << q.z << " / Q2:" << q2.w << ", " << q2.x << "," << q2.y << "," << q2.z << std::endl;
-            }
+            std::cout << "H0:" << h0.transpose() << ", "
+                      << "h-new:" << h.transpose() << std::endl;
+            std::cout << "Q:" << q.w << ", " << q.x << "," << q.y << "," << q.z << " / Q2:" << q2.w
+                      << ", " << q2.x << "," << q2.y << "," << q2.z << std::endl;
         }
     }
-
+}
 
 BOOST_AUTO_TEST_CASE(testMathToolsRPY)
 {
@@ -146,7 +147,6 @@ BOOST_AUTO_TEST_CASE(testMathToolsRPY)
     BOOST_CHECK_CLOSE(0, x[3], 1e-6);
     BOOST_CHECK_CLOSE(0, x[4], 1e-6);
     BOOST_CHECK_CLOSE(0, x[5], 1e-6);
-
 }
 
 BOOST_AUTO_TEST_CASE(testMathToolsPlane)
@@ -160,9 +160,7 @@ BOOST_AUTO_TEST_CASE(testMathToolsPlane)
     BOOST_CHECK_EQUAL(res(0), p(0));
     BOOST_CHECK_EQUAL(res(1), p(1));
     BOOST_CHECK_EQUAL(res(2), 0);
-
 }
-
 
 BOOST_AUTO_TEST_CASE(testMathToolsConvexHull2D)
 {
@@ -174,7 +172,7 @@ BOOST_AUTO_TEST_CASE(testMathToolsConvexHull2D)
     Eigen::Vector2f f(1.2f, 1.8f);
     Eigen::Vector2f g(2.5f, 2.5f);
     Eigen::Vector2f h(-1.5f, -1.5f);
-    std::vector< Eigen::Vector2f > points;
+    std::vector<Eigen::Vector2f> points;
     points.push_back(a);
     points.push_back(b);
     points.push_back(c);
@@ -202,7 +200,6 @@ BOOST_AUTO_TEST_CASE(testMathToolsConvexHull2D)
     BOOST_CHECK_EQUAL(isInsideH, false);
 }
 
-
 BOOST_AUTO_TEST_CASE(testMathToolsBasisChange)
 {
     Eigen::VectorXf a1(3), a2(3), a3(3);
@@ -213,11 +210,11 @@ BOOST_AUTO_TEST_CASE(testMathToolsBasisChange)
     b1 << 1, 0, 1;
     b2 << 0, 1, 1;
     b3 << 1, 1, 0;
-    std::vector< Eigen::VectorXf > a;
+    std::vector<Eigen::VectorXf> a;
     a.push_back(a1);
     a.push_back(a2);
     a.push_back(a3);
-    std::vector< Eigen::VectorXf > b;
+    std::vector<Eigen::VectorXf> b;
     b.push_back(b1);
     b.push_back(b2);
     b.push_back(b3);
@@ -233,43 +230,54 @@ BOOST_AUTO_TEST_CASE(testMathToolsBasisChange)
     // should be (5,2,0)
     BOOST_CHECK_CLOSE(v_c(0), 5.0f, 0.1f);
     BOOST_CHECK_CLOSE(v_c(1), 2.0f, 0.1f);
-    BOOST_CHECK_SMALL(v_c(2) , 0.001f);
+    BOOST_CHECK_SMALL(v_c(2), 0.001f);
 }
-
 
 BOOST_AUTO_TEST_CASE(testMathToolsSegemntPlaneIntersection)
 {
     VirtualRobot::MathTools::Plane plane(Eigen::Vector3f(0, 0, 0), Eigen::Vector3f(0, 0, 1.0f));
 
-    VirtualRobot::MathTools::Segment segment_noIntersect(Eigen::Vector3f(0, 0, 10.0f), Eigen::Vector3f(1.0f, 20.0f, 100.0f));
-    VirtualRobot::MathTools::Segment segment_intersect(Eigen::Vector3f(0, 0, -1.0f), Eigen::Vector3f(0, 0, 1.0f));
-    VirtualRobot::MathTools::Segment segment_intersect2(Eigen::Vector3f(200.0f, 30.0f, -100.0f), Eigen::Vector3f(50.0f, 200.0f, 100.0f));
-    VirtualRobot::MathTools::Segment segment_parallel(Eigen::Vector3f(0, 0, 0), Eigen::Vector3f(1.0f, 0, 0));
+    VirtualRobot::MathTools::Segment segment_noIntersect(Eigen::Vector3f(0, 0, 10.0f),
+                                                         Eigen::Vector3f(1.0f, 20.0f, 100.0f));
+    VirtualRobot::MathTools::Segment segment_intersect(Eigen::Vector3f(0, 0, -1.0f),
+                                                       Eigen::Vector3f(0, 0, 1.0f));
+    VirtualRobot::MathTools::Segment segment_intersect2(Eigen::Vector3f(200.0f, 30.0f, -100.0f),
+                                                        Eigen::Vector3f(50.0f, 200.0f, 100.0f));
+    VirtualRobot::MathTools::Segment segment_parallel(Eigen::Vector3f(0, 0, 0),
+                                                      Eigen::Vector3f(1.0f, 0, 0));
 
     Eigen::Vector3f res;
-    BOOST_CHECK_EQUAL(VirtualRobot::MathTools::intersectSegmentPlane(segment_noIntersect, plane, res), VirtualRobot::MathTools::eNoIntersection);
-    BOOST_CHECK_EQUAL(VirtualRobot::MathTools::intersectSegmentPlane(segment_intersect, plane, res), VirtualRobot::MathTools::eIntersection);
+    BOOST_CHECK_EQUAL(
+        VirtualRobot::MathTools::intersectSegmentPlane(segment_noIntersect, plane, res),
+        VirtualRobot::MathTools::eNoIntersection);
+    BOOST_CHECK_EQUAL(VirtualRobot::MathTools::intersectSegmentPlane(segment_intersect, plane, res),
+                      VirtualRobot::MathTools::eIntersection);
     // should be (0,0,0)
     BOOST_CHECK_CLOSE(res.norm(), 0.0f, 1e-6f);
 
-    BOOST_CHECK_EQUAL(VirtualRobot::MathTools::intersectSegmentPlane(segment_intersect2, plane, res), VirtualRobot::MathTools::eIntersection);
-    BOOST_CHECK_EQUAL(VirtualRobot::MathTools::intersectSegmentPlane(segment_parallel, plane, res), VirtualRobot::MathTools::eNoIntersection);
+    BOOST_CHECK_EQUAL(
+        VirtualRobot::MathTools::intersectSegmentPlane(segment_intersect2, plane, res),
+        VirtualRobot::MathTools::eIntersection);
+    BOOST_CHECK_EQUAL(VirtualRobot::MathTools::intersectSegmentPlane(segment_parallel, plane, res),
+                      VirtualRobot::MathTools::eNoIntersection);
 }
-
 
 BOOST_AUTO_TEST_CASE(testMathToolsOOBBPlaneIntersection)
 {
     Eigen::Matrix4f pose;
     pose.setIdentity();
     pose(2, 3) = 150.0f;
-    VirtualRobot::MathTools::OOBB oobb(Eigen::Vector3f(-100.0f, -100.0f, -100.0f), Eigen::Vector3f(100.0f, 100.0f, 100.0f), pose);
+    VirtualRobot::MathTools::OOBB oobb(
+        Eigen::Vector3f(-100.0f, -100.0f, -100.0f), Eigen::Vector3f(100.0f, 100.0f, 100.0f), pose);
     VirtualRobot::MathTools::Plane plane(Eigen::Vector3f(0, 0, 0), Eigen::Vector3f(0, 0, 1.0f));
 
     std::vector<Eigen::Vector3f> res;
-    BOOST_CHECK_EQUAL(VirtualRobot::MathTools::intersectOOBBPlane(oobb, plane, res), VirtualRobot::MathTools::eNoIntersection);
+    BOOST_CHECK_EQUAL(VirtualRobot::MathTools::intersectOOBBPlane(oobb, plane, res),
+                      VirtualRobot::MathTools::eNoIntersection);
     pose(2, 3) = -50.0f;
     oobb.pose = pose;
-    BOOST_CHECK_EQUAL(VirtualRobot::MathTools::intersectOOBBPlane(oobb, plane, res), VirtualRobot::MathTools::eIntersection);
+    BOOST_CHECK_EQUAL(VirtualRobot::MathTools::intersectOOBBPlane(oobb, plane, res),
+                      VirtualRobot::MathTools::eIntersection);
     BOOST_CHECK_EQUAL(res.size(), 4);
     BOOST_CHECK_CLOSE(res[0](0), -100.0f, 1e-6f);
     BOOST_CHECK_CLOSE(res[0](1), 100.0f, 1e-6f);
@@ -287,7 +295,6 @@ BOOST_AUTO_TEST_CASE(testMathToolsOOBBPlaneIntersection)
 
 BOOST_AUTO_TEST_SUITE_END()
 
-
 struct Fixture_getTriangleArea
 {
     static const float PRECISION;
@@ -300,56 +307,55 @@ const float Fixture_getTriangleArea::PRECISION = 1e-6f;
 
 BOOST_FIXTURE_TEST_SUITE(getTriangleArea, Fixture_getTriangleArea)
 
+BOOST_AUTO_TEST_CASE(test_getTriangleArea_simple)
+{
+    a << 0, 0, 0;
+    b << 2, 0, 0;
+    c << 0, 4, 0;
+    areaTrue = 4;
 
-    BOOST_AUTO_TEST_CASE(test_getTriangleArea_simple)
-    {
-        a << 0, 0, 0;
-        b << 2, 0, 0;
-        c << 0, 4, 0;
-        areaTrue = 4;
+    float area = VirtualRobot::MathTools::getTriangleArea(a, b, c);
+    BOOST_CHECK_CLOSE_FRACTION(area, areaTrue, PRECISION);
+}
 
-        float area = VirtualRobot::MathTools::getTriangleArea(a, b, c);
-        BOOST_CHECK_CLOSE_FRACTION(area, areaTrue, PRECISION);
-    }
+BOOST_AUTO_TEST_CASE(test_getTriangleArea_transformed)
+{
+    a << 0, 0, 1;
+    b << 2, 0, 1;
+    c << 0, 4, 1;
+    areaTrue = 4;
 
-    BOOST_AUTO_TEST_CASE(test_getTriangleArea_transformed)
-    {
-        a << 0, 0, 1;
-        b << 2, 0, 1;
-        c << 0, 4, 1;
-        areaTrue = 4;
+    Eigen::AngleAxisf rot(1.14f * M_PIf, Eigen::Vector3f(1, -.5, 2).normalized());
+    Eigen::Translation3f trans(-1, 2, .5);
+    Eigen::Affine3f tf = trans * rot;
 
-        Eigen::AngleAxisf rot(1.14f * M_PIf, Eigen::Vector3f(1, -.5, 2).normalized());
-        Eigen::Translation3f trans(-1, 2, .5);
-        Eigen::Affine3f tf = trans * rot;
+    a = tf * a;
+    b = tf * b;
+    c = tf * c;
 
-        a = tf * a;
-        b = tf * b;
-        c = tf * c;
+    float area = VirtualRobot::MathTools::getTriangleArea(a, b, c);
+    BOOST_CHECK_CLOSE_FRACTION(area, areaTrue, PRECISION);
+}
 
-        float area = VirtualRobot::MathTools::getTriangleArea(a, b, c);
-        BOOST_CHECK_CLOSE_FRACTION(area, areaTrue, PRECISION);
-    }
+BOOST_AUTO_TEST_CASE(test_getTriangleArea_colinear)
+{
+    a << 0, 4, 3;
+    b << 1, 4, 3;
+    c << 2, 4, 3;
+    areaTrue = 0;
 
-    BOOST_AUTO_TEST_CASE(test_getTriangleArea_colinear)
-    {
-        a << 0, 4, 3;
-        b << 1, 4, 3;
-        c << 2, 4, 3;
-        areaTrue = 0;
+    float area = VirtualRobot::MathTools::getTriangleArea(a, b, c);
+    BOOST_CHECK_CLOSE_FRACTION(area, areaTrue, PRECISION);
+}
 
-        float area = VirtualRobot::MathTools::getTriangleArea(a, b, c);
-        BOOST_CHECK_CLOSE_FRACTION(area, areaTrue, PRECISION);
-    }
+BOOST_AUTO_TEST_CASE(test_getTriangleArea_collapsed_triangle)
+{
+    a << 1, 2, 3;
+    b = c = a;
+    areaTrue = 0;
 
-    BOOST_AUTO_TEST_CASE(test_getTriangleArea_collapsed_triangle)
-    {
-        a << 1, 2, 3;
-        b = c = a;
-        areaTrue = 0;
-
-        float area = VirtualRobot::MathTools::getTriangleArea(a, b, c);
-        BOOST_CHECK_CLOSE_FRACTION(area, areaTrue, PRECISION);
-    }
+    float area = VirtualRobot::MathTools::getTriangleArea(a, b, c);
+    BOOST_CHECK_CLOSE_FRACTION(area, areaTrue, PRECISION);
+}
 
 BOOST_AUTO_TEST_SUITE_END()

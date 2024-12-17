@@ -2,7 +2,6 @@
 
 #include "linear.hpp"
 
-
 namespace simox::math
 {
 
@@ -16,4 +15,4 @@ namespace simox::math
     using LinearRegression3d = LinearRegression<3, double>;
     using LinearRegression4d = LinearRegression<4, double>;
 
-}
+} // namespace simox::math

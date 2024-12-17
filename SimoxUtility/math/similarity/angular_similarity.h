@@ -10,7 +10,6 @@
 // Simox
 #include <SimoxUtility/math/similarity/cosine_similarity.h>
 
-
 namespace simox::math
 {
 
@@ -27,9 +26,8 @@ namespace simox::math
      */
     template <int rows>
     float
-    angular_similarity(
-        const Eigen::Matrix<float, rows, 1>& v1,
-        const Eigen::Matrix<float, rows, 1>& v2)
+    angular_similarity(const Eigen::Matrix<float, rows, 1>& v1,
+                       const Eigen::Matrix<float, rows, 1>& v2)
     {
         const float cosine_similarity = math::cosine_similarity(v1, v2);
         const float angular_distance = std::acos(cosine_similarity) / M_PI;
@@ -39,4 +37,4 @@ namespace simox::math
         return std::clamp(angular_similarity, 0.f, 1.f);
     }
 
-}
+} // namespace simox::math

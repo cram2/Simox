@@ -2,8 +2,8 @@
 
 #include <Eigen/Geometry>
 
-#include <GeometricPlanning/types.h>
 #include <GeometricPlanning/path_primitives/PathPrimitive.h>
+#include <GeometricPlanning/types.h>
 
 namespace simox::geometric_planning
 {

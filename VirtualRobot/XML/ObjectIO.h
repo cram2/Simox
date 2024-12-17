@@ -23,17 +23,16 @@
 #pragma once
 
 
-#include <fstream>
 #include <filesystem>
+#include <fstream>
 
 #include "../VirtualRobot.h"
 #include "BaseIO.h"
 
-
 // using forward declarations here, so that the rapidXML header does not have to be parsed when this file is included
 namespace rapidxml
 {
-    template<class Ch>
+    template <class Ch>
     class xml_node;
 }
 
@@ -43,8 +42,8 @@ namespace VirtualRobot
     class VIRTUAL_ROBOT_IMPORT_EXPORT ObjectIO : public BaseIO
     {
         friend class SceneIO;
-    public:
 
+    public:
         /*!
             Load Obstacle from file.
             @param xmlFile The file
@@ -58,7 +57,8 @@ namespace VirtualRobot
             @param basePath If file tags are given, the base path for searching the object files can be specified.
             @return Returns an empty pointer, when file access failed.
         */
-        static ObstaclePtr loadObstacle(const std::ifstream& xmlFile, const std::string& basePath = "");
+        static ObstaclePtr loadObstacle(const std::ifstream& xmlFile,
+                                        const std::string& basePath = "");
 
         /*!
             Load ManipulationObject from file.
@@ -66,11 +66,15 @@ namespace VirtualRobot
             @return Returns an empty pointer, when file access failed.
         */
         static ManipulationObjectPtr loadManipulationObject(const std::string& xmlFile);
-        static ManipulationObjectPtr loadManipulationObject(const char* xmlFile)
+
+        static ManipulationObjectPtr
+        loadManipulationObject(const char* xmlFile)
         {
             return loadManipulationObject(std::string{xmlFile});
         }
-        static ManipulationObjectPtr loadManipulationObject(const std::filesystem::path& xmlFile)
+
+        static ManipulationObjectPtr
+        loadManipulationObject(const std::filesystem::path& xmlFile)
         {
             return loadManipulationObject(xmlFile.string());
         }
@@ -81,7 +85,8 @@ namespace VirtualRobot
             @param basePath If file tags are given, the base path for searching the object files can be specified.
             @return Returns an empty pointer, when file access failed.
         */
-        static ManipulationObjectPtr loadManipulationObject(const std::ifstream& xmlFile, const std::string& basePath = "");
+        static ManipulationObjectPtr loadManipulationObject(const std::ifstream& xmlFile,
+                                                            const std::string& basePath = "");
 
         /*!
             Save ManipulationObject to file.
@@ -89,24 +94,31 @@ namespace VirtualRobot
             @param xmlFile The file
             @return Returns true on success.
         */
-        static bool saveManipulationObject(ManipulationObjectPtr object, const std::string& xmlFile);
+        static bool saveManipulationObject(ManipulationObjectPtr object,
+                                           const std::string& xmlFile);
 
         /*!
             Creates ManipulationObject from string.
             @param xmlString The input string.
             @param basePath If file tags are given, the base path for searching the object files can be specified.
         */
-        static ManipulationObjectPtr createManipulationObjectFromString(const std::string& xmlString, const std::string& basePath = "");
+        static ManipulationObjectPtr
+        createManipulationObjectFromString(const std::string& xmlString,
+                                           const std::string& basePath = "");
 
         /*!
             Creates Obstacle from string.
             @param xmlString The input string.
             @param basePath If file tags are given, the base path for searching the object files can be specified.
         */
-        static ObstaclePtr createObstacleFromString(const std::string& xmlString, const std::string& basePath = "");
+        static ObstaclePtr createObstacleFromString(const std::string& xmlString,
+                                                    const std::string& basePath = "");
 
-        static ObstaclePtr processObstacle(rapidxml::xml_node<char>* objectXMLNode, const std::string& basePath);
-        static ManipulationObjectPtr processManipulationObject(rapidxml::xml_node<char>* objectXMLNode, const std::string& basePath);
+        static ObstaclePtr processObstacle(rapidxml::xml_node<char>* objectXMLNode,
+                                           const std::string& basePath);
+        static ManipulationObjectPtr
+        processManipulationObject(rapidxml::xml_node<char>* objectXMLNode,
+                                  const std::string& basePath);
 
         /*!
          * \brief writeSTL Write ascii stl file.
@@ -116,14 +128,19 @@ namespace VirtualRobot
          * \param scaling Usually we scale from the internal mm format to m.
          * \return true on success
          */
-        static bool writeSTL(TriMeshModelPtr t, const std::string& filename, const std::string& objectName, float scaling = 0.001f);
-    protected:
+        static bool writeSTL(TriMeshModelPtr t,
+                             const std::string& filename,
+                             const std::string& objectName,
+                             float scaling = 0.001f);
 
+    protected:
         // instantiation not allowed
         ObjectIO();
         ~ObjectIO() override;
 
-        static bool processSceneRobot(rapidxml::xml_node<char>* sceneXMLNode, ScenePtr scene, const std::string& basePath);
+        static bool processSceneRobot(rapidxml::xml_node<char>* sceneXMLNode,
+                                      ScenePtr scene,
+                                      const std::string& basePath);
     };
 
-}
+} // namespace VirtualRobot

@@ -1,30 +1,28 @@
-#include <Eigen/Geometry>
 #include "AdvancedIKSolver.h"
-#include "../Robot.h"
-#include "../VirtualRobotException.h"
-#include "../Nodes/RobotNodePrismatic.h"
-#include "../Nodes/RobotNodeRevolute.h"
-#include "../VirtualRobotException.h"
-#include "../Obstacle.h"
-#include "../ManipulationObject.h"
-#include "../Grasping/Grasp.h"
-#include "../Grasping/GraspSet.h"
-#include "../Workspace/Reachability.h"
-#include "../EndEffector/EndEffector.h"
-#include "../RobotConfig.h"
-#include "../CollisionDetection/CollisionChecker.h"
-#include "../CollisionDetection/CDManager.h"
-
-
 
 #include <algorithm>
+
+#include <Eigen/Geometry>
+
+#include "../CollisionDetection/CDManager.h"
+#include "../CollisionDetection/CollisionChecker.h"
+#include "../EndEffector/EndEffector.h"
+#include "../Grasping/Grasp.h"
+#include "../Grasping/GraspSet.h"
+#include "../ManipulationObject.h"
+#include "../Nodes/RobotNodePrismatic.h"
+#include "../Nodes/RobotNodeRevolute.h"
+#include "../Obstacle.h"
+#include "../Robot.h"
+#include "../RobotConfig.h"
+#include "../VirtualRobotException.h"
+#include "../Workspace/Reachability.h"
 
 namespace VirtualRobot
 {
     using std::endl;
 
-    AdvancedIKSolver::AdvancedIKSolver(RobotNodeSetPtr rns) :
-        IKSolver(), rns(rns)
+    AdvancedIKSolver::AdvancedIKSolver(RobotNodeSetPtr rns) : IKSolver(), rns(rns)
     {
         verbose = false;
         THROW_VR_EXCEPTION_IF(!rns, "Null data");
@@ -33,7 +31,8 @@ namespace VirtualRobot
         setMaximumError();
     }
 
-    void AdvancedIKSolver::collisionDetection(SceneObjectPtr avoidCollisionsWith)
+    void
+    AdvancedIKSolver::collisionDetection(SceneObjectPtr avoidCollisionsWith)
     {
         cdm.reset();
 
@@ -45,14 +44,15 @@ namespace VirtualRobot
         }
     }
 
-    void AdvancedIKSolver::collisionDetection(ObstaclePtr avoidCollisionsWith)
+    void
+    AdvancedIKSolver::collisionDetection(ObstaclePtr avoidCollisionsWith)
     {
         SceneObjectPtr so = std::dynamic_pointer_cast<SceneObject>(avoidCollisionsWith);
         collisionDetection(so);
     }
 
-
-    void AdvancedIKSolver::collisionDetection(SceneObjectSetPtr avoidCollisionsWith)
+    void
+    AdvancedIKSolver::collisionDetection(SceneObjectSetPtr avoidCollisionsWith)
     {
         cdm.reset();
 
@@ -64,13 +64,15 @@ namespace VirtualRobot
         }
     }
 
-
-    void AdvancedIKSolver::collisionDetection(CDManagerPtr avoidCollisions)
+    void
+    AdvancedIKSolver::collisionDetection(CDManagerPtr avoidCollisions)
     {
         cdm = avoidCollisions;
     }
 
-    std::vector<float> AdvancedIKSolver::solveNoRNSUpdate(const Eigen::Matrix4f& globalPose, CartesianSelection selection)
+    std::vector<float>
+    AdvancedIKSolver::solveNoRNSUpdate(const Eigen::Matrix4f& globalPose,
+                                       CartesianSelection selection)
     {
         std::vector<float> result;
         std::vector<float> v;
@@ -86,7 +88,8 @@ namespace VirtualRobot
         return result;
     }
 
-    bool AdvancedIKSolver::solve(const Eigen::Vector3f& globalPosition)
+    bool
+    AdvancedIKSolver::solve(const Eigen::Vector3f& globalPosition)
     {
         Eigen::Matrix4f t;
         t.setIdentity();
@@ -94,25 +97,28 @@ namespace VirtualRobot
         return solve(t, Position);
     }
 
-
-
-    GraspPtr AdvancedIKSolver::solve(ManipulationObjectPtr object, CartesianSelection selection /*= All*/, int maxLoops)
+    GraspPtr
+    AdvancedIKSolver::solve(ManipulationObjectPtr object,
+                            CartesianSelection selection /*= All*/,
+                            int maxLoops)
     {
         THROW_VR_EXCEPTION_IF(!object, "NULL object");
         // first get a compatible EEF
         RobotPtr robot = rns->getRobot();
         THROW_VR_EXCEPTION_IF(!robot, "NULL robot");
-        std::vector< EndEffectorPtr > eefs;
+        std::vector<EndEffectorPtr> eefs;
         robot->getEndEffectors(eefs);
         EndEffectorPtr eef;
 
-        for (auto & i : eefs)
+        for (auto& i : eefs)
         {
             if (i->getTcp() == rns->getTCP())
             {
                 if (eef)
                 {
-                    VR_ERROR << " Two end effectors with tcp " << rns->getTCP()->getName() << " defined in robot " << robot->getName() << ". taking the first one?!" << std::endl;
+                    VR_ERROR << " Two end effectors with tcp " << rns->getTCP()->getName()
+                             << " defined in robot " << robot->getName()
+                             << ". taking the first one?!" << std::endl;
                 }
                 else
                 {
@@ -123,7 +129,8 @@ namespace VirtualRobot
 
         if (!eef)
         {
-            VR_ERROR << " No end effector with tcp " << rns->getTCP()->getName() << " defined in robot " << robot->getName() << ". Aborting..." << std::endl;
+            VR_ERROR << " No end effector with tcp " << rns->getTCP()->getName()
+                     << " defined in robot " << robot->getName() << ". Aborting..." << std::endl;
             return GraspPtr();
         }
 
@@ -131,7 +138,8 @@ namespace VirtualRobot
 
         if (!gs || gs->getSize() == 0)
         {
-            VR_ERROR << " No grasps defined for eef " << eef->getName() << " defined in object " << object->getName() << ". Aborting..." << std::endl;
+            VR_ERROR << " No grasps defined for eef " << eef->getName() << " defined in object "
+                     << object->getName() << ". Aborting..." << std::endl;
             return GraspPtr();
         }
 
@@ -157,7 +165,11 @@ namespace VirtualRobot
         return GraspPtr();
     }
 
-    bool AdvancedIKSolver::solve(ManipulationObjectPtr object, GraspPtr grasp, CartesianSelection selection /*= All*/, int maxLoops)
+    bool
+    AdvancedIKSolver::solve(ManipulationObjectPtr object,
+                            GraspPtr grasp,
+                            CartesianSelection selection /*= All*/,
+                            int maxLoops)
     {
         THROW_VR_EXCEPTION_IF(!object, "NULL object");
         THROW_VR_EXCEPTION_IF(!grasp, "NULL grasp");
@@ -182,8 +194,12 @@ namespace VirtualRobot
         return false;
     }
 
-
-    GraspPtr AdvancedIKSolver::sampleSolution(ManipulationObjectPtr object, GraspSetPtr graspSet, CartesianSelection selection /*= All*/, bool removeGraspFromSet, int maxLoops)
+    GraspPtr
+    AdvancedIKSolver::sampleSolution(ManipulationObjectPtr object,
+                                     GraspSetPtr graspSet,
+                                     CartesianSelection selection /*= All*/,
+                                     bool removeGraspFromSet,
+                                     int maxLoops)
     {
         THROW_VR_EXCEPTION_IF(!object, "NULL object");
         //THROW_VR_EXCEPTION_IF(!eef,"NULL eef");
@@ -201,10 +217,10 @@ namespace VirtualRobot
         GraspPtr g = graspSet->getGrasp(pos);
         Eigen::Matrix4f m = g->getTcpPoseGlobal(object->getGlobalPose());
 
-            if (_sampleSolution(m, selection, maxLoops))
-            {
-                return g;
-            }
+        if (_sampleSolution(m, selection, maxLoops))
+        {
+            return g;
+        }
 
         // did not succeed, reset joint values and remove grasp from temporary set
         RobotPtr rob = rns->getRobot();
@@ -218,13 +234,16 @@ namespace VirtualRobot
         return GraspPtr();
     }
 
-    void AdvancedIKSolver::setMaximumError(float maxErrorPositionMM /*= 1.0f*/, float maxErrorOrientationRad /*= 0.02*/)
+    void
+    AdvancedIKSolver::setMaximumError(float maxErrorPositionMM /*= 1.0f*/,
+                                      float maxErrorOrientationRad /*= 0.02*/)
     {
         this->maxErrorPositionMM = maxErrorPositionMM;
         this->maxErrorOrientationRad = maxErrorOrientationRad;
     }
 
-    void AdvancedIKSolver::setReachabilityCheck(ReachabilityPtr reachabilitySpace)
+    void
+    AdvancedIKSolver::setReachabilityCheck(ReachabilityPtr reachabilitySpace)
     {
         this->reachabilitySpace = reachabilitySpace;
 
@@ -232,17 +251,24 @@ namespace VirtualRobot
         {
             if (reachabilitySpace->getTCP() != tcp)
             {
-                VR_ERROR << "Reachability representation has different tcp RobotNode (" << reachabilitySpace->getTCP()->getName() << ") than IK solver (" << tcp->getName() << ") ?! " << endl << "Reachability results may not be valid!" << std::endl;
+                VR_ERROR << "Reachability representation has different tcp RobotNode ("
+                         << reachabilitySpace->getTCP()->getName() << ") than IK solver ("
+                         << tcp->getName() << ") ?! " << endl
+                         << "Reachability results may not be valid!" << std::endl;
             }
 
             if (reachabilitySpace->getNodeSet() != rns)
             {
-                VR_ERROR << "Reachability representation is defined for a different RobotNodeSet (" << reachabilitySpace->getNodeSet()->getName() << ") than IK solver uses (" << rns->getName() << ") ?! " << endl << "Reachability results may not be valid!" << std::endl;
+                VR_ERROR << "Reachability representation is defined for a different RobotNodeSet ("
+                         << reachabilitySpace->getNodeSet()->getName() << ") than IK solver uses ("
+                         << rns->getName() << ") ?! " << endl
+                         << "Reachability results may not be valid!" << std::endl;
             }
         }
     }
 
-    bool AdvancedIKSolver::checkReachable(const Eigen::Matrix4f& globalPose)
+    bool
+    AdvancedIKSolver::checkReachable(const Eigen::Matrix4f& globalPose)
     {
         if (!reachabilitySpace)
         {
@@ -252,17 +278,20 @@ namespace VirtualRobot
         return reachabilitySpace->isReachable(globalPose);
     }
 
-    VirtualRobot::RobotNodePtr AdvancedIKSolver::getTcp()
+    VirtualRobot::RobotNodePtr
+    AdvancedIKSolver::getTcp()
     {
         return tcp;
     }
 
-    VirtualRobot::RobotNodeSetPtr AdvancedIKSolver::getRobotNodeSet()
+    VirtualRobot::RobotNodeSetPtr
+    AdvancedIKSolver::getRobotNodeSet()
     {
         return rns;
     }
 
-    void AdvancedIKSolver::setVerbose(bool enable)
+    void
+    AdvancedIKSolver::setVerbose(bool enable)
     {
         verbose = enable;
     }

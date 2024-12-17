@@ -21,55 +21,47 @@
 
 #pragma once
 
-#include "MathForwardDefinitions.h"
-
 #include "Index3.h"
-
+#include "MathForwardDefinitions.h"
 
 namespace math
 {
-    template<class T>
+    template <class T>
     class Array3D
     {
     public:
-        Array3D(int size) :
-            size(size)
+        Array3D(int size) : size(size)
         {
             data = std::shared_ptr<std::vector<T>>(new std::vector<T>);
-            data->resize(size*size*size);
+            data->resize(size * size * size);
         }
 
-        T Get(Index3 index)
+        T
+        Get(Index3 index)
         {
-            return data->at(index.X() +
-                    size * index.Y() +
-                    size * size * index.Z());
+            return data->at(index.X() + size * index.Y() + size * size * index.Z());
         }
 
-        T Get(int i, int j, int k)
+        T
+        Get(int i, int j, int k)
         {
-            return data->at(i +
-                    size * j +
-                    size * size * k );
-
+            return data->at(i + size * j + size * size * k);
         }
 
-        void Set(Index3 index, T value)
+        void
+        Set(Index3 index, T value)
         {
-            data->at(             index.X() +
-                    size * index.Y() +
-                    size * size * index.Z()) = value;
+            data->at(index.X() + size * index.Y() + size * size * index.Z()) = value;
         }
-        void Set(int i, int j, int k, T value)
+
+        void
+        Set(int i, int j, int k, T value)
         {
-            data->at(            i +
-                    size * j +
-                    size * size * k )= value;
+            data->at(i + size * j + size * size * k) = value;
         }
 
     private:
         std::shared_ptr<std::vector<T>> data;
         int size;
     };
-}
-
+} // namespace math

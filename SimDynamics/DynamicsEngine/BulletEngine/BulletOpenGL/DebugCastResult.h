@@ -16,14 +16,14 @@ subject to the following restrictions:
 #pragma once
 
 #include "BulletCollision/NarrowPhaseCollision/btConvexCast.h"
-#include "LinearMath/btTransform.h"
 #include "GL_ShapeDrawer.h"
 #include "GlutStuff.h"
+#include "LinearMath/btTransform.h"
 #ifdef WIN32
 #include <windows.h>
 #endif
 //think different
-#if defined(__APPLE__) && !defined (VMDMESA)
+#if defined(__APPLE__) && !defined(VMDMESA)
 #include <OpenGL/gl.h>
 #include <OpenGL/glu.h>
 #else
@@ -34,21 +34,25 @@ struct btDebugCastResult : public btConvexCast::CastResult
 
     btTransform m_fromTrans;
     const btPolyhedralConvexShape* m_shape;
-    btVector3   m_linVel;
+    btVector3 m_linVel;
     btVector3 m_angVel;
     GL_ShapeDrawer* m_shapeDrawer;
 
-    btDebugCastResult(const btTransform& fromTrans, const btPolyhedralConvexShape* shape,
-                      const btVector3& linVel, const btVector3& angVel, GL_ShapeDrawer* drawer)
-        : m_fromTrans(fromTrans),
-          m_shape(shape),
-          m_linVel(linVel),
-          m_angVel(angVel),
-          m_shapeDrawer(drawer)
+    btDebugCastResult(const btTransform& fromTrans,
+                      const btPolyhedralConvexShape* shape,
+                      const btVector3& linVel,
+                      const btVector3& angVel,
+                      GL_ShapeDrawer* drawer) :
+        m_fromTrans(fromTrans),
+        m_shape(shape),
+        m_linVel(linVel),
+        m_angVel(angVel),
+        m_shapeDrawer(drawer)
     {
     }
 
-    virtual void drawCoordSystem(const btTransform& tr)
+    virtual void
+    drawCoordSystem(const btTransform& tr)
     {
         btScalar m[16];
         tr.getOpenGLMatrix(m);
@@ -68,7 +72,8 @@ struct btDebugCastResult : public btConvexCast::CastResult
         glPopMatrix();
     }
 
-    virtual void    DebugDraw(btScalar  fraction)
+    virtual void
+    DebugDraw(btScalar fraction)
     {
         btVector3 worldBoundsMin(-1000, -1000, -1000);
         btVector3 worldBoundsMax(1000, 1000, 1000);
@@ -81,9 +86,12 @@ struct btDebugCastResult : public btConvexCast::CastResult
 
         if (m_shapeDrawer)
         {
-            m_shapeDrawer->drawOpenGL(m, m_shape, btVector3(1, 0, 0), btIDebugDraw::DBG_NoDebug, worldBoundsMin, worldBoundsMax);
+            m_shapeDrawer->drawOpenGL(m,
+                                      m_shape,
+                                      btVector3(1, 0, 0),
+                                      btIDebugDraw::DBG_NoDebug,
+                                      worldBoundsMin,
+                                      worldBoundsMax);
         }
     }
 };
-
-

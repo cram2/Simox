@@ -1,33 +1,32 @@
 
 #pragma once
 
-#include <VirtualRobot/VirtualRobot.h>
-#include <VirtualRobot/Robot.h>
-#include <VirtualRobot/VirtualRobotException.h>
-#include <VirtualRobot/Nodes/RobotNode.h>
-#include <VirtualRobot/XML/RobotIO.h>
-#include <VirtualRobot/Visualization/VisualizationFactory.h>
-#include <VirtualRobot/Obstacle.h>
-#include <VirtualRobot/RobotNodeSet.h>
-#include <VirtualRobot/Visualization/CoinVisualization/CoinVisualizationNode.h>
-#include <VirtualRobot/Visualization/CoinVisualization/CoinVisualization.h>
-
 #include <string.h>
-#include <QtCore/QtGlobal>
-#include <QtGui/QtGui>
-#include <QtCore/QtCore>
-#include <QtOpenGL/QtOpenGL>
-
-#include <Inventor/sensors/SoTimerSensor.h>
-#include <Inventor/nodes/SoEventCallback.h>
-#include <Inventor/Qt/viewers/SoQtExaminerViewer.h>
-#include <Inventor/Qt/SoQt.h>
-#include <Inventor/nodes/SoSeparator.h>
-
 
 #include <vector>
 
+#include <QtCore/QtCore>
+#include <QtCore/QtGlobal>
+#include <QtGui/QtGui>
+#include <QtOpenGL/QtOpenGL>
+
+#include <VirtualRobot/Nodes/RobotNode.h>
+#include <VirtualRobot/Obstacle.h>
+#include <VirtualRobot/Robot.h>
+#include <VirtualRobot/RobotNodeSet.h>
+#include <VirtualRobot/VirtualRobot.h>
+#include <VirtualRobot/VirtualRobotException.h>
+#include <VirtualRobot/Visualization/CoinVisualization/CoinVisualization.h>
+#include <VirtualRobot/Visualization/CoinVisualization/CoinVisualizationNode.h>
+#include <VirtualRobot/Visualization/VisualizationFactory.h>
+#include <VirtualRobot/XML/RobotIO.h>
+
 #include "ui_CameraViewer.h"
+#include <Inventor/Qt/SoQt.h>
+#include <Inventor/Qt/viewers/SoQtExaminerViewer.h>
+#include <Inventor/nodes/SoEventCallback.h>
+#include <Inventor/nodes/SoSeparator.h>
+#include <Inventor/sensors/SoTimerSensor.h>
 
 class showCamWindow : public QMainWindow
 {
@@ -57,8 +56,8 @@ public slots:
 
     void selectRobot();
 
-
-    SoQtExaminerViewer* getExaminerViewer()
+    SoQtExaminerViewer*
+    getExaminerViewer()
     {
         return viewer;
     };
@@ -76,7 +75,8 @@ protected:
 
     void updatRobotInfo();
     Ui::MainWindowCamera UI;
-    SoQtExaminerViewer* viewer; /*!< Viewer to display the 3D model of the robot and the environment. */
+    SoQtExaminerViewer*
+        viewer; /*!< Viewer to display the 3D model of the robot and the environment. */
 
     SoSeparator* sceneSep;
     SoSeparator* robotSep;
@@ -99,9 +99,9 @@ protected:
     std::vector<Eigen::Vector3f> cam1PointCloud;
     unsigned char* cam2Buffer;
     float* cam2DepthBuffer;
-    std::vector < VirtualRobot::RobotNodePtr > allRobotNodes;
-    std::vector < VirtualRobot::RobotNodePtr > currentRobotNodes;
-    std::vector < VirtualRobot::RobotNodeSetPtr > robotNodeSets;
+    std::vector<VirtualRobot::RobotNodePtr> allRobotNodes;
+    std::vector<VirtualRobot::RobotNodePtr> currentRobotNodes;
+    std::vector<VirtualRobot::RobotNodeSetPtr> robotNodeSets;
     VirtualRobot::RobotNodeSetPtr currentRobotNodeSet;
     VirtualRobot::RobotNodePtr currentRobotNode;
 
@@ -115,9 +115,8 @@ protected:
         std::size_t w;
         std::size_t h;
     };
+
     DepthRenderData userdata2;
 
-    static void getDepthImage(void *userdata);
-
+    static void getDepthImage(void* userdata);
 };
-

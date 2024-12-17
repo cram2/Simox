@@ -23,17 +23,27 @@
 
 #pragma once
 
-#include "VirtualRobot/VirtualRobot.h"
-#include "VirtualRobot/IK/Constraint.h"
 #include "VirtualRobot/IK/CoMIK.h"
+#include "VirtualRobot/IK/Constraint.h"
+#include "VirtualRobot/VirtualRobot.h"
 
 namespace VirtualRobot
 {
-    class VIRTUAL_ROBOT_IMPORT_EXPORT CoMConstraint : public Constraint, public std::enable_shared_from_this<CoMConstraint>
+    class VIRTUAL_ROBOT_IMPORT_EXPORT CoMConstraint :
+        public Constraint,
+        public std::enable_shared_from_this<CoMConstraint>
     {
     public:
-        CoMConstraint(const RobotPtr& robot, const RobotNodeSetPtr& joints, const RobotNodeSetPtr& bodies, const Eigen::Vector3f& target, float tolerance);
-        CoMConstraint(const RobotPtr& robot, const RobotNodeSetPtr& joints, const RobotNodeSetPtr& bodies, const Eigen::Vector2f& target, float tolerance);
+        CoMConstraint(const RobotPtr& robot,
+                      const RobotNodeSetPtr& joints,
+                      const RobotNodeSetPtr& bodies,
+                      const Eigen::Vector3f& target,
+                      float tolerance);
+        CoMConstraint(const RobotPtr& robot,
+                      const RobotNodeSetPtr& joints,
+                      const RobotNodeSetPtr& bodies,
+                      const Eigen::Vector2f& target,
+                      float tolerance);
 
         double optimizationFunction(unsigned int id) override;
         Eigen::VectorXf optimizationGradient(unsigned int id) override;
@@ -54,6 +64,4 @@ namespace VirtualRobot
     };
 
     typedef std::shared_ptr<CoMConstraint> CoMConstraintPtr;
-}
-
-
+} // namespace VirtualRobot

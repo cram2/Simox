@@ -12,7 +12,6 @@ namespace VirtualRobot
         this->id = id;
     }
 
-
     void
     CollisionModelImplementation::setGlobalPose(const Eigen::Matrix4f& m)
     {
@@ -24,8 +23,6 @@ namespace VirtualRobot
     {
         return globalPose;
     }
-
-
 
     const TriMeshModelPtr&
     CollisionModelImplementation::getTriMeshModel()

@@ -20,35 +20,40 @@
  */
 
 #include "LineStrip.h"
+
 #include "Helpers.h"
 
 namespace math
 {
-    LineStrip::LineStrip(const std::vector<Eigen::Vector3f>& points, float minT, float maxT)
-        : points(points), minT(minT), maxT(maxT)
+    LineStrip::LineStrip(const std::vector<Eigen::Vector3f>& points, float minT, float maxT) :
+        points(points), minT(minT), maxT(maxT)
     {
     }
 
-    bool LineStrip::InLimits(float t)
+    bool
+    LineStrip::InLimits(float t)
     {
         return t >= minT && t <= maxT;
     }
 
-    Eigen::Vector3f LineStrip::Get(float t)
+    Eigen::Vector3f
+    LineStrip::Get(float t)
     {
         int i;
         float f;
-        GetIndex(t,  i,  f);
+        GetIndex(t, i, f);
         return points.at(i) * (1 - f) + points.at(i + 1) * f;
     }
 
-    Eigen::Vector3f LineStrip::GetDirection(int i)
+    Eigen::Vector3f
+    LineStrip::GetDirection(int i)
     {
         return points.at(i + 1) - points.at(i);
     }
 
-    void LineStrip::GetIndex(float t, int& i, float& f)
+    void
+    LineStrip::GetIndex(float t, int& i, float& f)
     {
-        Helpers::GetIndex(t, minT, maxT, points.size(),  i,  f);
+        Helpers::GetIndex(t, minT, maxT, points.size(), i, f);
     }
-}
+} // namespace math

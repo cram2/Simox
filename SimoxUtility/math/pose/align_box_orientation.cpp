@@ -8,8 +8,9 @@
 
 static const float ROTATION_PRECISION = 1.0e-3;
 
-Eigen::Matrix3f simox::math::get_rotation_to_align_box(
-        const Eigen::Matrix3f orientation, const Eigen::Matrix3f canonicOrientation)
+Eigen::Matrix3f
+simox::math::get_rotation_to_align_box(const Eigen::Matrix3f orientation,
+                                       const Eigen::Matrix3f canonicOrientation)
 {
     /* [ xx xy xz ]   [  x  ]   [       ]
      * [ yx yy yz ] = [  y  ] * [ x y z ]
@@ -45,9 +46,9 @@ Eigen::Matrix3f simox::math::get_rotation_to_align_box(
     return rotation;
 }
 
-
-Eigen::Matrix3f simox::math::align_box_orientation(
-        const Eigen::Matrix3f orientation, const Eigen::Matrix3f canonicOrientation)
+Eigen::Matrix3f
+simox::math::align_box_orientation(const Eigen::Matrix3f orientation,
+                                   const Eigen::Matrix3f canonicOrientation)
 {
     const Eigen::Matrix3f rotation = get_rotation_to_align_box(orientation, canonicOrientation);
     const Eigen::Matrix3f canonic = orientation * rotation;
@@ -55,10 +56,10 @@ Eigen::Matrix3f simox::math::align_box_orientation(
     return canonic;
 }
 
-
-simox::math::AlignedBox simox::math::align_box_orientation(
-        const Eigen::Matrix3f orientation, const Eigen::Vector3f extents,
-        const Eigen::Matrix3f canonicOrientation)
+simox::math::AlignedBox
+simox::math::align_box_orientation(const Eigen::Matrix3f orientation,
+                                   const Eigen::Vector3f extents,
+                                   const Eigen::Matrix3f canonicOrientation)
 {
     const Eigen::Matrix3f rotation = get_rotation_to_align_box(orientation, canonicOrientation);
 

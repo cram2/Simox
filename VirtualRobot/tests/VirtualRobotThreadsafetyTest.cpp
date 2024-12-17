@@ -6,19 +6,18 @@
 
 #define BOOST_TEST_MODULE VirtualRobot_CoordinatesTest
 
-#include <VirtualRobot/VirtualRobotTest.h>
-#include <VirtualRobot/VirtualRobot.h>
-#include <VirtualRobot/XML/RobotIO.h>
-#include <VirtualRobot/Robot.h>
-#include <VirtualRobot/LinkedCoordinate.h>
-#include <VirtualRobot/Nodes/RobotNode.h>
 #include <string>
-
+#include <thread>
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
-#include <thread>
+#include <VirtualRobot/LinkedCoordinate.h>
+#include <VirtualRobot/Nodes/RobotNode.h>
+#include <VirtualRobot/Robot.h>
+#include <VirtualRobot/VirtualRobot.h>
+#include <VirtualRobot/VirtualRobotTest.h>
+#include <VirtualRobot/XML/RobotIO.h>
 
 BOOST_AUTO_TEST_SUITE(RobotNode)
 
@@ -28,8 +27,8 @@ VirtualRobot::RobotPtr rob;
 VirtualRobot::RobotNodePtr r1;
 VirtualRobot::RobotNodePtr r2;
 
-
-void thread1()
+void
+thread1()
 {
     for (int i = 0; i < 20; i++)
     {
@@ -38,7 +37,8 @@ void thread1()
     }
 }
 
-void thread2()
+void
+thread2()
 {
     for (int i = 0; i < 20; i++)
     {
@@ -47,7 +47,6 @@ void thread2()
         coord.set(r1);
         std::cout << coord.getInFrame(r2).block<3, 1>(0, 3) << std::endl;
     }
-
 }
 
 BOOST_AUTO_TEST_CASE(testIntelligentCoordinate)
@@ -94,7 +93,6 @@ BOOST_AUTO_TEST_CASE(testIntelligentCoordinate)
     t1.join();
     t2.join();
     // design more advanced and complete tests
-
 }
 
 BOOST_AUTO_TEST_SUITE_END()

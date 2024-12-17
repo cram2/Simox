@@ -23,14 +23,15 @@
 
 #pragma once
 
-#include "Saba.h"
-
-#include <vector>
-#include <map>
 #include <float.h>
+
+#include <map>
+#include <vector>
+
 #include <VirtualRobot/SphereApproximator.h>
 
 #include "CSpace/CSpaceNode.h"
+#include "Saba.h"
 
 namespace Saba
 {
@@ -95,7 +96,6 @@ namespace Saba
 
 
     private:
-
         struct CSpaceNodeMapping
         {
             int count;
@@ -110,5 +110,4 @@ namespace Saba
         std::vector<int> activeFaces;
     };
 
-}
-
+} // namespace Saba

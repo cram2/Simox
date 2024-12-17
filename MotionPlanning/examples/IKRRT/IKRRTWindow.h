@@ -1,40 +1,43 @@
 
 #pragma once
 
-#include <VirtualRobot/VirtualRobot.h>
-#include <VirtualRobot/Robot.h>
-#include <VirtualRobot/VirtualRobotException.h>
-#include <VirtualRobot/Nodes/RobotNode.h>
-#include <VirtualRobot/XML/SceneIO.h>
-#include <VirtualRobot/Visualization/VisualizationFactory.h>
-#include <VirtualRobot/Visualization/CoinVisualization/CoinVisualization.h>
-#include <VirtualRobot/Obstacle.h>
-#include <VirtualRobot/ManipulationObject.h>
-
-#include "MotionPlanning/Saba.h"
-#include "MotionPlanning/CSpace/CSpacePath.h"
-
 #include <string.h>
-#include <QtCore/QtGlobal>
-#include <QtGui/QtGui>
-#include <QtCore/QtCore>
-
-#include <Inventor/sensors/SoTimerSensor.h>
-#include <Inventor/nodes/SoEventCallback.h>
-#include <Inventor/Qt/viewers/SoQtExaminerViewer.h>
-#include <Inventor/Qt/SoQt.h>
-#include <Inventor/nodes/SoSeparator.h>
-
 
 #include <vector>
 
+#include <QtCore/QtCore>
+#include <QtCore/QtGlobal>
+#include <QtGui/QtGui>
+
+#include <VirtualRobot/ManipulationObject.h>
+#include <VirtualRobot/Nodes/RobotNode.h>
+#include <VirtualRobot/Obstacle.h>
+#include <VirtualRobot/Robot.h>
+#include <VirtualRobot/VirtualRobot.h>
+#include <VirtualRobot/VirtualRobotException.h>
+#include <VirtualRobot/Visualization/CoinVisualization/CoinVisualization.h>
+#include <VirtualRobot/Visualization/VisualizationFactory.h>
+#include <VirtualRobot/XML/SceneIO.h>
+
+#include "MotionPlanning/CSpace/CSpacePath.h"
+#include "MotionPlanning/Saba.h"
 #include "ui_IKRRT.h"
+#include <Inventor/Qt/SoQt.h>
+#include <Inventor/Qt/viewers/SoQtExaminerViewer.h>
+#include <Inventor/nodes/SoEventCallback.h>
+#include <Inventor/nodes/SoSeparator.h>
+#include <Inventor/sensors/SoTimerSensor.h>
 
 class IKRRTWindow : public QMainWindow
 {
     Q_OBJECT
 public:
-    IKRRTWindow(std::string& sceneFile, std::string& reachFile, std::string& rns, std::string& eef, std::string& colModel, std::string& colModelRob);
+    IKRRTWindow(std::string& sceneFile,
+                std::string& reachFile,
+                std::string& rns,
+                std::string& eef,
+                std::string& colModel,
+                std::string& colModelRob);
     ~IKRRTWindow() override;
 
     /*!< Executes the SoQt mainLoop. You need to call this in order to execute the application. */
@@ -75,7 +78,6 @@ public slots:
     void playAndSave();
 
 protected:
-
     void loadScene();
     void loadReach();
 
@@ -92,7 +94,8 @@ protected:
     void buildRrtVisu();
     void saveScreenshot();
     Ui::MainWindowIKRRT UI;
-    SoQtExaminerViewer* viewer; /*!< Viewer to display the 3D model of the robot and the environment. */
+    SoQtExaminerViewer*
+        viewer; /*!< Viewer to display the 3D model of the robot and the environment. */
 
     SoSeparator* sceneSep;
     SoSeparator* robotSep;
@@ -104,7 +107,7 @@ protected:
     SoSeparator* rrtSep;
 
     VirtualRobot::RobotPtr robot;
-    std::vector< VirtualRobot::ObstaclePtr > obstacles;
+    std::vector<VirtualRobot::ObstaclePtr> obstacles;
     VirtualRobot::ManipulationObjectPtr object;
     VirtualRobot::ReachabilityPtr reachSpace;
 
@@ -133,4 +136,3 @@ protected:
     std::shared_ptr<VirtualRobot::CoinVisualization> visualizationRobot;
     std::shared_ptr<VirtualRobot::CoinVisualization> visualizationObject;
 };
-

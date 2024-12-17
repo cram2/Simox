@@ -15,46 +15,49 @@ subject to the following restrictions:
 
 #include "GL_DialogWindow.h"
 
-
+#include <cstdio> // for sprintf()
 
 #include "GLDebugFont.h"
 #include "btBulletDynamicsCommon.h"
 
-#include <cstdio> // for sprintf()
-
 #define USE_ARRAYS 1
 
-
-GL_DialogWindow::GL_DialogWindow(int horPos, int vertPos, int dialogWidth, int dialogHeight, btCollisionObject* collisionObject, const char* dialogTitle)
-    : m_dialogHorPos(horPos),
-      m_dialogVertPos(vertPos),
-      m_dialogWidth(dialogWidth),
-      m_dialogHeight(dialogHeight),
-      m_screenWidth(0),
-      m_screenHeight(0),
-      m_dialogTitle(dialogTitle),
-      m_MaxClipPlanes(-1),
-      m_collisionObject(collisionObject)
+GL_DialogWindow::GL_DialogWindow(int horPos,
+                                 int vertPos,
+                                 int dialogWidth,
+                                 int dialogHeight,
+                                 btCollisionObject* collisionObject,
+                                 const char* dialogTitle) :
+    m_dialogHorPos(horPos),
+    m_dialogVertPos(vertPos),
+    m_dialogWidth(dialogWidth),
+    m_dialogHeight(dialogHeight),
+    m_screenWidth(0),
+    m_screenHeight(0),
+    m_dialogTitle(dialogTitle),
+    m_MaxClipPlanes(-1),
+    m_collisionObject(collisionObject)
 
 {
 }
 
-void    GL_DialogWindow::setScreenSize(int width, int height)
+void
+GL_DialogWindow::setScreenSize(int width, int height)
 {
     m_screenWidth = width;
     m_screenHeight = height;
 }
-GL_DialogWindow::~GL_DialogWindow()
-= default;
 
+GL_DialogWindow::~GL_DialogWindow() = default;
 
-
-static void drawLine(int _X0, int _Y0, int _X1, int _Y1, unsigned int _Color0, unsigned int /*_Color1*/)
+static void
+drawLine(int _X0, int _Y0, int _X1, int _Y1, unsigned int _Color0, unsigned int /*_Color1*/)
 {
     const GLfloat dx = +0.5f;
     const GLfloat dy = -0.5f;
 
-    GLfloat vVertices[] = {(GLfloat)_X0 + dx, (GLfloat)_Y0 + dy, (GLfloat)_X1 + dx, (GLfloat)_Y1 + dy};
+    GLfloat vVertices[] = {
+        (GLfloat)_X0 + dx, (GLfloat)_Y0 + dy, (GLfloat)_X1 + dx, (GLfloat)_Y1 + dy};
 
     bool antiAliased = false;
 
@@ -72,7 +75,8 @@ static void drawLine(int _X0, int _Y0, int _X1, int _Y1, unsigned int _Color0, u
     glLoadIdentity();
 
 #ifdef USE_ARRAYS
-    glColor4ub(GLubyte(_Color0 >> 16), GLubyte(_Color0 >> 8), GLubyte(_Color0), GLubyte(_Color0 >> 24));
+    glColor4ub(
+        GLubyte(_Color0 >> 16), GLubyte(_Color0 >> 8), GLubyte(_Color0), GLubyte(_Color0 >> 24));
     glDisableClientState(GL_COLOR_ARRAY);
     glDisableClientState(GL_NORMAL_ARRAY);
     glDisableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -83,16 +87,26 @@ static void drawLine(int _X0, int _Y0, int _X1, int _Y1, unsigned int _Color0, u
 #else
     glLineWidth(13.0f);
     glBegin(GL_LINES);
-    glColor4ub(GLubyte(_Color0 >> 16), GLubyte(_Color0 >> 8), GLubyte(_Color0), GLubyte(_Color0 >> 24));
+    glColor4ub(
+        GLubyte(_Color0 >> 16), GLubyte(_Color0 >> 8), GLubyte(_Color0), GLubyte(_Color0 >> 24));
     glVertex2f((GLfloat)_X0 + dx, (GLfloat)_Y0 + dy);
-    glColor4ub(GLubyte(_Color1 >> 16), GLubyte(_Color1 >> 8), GLubyte(_Color1), GLubyte(_Color1 >> 24));
+    glColor4ub(
+        GLubyte(_Color1 >> 16), GLubyte(_Color1 >> 8), GLubyte(_Color1), GLubyte(_Color1 >> 24));
     glVertex2f((GLfloat)_X1 + dx, (GLfloat)_Y1 + dy);
     glEnd();
 #endif
     glDisable(GL_LINE_SMOOTH);
 }
 
-static void drawRect(int horStart, int vertStart, int horEnd, int vertEnd, unsigned int argbColor00, unsigned int /*argbColor10*/, unsigned int /*argbColor01*/, unsigned int /*argbColor11*/)
+static void
+drawRect(int horStart,
+         int vertStart,
+         int horEnd,
+         int vertEnd,
+         unsigned int argbColor00,
+         unsigned int /*argbColor10*/,
+         unsigned int /*argbColor01*/,
+         unsigned int /*argbColor11*/)
 {
     float dx = 0;
     float dy = 0;
@@ -100,15 +114,12 @@ static void drawRect(int horStart, int vertStart, int horEnd, int vertEnd, unsig
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 #ifdef USE_ARRAYS
-    GLfloat verts[] =
-    {
-        0.0f, 1.0f, 0.0f,
-        -1.0f, -1.0f, 0.0f,
-        1.0f, -1.0f, 0.0f,
-        0.f, 0.f, 0.f
-    };
+    GLfloat verts[] = {0.0f, 1.0f, 0.0f, -1.0f, -1.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.f, 0.f, 0.f};
 
-    glColor4ub(GLubyte(argbColor00 >> 16), GLubyte(argbColor00 >> 8), GLubyte(argbColor00), GLubyte(argbColor00 >> 24));
+    glColor4ub(GLubyte(argbColor00 >> 16),
+               GLubyte(argbColor00 >> 8),
+               GLubyte(argbColor00),
+               GLubyte(argbColor00 >> 24));
     verts[0] = (GLfloat)horStart + dx;
     verts[1] = (GLfloat)vertStart + dy;
     verts[2] = (GLfloat)horEnd + dx;
@@ -127,29 +138,43 @@ static void drawRect(int horStart, int vertStart, int horEnd, int vertEnd, unsig
 
 #else
     glBegin(GL_QUADS);
-    glColor4ub(GLubyte(argbColor00 >> 16), GLubyte(argbColor00 >> 8), GLubyte(argbColor00), GLubyte(argbColor00 >> 24));
+    glColor4ub(GLubyte(argbColor00 >> 16),
+               GLubyte(argbColor00 >> 8),
+               GLubyte(argbColor00),
+               GLubyte(argbColor00 >> 24));
     glVertex2f((GLfloat)horStart + dx, (GLfloat)vertStart + dy);
-    glColor4ub(GLubyte(argbColor10 >> 16), GLubyte(argbColor10 >> 8), GLubyte(argbColor10), GLubyte(argbColor10 >> 24));
+    glColor4ub(GLubyte(argbColor10 >> 16),
+               GLubyte(argbColor10 >> 8),
+               GLubyte(argbColor10),
+               GLubyte(argbColor10 >> 24));
     glVertex2f((GLfloat)horEnd + dx, (GLfloat)vertStart + dy);
-    glColor4ub(GLubyte(argbColor11 >> 16), GLubyte(argbColor11 >> 8), GLubyte(argbColor11), GLubyte(argbColor11 >> 24));
+    glColor4ub(GLubyte(argbColor11 >> 16),
+               GLubyte(argbColor11 >> 8),
+               GLubyte(argbColor11),
+               GLubyte(argbColor11 >> 24));
     glVertex2f((GLfloat)horEnd + dx, (GLfloat)vertEnd + dy);
-    glColor4ub(GLubyte(argbColor01 >> 16), GLubyte(argbColor01 >> 8), GLubyte(argbColor01), GLubyte(argbColor01 >> 24));
+    glColor4ub(GLubyte(argbColor01 >> 16),
+               GLubyte(argbColor01 >> 8),
+               GLubyte(argbColor01),
+               GLubyte(argbColor01 >> 24));
     glVertex2f((GLfloat)horStart + dx, (GLfloat)vertEnd + dy);
     glEnd();
 #endif
-
 }
 
-void GL_DialogWindow::draw(btScalar deltaTime)
+void
+GL_DialogWindow::draw(btScalar deltaTime)
 {
     if (!m_screenWidth || !m_screenHeight)
     {
         return;
     }
 
-    m_dialogHorPos = int(m_collisionObject->getWorldTransform().getOrigin()[0] + m_screenWidth / 2.f - m_dialogWidth / 2.f);
+    m_dialogHorPos = int(m_collisionObject->getWorldTransform().getOrigin()[0] +
+                         m_screenWidth / 2.f - m_dialogWidth / 2.f);
 
-    m_dialogVertPos = int(m_collisionObject->getWorldTransform().getOrigin()[1] + m_screenHeight / 2.f - m_dialogHeight / 2.f);
+    m_dialogVertPos = int(m_collisionObject->getWorldTransform().getOrigin()[1] +
+                          m_screenHeight / 2.f - m_dialogHeight / 2.f);
     saveOpenGLState();
 
     //drawRect(m_dialogHorPos,m_dialogVertPos,m_dialogHorPos+m_dialogWidth,m_dialogVertPos+m_dialogHeight,0xa6000000);
@@ -159,15 +184,36 @@ void GL_DialogWindow::draw(btScalar deltaTime)
 
     int titleHeight = charHeight + 2;
 
-    drawRect(m_dialogHorPos, m_dialogVertPos, m_dialogHorPos + m_dialogWidth - 1, m_dialogVertPos + titleHeight, argbColor, argbColor, argbColor, argbColor);
+    drawRect(m_dialogHorPos,
+             m_dialogVertPos,
+             m_dialogHorPos + m_dialogWidth - 1,
+             m_dialogVertPos + titleHeight,
+             argbColor,
+             argbColor,
+             argbColor,
+             argbColor);
     //const unsigned int COL0 = 0x50ffffff;
     const unsigned int COL0 = 0xffffffff;
     const unsigned int COL1 = 0xff1f1f1f;
 
-    drawRect(m_dialogHorPos, m_dialogVertPos, m_dialogHorPos + m_dialogWidth - 1, m_dialogVertPos + 1, COL0, COL0, COL1, COL1);
+    drawRect(m_dialogHorPos,
+             m_dialogVertPos,
+             m_dialogHorPos + m_dialogWidth - 1,
+             m_dialogVertPos + 1,
+             COL0,
+             COL0,
+             COL1,
+             COL1);
 
     argbColor = 0x864f4f4f;
-    drawRect(m_dialogHorPos + 1, m_dialogVertPos + titleHeight, m_dialogHorPos + m_dialogWidth - 1, m_dialogVertPos + m_dialogHeight, argbColor, argbColor, argbColor, argbColor);
+    drawRect(m_dialogHorPos + 1,
+             m_dialogVertPos + titleHeight,
+             m_dialogHorPos + m_dialogWidth - 1,
+             m_dialogVertPos + m_dialogHeight,
+             argbColor,
+             argbColor,
+             argbColor,
+             argbColor);
 
 
     int y = m_dialogVertPos + charHeight + 1;
@@ -175,27 +221,84 @@ void GL_DialogWindow::draw(btScalar deltaTime)
     drawLine(m_dialogHorPos, y, m_dialogHorPos + m_dialogWidth - 1, y, 0x80afafaf, 0x80afafaf);
 
 
+    unsigned int clight = 0x5FFFFFFF; // bar contour
+    drawLine(m_dialogHorPos,
+             m_dialogVertPos,
+             m_dialogHorPos,
+             m_dialogVertPos + m_dialogHeight,
+             clight,
+             clight);
+    drawLine(m_dialogHorPos,
+             m_dialogVertPos,
+             m_dialogHorPos + m_dialogWidth,
+             m_dialogVertPos,
+             clight,
+             clight);
+    drawLine(m_dialogHorPos + m_dialogWidth,
+             m_dialogVertPos,
+             m_dialogHorPos + m_dialogWidth,
+             m_dialogVertPos + m_dialogHeight,
+             clight,
+             clight);
+    drawLine(m_dialogHorPos,
+             m_dialogVertPos + m_dialogHeight,
+             m_dialogHorPos + m_dialogWidth,
+             m_dialogVertPos + m_dialogHeight,
+             clight,
+             clight);
+    int dshad = 3; // bar shadows
 
-    unsigned int  clight = 0x5FFFFFFF; // bar contour
-    drawLine(m_dialogHorPos, m_dialogVertPos, m_dialogHorPos, m_dialogVertPos + m_dialogHeight, clight, clight);
-    drawLine(m_dialogHorPos, m_dialogVertPos, m_dialogHorPos + m_dialogWidth, m_dialogVertPos, clight, clight);
-    drawLine(m_dialogHorPos + m_dialogWidth, m_dialogVertPos, m_dialogHorPos + m_dialogWidth, m_dialogVertPos + m_dialogHeight, clight, clight);
-    drawLine(m_dialogHorPos, m_dialogVertPos + m_dialogHeight, m_dialogHorPos + m_dialogWidth, m_dialogVertPos + m_dialogHeight, clight, clight);
-    int dshad = 3;  // bar shadows
-
-    unsigned int  cshad = (((0x40000000 >> 24) / 2) << 24) & 0xFF000000;
-    drawRect(m_dialogHorPos, m_dialogVertPos + m_dialogHeight, m_dialogHorPos + dshad, m_dialogVertPos + m_dialogHeight + dshad, 0, cshad, 0, 0);
-    drawRect(m_dialogHorPos + dshad + 1, m_dialogVertPos + m_dialogHeight, m_dialogHorPos + m_dialogWidth - 1, m_dialogVertPos + m_dialogHeight + dshad, cshad, cshad, 0, 0);
-    drawRect(m_dialogHorPos + m_dialogWidth, m_dialogVertPos + m_dialogHeight, m_dialogHorPos + m_dialogWidth + dshad, m_dialogVertPos + m_dialogHeight + dshad, cshad, 0, 0, 0);
-    drawRect(m_dialogHorPos + m_dialogWidth, m_dialogVertPos, m_dialogHorPos + m_dialogWidth + dshad, m_dialogVertPos + dshad, 0, 0, cshad, 0);
-    drawRect(m_dialogHorPos + m_dialogWidth, m_dialogVertPos + dshad + 1, m_dialogHorPos + m_dialogWidth + dshad, m_dialogVertPos + m_dialogHeight - 1, cshad, 0, cshad, 0);
+    unsigned int cshad = (((0x40000000 >> 24) / 2) << 24) & 0xFF000000;
+    drawRect(m_dialogHorPos,
+             m_dialogVertPos + m_dialogHeight,
+             m_dialogHorPos + dshad,
+             m_dialogVertPos + m_dialogHeight + dshad,
+             0,
+             cshad,
+             0,
+             0);
+    drawRect(m_dialogHorPos + dshad + 1,
+             m_dialogVertPos + m_dialogHeight,
+             m_dialogHorPos + m_dialogWidth - 1,
+             m_dialogVertPos + m_dialogHeight + dshad,
+             cshad,
+             cshad,
+             0,
+             0);
+    drawRect(m_dialogHorPos + m_dialogWidth,
+             m_dialogVertPos + m_dialogHeight,
+             m_dialogHorPos + m_dialogWidth + dshad,
+             m_dialogVertPos + m_dialogHeight + dshad,
+             cshad,
+             0,
+             0,
+             0);
+    drawRect(m_dialogHorPos + m_dialogWidth,
+             m_dialogVertPos,
+             m_dialogHorPos + m_dialogWidth + dshad,
+             m_dialogVertPos + dshad,
+             0,
+             0,
+             cshad,
+             0);
+    drawRect(m_dialogHorPos + m_dialogWidth,
+             m_dialogVertPos + dshad + 1,
+             m_dialogHorPos + m_dialogWidth + dshad,
+             m_dialogVertPos + m_dialogHeight - 1,
+             cshad,
+             0,
+             cshad,
+             0);
 
     int yInc = 16;
     int curHorPos = m_dialogHorPos + 5;
     int curVertPos = m_dialogVertPos;
     curVertPos += yInc;
 
-    GLDebugDrawString(m_dialogHorPos + m_dialogWidth / 2 - ((int(strlen(m_dialogTitle) / 2))*charWidth), m_dialogVertPos + yInc , m_dialogTitle);
+    GLDebugDrawString(m_dialogHorPos + m_dialogWidth / 2 -
+                          ((int(strlen(m_dialogTitle) / 2)) * charWidth),
+                      m_dialogVertPos + yInc,
+                      m_dialogTitle);
     curVertPos += 20;
 
 
@@ -207,8 +310,8 @@ void GL_DialogWindow::draw(btScalar deltaTime)
     restoreOpenGLState();
 }
 
-
-void    GL_DialogWindow::saveOpenGLState()
+void
+GL_DialogWindow::saveOpenGLState()
 {
     glMatrixMode(GL_TEXTURE);
     glPushMatrix();
@@ -250,10 +353,10 @@ void    GL_DialogWindow::saveOpenGLState()
     glGetTexEnviv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, &m_PrevTexEnv);
     glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     glDisable(GL_TEXTURE_2D);
-
 }
 
-void    GL_DialogWindow::restoreOpenGLState()
+void
+GL_DialogWindow::restoreOpenGLState()
 {
     glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, m_PrevTexEnv);
     glLineWidth(m_PrevLineWidth);
@@ -265,11 +368,10 @@ void    GL_DialogWindow::restoreOpenGLState()
     glPopMatrix();
     glPopClientAttrib();
     glPopAttrib();
-
 }
 
-
-void    GL_TextControl::draw(int& parentHorPos, int& parentVertPos, btScalar /*deltaTime*/)
+void
+GL_TextControl::draw(int& parentHorPos, int& parentVertPos, btScalar /*deltaTime*/)
 {
     for (int i = 0; i < m_textLines.size(); i++)
     {
@@ -278,24 +380,33 @@ void    GL_TextControl::draw(int& parentHorPos, int& parentVertPos, btScalar /*d
     }
 }
 
-
-
-void GL_ToggleControl::draw(int& parentHorPos2, int& parentVertPos2, btScalar /*deltaTime*/)
+void
+GL_ToggleControl::draw(int& parentHorPos2, int& parentVertPos2, btScalar /*deltaTime*/)
 {
 
-    int controlHorPos = int(m_toggleBody->getWorldTransform().getOrigin()[0] + m_parentWindow->getScreenWidth() / 2);
-    int controlVertPos = int(m_toggleBody->getWorldTransform().getOrigin()[1] + m_parentWindow->getScreenHeight() / 2);
+    int controlHorPos = int(m_toggleBody->getWorldTransform().getOrigin()[0] +
+                            m_parentWindow->getScreenWidth() / 2);
+    int controlVertPos = int(m_toggleBody->getWorldTransform().getOrigin()[1] +
+                             m_parentWindow->getScreenHeight() / 2);
 
     int parentHorPos = controlHorPos - 8;
     int parentVertPos = controlVertPos - 8;
 
     unsigned int grey = 0xff6f6f6f;
 
-    drawRect(parentHorPos, parentVertPos, parentHorPos + 16, parentVertPos + 16, grey, grey, grey, grey);
+    drawRect(
+        parentHorPos, parentVertPos, parentHorPos + 16, parentVertPos + 16, grey, grey, grey, grey);
 
     int borderSize = 2;
     unsigned int white = 0xffefefef;
-    drawRect(parentHorPos + borderSize, parentVertPos + borderSize, parentHorPos + 16 - borderSize, parentVertPos + 16 - borderSize, white, white, white, white);
+    drawRect(parentHorPos + borderSize,
+             parentVertPos + borderSize,
+             parentHorPos + 16 - borderSize,
+             parentVertPos + 16 - borderSize,
+             white,
+             white,
+             white,
+             white);
 
 
     if (m_active)
@@ -304,21 +415,30 @@ void GL_ToggleControl::draw(int& parentHorPos2, int& parentVertPos2, btScalar /*
         //  unsigned int white = 0xff8f0000;
         unsigned int black = 0xff1f1f1f;
         borderSize = 4;
-        drawRect(parentHorPos + borderSize, parentVertPos + borderSize, parentHorPos + 16 - borderSize, parentVertPos + 16 - borderSize, black, black, black, black);
+        drawRect(parentHorPos + borderSize,
+                 parentVertPos + borderSize,
+                 parentHorPos + 16 - borderSize,
+                 parentVertPos + 16 - borderSize,
+                 black,
+                 black,
+                 black,
+                 black);
     }
 
     btVector3 rgb(1, 1, 1);
 
     GLDebugDrawStringInternal(parentHorPos2, parentVertPos + 16, m_toggleText, rgb);
     parentVertPos2 += 20;
-
 }
 
-void GL_SliderControl::draw(int& parentHorPos2, int& parentVertPos2, btScalar /*deltaTime*/)
+void
+GL_SliderControl::draw(int& parentHorPos2, int& parentVertPos2, btScalar /*deltaTime*/)
 {
 
-    int controlHorPos = int(m_sliderBody->getWorldTransform().getOrigin()[0] + m_parentWindow->getScreenWidth() / 2);
-    int controlVertPos = int(m_sliderBody->getWorldTransform().getOrigin()[1] + m_parentWindow->getScreenHeight() / 2);
+    int controlHorPos = int(m_sliderBody->getWorldTransform().getOrigin()[0] +
+                            m_parentWindow->getScreenWidth() / 2);
+    int controlVertPos = int(m_sliderBody->getWorldTransform().getOrigin()[1] +
+                             m_parentWindow->getScreenHeight() / 2);
 
     int parentHorPos = controlHorPos - 8;
     int parentVertPos = controlVertPos - 8;
@@ -345,14 +465,23 @@ void GL_SliderControl::draw(int& parentHorPos2, int& parentVertPos2, btScalar /*
              parentVertPos2 + borderSize,
              sliderPosE,
              parentVertPos2 + 2 - borderSize,
-             white, white, white, white);
+             white,
+             white,
+             white,
+             white);
 
-    drawRect(parentHorPos, parentVertPos, parentHorPos + 16, parentVertPos + 16, grey, grey, grey, grey);
+    drawRect(
+        parentHorPos, parentVertPos, parentHorPos + 16, parentVertPos + 16, grey, grey, grey, grey);
 
 
-
-    drawRect(parentHorPos + borderSize, parentVertPos + borderSize, parentHorPos + 16 - borderSize, parentVertPos + 16 - borderSize, white, white, white, white);
-
+    drawRect(parentHorPos + borderSize,
+             parentVertPos + borderSize,
+             parentHorPos + 16 - borderSize,
+             parentVertPos + 16 - borderSize,
+             white,
+             white,
+             white,
+             white);
 
 
     btVector3 rgb(1, 1, 1);
@@ -370,5 +499,4 @@ void GL_SliderControl::draw(int& parentHorPos2, int& parentVertPos2, btScalar /*
     //  GLDebugDrawStringInternal(parentHorPos2,parentVertPos2+8,m_sliderText,rgb);
     GLDebugDrawStringInternal(parentHorPos2, parentVertPos2 + 8, tmpBuf, rgb);
     parentVertPos2 += 20;
-
 }

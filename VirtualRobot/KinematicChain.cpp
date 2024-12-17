@@ -1,17 +1,21 @@
 
 #include "KinematicChain.h"
-#include "Robot.h"
-#include "VirtualRobotException.h"
-#include "Nodes/RobotNode.h"
-
 
 #include <algorithm>
+
+#include "Nodes/RobotNode.h"
+#include "Robot.h"
+#include "VirtualRobotException.h"
 
 namespace VirtualRobot
 {
 
-    KinematicChain::KinematicChain(const std::string& name, RobotPtr robot, const std::vector< RobotNodePtr >& robotNodes, RobotNodePtr tcp, RobotNodePtr kinematicRoot /*= RobotNodePtr()*/)
-        : RobotNodeSet(name, robot, robotNodes, kinematicRoot)
+    KinematicChain::KinematicChain(const std::string& name,
+                                   RobotPtr robot,
+                                   const std::vector<RobotNodePtr>& robotNodes,
+                                   RobotNodePtr tcp,
+                                   RobotNodePtr kinematicRoot /*= RobotNodePtr()*/) :
+        RobotNodeSet(name, robot, robotNodes, kinematicRoot)
     {
         if (robotNodes.size() == 0)
         {
@@ -22,14 +26,21 @@ namespace VirtualRobot
         {
             if (!this->robotNodes[i]->hasChild(this->robotNodes[i + 1], true))
             {
-                THROW_VR_EXCEPTION("Robot node <" << this->robotNodes[i + 1]->getName() << "> is not a child of robot node <" << this->robotNodes[i]->getName() << ">. This is not allowed in KinematicChains...");
+                THROW_VR_EXCEPTION("Robot node <"
+                                   << this->robotNodes[i + 1]->getName()
+                                   << "> is not a child of robot node <"
+                                   << this->robotNodes[i]->getName()
+                                   << ">. This is not allowed in KinematicChains...");
             }
 
             if (robotNodes[i]->getRobot() != robotNodes[i + 1]->getRobot())
             {
-                THROW_VR_EXCEPTION("Robot node <" << this->robotNodes[i + 1]->getName() << "> his linked to different robot than robot node <" << this->robotNodes[i]->getName() << ">. This is not allowed in KinematicChains...");
+                THROW_VR_EXCEPTION("Robot node <"
+                                   << this->robotNodes[i + 1]->getName()
+                                   << "> his linked to different robot than robot node <"
+                                   << this->robotNodes[i]->getName()
+                                   << ">. This is not allowed in KinematicChains...");
             }
-
         }
 
         this->robot = robotNodes[0]->getRobot();
@@ -44,10 +55,7 @@ namespace VirtualRobot
         }
     }
 
-
-    KinematicChain::~KinematicChain()
-    = default;
-
+    KinematicChain::~KinematicChain() = default;
 
 
 } // namespace VirtualRobot

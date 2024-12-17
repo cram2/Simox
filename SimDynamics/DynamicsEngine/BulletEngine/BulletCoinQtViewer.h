@@ -23,22 +23,20 @@
 
 #pragma once
 
-#include "../../SimDynamics.h"
-#include "../../DynamicsWorld.h"
-#include "BulletEngine.h"
-
-#include <btBulletDynamicsCommon.h>
-#include <LinearMath/btQuickprof.h>
-
-#include <Inventor/Qt/viewers/SoQtExaminerViewer.h>
-#include <Inventor/Qt/SoQt.h>
-#include <Inventor/nodes/SoSeparator.h>
-#include <Inventor/nodes/SoSelection.h>
-
+#include <QtCore/QtCore>
 #include <QtCore/QtGlobal>
 #include <QtGui/QtGui>
-#include <QtCore/QtCore>
 #include <QtWidgets/QFrame>
+
+#include "../../DynamicsWorld.h"
+#include "../../SimDynamics.h"
+#include "BulletEngine.h"
+#include <Inventor/Qt/SoQt.h>
+#include <Inventor/Qt/viewers/SoQtExaminerViewer.h>
+#include <Inventor/nodes/SoSelection.h>
+#include <Inventor/nodes/SoSeparator.h>
+#include <LinearMath/btQuickprof.h>
+#include <btBulletDynamicsCommon.h>
 
 namespace SimDynamics
 {
@@ -86,18 +84,22 @@ namespace SimDynamics
         /*!
             Visualize dynamics object.
         */
-        void addVisualization(VirtualRobot::RobotPtr o,
-                              VirtualRobot::SceneObject::VisualizationType visuType = VirtualRobot::SceneObject::Full,
-                              SoSeparator* container = NULL);
-        void addVisualization(VirtualRobot::SceneObjectPtr o,
-                              VirtualRobot::SceneObject::VisualizationType visuType = VirtualRobot::SceneObject::Full,
-                              SoSeparator* container = NULL);
-        void addVisualization(DynamicsObjectPtr o,
-                              VirtualRobot::SceneObject::VisualizationType visuType = VirtualRobot::SceneObject::Full,
-                              SoSeparator* container = NULL);
-        void addVisualization(DynamicsRobotPtr r,
-                              VirtualRobot::SceneObject::VisualizationType visuType = VirtualRobot::SceneObject::Full,
-                              SoSeparator* container = NULL);
+        void addVisualization(
+            VirtualRobot::RobotPtr o,
+            VirtualRobot::SceneObject::VisualizationType visuType = VirtualRobot::SceneObject::Full,
+            SoSeparator* container = NULL);
+        void addVisualization(
+            VirtualRobot::SceneObjectPtr o,
+            VirtualRobot::SceneObject::VisualizationType visuType = VirtualRobot::SceneObject::Full,
+            SoSeparator* container = NULL);
+        void addVisualization(
+            DynamicsObjectPtr o,
+            VirtualRobot::SceneObject::VisualizationType visuType = VirtualRobot::SceneObject::Full,
+            SoSeparator* container = NULL);
+        void addVisualization(
+            DynamicsRobotPtr r,
+            VirtualRobot::SceneObject::VisualizationType visuType = VirtualRobot::SceneObject::Full,
+            SoSeparator* container = NULL);
 
         /*!
             Remove visualization of dynamics object.
@@ -142,7 +144,8 @@ namespace SimDynamics
         /*!
             See setBulletSimTimeStepMsec()
          */
-        int getBulletSimTimeStepMsec() const
+        int
+        getBulletSimTimeStepMsec() const
         {
             return bulletTimeStepMsec;
         }
@@ -150,11 +153,14 @@ namespace SimDynamics
         /*!
             See setBulletSimMaxSubSteps()
          */
-        int getBulletSimMaxSubSteps() const
+        int
+        getBulletSimMaxSubSteps() const
         {
             return bulletMaxSubSteps;
         }
-        int getUpdateTimerInterval() const
+
+        int
+        getUpdateTimerInterval() const
         {
             return updateTimerIntervalMS;
         }
@@ -170,7 +176,7 @@ namespace SimDynamics
         //! If set, all actions are protected with this mutex
         virtual void setMutex(std::shared_ptr<std::recursive_mutex> engineMutexPtr);
 
-        typedef std::shared_ptr< std::scoped_lock<std::recursive_mutex> > MutexLockPtr;
+        typedef std::shared_ptr<std::scoped_lock<std::recursive_mutex>> MutexLockPtr;
         /*!
         This lock can be used to protect data access. It locks the mutex until deletion.
         If no mutex was specified, an empty lock will be returned which does not protect the engine calls (this is the standard behavior).
@@ -189,7 +195,6 @@ namespace SimDynamics
         MutexLockPtr getScopedLock();
 
     protected:
-
         //checks if physics engine is enabled and performes a time step.
         virtual void updatePhysics();
 
@@ -198,7 +203,10 @@ namespace SimDynamics
             It can be overwritten in order to perform custom updates.
             It is safe to access the scene graph.
         */
-        virtual void customUpdate() {}
+        virtual void
+        customUpdate()
+        {
+        }
 
         /*!
             This method is called when a node has been selected by the user.
@@ -206,14 +214,18 @@ namespace SimDynamics
             It is safe to access the scene graph.
             \param path The path that was selected
         */
-        virtual void customSelection(SoPath* path)
+        virtual void
+        customSelection(SoPath* path)
         {
-            std::cout << "Selecting node " <<  path->getTail()->getTypeId().getName().getString() << std::endl;
+            std::cout << "Selecting node " << path->getTail()->getTypeId().getName().getString()
+                      << std::endl;
         }
 
-        virtual void customDeselection(SoPath* path)
+        virtual void
+        customDeselection(SoPath* path)
         {
-            std::cout << "Deselecting node " <<  path->getTail()->getTypeId().getName().getString() << std::endl;
+            std::cout << "Deselecting node " << path->getTail()->getTypeId().getName().getString()
+                      << std::endl;
         }
 
         //! Redraw
@@ -249,11 +261,9 @@ namespace SimDynamics
         bool enablePhysicsUpdates;
         int updateTimerIntervalMS;
 
-        std::shared_ptr <std::recursive_mutex> engineMutexPtr;
+        std::shared_ptr<std::recursive_mutex> engineMutexPtr;
     };
-
 
     typedef std::shared_ptr<BulletCoinQtViewer> BulletCoinQtViewerPtr;
 
-} // namespace
-
+} // namespace SimDynamics

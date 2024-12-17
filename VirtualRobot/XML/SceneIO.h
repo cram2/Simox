@@ -28,7 +28,7 @@
 // using forward declarations here, so that the rapidXML header does not have to be parsed when this file is included
 namespace rapidxml
 {
-    template<class Ch>
+    template <class Ch>
     class xml_node;
 }
 
@@ -38,7 +38,6 @@ namespace VirtualRobot
     class VIRTUAL_ROBOT_IMPORT_EXPORT SceneIO : public BaseIO
     {
     public:
-
         /*!
             Load scene from file.
             \param xmlFile The file.
@@ -59,20 +58,27 @@ namespace VirtualRobot
             \param xmlString The input.
             \param basePath If any robot tags are given, the base path for searching the robot files can be specified.
         */
-        static ScenePtr createSceneFromString(const std::string& xmlString, const std::string& basePath = "");
+        static ScenePtr createSceneFromString(const std::string& xmlString,
+                                              const std::string& basePath = "");
 
     protected:
-
         // instantiation not allowed
         SceneIO();
         ~SceneIO() override;
-        static ScenePtr processScene(rapidxml::xml_node<char>* sceneXMLNode, const std::string& basePath);
+        static ScenePtr processScene(rapidxml::xml_node<char>* sceneXMLNode,
+                                     const std::string& basePath);
         static ScenePtr processSceneAttributes(rapidxml::xml_node<char>* sceneXMLNode);
-        static bool processSceneRobot(rapidxml::xml_node<char>* sceneXMLNode, ScenePtr scene, const std::string& basePath);
-        static bool processSceneObstacle(rapidxml::xml_node<char>* sceneXMLNode, ScenePtr scene, const std::string& basePath);
+        static bool processSceneRobot(rapidxml::xml_node<char>* sceneXMLNode,
+                                      ScenePtr scene,
+                                      const std::string& basePath);
+        static bool processSceneObstacle(rapidxml::xml_node<char>* sceneXMLNode,
+                                         ScenePtr scene,
+                                         const std::string& basePath);
         static bool processSceneTrajectory(rapidxml::xml_node<char>* sceneXMLNode, ScenePtr scene);
-        static bool processSceneManipulationObject(rapidxml::xml_node<char>* sceneXMLNode, ScenePtr scene, const std::string& basePath);
+        static bool processSceneManipulationObject(rapidxml::xml_node<char>* sceneXMLNode,
+                                                   ScenePtr scene,
+                                                   const std::string& basePath);
         static bool processSceneObjectSet(rapidxml::xml_node<char>* sceneXMLNode, ScenePtr scene);
     };
 
-}
+} // namespace VirtualRobot

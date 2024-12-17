@@ -38,8 +38,9 @@
 
 #pragma once
 
-#include "../VirtualRobot.h"
 #include <Eigen/Core>
+
+#include "../VirtualRobot.h"
 #include "Path.h"
 
 namespace VirtualRobot
@@ -54,7 +55,10 @@ namespace VirtualRobot
     {
     public:
         // Generates a time-optimal trajectory
-        TimeOptimalTrajectory(const Path &path, const Eigen::VectorXd &maxVelocity, const Eigen::VectorXd &maxAcceleration, double timeStep = 0.001);
+        TimeOptimalTrajectory(const Path& path,
+                              const Eigen::VectorXd& maxVelocity,
+                              const Eigen::VectorXd& maxAcceleration,
+                              double timeStep = 0.001);
 
         ~TimeOptimalTrajectory(void);
 
@@ -73,22 +77,40 @@ namespace VirtualRobot
         void outputPhasePlaneTrajectory() const;
 
     private:
-        struct TimeOptimalTrajectoryStep {
-            TimeOptimalTrajectoryStep() {}
+        struct TimeOptimalTrajectoryStep
+        {
+            TimeOptimalTrajectoryStep()
+            {
+            }
+
             TimeOptimalTrajectoryStep(double pathPos, double pathVel) :
-                pathPos(pathPos),
-                pathVel(pathVel)
-            {}
+                pathPos(pathPos), pathVel(pathVel)
+            {
+            }
+
             double pathPos;
             double pathVel;
             double time;
         };
 
-        bool getNextSwitchingPoint(double pathPos, TimeOptimalTrajectoryStep &nextSwitchingPoint, double &beforeAcceleration, double &afterAcceleration);
-        bool getNextAccelerationSwitchingPoint(double pathPos, TimeOptimalTrajectoryStep &nextSwitchingPoint, double &beforeAcceleration, double &afterAcceleration);
-        bool getNextVelocitySwitchingPoint(double pathPos, TimeOptimalTrajectoryStep &nextSwitchingPoint, double &beforeAcceleration, double &afterAcceleration);
-        bool integrateForward(std::list<TimeOptimalTrajectoryStep> &trajectory, double acceleration);
-        void integrateBackward(std::list<TimeOptimalTrajectoryStep> &startTrajectory, double pathPos, double pathVel, double acceleration);
+        bool getNextSwitchingPoint(double pathPos,
+                                   TimeOptimalTrajectoryStep& nextSwitchingPoint,
+                                   double& beforeAcceleration,
+                                   double& afterAcceleration);
+        bool getNextAccelerationSwitchingPoint(double pathPos,
+                                               TimeOptimalTrajectoryStep& nextSwitchingPoint,
+                                               double& beforeAcceleration,
+                                               double& afterAcceleration);
+        bool getNextVelocitySwitchingPoint(double pathPos,
+                                           TimeOptimalTrajectoryStep& nextSwitchingPoint,
+                                           double& beforeAcceleration,
+                                           double& afterAcceleration);
+        bool integrateForward(std::list<TimeOptimalTrajectoryStep>& trajectory,
+                              double acceleration);
+        void integrateBackward(std::list<TimeOptimalTrajectoryStep>& startTrajectory,
+                               double pathPos,
+                               double pathVel,
+                               double acceleration);
         double getMinMaxPathAcceleration(double pathPosition, double pathVelocity, bool max);
         double getMinMaxPhaseSlope(double pathPosition, double pathVelocity, bool max);
         double getAccelerationMaxPathVelocity(double pathPos) const;
@@ -96,7 +118,8 @@ namespace VirtualRobot
         double getAccelerationMaxPathVelocityDeriv(double pathPos);
         double getVelocityMaxPathVelocityDeriv(double pathPos);
 
-        std::list<TimeOptimalTrajectoryStep>::const_iterator getTrajectorySegment(double time) const;
+        std::list<TimeOptimalTrajectoryStep>::const_iterator
+        getTrajectorySegment(double time) const;
 
         Path path;
         Eigen::VectorXd maxVelocity;
@@ -104,7 +127,8 @@ namespace VirtualRobot
         unsigned int n;
         bool valid;
         std::list<TimeOptimalTrajectoryStep> trajectory;
-        std::list<TimeOptimalTrajectoryStep> endTrajectory; // non-empty only if the trajectory generation failed.
+        std::list<TimeOptimalTrajectoryStep>
+            endTrajectory; // non-empty only if the trajectory generation failed.
 
         static const double eps;
         const double timeStep;
@@ -112,5 +136,4 @@ namespace VirtualRobot
         mutable double cachedTime;
         mutable std::list<TimeOptimalTrajectoryStep>::const_iterator cachedTrajectorySegment;
     };
-}
-
+} // namespace VirtualRobot

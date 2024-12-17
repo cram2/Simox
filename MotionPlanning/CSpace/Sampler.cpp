@@ -1,4 +1,5 @@
 #include "Sampler.h"
+
 #include "CSpace.h"
 
 namespace Saba
@@ -10,10 +11,10 @@ namespace Saba
         metricWeights.Ones(dimension);
     }
 
-    Sampler::~Sampler()
-    = default;
+    Sampler::~Sampler() = default;
 
-    void Sampler::getUniformlyRandomConfig(Eigen::VectorXf& stroreConfig, CSpacePtr space)
+    void
+    Sampler::getUniformlyRandomConfig(Eigen::VectorXf& stroreConfig, CSpacePtr space)
     {
         for (unsigned int i = 0; i < dimension; i++)
         {
@@ -21,23 +22,28 @@ namespace Saba
         }
     }
 
-    void Sampler::getNormalRandomConfig(Eigen::VectorXf& /*stroreConfig*/, const Eigen::VectorXf& /*mean*/, const Eigen::MatrixXf& /*variance*/)
+    void
+    Sampler::getNormalRandomConfig(Eigen::VectorXf& /*stroreConfig*/,
+                                   const Eigen::VectorXf& /*mean*/,
+                                   const Eigen::MatrixXf& /*variance*/)
     {
         //for(unsigned int i = 0; i < dimension; i++)
         //  pStoreConfig[i] = MathHelpers::getNormalRandom(mean[i], variance[i]);
         std::cout << "todo" << std::endl;
-
     }
 
-    void Sampler::getNormalRandomConfig(Eigen::VectorXf& /*stroreConfig*/, const Eigen::VectorXf& /*mean*/, float /*variance*/)
+    void
+    Sampler::getNormalRandomConfig(Eigen::VectorXf& /*stroreConfig*/,
+                                   const Eigen::VectorXf& /*mean*/,
+                                   float /*variance*/)
     {
         //for(unsigned int i = 0; i < dimension; i++)
         //  pStoreConfig[i] = MathHelpers::getNormalRandom(mean[i], variance);
         std::cout << "todo" << std::endl;
-
     }
 
-    void Sampler::enableMetricWeights(const Eigen::VectorXf& /*weights*/)
+    void
+    Sampler::enableMetricWeights(const Eigen::VectorXf& /*weights*/)
     {
         /*delete [] m_pMetricWeights;
         m_pMetricWeights = NULL;
@@ -49,9 +55,10 @@ namespace Saba
         std::cout << "todo" << std::endl;
     }
 
-    void Sampler::disableMetricWeights()
+    void
+    Sampler::disableMetricWeights()
     {
         std::cout << "todo" << std::endl;
     }
 
-}
+} // namespace Saba

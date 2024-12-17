@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+
 #include "../SimDynamics.h"
 
 namespace SimDynamics
@@ -41,10 +42,11 @@ namespace SimDynamics
 
         struct
         {
-            unsigned char position: 1 ;
-            unsigned char velocity: 1;
-            unsigned char torque: 1;
+            unsigned char position : 1;
+            unsigned char velocity : 1;
+            unsigned char torque : 1;
         } modes;
+
         unsigned char mode;
     };
 
@@ -81,7 +83,11 @@ namespace SimDynamics
                               const PIDController& velocityController,
                               const PIDController& torqueController);
 
-        double update(double positionError, double velocityError, double torqueError, ActuationMode actuation, double dt);
+        double update(double positionError,
+                      double velocityError,
+                      double torqueError,
+                      ActuationMode actuation,
+                      double dt);
 
     private:
         PIDController positionController;
@@ -112,14 +118,17 @@ namespace SimDynamics
     class SIMDYNAMICS_IMPORT_EXPORT VelocityMotorController
     {
     public:
-        VelocityMotorController(double maxVelocity = -1.0, double maxAcceleration = -1.0, double maxJerk = -1);
+        VelocityMotorController(double maxVelocity = -1.0,
+                                double maxAcceleration = -1.0,
+                                double maxJerk = -1);
 
         VelocityMotorController(const PIDController& positionController);
 
         void setCurrentVelocity(double vel);
 
 
-        double update(double positionError, double targetVelocity, ActuationMode actuation, double dt);
+        double
+        update(double positionError, double targetVelocity, ActuationMode actuation, double dt);
 
         void reset();
         //! set new p,i,d values for position controller
@@ -129,7 +138,7 @@ namespace SimDynamics
 
         void getPosPID(double& storeP, double& storeI, double& storeD);
         std::string getName() const;
-        void setName(const std::string &value);
+        void setName(const std::string& value);
 
         double getMaxVelocity() const;
         void setMaxVelocity(double value);
@@ -150,6 +159,4 @@ namespace SimDynamics
         std::string name;
     };
 
-}
-
-
+} // namespace SimDynamics
