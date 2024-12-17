@@ -73,7 +73,7 @@ namespace simox::alg
             const std::locale& locale = DEFAULT_LOCALE);
 
     std::string
-    join(const std::vector<std::string> vec,
+    join(const std::vector<std::string>& vec,
          const std::string& delimiter = " ",
          bool trimElements = false,
          bool ignoreEmptyElements = false,
