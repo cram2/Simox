@@ -34,6 +34,8 @@
 #include <Inventor/nodes/SoShapeHints.h>
 #include <Inventor/sensors/SoTimerSensor.h>
 
+#include "spnav.h"
+
 
 using namespace std;
 using namespace VirtualRobot;
