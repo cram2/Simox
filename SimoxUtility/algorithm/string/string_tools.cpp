@@ -127,7 +127,7 @@ namespace simox
     }
 
     std::string
-    alg::join(const std::vector<std::string> vec,
+    alg::join(const std::vector<std::string>& vec,
               const std::string& delimiter,
               bool trimElements,
               bool ignoreEmptyElements,

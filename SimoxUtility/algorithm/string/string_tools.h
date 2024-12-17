@@ -68,7 +68,7 @@ namespace simox::alg
                                               bool removeEmptyElements = true,
                                               const std::locale& locale = DEFAULT_LOCALE);
 
-    std::string join(const std::vector<std::string> vec,
+    std::string join(const std::vector<std::string>& vec,
                      const std::string& delimiter = " ",
                      bool trimElements = false,
                      bool ignoreEmptyElements = false,
