@@ -7,58 +7,48 @@
 //implementation namespace
 namespace simox::meta::member::type::value::impl
 {
-    template <class T, class = void>
+    template<class T, class = void>
     struct member_type_exists : std::false_type
-    {
-    };
+    {};
+    template<class T>
+    struct member_type_exists < T, std::void_t < typename T::value > > : std::true_type
+    {};
 
-    template <class T>
-    struct member_type_exists<T, std::void_t<typename T::value>> : std::true_type
-    {
-    };
-
-    template <class T, class = void>
+    template<class T, class = void>
     struct member_type_type
-    {
-    };
+    {};
 
-    template <class T>
-    struct member_type_type<T, std::void_t<typename T::value>>
+    template<class T>
+    struct member_type_type < T, std::void_t < typename T::value > >
     {
         using type = typename T::value;
     };
-} // namespace simox::meta::member::type::value::impl
+}
 
 //meta fncs namespaced by class
 namespace simox::meta::member::type::value
 {
-    template <class T>
-    using exists = impl::member_type_exists<T>;
-    template <class T>
-    static constexpr bool exists_v = exists<T>::value;
-    template <class T>
-    using type = impl::member_type_type<T>;
-    template <class T>
-    using type_t = typename type<T>::type;
-} // namespace simox::meta::member::type::value
+    template<class T> using exists                   = impl::member_type_exists<T>;
+    template<class T> static constexpr bool exists_v = exists<T>::value;
+    template<class T> using type                     = impl::member_type_type<T>;
+    template<class T> using type_t                   = typename type<T>::type;
+}
 
 //exists_v
 namespace simox::meta::member::type::exists_v
 {
-    template <class T>
+    template<class T>
     static constexpr bool value = ::simox::meta::member::type::value::exists_v<T>;
 }
-
 //concept
 namespace simox::meta::member::type::ccept
 {
-    template <class T>
+    template<class T>
     concept value = ::simox::meta::member::type::value::exists_v<T>;
 }
-
 //type_t
 namespace simox::meta::member::type::type_t
 {
-    template <class T>
+    template<class T>
     using value = ::simox::meta::member::type::value::type_t<T>;
 }
