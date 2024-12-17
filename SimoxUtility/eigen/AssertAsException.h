@@ -2,7 +2,7 @@
 
 #ifdef __cplusplus
 
-#include <stdexcept>
+#include <stdexcept> // IWYU pragma: keep
 
 #undef eigen_assert
 #define eigen_assert(x)                                                                            \
