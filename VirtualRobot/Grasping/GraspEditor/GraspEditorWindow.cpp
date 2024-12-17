@@ -147,12 +147,12 @@ namespace VirtualRobot
 
             case SPNAV_EVENT_MOTION:
 
-                x[0] = -sev.motion.z / translation_scaling;
-                x[1] = sev.motion.x / translation_scaling;
+                x[0] = sev.motion.z / translation_scaling;
+                x[1] = -sev.motion.x / translation_scaling;
                 x[2] = -sev.motion.y / translation_scaling;
 
-                x[3] = -sev.motion.rz / rotation_scaling;
-                x[4] = sev.motion.rx / rotation_scaling;
+                x[3] = sev.motion.rz / rotation_scaling;
+                x[4] = -sev.motion.rx / rotation_scaling;
                 x[5] = -sev.motion.ry / rotation_scaling;
 
                 //cout << "x: " << x[0] << " " << x[1] << " " << x[2] << " " << x[3] << " "<< x[4] << " "<< x[5] << std::endl;
@@ -897,10 +897,12 @@ namespace VirtualRobot
                 MathTools::posrpy2eigen4f(x, m);
 
                 Eigen::Matrix4f localTransformation = virtual_object->getLocalTransformation();
-                Eigen::Matrix4f newLocalTransformation = localTransformation * m;
+
+                // Eigen::Matrix4f newLocalTransformation = localTransformation * m; // in this case, along global axis
+                Eigen::Matrix4f newLocalTransformation = m * localTransformation; // in this case, along local axis of hand
 
                 virtual_object->setLocalTransformation(newLocalTransformation);
-                currentGrasp->setObjectTransformation(newLocalTransformation);
+                // currentGrasp->setObjectTransformation(newLocalTransformation);
                 virtual_object->updatePose(false);
 
 
