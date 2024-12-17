@@ -28,12 +28,14 @@
 namespace VirtualRobot
 {
 
-    
+
     class VIRTUAL_ROBOT_IMPORT_EXPORT NaturalPosture :
-            public WorkspaceRepresentation, public std::enable_shared_from_this<NaturalPosture>
+        public WorkspaceRepresentation,
+        public std::enable_shared_from_this<NaturalPosture>
     {
     public:
         friend class CoinVisualizationFactory;
+
     public:
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
@@ -64,11 +66,8 @@ namespace VirtualRobot
         // WorkspaceRepresentationPtr clone() override;
 
 
-
     protected:
-
         float evaluate();
-
     };
 
 

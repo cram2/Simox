@@ -6,51 +6,58 @@
 
 #define BOOST_TEST_MODULE VirtualRobot_VirtualRobotRobotTest
 
-#include <VirtualRobot/VirtualRobotTest.h>
-#include <VirtualRobot/XML/RobotIO.h>
+#include <string>
+
+#include <VirtualRobot/Nodes/PositionSensor.h>
+#include <VirtualRobot/Nodes/Sensor.h>
 #include <VirtualRobot/Robot.h>
 #include <VirtualRobot/VirtualRobotException.h>
-#include <VirtualRobot/Nodes/Sensor.h>
-#include <VirtualRobot/Nodes/PositionSensor.h>
-#include <string>
+#include <VirtualRobot/VirtualRobotTest.h>
+#include <VirtualRobot/XML/RobotIO.h>
 
 BOOST_AUTO_TEST_SUITE(RobotFactory)
 
 BOOST_AUTO_TEST_CASE(testRobotFactoryEmptyXML)
 {
     const std::string robotString = "";
-    BOOST_REQUIRE_THROW((VirtualRobot::RobotIO::createRobotFromString(robotString)), VirtualRobot::VirtualRobotException);
+    BOOST_REQUIRE_THROW((VirtualRobot::RobotIO::createRobotFromString(robotString)),
+                        VirtualRobot::VirtualRobotException);
 }
 
 BOOST_AUTO_TEST_CASE(testRobotFactoryUnclosedRobotTag)
 {
     const std::string robotString = "<Robot>";
     VirtualRobot::RobotPtr robot;
-    BOOST_REQUIRE_THROW(robot = VirtualRobot::RobotIO::createRobotFromString(robotString), VirtualRobot::VirtualRobotException);
+    BOOST_REQUIRE_THROW(robot = VirtualRobot::RobotIO::createRobotFromString(robotString),
+                        VirtualRobot::VirtualRobotException);
 }
 
 BOOST_AUTO_TEST_CASE(testRobotFactoryOnlyClosedRobotTag)
 {
     const std::string robotString = "</Robot>";
-    BOOST_REQUIRE_THROW(VirtualRobot::RobotIO::createRobotFromString(robotString), VirtualRobot::VirtualRobotException);
+    BOOST_REQUIRE_THROW(VirtualRobot::RobotIO::createRobotFromString(robotString),
+                        VirtualRobot::VirtualRobotException);
 }
 
 BOOST_AUTO_TEST_CASE(testRobotFactoryEmptyRobotTag)
 {
     const std::string robotString = "<Robot></Robot>";
-    BOOST_REQUIRE_THROW(VirtualRobot::RobotIO::createRobotFromString(robotString), VirtualRobot::VirtualRobotException);
+    BOOST_REQUIRE_THROW(VirtualRobot::RobotIO::createRobotFromString(robotString),
+                        VirtualRobot::VirtualRobotException);
 }
 
 BOOST_AUTO_TEST_CASE(testRobotFactoryEmptyTypeString)
 {
     const std::string robotString = "<Robot Type=''></Robot>";
-    BOOST_REQUIRE_THROW(VirtualRobot::RobotIO::createRobotFromString(robotString), VirtualRobot::VirtualRobotException);
+    BOOST_REQUIRE_THROW(VirtualRobot::RobotIO::createRobotFromString(robotString),
+                        VirtualRobot::VirtualRobotException);
 }
 
 BOOST_AUTO_TEST_CASE(testRobotFactoryNotExistentType)
 {
     const std::string robotString = "<Robot Type='XYZ'></Robot>";
-    BOOST_REQUIRE_THROW(VirtualRobot::RobotIO::createRobotFromString(robotString), VirtualRobot::VirtualRobotException);
+    BOOST_REQUIRE_THROW(VirtualRobot::RobotIO::createRobotFromString(robotString),
+                        VirtualRobot::VirtualRobotException);
 }
 
 BOOST_AUTO_TEST_CASE(testVirtualRobotRobotMacro)
@@ -74,13 +81,15 @@ BOOST_AUTO_TEST_CASE(testVirtualRobotRobotMacro)
 BOOST_AUTO_TEST_CASE(testRobotFactoryEmptyRootNodeString)
 {
     const std::string robotString = "<Robot RootNode=''></Robot>";
-    BOOST_REQUIRE_THROW(VirtualRobot::RobotIO::createRobotFromString(robotString), VirtualRobot::VirtualRobotException);
+    BOOST_REQUIRE_THROW(VirtualRobot::RobotIO::createRobotFromString(robotString),
+                        VirtualRobot::VirtualRobotException);
 }
 
 BOOST_AUTO_TEST_CASE(testRobotFactoryNotExistentRootNode)
 {
     const std::string robotString = "<Robot RootNode='JointX'></Robot>";
-    BOOST_REQUIRE_THROW(VirtualRobot::RobotIO::createRobotFromString(robotString), VirtualRobot::VirtualRobotException);
+    BOOST_REQUIRE_THROW(VirtualRobot::RobotIO::createRobotFromString(robotString),
+                        VirtualRobot::VirtualRobotException);
 }
 
 BOOST_AUTO_TEST_CASE(testVirtualRobotValidEndeffector)
@@ -163,7 +172,6 @@ BOOST_AUTO_TEST_CASE(testVirtualRobotInvariantTagPosition)
     BOOST_REQUIRE(rob);
 }
 
-
 BOOST_AUTO_TEST_CASE(testVirtualRobotEndeffectorWrongChildTag)
 {
     const std::string robotString =
@@ -181,9 +189,9 @@ BOOST_AUTO_TEST_CASE(testVirtualRobotEndeffectorWrongChildTag)
         "  </Static>"
         " </Endeffector>"
         "</Robot>";
-    BOOST_REQUIRE_THROW(VirtualRobot::RobotIO::createRobotFromString(robotString), std::exception);//VirtualRobot::VirtualRobotException);
+    BOOST_REQUIRE_THROW(VirtualRobot::RobotIO::createRobotFromString(robotString),
+                        std::exception); //VirtualRobot::VirtualRobotException);
 }
-
 
 BOOST_AUTO_TEST_CASE(testVirtualRobotEndeffectorWithoutNameTag)
 {
@@ -192,9 +200,9 @@ BOOST_AUTO_TEST_CASE(testVirtualRobotEndeffectorWithoutNameTag)
         " <Endeffector base='Joint1' tcp='Joint1'>"
         " </Endeffector>"
         "</Robot>";
-    BOOST_REQUIRE_THROW(VirtualRobot::RobotIO::createRobotFromString(robotString), VirtualRobot::VirtualRobotException);
+    BOOST_REQUIRE_THROW(VirtualRobot::RobotIO::createRobotFromString(robotString),
+                        VirtualRobot::VirtualRobotException);
 }
-
 
 BOOST_AUTO_TEST_CASE(testVirtualRobotEndeffectorMissingBasenodeTag)
 {
@@ -203,9 +211,9 @@ BOOST_AUTO_TEST_CASE(testVirtualRobotEndeffectorMissingBasenodeTag)
         " <Endeffector name ='e1'>"
         " </Endeffector>"
         "</Robot>";
-    BOOST_REQUIRE_THROW(VirtualRobot::RobotIO::createRobotFromString(robotString), VirtualRobot::VirtualRobotException);
+    BOOST_REQUIRE_THROW(VirtualRobot::RobotIO::createRobotFromString(robotString),
+                        VirtualRobot::VirtualRobotException);
 }
-
 
 BOOST_AUTO_TEST_CASE(testVirtualRobotEndeffectorMissingBasenode)
 {
@@ -214,7 +222,8 @@ BOOST_AUTO_TEST_CASE(testVirtualRobotEndeffectorMissingBasenode)
         " <Endeffector name ='e1' base='Joint1' tcp='Joint1'>"
         " </Endeffector>"
         "</Robot>";
-    BOOST_REQUIRE_THROW(VirtualRobot::RobotIO::createRobotFromString(robotString), VirtualRobot::VirtualRobotException);
+    BOOST_REQUIRE_THROW(VirtualRobot::RobotIO::createRobotFromString(robotString),
+                        VirtualRobot::VirtualRobotException);
 }
 
 BOOST_AUTO_TEST_CASE(testVirtualRobotPhysicsTag)
@@ -267,7 +276,6 @@ BOOST_AUTO_TEST_CASE(testVirtualRobotPhysicsTag)
     Eigen::Matrix4f m = rn->getLocalTransformation();
     BOOST_CHECK_EQUAL(m(0, 3), 1000.0f);
 }
-
 
 BOOST_AUTO_TEST_CASE(testVirtualRobotDependendNodes)
 {
@@ -324,49 +332,46 @@ BOOST_AUTO_TEST_CASE(testVirtualRobotDependendNodes)
     j2 = r2->getJointValue();
     BOOST_CHECK_CLOSE(j1, 0.2f, 0.1f);
     BOOST_CHECK_CLOSE(j2, 0.5f, 0.1f);
-
 }
-
 
 BOOST_AUTO_TEST_CASE(testVirtualRobotToXML)
 {
-    const std::string robotString =
-        "<Robot Type='MyDemoRobotType' RootNode='Joint1'>"
-        " <RobotNode name='Joint1'>"
-        "  <Physics>"
-        "   <Mass value='100' units='kg'/>"
-        "   <CoM location='joint' x='10' y='20' z='30' units='mm'/>"
-        "   <InertiaMatrix unitsWeight='ton' unitsLength='mm'>"
-        "     <row1 c1='1' c2='2' c3='3'/>"
-        "     <row2 c1='4' c2='5' c3='6'/>"
-        "     <row3 c1='7' c2='8' c3='9'/>"
-        "   </InertiaMatrix>"
-        "  </Physics>"
-        "  <Joint type='revolute'>"
-        "    <axis x='0' y='0' z='1'/>"
-        "    <Limits unit='degree' lo='0' hi='180'/>"
-        "    <PropagateJointValue factor='0.5' name='Joint2'/>"
-        "    <MaxVelocity value='36' unitsLength='mm' unitsTime='h'/>"
-        "    <MaxAcceleration value='36' unitsTime='min'/>"
-        "    <MaxTorque value='0.2' units='meter'/>"
-        "  </Joint>"
-        "  <Child name='Joint2'/>"
-        " </RobotNode>"
-        " <RobotNode name='Joint2'>"
-        "  <Transform>"
-        "    <Translation x='100' y='50' z='0'/>"
-        "  </Transform>"
-        "   <Joint type='revolute'>"
-        "    <axis x='0' y='0' z='1'/>"
-        "    <Limits unit='degree' lo='0' hi='90'/>"
-        "   </Joint>"
-        "  <Sensor type='position' name='sensor2'>"
-        "    <Transform>"
-        "       <Translation x='100' y='50' z='0'/>"
-        "    </Transfrom>"
-        "  </Sensor>"
-        " </RobotNode>"
-        "</Robot>";
+    const std::string robotString = "<Robot Type='MyDemoRobotType' RootNode='Joint1'>"
+                                    " <RobotNode name='Joint1'>"
+                                    "  <Physics>"
+                                    "   <Mass value='100' units='kg'/>"
+                                    "   <CoM location='joint' x='10' y='20' z='30' units='mm'/>"
+                                    "   <InertiaMatrix unitsWeight='ton' unitsLength='mm'>"
+                                    "     <row1 c1='1' c2='2' c3='3'/>"
+                                    "     <row2 c1='4' c2='5' c3='6'/>"
+                                    "     <row3 c1='7' c2='8' c3='9'/>"
+                                    "   </InertiaMatrix>"
+                                    "  </Physics>"
+                                    "  <Joint type='revolute'>"
+                                    "    <axis x='0' y='0' z='1'/>"
+                                    "    <Limits unit='degree' lo='0' hi='180'/>"
+                                    "    <PropagateJointValue factor='0.5' name='Joint2'/>"
+                                    "    <MaxVelocity value='36' unitsLength='mm' unitsTime='h'/>"
+                                    "    <MaxAcceleration value='36' unitsTime='min'/>"
+                                    "    <MaxTorque value='0.2' units='meter'/>"
+                                    "  </Joint>"
+                                    "  <Child name='Joint2'/>"
+                                    " </RobotNode>"
+                                    " <RobotNode name='Joint2'>"
+                                    "  <Transform>"
+                                    "    <Translation x='100' y='50' z='0'/>"
+                                    "  </Transform>"
+                                    "   <Joint type='revolute'>"
+                                    "    <axis x='0' y='0' z='1'/>"
+                                    "    <Limits unit='degree' lo='0' hi='90'/>"
+                                    "   </Joint>"
+                                    "  <Sensor type='position' name='sensor2'>"
+                                    "    <Transform>"
+                                    "       <Translation x='100' y='50' z='0'/>"
+                                    "    </Transfrom>"
+                                    "  </Sensor>"
+                                    " </RobotNode>"
+                                    "</Robot>";
     VirtualRobot::RobotPtr rob;
     BOOST_REQUIRE_NO_THROW(rob = VirtualRobot::RobotIO::createRobotFromString(robotString));
     BOOST_REQUIRE(rob);
@@ -400,7 +405,8 @@ BOOST_AUTO_TEST_CASE(testVirtualRobotToXML)
 
     // check sensor
     BOOST_REQUIRE(rn2->hasSensor("sensor2"));
-    VirtualRobot::PositionSensorPtr ps = std::dynamic_pointer_cast<VirtualRobot::PositionSensor>(rn2->getSensor("sensor2"));
+    VirtualRobot::PositionSensorPtr ps =
+        std::dynamic_pointer_cast<VirtualRobot::PositionSensor>(rn2->getSensor("sensor2"));
     BOOST_REQUIRE(ps);
     Eigen::Matrix4f p = ps->getGlobalPose();
     Eigen::Matrix4f p2 = Eigen::Matrix4f::Identity();

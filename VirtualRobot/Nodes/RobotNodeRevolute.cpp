@@ -1,31 +1,44 @@
 
 #include "RobotNodeRevolute.h"
-#include "Nodes/Sensor.h"
-#include "../Robot.h"
-#include <cmath>
+
 #include <algorithm>
+#include <cmath>
 
 #include <Eigen/Geometry>
+
+#include "../Robot.h"
 #include "../VirtualRobotException.h"
+#include "Nodes/Sensor.h"
 
 namespace VirtualRobot
 {
     using std::cout;
     using std::endl;
 
-    RobotNodeRevolute::RobotNodeRevolute(RobotWeakPtr rob,
-                                         const std::string& name,
-                                         float jointLimitLo,
-                                         float jointLimitHi,
-                                         const Eigen::Matrix4f& preJointTransform,            //!< This transformation is applied before the translation of the joint is done
-                                         const Eigen::Vector3f& axis,         //!< This is the direction of the translation
-                                         VisualizationNodePtr visualization,
-                                         CollisionModelPtr collisionModel,
-                                         float jointValueOffset,
-                                         const SceneObject::Physics& p,
-                                         CollisionCheckerPtr colChecker,
-                                         RobotNodeType type
-                                        ) : RobotNode(rob, name, jointLimitLo, jointLimitHi, visualization, collisionModel, jointValueOffset, p, colChecker, type)
+    RobotNodeRevolute::RobotNodeRevolute(
+        RobotWeakPtr rob,
+        const std::string& name,
+        float jointLimitLo,
+        float jointLimitHi,
+        const Eigen::Matrix4f&
+            preJointTransform, //!< This transformation is applied before the translation of the joint is done
+        const Eigen::Vector3f& axis, //!< This is the direction of the translation
+        VisualizationNodePtr visualization,
+        CollisionModelPtr collisionModel,
+        float jointValueOffset,
+        const SceneObject::Physics& p,
+        CollisionCheckerPtr colChecker,
+        RobotNodeType type) :
+        RobotNode(rob,
+                  name,
+                  jointLimitLo,
+                  jointLimitHi,
+                  visualization,
+                  collisionModel,
+                  jointValueOffset,
+                  p,
+                  colChecker,
+                  type)
     {
         initialized = false;
         optionalDHParameter.isSet = false;
@@ -40,14 +53,26 @@ namespace VirtualRobot
                                          const std::string& name,
                                          float jointLimitLo,
                                          float jointLimitHi,
-                                         float a, float d, float alpha, float theta,
+                                         float a,
+                                         float d,
+                                         float alpha,
+                                         float theta,
                                          VisualizationNodePtr visualization,
                                          CollisionModelPtr collisionModel,
                                          float jointValueOffset,
                                          const SceneObject::Physics& p,
                                          CollisionCheckerPtr colChecker,
-                                         RobotNodeType type
-                                        ) : RobotNode(rob, name, jointLimitLo, jointLimitHi, visualization, collisionModel, jointValueOffset, p, colChecker, type)
+                                         RobotNodeType type) :
+        RobotNode(rob,
+                  name,
+                  jointLimitLo,
+                  jointLimitHi,
+                  visualization,
+                  collisionModel,
+                  jointValueOffset,
+                  p,
+                  colChecker,
+                  type)
 
     {
         initialized = false;
@@ -74,29 +99,33 @@ namespace VirtualRobot
         RotAlpha(2, 2) = cos(alpha);
 
         this->localTransformation = RotTheta * TransD * TransA * RotAlpha;
-        this->jointRotationAxis = Eigen::Vector3f(0, 0, 1);         // rotation around z axis
+        this->jointRotationAxis = Eigen::Vector3f(0, 0, 1); // rotation around z axis
         tmpRotMat.setIdentity();
         checkValidRobotNodeType();
     }
 
+    RobotNodeRevolute::~RobotNodeRevolute() = default;
 
-    RobotNodeRevolute::~RobotNodeRevolute()
-    = default;
-
-    bool RobotNodeRevolute::initialize(SceneObjectPtr parent, const std::vector<SceneObjectPtr>& children)
+    bool
+    RobotNodeRevolute::initialize(SceneObjectPtr parent,
+                                  const std::vector<SceneObjectPtr>& children)
     {
         return RobotNode::initialize(parent, children);
     }
 
-    void RobotNodeRevolute::updateTransformationMatrices(const Eigen::Matrix4f& parentPose)
+    void
+    RobotNodeRevolute::updateTransformationMatrices(const Eigen::Matrix4f& parentPose)
     {
         //Eigen::Affine3f tmpT(Eigen::AngleAxisf(jointValue + jointValueOffset, jointRotationAxis));
         //MathTools::axisangle2eigen4f(jointRotationAxis, jointValue + jointValueOffset, tmpRotMat);
-        tmpRotMat.block(0, 0, 3, 3) = Eigen::AngleAxisf(jointValue + jointValueOffset, jointRotationAxis).matrix();
-        globalPose.noalias() = parentPose * localTransformation /*getLocalTransformation()*/ * tmpRotMat;
+        tmpRotMat.block(0, 0, 3, 3) =
+            Eigen::AngleAxisf(jointValue + jointValueOffset, jointRotationAxis).matrix();
+        globalPose.noalias() =
+            parentPose * localTransformation /*getLocalTransformation()*/ * tmpRotMat;
     }
 
-    void RobotNodeRevolute::print(bool printChildren, bool printDecoration) const
+    void
+    RobotNodeRevolute::print(bool printChildren, bool printDecoration) const
     {
         ReadLockPtr lock = getRobot()->getReadLock();
 
@@ -107,23 +136,30 @@ namespace VirtualRobot
 
         RobotNode::print(false, false);
 
-        std::cout << "* JointRotationAxis: " << jointRotationAxis[0] << ", " << jointRotationAxis[1] << ", " << jointRotationAxis[2] << std::endl;
+        std::cout << "* JointRotationAxis: " << jointRotationAxis[0] << ", " << jointRotationAxis[1]
+                  << ", " << jointRotationAxis[2] << std::endl;
 
         if (printDecoration)
         {
             std::cout << "******** End RobotNodeRevolute ********" << std::endl;
         }
 
-        std::vector< SceneObjectPtr > children = this->getChildren();
+        std::vector<SceneObjectPtr> children = this->getChildren();
 
         if (printChildren)
         {
-            std::for_each(children.begin(), children.end(), std::bind(&SceneObject::print,
-                                                                      std::placeholders::_1, true, true));
+            std::for_each(children.begin(),
+                          children.end(),
+                          std::bind(&SceneObject::print, std::placeholders::_1, true, true));
         }
     }
 
-    RobotNodePtr RobotNodeRevolute::_clone(const RobotPtr newRobot, const VisualizationNodePtr visualizationModel, const CollisionModelPtr collisionModel, CollisionCheckerPtr colChecker, float scaling)
+    RobotNodePtr
+    RobotNodeRevolute::_clone(const RobotPtr newRobot,
+                              const VisualizationNodePtr visualizationModel,
+                              const CollisionModelPtr collisionModel,
+                              CollisionCheckerPtr colChecker,
+                              float scaling)
     {
         ReadLockPtr lock = getRobot()->getReadLock();
         RobotNodePtr result;
@@ -132,29 +168,56 @@ namespace VirtualRobot
 
         if (optionalDHParameter.isSet)
         {
-            result.reset(new RobotNodeRevolute(newRobot, name, jointLimitLo, jointLimitHi, optionalDHParameter.aMM()*scaling, optionalDHParameter.dMM()*scaling, optionalDHParameter.alphaRadian(), optionalDHParameter.thetaRadian(), visualizationModel, collisionModel, jointValueOffset, p, colChecker, nodeType));
+            result.reset(new RobotNodeRevolute(newRobot,
+                                               name,
+                                               jointLimitLo,
+                                               jointLimitHi,
+                                               optionalDHParameter.aMM() * scaling,
+                                               optionalDHParameter.dMM() * scaling,
+                                               optionalDHParameter.alphaRadian(),
+                                               optionalDHParameter.thetaRadian(),
+                                               visualizationModel,
+                                               collisionModel,
+                                               jointValueOffset,
+                                               p,
+                                               colChecker,
+                                               nodeType));
         }
         else
         {
             Eigen::Matrix4f lt = getLocalTransformation();
             lt.block(0, 3, 3, 1) *= scaling;
-            result.reset(new RobotNodeRevolute(newRobot, name, jointLimitLo, jointLimitHi, lt, jointRotationAxis, visualizationModel, collisionModel, jointValueOffset, p, colChecker, nodeType));
+            result.reset(new RobotNodeRevolute(newRobot,
+                                               name,
+                                               jointLimitLo,
+                                               jointLimitHi,
+                                               lt,
+                                               jointRotationAxis,
+                                               visualizationModel,
+                                               collisionModel,
+                                               jointValueOffset,
+                                               p,
+                                               colChecker,
+                                               nodeType));
         }
 
         return result;
     }
 
-    bool RobotNodeRevolute::isRotationalJoint() const noexcept
+    bool
+    RobotNodeRevolute::isRotationalJoint() const noexcept
     {
         return true;
     }
 
-    void RobotNodeRevolute::setJointRotationAxis(Eigen::Vector3f newAxis)
+    void
+    RobotNodeRevolute::setJointRotationAxis(Eigen::Vector3f newAxis)
     {
         this->jointRotationAxis = newAxis;
     }
 
-    Eigen::Vector3f RobotNodeRevolute::getJointRotationAxis(const SceneObjectPtr coordSystem) const
+    Eigen::Vector3f
+    RobotNodeRevolute::getJointRotationAxis(const SceneObjectPtr coordSystem) const
     {
         ReadLockPtr lock = getRobot()->getReadLock();
         Eigen::Vector4f result4f = Eigen::Vector4f::Zero();
@@ -170,7 +233,9 @@ namespace VirtualRobot
         return result4f.block(0, 0, 3, 1);
     }
 
-    void RobotNodeRevolute::updateVisualizationPose(const Eigen::Matrix4f& globalPose, bool updateChildren /*= false*/)
+    void
+    RobotNodeRevolute::updateVisualizationPose(const Eigen::Matrix4f& globalPose,
+                                               bool updateChildren /*= false*/)
     {
         RobotNode::updateVisualizationPose(globalPose, updateChildren);
 
@@ -203,32 +268,38 @@ namespace VirtualRobot
         jointValue = angle - jointValueOffset;*/
     }
 
-    Eigen::Vector3f RobotNodeRevolute::getJointRotationAxisInJointCoordSystem() const
+    Eigen::Vector3f
+    RobotNodeRevolute::getJointRotationAxisInJointCoordSystem() const
     {
         return jointRotationAxis;
     }
 
-    void RobotNodeRevolute::checkValidRobotNodeType()
+    void
+    RobotNodeRevolute::checkValidRobotNodeType()
     {
         RobotNode::checkValidRobotNodeType();
-        THROW_VR_EXCEPTION_IF(nodeType == Body || nodeType == Transform, "RobotNodeRevolute must be a JointNode or a GenericNode");
+        THROW_VR_EXCEPTION_IF(nodeType == Body || nodeType == Transform,
+                              "RobotNodeRevolute must be a JointNode or a GenericNode");
     }
 
-
-    std::string RobotNodeRevolute::_toXML(const std::string& /*modelPath*/)
+    std::string
+    RobotNodeRevolute::_toXML(const std::string& /*modelPath*/)
     {
         std::stringstream ss;
         ss << "\t\t<Joint type='revolute'>" << std::endl;
-        ss << "\t\t\t<axis x='" << jointRotationAxis[0] << "' y='" << jointRotationAxis[1] << "' z='" << jointRotationAxis[2] << "'/>" << std::endl;
-        ss << "\t\t\t<limits lo='" << jointLimitLo << "' hi='" << jointLimitHi << "' units='radian'/>" << std::endl;
+        ss << "\t\t\t<axis x='" << jointRotationAxis[0] << "' y='" << jointRotationAxis[1]
+           << "' z='" << jointRotationAxis[2] << "'/>" << std::endl;
+        ss << "\t\t\t<limits lo='" << jointLimitLo << "' hi='" << jointLimitHi
+           << "' units='radian'/>" << std::endl;
         ss << "\t\t\t<MaxAcceleration value='" << maxAcceleration << "'/>" << std::endl;
         ss << "\t\t\t<MaxVelocity value='" << maxVelocity << "'/>" << std::endl;
         ss << "\t\t\t<MaxTorque value='" << maxTorque << "'/>" << std::endl;
-        std::map< std::string, float >::iterator propIt = propagatedJointValues.begin();
+        std::map<std::string, float>::iterator propIt = propagatedJointValues.begin();
 
         while (propIt != propagatedJointValues.end())
         {
-            ss << "\t\t\t<PropagateJointValue name='" << propIt->first << "' factor='" << propIt->second << "'/>" << std::endl;
+            ss << "\t\t\t<PropagateJointValue name='" << propIt->first << "' factor='"
+               << propIt->second << "'/>" << std::endl;
             propIt++;
         }
 
@@ -236,7 +307,8 @@ namespace VirtualRobot
         return ss.str();
     }
 
-    float RobotNodeRevolute::getLMTC(float angle)
+    float
+    RobotNodeRevolute::getLMTC(float angle)
     {
 
         return sqrt(2 - 2 * cos(angle));
@@ -262,7 +334,8 @@ namespace VirtualRobot
     //Eigen::Matrix4f fromParent = getTransformationFrom(getParent());
     //Eigen::Matrix4f toChild = child->getTransformationFrom(child->getParent());
 
-    float RobotNodeRevolute::getLMomentArm(float angle)
+    float
+    RobotNodeRevolute::getLMomentArm(float angle)
     {
         float b = getLMTC(angle);
 
@@ -282,6 +355,7 @@ namespace VirtualRobot
         return lMomentArm;
         */
     }
+
     /*
     float a = fromParent.col(3).head(3).norm();
     float c = toChild.col(3).head(3).norm();
@@ -296,4 +370,4 @@ namespace VirtualRobot
 
     }*/
 
-} // namespace
+} // namespace VirtualRobot

@@ -22,11 +22,10 @@
 */
 #pragma once
 
-#include "../VirtualRobot.h"
-#include "WorkspaceRepresentation.h"
-
 #include <vector>
 
+#include "../VirtualRobot.h"
+#include "WorkspaceRepresentation.h"
 
 namespace VirtualRobot
 {
@@ -44,7 +43,12 @@ namespace VirtualRobot
         /*!
             Setup the 2D grid with given extends and discretization parameter.
         */
-        WorkspaceGrid(float minX, float maxX, float minY, float maxY, float discretizeSize, bool checkNeighbors = false);
+        WorkspaceGrid(float minX,
+                      float maxX,
+                      float minY,
+                      float maxY,
+                      float discretizeSize,
+                      bool checkNeighbors = false);
         ~WorkspaceGrid();
 
         //! returns entry of position in x/y plane (in world coords)
@@ -63,7 +67,8 @@ namespace VirtualRobot
         //! returns entry of discretized square (x/y)
         int getCellEntry(int cellX, int cellY);
         bool getCellEntry(int cellX, int cellY, int& nStoreEntry, GraspPtr& storeGrasp);
-        bool getCellEntry(int cellX, int cellY, int& nStoreEntry, std::vector<GraspPtr>& storeGrasps);
+        bool
+        getCellEntry(int cellX, int cellY, int& nStoreEntry, std::vector<GraspPtr>& storeGrasps);
         /*!
             sets the entry to value, if the current value is lower
         */
@@ -79,8 +84,18 @@ namespace VirtualRobot
         void setEntryCheckNeighbors(float x, float y, int value, GraspPtr grasp);
 
         //! tries to find a random position with a entry >= minEntry
-        bool getRandomPos(int minEntry, float& storeXGlobal, float& storeYGlobal, GraspPtr& storeGrasp, int maxLoops = 50, int* entries = NULL);
-        bool getRandomPos(int minEntry, float& storeXGlobal, float& storeYGlobal, std::vector<GraspPtr>& storeGrasps, int maxLoops = 50, int* entries = NULL);
+        bool getRandomPos(int minEntry,
+                          float& storeXGlobal,
+                          float& storeYGlobal,
+                          GraspPtr& storeGrasp,
+                          int maxLoops = 50,
+                          int* entries = NULL);
+        bool getRandomPos(int minEntry,
+                          float& storeXGlobal,
+                          float& storeYGlobal,
+                          std::vector<GraspPtr>& storeGrasps,
+                          int maxLoops = 50,
+                          int* entries = NULL);
 
         /*!
             Clear all entries.
@@ -90,8 +105,19 @@ namespace VirtualRobot
         /*!
             Fill the grid with inverse reachability data generated from grasp g and object o.
         */
-        bool fillGridData(WorkspaceRepresentationPtr ws, ManipulationObjectPtr o, GraspPtr g, RobotNodePtr baseRobotNode, float baseOrientation = 0, float maxAngle = M_PIf32);
-        bool fillGridData(WorkspaceRepresentationPtr ws, const Eigen::Matrix4f &graspGlobal, GraspPtr g, RobotNodePtr baseRobotNode, float baseOrientation = 0, float maxAngle = M_PIf32, float minCenterDistance = 0);
+        bool fillGridData(WorkspaceRepresentationPtr ws,
+                          ManipulationObjectPtr o,
+                          GraspPtr g,
+                          RobotNodePtr baseRobotNode,
+                          float baseOrientation = 0,
+                          float maxAngle = M_PIf32);
+        bool fillGridData(WorkspaceRepresentationPtr ws,
+                          const Eigen::Matrix4f& graspGlobal,
+                          GraspPtr g,
+                          RobotNodePtr baseRobotNode,
+                          float baseOrientation = 0,
+                          float maxAngle = M_PIf32,
+                          float minCenterDistance = 0);
 
 
         /*!
@@ -113,15 +139,10 @@ namespace VirtualRobot
             float maxY;
         };
 
-        Extends getExtends() const
+        Extends
+        getExtends() const
         {
-            return Extends
-            {
-                .minX = minX,
-                .maxX = maxX,
-                .minY = minY,
-                .maxY = maxY
-            };
+            return Extends{.minX = minX, .maxX = maxX, .minY = minY, .maxY = maxY};
         }
 
         enum CellUpdateMode
@@ -130,11 +151,11 @@ namespace VirtualRobot
             MAX
         };
 
-        void setCellUpdateMode(const CellUpdateMode mode)
+        void
+        setCellUpdateMode(const CellUpdateMode mode)
         {
             this->mode = mode;
         }
-
 
         /*!
             Number of cells in x and y
@@ -143,14 +164,14 @@ namespace VirtualRobot
 
         struct Size
         {
-            int x,y;
+            int x, y;
         };
 
-        Size getCells() const
+        Size
+        getCells() const
         {
             return Size{.x = gridSizeX, .y = gridSizeY};
         }
-
 
         Eigen::Vector2f getPosition(int cellX, int cellY) const;
 
@@ -164,23 +185,27 @@ namespace VirtualRobot
          * @param reachGrids grids for different grasp poses or object poses
          * @return new, merged grid
          */
-        static WorkspaceGridPtr MergeWorkspaceGrids(const std::vector<WorkspaceGridPtr>& reachGrids);
+        static WorkspaceGridPtr
+        MergeWorkspaceGrids(const std::vector<WorkspaceGridPtr>& reachGrids);
+
     protected:
         /*!
             Adds data stored in reachability transformations. This data defines transformations from robot base system to grasping pose,
             so when defining a grasping pose, the inverse reachability can be represented by this grid
             Therefor the "world coordinates" of the inverse reachability distributions are computed by T_grasp * ReachTransformation^-1
         */
-        void setEntries(std::vector<WorkspaceRepresentation::WorkspaceCut2DTransformation>& wsData, const Eigen::Matrix4f& graspGlobal, GraspPtr grasp);
+        void setEntries(std::vector<WorkspaceRepresentation::WorkspaceCut2DTransformation>& wsData,
+                        const Eigen::Matrix4f& graspGlobal,
+                        GraspPtr grasp);
 
         void checkAndReplaceValue(int& val, int newVal);
 
-
-
-        inline int getDataPos(int x, int y)
+        inline int
+        getDataPos(int x, int y)
         {
             return (x * gridSizeY + y);
         };
+
         float minX, maxX; // in global coord system
         float minY, maxY; // in global coord system
         float discretizeSize;
@@ -189,8 +214,8 @@ namespace VirtualRobot
 
         float gridExtendX, gridExtendY;
 
-        int* data;                              // stores the quality values
-        std::vector<GraspPtr>* graspLink;       // points to list of all reachable grasps
+        int* data; // stores the quality values
+        std::vector<GraspPtr>* graspLink; // points to list of all reachable grasps
 
         const bool checkNeighbors;
 
@@ -198,4 +223,4 @@ namespace VirtualRobot
         CellUpdateMode mode = CellUpdateMode::MAX;
     };
 
-}
+} // namespace VirtualRobot

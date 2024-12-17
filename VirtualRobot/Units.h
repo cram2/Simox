@@ -6,9 +6,9 @@
 * @copyright  2011 Manfred Kroehnert
 */
 
-#include "VirtualRobotImportExport.h"
-
 #include <string>
+
+#include "VirtualRobotImportExport.h"
 
 namespace VirtualRobot
 {
@@ -16,7 +16,6 @@ namespace VirtualRobot
     class VIRTUAL_ROBOT_IMPORT_EXPORT Units
     {
     public:
-
         enum UnitsType
         {
             eAngle,

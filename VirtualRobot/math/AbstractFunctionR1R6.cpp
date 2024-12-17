@@ -21,9 +21,7 @@
 
 #include "AbstractFunctionR1R6.h"
 
-
 namespace math
 {
 
 }
-

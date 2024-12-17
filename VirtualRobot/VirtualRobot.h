@@ -22,15 +22,14 @@
 */
 #pragma once
 
-#include <VirtualRobot/VirtualRobotImportExport.h>
-#include <VirtualRobot/Logging.h> // convenience include for logging. Will be removed in the future.
 #include <VirtualRobot/Assert.h> // convenience include for assertions. Will be removed in the future.
+#include <VirtualRobot/Logging.h> // convenience include for logging. Will be removed in the future.
+#include <VirtualRobot/VirtualRobotImportExport.h>
 
 /*! \defgroup VirtualRobot The VirtualRobot Library
 * With the VirtualRobot library you can define complex robot structures,
 * perform collision detection, visualize robots and environments, do reachability analysis and generic IK solvers are provided.
 */
-
 
 
 /** \mainpage Simox: A simulation, motion and grasp planning toolbox.
@@ -125,7 +124,6 @@
 
 #include <Eigen/Core>
 
-
 namespace VirtualRobot
 {
 
@@ -143,7 +141,7 @@ namespace VirtualRobot
     class RobotNode;
     class RobotNodeRevolute;
     class RobotNodePrismatic;
-    class RobotNodeFixed;    
+    class RobotNodeFixed;
 
     class RobotNodeFactory;
     class RobotNodeSet;
@@ -253,7 +251,8 @@ namespace VirtualRobot
         struct ConvexHull3D;
         struct ConvexHull6D;
         struct Plane;
-        template<typename VectorT> struct BaseLine;
+        template <typename VectorT>
+        struct BaseLine;
         struct Segment;
         struct OOBB;
         struct ContactPoint;
@@ -266,16 +265,15 @@ namespace VirtualRobot
         typedef std::shared_ptr<ConvexHull3D> ConvexHull3DPtr;
         typedef std::shared_ptr<ConvexHull6D> ConvexHull6DPtr;
 
-   }
-
+    } // namespace MathTools
 
     /*!
     Initialize the runtime envionment. This method calls VisualizationFactory::init().
     */
-    void VIRTUAL_ROBOT_IMPORT_EXPORT init(int &argc, char* argv[], const std::string &appName);
-    void VIRTUAL_ROBOT_IMPORT_EXPORT init(const std::string &appName);
+    void VIRTUAL_ROBOT_IMPORT_EXPORT init(int& argc, char* argv[], const std::string& appName);
+    void VIRTUAL_ROBOT_IMPORT_EXPORT init(const std::string& appName);
 
     // init method is storing appName, since the c_string is passed by refrence to QT -> we must ensure that the string stays alive
     VIRTUAL_ROBOT_IMPORT_EXPORT extern std::string globalAppName;
 
-} // namespace
+} // namespace VirtualRobot

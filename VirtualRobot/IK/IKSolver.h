@@ -34,7 +34,6 @@ namespace VirtualRobot
     class VIRTUAL_ROBOT_IMPORT_EXPORT IKSolver : public std::enable_shared_from_this<IKSolver>
     {
     public:
-
         /*!
         @brief Flags for the selection of the target components.
         @details The flags can be combined with the +-operator.

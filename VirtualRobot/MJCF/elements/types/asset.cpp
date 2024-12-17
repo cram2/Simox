@@ -6,13 +6,13 @@
 using namespace mjcf;
 
 
-const std::string Texture::tag      = "texture";
-const std::string Material::tag     = "material";
-const std::string Mesh::tag         = "mesh";
+const std::string Texture::tag = "texture";
+const std::string Material::tag = "material";
+const std::string Mesh::tag = "mesh";
 const std::string AssetSection::tag = "asset";
 
-
-Texture AssetSection::addSkyboxTexture(const Eigen::Vector3f& rgb1, const Eigen::Vector3f& rgb2)
+Texture
+AssetSection::addSkyboxTexture(const Eigen::Vector3f& rgb1, const Eigen::Vector3f& rgb2)
 {
     Texture texSkybox = addChild<Texture>();
 
@@ -26,8 +26,11 @@ Texture AssetSection::addSkyboxTexture(const Eigen::Vector3f& rgb1, const Eigen:
     return texSkybox;
 }
 
-Texture AssetSection::addTextureFile(const std::string& name, const std::string& file,
-                                     bool vflip, bool hflip)
+Texture
+AssetSection::addTextureFile(const std::string& name,
+                             const std::string& file,
+                             bool vflip,
+                             bool hflip)
 {
     Texture texture = addChild<Texture>();
     texture.name = name;
@@ -38,7 +41,8 @@ Texture AssetSection::addTextureFile(const std::string& name, const std::string&
     return texture;
 }
 
-Mesh AssetSection::addMesh(const std::string& name, const std::string& file)
+Mesh
+AssetSection::addMesh(const std::string& name, const std::string& file)
 {
     Mesh mesh = addChild<Mesh>();
     mesh.name = name;
@@ -46,7 +50,8 @@ Mesh AssetSection::addMesh(const std::string& name, const std::string& file)
     return mesh;
 }
 
-Material AssetSection::addMaterial(const std::string& name, const std::string& textureName)
+Material
+AssetSection::addMaterial(const std::string& name, const std::string& textureName)
 {
     Material material = addChild<Material>();
     material.name = name;

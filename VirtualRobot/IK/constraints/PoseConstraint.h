@@ -23,18 +23,24 @@
 
 #pragma once
 
-#include "VirtualRobot/VirtualRobot.h"
 #include "VirtualRobot/IK/Constraint.h"
 #include "VirtualRobot/IK/DifferentialIK.h"
+#include "VirtualRobot/VirtualRobot.h"
 
 namespace VirtualRobot
 {
-    class VIRTUAL_ROBOT_IMPORT_EXPORT PoseConstraint : public Constraint, public std::enable_shared_from_this<PoseConstraint>
+    class VIRTUAL_ROBOT_IMPORT_EXPORT PoseConstraint :
+        public Constraint,
+        public std::enable_shared_from_this<PoseConstraint>
     {
     public:
-        PoseConstraint(const RobotPtr& robot, const RobotNodeSetPtr& nodeSet, const SceneObjectPtr& eef, const Eigen::Matrix4f& target,
+        PoseConstraint(const RobotPtr& robot,
+                       const RobotNodeSetPtr& nodeSet,
+                       const SceneObjectPtr& eef,
+                       const Eigen::Matrix4f& target,
                        IKSolver::CartesianSelection cartesianSelection = IKSolver::All,
-                       float tolerancePosition = 5.0f, float toleranceRotation = 3.0f / 180.0f * M_PI);
+                       float tolerancePosition = 5.0f,
+                       float toleranceRotation = 3.0f / 180.0f * M_PI);
 
         void setVisualization(const SceneObjectSetPtr& visualizationNodeSet);
 
@@ -80,5 +86,4 @@ namespace VirtualRobot
     };
 
     typedef std::shared_ptr<PoseConstraint> PoseConstraintPtr;
-}
-
+} // namespace VirtualRobot

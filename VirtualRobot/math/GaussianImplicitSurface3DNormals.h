@@ -22,12 +22,12 @@
 #pragma once
 
 #include "../VirtualRobot.h"
-#include "MathForwardDefinitions.h"
 #include "Contact.h"
-#include "Helpers.h"
-#include "SimpleAbstractFunctionR3R1.h"
 #include "ContactList.h"
+#include "Helpers.h"
 #include "Kernels.h"
+#include "MathForwardDefinitions.h"
+#include "SimpleAbstractFunctionR3R1.h"
 
 namespace math
 {
@@ -36,7 +36,8 @@ namespace math
     {
     public:
         GaussianImplicitSurface3DNormals(std::unique_ptr<KernelWithDerivatives> kernel);
-        void Calculate(const ContactList& samples, float noise, float normalNoise, float normalScale);
+        void
+        Calculate(const ContactList& samples, float noise, float normalNoise, float normalScale);
         float Get(Eigen::Vector3f pos) override;
         float GetVariance(const Eigen::Vector3f& pos);
 
@@ -51,11 +52,13 @@ namespace math
         std::unique_ptr<KernelWithDerivatives> kernel;
 
         float Predict(const Eigen::Vector3f& pos);
-        void CalculateCovariance(const std::vector<Eigen::Vector3f>& points, float R, float noise, float normalNoise);
+        void CalculateCovariance(const std::vector<Eigen::Vector3f>& points,
+                                 float R,
+                                 float noise,
+                                 float normalNoise);
 
         void MatrixInvert(const Eigen::VectorXd& b);
         static Eigen::Vector3f Average(const ContactList& samples);
         Eigen::VectorXd getCux(const Eigen::Vector3f& pos);
     };
-}
-
+} // namespace math

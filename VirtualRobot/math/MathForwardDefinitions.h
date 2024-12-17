@@ -24,32 +24,36 @@
 //scale intern sizes to milimeters
 #define HAPTIC_EXPLORATION_SCALE 40
 
-#include <Eigen/Core>
-#include <stdexcept>
 #include <memory>
+#include <stdexcept>
 #include <vector>
 
+#include <Eigen/Core>
 
-template<class T> class Nullable
+template <class T>
+class Nullable
 {
 public:
-    Nullable(T& value)
-        : defined(true), value(value)
-    { }
-
-    Nullable()
-        : defined(false)
-    { }
-
-    T get()
+    Nullable(T& value) : defined(true), value(value)
     {
-        if(!defined)
+    }
+
+    Nullable() : defined(false)
+    {
+    }
+
+    T
+    get()
+    {
+        if (!defined)
         {
             throw std::runtime_error("Value is not set");
         }
         return value;
     }
-    bool hasValue()
+
+    bool
+    hasValue()
     {
         return defined;
     }
@@ -58,8 +62,6 @@ private:
     bool defined;
     T value;
 };
-
-
 
 namespace math
 {
@@ -94,8 +96,10 @@ namespace math
     typedef std::shared_ptr<class GaussianObjectModel> GaussianObjectModelPtr;
     typedef std::shared_ptr<class GaussianObjectModelNormals> GaussianObjectModelNormalsPtr;
     typedef std::shared_ptr<class GaussianImplicitSurface3D> GaussianImplicitSurface3DPtr;
-    typedef std::shared_ptr<class GaussianImplicitSurface3DNormals> GaussianImplicitSurface3DNormalsPtr;
-    typedef std::shared_ptr<class GaussianImplicitSurface3DCombined> GaussianImplicitSurface3DCombinedPtr;
+    typedef std::shared_ptr<class GaussianImplicitSurface3DNormals>
+        GaussianImplicitSurface3DNormalsPtr;
+    typedef std::shared_ptr<class GaussianImplicitSurface3DCombined>
+        GaussianImplicitSurface3DCombinedPtr;
     typedef std::shared_ptr<class DataR3R1> DataR3R1Ptr;
     typedef std::shared_ptr<class DataR3R2> DataR3R2Ptr;
     typedef std::shared_ptr<class MarchingCubes> MarchingCubesPtr;
@@ -105,7 +109,8 @@ namespace math
     typedef std::shared_ptr<struct Index3> Index3Ptr;
     typedef std::shared_ptr<class AbstractContactFeature> AbstractContactFeaturePtr;
     typedef std::shared_ptr<class BinContactFeature> BinContactFeaturePtr;
-    template<class T> class Array3D;
+    template <class T>
+    class Array3D;
     typedef std::shared_ptr<Array3D<float>> Array3DFloatPtr;
     typedef std::shared_ptr<Array3D<bool>> Array3DBoolPtr;
     //typedef std::shared_ptr<Array3D<>> Array3DPtr<T>;
@@ -124,7 +129,7 @@ namespace math
     typedef std::shared_ptr<class EdgeFeature> EdgeFeaturePtr;
 
 
-}
+} // namespace math
 
 namespace sim
 {
@@ -133,25 +138,25 @@ namespace sim
     class HapticExplorationData;
     typedef std::shared_ptr<HapticExplorationData> HapticExplorationDataPtr;
 
-    namespace objects{
+    namespace objects
+    {
 
-    class AbstractObject;
-    typedef std::shared_ptr<AbstractObject> AbstractObjectPtr;
-    class ImplicitObject;
-    typedef std::shared_ptr<ImplicitObject> ImplicitObjectPtr;
-    class InfiniteObject;
-    typedef std::shared_ptr<InfiniteObject> InfiniteObjectPtr;
-    class CompositeObject;
-    typedef std::shared_ptr<CompositeObject> CompositeObjectPtr;
-    class Sphere;
-    typedef std::shared_ptr<Sphere> SpherePtr;
-    class TriangleMeshObject;
-    typedef std::shared_ptr<TriangleMeshObject> TriangleMeshObjectPtr;
+        class AbstractObject;
+        typedef std::shared_ptr<AbstractObject> AbstractObjectPtr;
+        class ImplicitObject;
+        typedef std::shared_ptr<ImplicitObject> ImplicitObjectPtr;
+        class InfiniteObject;
+        typedef std::shared_ptr<InfiniteObject> InfiniteObjectPtr;
+        class CompositeObject;
+        typedef std::shared_ptr<CompositeObject> CompositeObjectPtr;
+        class Sphere;
+        typedef std::shared_ptr<Sphere> SpherePtr;
+        class TriangleMeshObject;
+        typedef std::shared_ptr<TriangleMeshObject> TriangleMeshObjectPtr;
 
 
-
-    }
-}
+    } // namespace objects
+} // namespace sim
 
 namespace explorationControllers
 {
@@ -171,15 +176,4 @@ namespace explorationControllers
     class Target;
     typedef std::shared_ptr<Target> TargetPtr;
 
-}
-
-
-
-
-
-
-
-
-
-
-
+} // namespace explorationControllers

@@ -1,17 +1,18 @@
 #include "io.h"
-#include "error.h"
 
 #include <filesystem>
 #include <fstream>
 #include <iostream>
 
+#include "error.h"
+
 
 namespace fs = std::filesystem;
 
-
 namespace simox
 {
-    json::json json::read(const std::string& filename)
+    json::json
+    json::read(const std::string& filename)
     {
         std::ifstream ifs;
         // Allow throwing std::ios_base::failure.
@@ -38,8 +39,8 @@ namespace simox
         }
     }
 
-
-    json::json json::read(std::istream& is)
+    json::json
+    json::read(std::istream& is)
     {
         json j;
         try
@@ -53,9 +54,11 @@ namespace simox
         return j;
     }
 
-
-    void json::write(const std::string& filename, const json& j,
-                     const int indent, const char indent_char)
+    void
+    json::write(const std::string& filename,
+                const json& j,
+                const int indent,
+                const char indent_char)
     {
         std::ofstream ofs;
         // Allow throwing std::ios_base::failure.
@@ -74,40 +77,37 @@ namespace simox
         }
     }
 
-
-    void json::write(std::ostream& os, const json& j,
-                     const int indent, const char indent_char)
+    void
+    json::write(std::ostream& os, const json& j, const int indent, const char indent_char)
     {
         os << j.dump(indent, indent_char);
     }
 
-}
+} // namespace simox
 
-
-
-nlohmann::json nlohmann::read_json(const std::string& filename)
+nlohmann::json
+nlohmann::read_json(const std::string& filename)
 {
     return simox::json::read(filename);
 }
 
-
-nlohmann::json nlohmann::read_json(std::istream& is)
+nlohmann::json
+nlohmann::read_json(std::istream& is)
 {
     return simox::json::read(is);
 }
 
-
-void nlohmann::write_json(const std::string& filename, const json& j,
-                          const int indent, const char indent_char)
+void
+nlohmann::write_json(const std::string& filename,
+                     const json& j,
+                     const int indent,
+                     const char indent_char)
 {
     simox::json::write(filename, j, indent, indent_char);
 }
 
-
-void nlohmann::write_json(std::ostream& os, const json& j,
-                          const int indent, const char indent_char)
+void
+nlohmann::write_json(std::ostream& os, const json& j, const int indent, const char indent_char)
 {
     simox::json::write(os, j, indent, indent_char);
 }
-
-

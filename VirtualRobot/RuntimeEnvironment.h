@@ -22,15 +22,14 @@
 */
 #pragma once
 
-#include "VirtualRobotImportExport.h"
-
+#include <iostream>
 #include <map>
 #include <string>
 #include <vector>
-#include <iostream>
 
 #include <Eigen/Core>
 
+#include "VirtualRobotImportExport.h"
 
 namespace VirtualRobot
 {
@@ -46,7 +45,7 @@ namespace VirtualRobot
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
         //! Return vector of all data paths.
-        static std::vector< std::string > getDataPaths();
+        static std::vector<std::string> getDataPaths();
 
         /// Set the runtime environment caption.
         static void setCaption(const std::string& caption);
@@ -126,13 +125,15 @@ namespace VirtualRobot
          *                         and all datapaths are searched for it.
          * \return A valid filename if it can be found, otherwise the standardFilename is returned.
         */
-        static std::string checkValidFileParameter(const std::string& key, const std::string& standardFilename);
+        static std::string checkValidFileParameter(const std::string& key,
+                                                   const std::string& standardFilename);
 
         /*!
          * Checks command line arguments for parameter key.
          * If present the corresponding value is returned, otherwise standardValue will be returned.
          */
-        static std::string checkParameter(const std::string& key, const std::string& standardValue = "");
+        static std::string checkParameter(const std::string& key,
+                                          const std::string& standardValue = "");
 
         //! Print status.
         static void print();
@@ -149,11 +150,15 @@ namespace VirtualRobot
 
 
     protected:
+        RuntimeEnvironment()
+        {
+        }
 
-        RuntimeEnvironment() {}
-        virtual ~RuntimeEnvironment() {}
+        virtual ~RuntimeEnvironment()
+        {
+        }
 
         static void init();
     };
 
-} // namespace
+} // namespace VirtualRobot

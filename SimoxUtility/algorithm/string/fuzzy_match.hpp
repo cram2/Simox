@@ -2,8 +2,9 @@
 
 #ifdef DIFFLIB_FOUND
 
-#include <difflib.h>
 #include <string>
+
+#include <difflib.h>
 
 namespace simox::alg
 {

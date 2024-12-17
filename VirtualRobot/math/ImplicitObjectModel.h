@@ -22,29 +22,37 @@
 #pragma once
 
 #include "../VirtualRobot.h"
-#include "MathForwardDefinitions.h"
 #include "ContactList.h"
+#include "MathForwardDefinitions.h"
 #include "SimpleAbstractFunctionR3R1.h"
 
 namespace math
 {
-class VIRTUAL_ROBOT_IMPORT_EXPORT ImplicitObjectModel
-{
-public:
-    ContactListPtr Contacts() {return contacts;}
-    SimpleAbstractFunctionR3R1Ptr Model() {return model;}
+    class VIRTUAL_ROBOT_IMPORT_EXPORT ImplicitObjectModel
+    {
+    public:
+        ContactListPtr
+        Contacts()
+        {
+            return contacts;
+        }
 
-    ImplicitObjectModel();
-    virtual  void Update() = 0;
-    virtual  void AddContact(Contact contact) = 0;
-    //virtual  void RemoveContact(Contact contact);
-    virtual  void Clear();
-    virtual  std::vector<float> GetContactWeights() = 0;
+        SimpleAbstractFunctionR3R1Ptr
+        Model()
+        {
+            return model;
+        }
+
+        ImplicitObjectModel();
+        virtual void Update() = 0;
+        virtual void AddContact(Contact contact) = 0;
+        //virtual  void RemoveContact(Contact contact);
+        virtual void Clear();
+        virtual std::vector<float> GetContactWeights() = 0;
 
 
-protected:
-    ContactListPtr contacts;
-    SimpleAbstractFunctionR3R1Ptr model;
-};
-}
-
+    protected:
+        ContactListPtr contacts;
+        SimpleAbstractFunctionR3R1Ptr model;
+    };
+} // namespace math

@@ -1,22 +1,22 @@
-#include <VirtualRobot/Robot.h>
-#include <VirtualRobot/VirtualRobotException.h>
+#include <filesystem>
+#include <iostream>
+#include <string>
+
+#include <VirtualRobot/Import/URDF/SimoxURDFFactory.h>
 #include <VirtualRobot/Nodes/RobotNode.h>
 #include <VirtualRobot/Nodes/RobotNodeRevoluteFactory.h>
-#include <VirtualRobot/Transformation/DHParameter.h>
-#include <VirtualRobot/XML/RobotIO.h>
+#include <VirtualRobot/Robot.h>
 #include <VirtualRobot/RuntimeEnvironment.h>
-#include <VirtualRobot/Import/URDF/SimoxURDFFactory.h>
-
-#include <string>
-#include <iostream>
-#include <filesystem>
+#include <VirtualRobot/Transformation/DHParameter.h>
+#include <VirtualRobot/VirtualRobotException.h>
+#include <VirtualRobot/XML/RobotIO.h>
 
 using std::cout;
 using std::endl;
 using namespace VirtualRobot;
 
-
-int main(int /*argc*/, char* /*argv*/[])
+int
+main(int /*argc*/, char* /*argv*/[])
 {
     SimoxURDFFactory f;
 

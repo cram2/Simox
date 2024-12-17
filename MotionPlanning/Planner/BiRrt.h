@@ -22,9 +22,9 @@
 */
 #pragma once
 
-#include "../Saba.h"
-#include "../CSpace/CSpaceSampled.h"
 #include "../CSpace/CSpacePath.h"
+#include "../CSpace/CSpaceSampled.h"
+#include "../Saba.h"
 #include "Rrt.h"
 
 namespace Saba
@@ -48,7 +48,10 @@ namespace Saba
             \param modeB Specify the RRT method that should be used to build the second tree
             \param samplingSize
         */
-        BiRrt(CSpacePtr cspace, RrtMethod modeA = eConnect, RrtMethod modeB = eConnect, float samplingSize = -1);
+        BiRrt(CSpacePtr cspace,
+              RrtMethod modeA = eConnect,
+              RrtMethod modeB = eConnect,
+              float samplingSize = -1);
         ~BiRrt() override;
 
         /*!
@@ -71,16 +74,12 @@ namespace Saba
         CSpaceTreePtr getTree2();
 
     protected:
-
         bool createSolution(bool bQuiet = false) override;
 
-        CSpaceTreePtr tree2;                    //!< the second tree
+        CSpaceTreePtr tree2; //!< the second tree
 
-        int lastAddedID2;               //!< ID of last added node
+        int lastAddedID2; //!< ID of last added node
         RrtMethod rrtMode2;
     };
 
-} // namespace
-
-
-
+} // namespace Saba

@@ -22,30 +22,51 @@
 */
 #pragma once
 
-#include "../VirtualRobot.h"
 #include "../SceneObject.h"
+#include "../VirtualRobot.h"
 #include "RobotNodeFactory.h"
-
 
 namespace VirtualRobot
 {
     class RobotNode;
 
-    class VIRTUAL_ROBOT_IMPORT_EXPORT RobotNodeRevoluteFactory  : public RobotNodeFactory
+    class VIRTUAL_ROBOT_IMPORT_EXPORT RobotNodeRevoluteFactory : public RobotNodeFactory
     {
     public:
         RobotNodeRevoluteFactory();
         ~RobotNodeRevoluteFactory() override;
 
-        RobotNodePtr createRobotNode(RobotPtr robot, const std::string& nodeName, VisualizationNodePtr visualizationModel, CollisionModelPtr collisionModel, float limitLow, float limitHigh, float jointValueOffset, const Eigen::Matrix4f& preJointTransform, const Eigen::Vector3f& axis, const Eigen::Vector3f& translationDirection, const SceneObject::Physics& p = SceneObject::Physics(), RobotNode::RobotNodeType rntype = RobotNode::Generic) const override;
-        RobotNodePtr createRobotNodeDH(RobotPtr robot, const std::string& nodeName, VisualizationNodePtr visualizationModel, CollisionModelPtr collisionModel, float limitLow, float limitHigh, float jointValueOffset, const DHParameter& dhParameters, const SceneObject::Physics& p = SceneObject::Physics(), RobotNode::RobotNodeType rntype = RobotNode::Generic) const override;
+        RobotNodePtr
+        createRobotNode(RobotPtr robot,
+                        const std::string& nodeName,
+                        VisualizationNodePtr visualizationModel,
+                        CollisionModelPtr collisionModel,
+                        float limitLow,
+                        float limitHigh,
+                        float jointValueOffset,
+                        const Eigen::Matrix4f& preJointTransform,
+                        const Eigen::Vector3f& axis,
+                        const Eigen::Vector3f& translationDirection,
+                        const SceneObject::Physics& p = SceneObject::Physics(),
+                        RobotNode::RobotNodeType rntype = RobotNode::Generic) const override;
+        RobotNodePtr
+        createRobotNodeDH(RobotPtr robot,
+                          const std::string& nodeName,
+                          VisualizationNodePtr visualizationModel,
+                          CollisionModelPtr collisionModel,
+                          float limitLow,
+                          float limitHigh,
+                          float jointValueOffset,
+                          const DHParameter& dhParameters,
+                          const SceneObject::Physics& p = SceneObject::Physics(),
+                          RobotNode::RobotNodeType rntype = RobotNode::Generic) const override;
         // AbstractFactoryMethod
     public:
         static std::string getName();
         static std::shared_ptr<RobotNodeFactory> createInstance(void*);
+
     private:
         static SubClassRegistry registry;
     };
 
 } // namespace VirtualRobot
-

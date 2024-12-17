@@ -1,13 +1,13 @@
 
 
 
-
-
 #include "ConvexHullGenerator.h"
-#include <VirtualRobot/Visualization/TriMeshModel.h>
+
+#include <cfloat>
 #include <cmath>
 #include <iostream>
-#include <cfloat>
+
+#include <VirtualRobot/Visualization/TriMeshModel.h>
 
 //#define CONVEXHULL_DEBUG_OUTPUT
 
@@ -15,11 +15,11 @@ using namespace std;
 using namespace VirtualRobot;
 using namespace VirtualRobot::MathTools;
 
-
-
 namespace GraspStudio
 {
-    bool ConvexHullGenerator::ConvertPoints(const std::vector<Eigen::Vector3f>& points, double* storePointsQHull)
+    bool
+    ConvexHullGenerator::ConvertPoints(const std::vector<Eigen::Vector3f>& points,
+                                       double* storePointsQHull)
     {
         for (int i = 0; i < (int)points.size(); i++)
         {
@@ -30,7 +30,9 @@ namespace GraspStudio
         return true;
     }
 
-    bool ConvexHullGenerator::ConvertPoints(const std::vector<ContactPoint>& points, double* storePointsQHull)
+    bool
+    ConvexHullGenerator::ConvertPoints(const std::vector<ContactPoint>& points,
+                                       double* storePointsQHull)
     {
         for (int i = 0; i < (int)points.size(); i++)
         {
@@ -44,8 +46,8 @@ namespace GraspStudio
         return true;
     }
 
-
-    VirtualRobot::MathTools::ConvexHull3DPtr ConvexHullGenerator::CreateConvexHull(VirtualRobot::TriMeshModelPtr pointsInput)
+    VirtualRobot::MathTools::ConvexHull3DPtr
+    ConvexHullGenerator::CreateConvexHull(VirtualRobot::TriMeshModelPtr pointsInput)
     {
         return CreateConvexHull(pointsInput->vertices);
     }
@@ -336,15 +338,19 @@ namespace GraspStudio
         * /
     }*/
 
-    void ConvexHullGenerator::PrintVertices(std::vector<ContactPoint>& pointsInput)
+    void
+    ConvexHullGenerator::PrintVertices(std::vector<ContactPoint>& pointsInput)
     {
         for (std::size_t i = 0; i < pointsInput.size(); i++)
         {
-            std::cout << "v" << i << ": " << pointsInput[i].p[0] << "," << pointsInput[i].p[1] << "," << pointsInput[i].p[2] << ","
-                 << pointsInput[i].n[0] << "," << pointsInput[i].n[1] << "," << pointsInput[i].n[2] << std::endl;
+            std::cout << "v" << i << ": " << pointsInput[i].p[0] << "," << pointsInput[i].p[1]
+                      << "," << pointsInput[i].p[2] << "," << pointsInput[i].n[0] << ","
+                      << pointsInput[i].n[1] << "," << pointsInput[i].n[2] << std::endl;
         }
     }
-    void ConvexHullGenerator::PrintStatistics(VirtualRobot::MathTools::ConvexHull6DPtr convHull)
+
+    void
+    ConvexHullGenerator::PrintStatistics(VirtualRobot::MathTools::ConvexHull6DPtr convHull)
     {
         if (!convHull)
         {
@@ -433,7 +439,11 @@ namespace GraspStudio
         std::cout << "\t\t nz: " << minValue[5] << "," << maxValue[5] << std::endl;
     }
 
-    bool ConvexHullGenerator::checkVerticeOrientation(const Eigen::Vector3f& v1, const Eigen::Vector3f& v2, const Eigen::Vector3f& v3, const Eigen::Vector3f& n)
+    bool
+    ConvexHullGenerator::checkVerticeOrientation(const Eigen::Vector3f& v1,
+                                                 const Eigen::Vector3f& v2,
+                                                 const Eigen::Vector3f& v3,
+                                                 const Eigen::Vector3f& n)
     {
         Eigen::Vector3f tmp;
         Eigen::Vector3f v1v2;
@@ -452,5 +462,4 @@ namespace GraspStudio
     }
 
 
-
-} // namespace
+} // namespace GraspStudio

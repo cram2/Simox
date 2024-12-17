@@ -4,30 +4,28 @@
 * @copyright  2019 Raphael Grimm
 */
 
-#define BOOST_TEST_MODULE SimoxUtility/shapes/JsonConversionsTest
+#define BOOST_TEST_MODULE SimoxUtility / shapes / JsonConversionsTest
 
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <random>
-#include <filesystem>
 
 #include <boost/test/included/unit_test.hpp>
 
-#include <SimoxUtility/shapes/json_conversions.h>
-#include <SimoxUtility/shapes/OrientedBox.h>
-#include <SimoxUtility/shapes/AxisAlignedBoundingBox.h>
 #include <SimoxUtility/json/eigen_conversion.h>
 #include <SimoxUtility/json/io.h>
 #include <SimoxUtility/json/util.h>
-
+#include <SimoxUtility/shapes/AxisAlignedBoundingBox.h>
+#include <SimoxUtility/shapes/OrientedBox.h>
+#include <SimoxUtility/shapes/json_conversions.h>
 
 #include "JsonConversionsTest_files.h"
 
 
-#define BOOST_CHECK_EQUAL_VECTOR(lhs, rhs, prec) \
-    BOOST_TEST_INFO((lhs).transpose() << " == " << (rhs).transpose()); \
+#define BOOST_CHECK_EQUAL_VECTOR(lhs, rhs, prec)                                                   \
+    BOOST_TEST_INFO((lhs).transpose() << " == " << (rhs).transpose());                             \
     BOOST_CHECK_LE(((lhs) - (rhs)).norm(), prec);
-
 
 namespace JsonConversionsTest
 {
@@ -41,11 +39,11 @@ namespace JsonConversionsTest
         std::vector<std::string> jsonOrientedBoxFilenames;
         std::vector<std::string> jsonAllFilenames;
 
-
         Fixture()
         {
-            auto writeFile = [this](std::string filename, const std::string& text,
-                    std::vector<std::string>& list)
+            auto writeFile = [this](std::string filename,
+                                    const std::string& text,
+                                    std::vector<std::string>& list)
             {
                 filename = prefix + filename;
 
@@ -65,8 +63,12 @@ namespace JsonConversionsTest
 
             writeFile("AABB_center_extents.json", AABB_center_extents, jsonAabbFilenames);
             writeFile("AABB_min_max.json", AABB_min_max, jsonAabbFilenames);
-            writeFile("OrientedBox_position_orientation_extents.json", OrientedBox_position_orientation_extents, jsonOrientedBoxFilenames);
-            writeFile("OrientedBox_pos_ori_dimensions.json", OrientedBox_pos_ori_dimensions, jsonOrientedBoxFilenames);
+            writeFile("OrientedBox_position_orientation_extents.json",
+                      OrientedBox_position_orientation_extents,
+                      jsonOrientedBoxFilenames);
+            writeFile("OrientedBox_pos_ori_dimensions.json",
+                      OrientedBox_pos_ori_dimensions,
+                      jsonOrientedBoxFilenames);
 
             for (const std::string& filename : jsonAllFilenames)
             {
@@ -76,6 +78,7 @@ namespace JsonConversionsTest
                 }
             }
         }
+
         ~Fixture()
         {
             for (const std::string& filename : jsonAllFilenames)
@@ -88,9 +91,9 @@ namespace JsonConversionsTest
             }
         }
 
-
         template <typename FloatT>
-        void test_read_OrientedBox_type(const FloatT prec)
+        void
+        test_read_OrientedBox_type(const FloatT prec)
         {
             using Vector3 = Eigen::Matrix<FloatT, 3, 1>;
             using Quaternion = Eigen::Quaternion<FloatT>;
@@ -105,19 +108,19 @@ namespace JsonConversionsTest
 
                     const simox::OrientedBox<FloatT> ob = j.get<simox::OrientedBox<FloatT>>();
                     BOOST_CHECK_EQUAL_VECTOR(ob.center(), Vector3(10, -20, 0), prec);
-                    BOOST_CHECK_EQUAL_VECTOR(ob.rotation(), Quaternion(0.707, 0, 0.707, 0).toRotationMatrix(), prec);
-                    BOOST_CHECK_EQUAL_VECTOR(ob.dimensions(), Vector3(100, 200, 300), prec * FloatT(1e2));
+                    BOOST_CHECK_EQUAL_VECTOR(
+                        ob.rotation(), Quaternion(0.707, 0, 0.707, 0).toRotationMatrix(), prec);
+                    BOOST_CHECK_EQUAL_VECTOR(
+                        ob.dimensions(), Vector3(100, 200, 300), prec * FloatT(1e2));
                 }
             }
         }
-
     };
 
-}
+} // namespace JsonConversionsTest
 
 
 BOOST_FIXTURE_TEST_SUITE(JsonConversionsTest, Fixture)
-
 
 BOOST_AUTO_TEST_CASE(test_read_AABB)
 {
@@ -142,12 +145,10 @@ BOOST_AUTO_TEST_CASE(test_read_AABB)
     }
 }
 
-
 BOOST_AUTO_TEST_CASE(test_read_OrientedBox_float)
 {
     test_read_OrientedBox_type<float>(PRECF);
 }
-
 
 BOOST_AUTO_TEST_CASE(test_read_OrientedBox_double)
 {

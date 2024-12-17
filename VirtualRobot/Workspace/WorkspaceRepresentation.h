@@ -22,14 +22,13 @@
 */
 #pragma once
 
-#include "../VirtualRobot.h"
-
 #include <cmath>
 #include <vector>
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
+#include "../VirtualRobot.h"
 
 namespace VirtualRobot
 {
@@ -47,10 +46,12 @@ namespace VirtualRobot
             When the torso moves, the data representation also changes it's position according to the position of the shoulder.
     */
 
-    class VIRTUAL_ROBOT_IMPORT_EXPORT WorkspaceRepresentation : public std::enable_shared_from_this<WorkspaceRepresentation>
+    class VIRTUAL_ROBOT_IMPORT_EXPORT WorkspaceRepresentation :
+        public std::enable_shared_from_this<WorkspaceRepresentation>
     {
     public:
         friend class CoinVisualizationFactory;
+
     public:
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
@@ -60,21 +61,22 @@ namespace VirtualRobot
         enum eOrientationType
         {
             RPY,
-            EulerXYZ,           // intrinsic
-            EulerXYZExtrinsic,  // fixed frame (standard)
-            Hopf                // hopf coordinates
+            EulerXYZ, // intrinsic
+            EulerXYZExtrinsic, // fixed frame (standard)
+            Hopf // hopf coordinates
         };
 
         struct VolumeInfo
         {
-            unsigned int voxelCount3D;              // overall number of 3d voxels
-            unsigned int filledVoxelCount3D;        // number of filled voxels (nr of 3d position voxels for which at least one 6D cell exists that is filled)
-            unsigned int borderVoxelCount3D;        // number of border voxels (3d voxels with at least 2 emoty neighbors in 3d)
-            float volumeVoxel3D;                    // volume of one voxel (m^3)
-            float volumeFilledVoxels3D;             // accumulated volume of all filled voxels (m^3)
-            float volume3D;                         // (filledVoxelCount3D - 0.5*borderVoxelCount3D) * volumeVoxel3D
+            unsigned int voxelCount3D; // overall number of 3d voxels
+            unsigned int
+                filledVoxelCount3D; // number of filled voxels (nr of 3d position voxels for which at least one 6D cell exists that is filled)
+            unsigned int
+                borderVoxelCount3D; // number of border voxels (3d voxels with at least 2 emoty neighbors in 3d)
+            float volumeVoxel3D; // volume of one voxel (m^3)
+            float volumeFilledVoxels3D; // accumulated volume of all filled voxels (m^3)
+            float volume3D; // (filledVoxelCount3D - 0.5*borderVoxelCount3D) * volumeVoxel3D
         };
-
 
         WorkspaceRepresentation(RobotPtr robot);
 
@@ -126,8 +128,10 @@ namespace VirtualRobot
          * @param maxOpeningRight angle in [rad]. Positive angle to indicate accepted lower angle limit.
          *
          */
-        void invalidateRegion(bool inverted = false, float maxOpeningLeft = M_PI_2, float maxOpeningRight = M_PI_2);
-        
+        void invalidateRegion(bool inverted = false,
+                              float maxOpeningLeft = M_PI_2,
+                              float maxOpeningRight = M_PI_2);
+
 
         /*!
             Initialize and reset all data.
@@ -188,7 +192,9 @@ namespace VirtualRobot
             \param nodeSet The nodes. If not given, the standard nodeSet is used.
             \param checkForSelfCollisions Build a collision-free configuration. If true, random configs are generated until one is collision-free.
         */
-        virtual bool setRobotNodesToRandomConfig(VirtualRobot::RobotNodeSetPtr nodeSet = VirtualRobot::RobotNodeSetPtr(), bool checkForSelfCollisions = true);
+        virtual bool setRobotNodesToRandomConfig(
+            VirtualRobot::RobotNodeSetPtr nodeSet = VirtualRobot::RobotNodeSetPtr(),
+            bool checkForSelfCollisions = true);
 
         /*!
             Cut all data >1 to 1. This reduces the file size when saving compressed data.
@@ -228,7 +234,12 @@ namespace VirtualRobot
         /*!
             get entry of given voxel.
         */
-        virtual unsigned char getVoxelEntry(unsigned int a, unsigned int b, unsigned int c, unsigned int d, unsigned int e, unsigned int f) const;
+        virtual unsigned char getVoxelEntry(unsigned int a,
+                                            unsigned int b,
+                                            unsigned int c,
+                                            unsigned int d,
+                                            unsigned int e,
+                                            unsigned int f) const;
 
         /*!
             Sums all angle (x3,x4,x5) entries for the given position.
@@ -257,7 +268,8 @@ namespace VirtualRobot
             Get the corresponding voxel coordinates.
             If false is returned the position is outside the covered workspace.
         */
-        virtual bool getVoxelFromPosition(const Eigen::Matrix4f& globalPose, unsigned int v[3]) const;
+        virtual bool getVoxelFromPosition(const Eigen::Matrix4f& globalPose,
+                                          unsigned int v[3]) const;
 
         /*!
             Computes center of corresponding voxel in global coord system.
@@ -307,6 +319,7 @@ namespace VirtualRobot
             float minBounds[2]; // in global coord system
             float maxBounds[2]; // in global coord system
         };
+
         typedef std::shared_ptr<WorkspaceCut2D> WorkspaceCut2DPtr;
 
         struct WorkspaceCut2DTransformation
@@ -322,7 +335,8 @@ namespace VirtualRobot
             Create a horizontal cut through this workspace data. Therefore, the z component and the orientation of the reference pose (in global coordinate system) is used.
             Then the x and y components are iterated and the corresponding entires are used to fill the 2d grid.
         */
-        WorkspaceCut2DPtr createCut(const Eigen::Matrix4f& referencePose, float cellSize, bool sumAngles) const;
+        WorkspaceCut2DPtr
+        createCut(const Eigen::Matrix4f& referencePose, float cellSize, bool sumAngles) const;
 
         /*!
         * \brief createCut Create a cut at a specific height (assuming z is upwards).
@@ -337,13 +351,17 @@ namespace VirtualRobot
             Build all transformations from referenceNode to cutXY data.h Only entries>0 are considered.
             If referenceNode is set, the transformations are given in the corresponding coordinate system.
         */
-        std::vector<WorkspaceCut2DTransformation> createCutTransformations(WorkspaceCut2DPtr cutXY, RobotNodePtr referenceNode = RobotNodePtr(), float maxAngle = M_PIf32);
+        std::vector<WorkspaceCut2DTransformation>
+        createCutTransformations(WorkspaceCut2DPtr cutXY,
+                                 RobotNodePtr referenceNode = RobotNodePtr(),
+                                 float maxAngle = M_PIf32);
 
         /*!
             Computes the axis aligned bounding box of this object in global coordinate system.
             Note, that the bbox changes when the robot moves.
         */
-        bool getWorkspaceExtends(Eigen::Vector3f& storeMinBBox, Eigen::Vector3f& storeMaxBBox) const;
+        bool getWorkspaceExtends(Eigen::Vector3f& storeMinBBox,
+                                 Eigen::Vector3f& storeMaxBBox) const;
 
         /*!
             The bounding box in global frame.
@@ -355,24 +373,32 @@ namespace VirtualRobot
         float getDiscretizeParameterTranslation();
         float getDiscretizeParameterRotation();
 
-        RobotPtr getRobot()
+        RobotPtr
+        getRobot()
         {
             return robot;
         }
 
-        SceneObjectSetPtr getCollisionModelStatic()
+        SceneObjectSetPtr
+        getCollisionModelStatic()
         {
             return staticCollisionModel;
         }
-        SceneObjectSetPtr getCollisionModelDynamic()
+
+        SceneObjectSetPtr
+        getCollisionModelDynamic()
         {
             return dynamicCollisionModel;
         }
-        RobotNodePtr getTcp()
+
+        RobotNodePtr
+        getTcp()
         {
             return tcpNode;
         }
-        bool getAdjustOnOverflow()
+
+        bool
+        getAdjustOnOverflow()
         {
             return adjustOnOverflow;
         }
@@ -398,11 +424,15 @@ namespace VirtualRobot
             \param numThreads number of worker threads used behind the scenes to append random TCP poses to workspace data.
             \param checkForSelfCollisions Build a collision-free configuration. If true, random configs are generated until one is collision-free.
         */
-        virtual void addRandomTCPPoses(unsigned int loops, unsigned int numThreads, bool checkForSelfCollisions = true);
+        virtual void addRandomTCPPoses(unsigned int loops,
+                                       unsigned int numThreads,
+                                       bool checkForSelfCollisions = true);
 
         void setVoxelEntry(unsigned int v[6], unsigned char e);
         void setEntry(const Eigen::Matrix4f& poseGlobal, unsigned char e);
-        void setEntryCheckNeighbors(const Eigen::Matrix4f& poseGlobal, unsigned char e, unsigned int neighborVoxels);
+        void setEntryCheckNeighbors(const Eigen::Matrix4f& poseGlobal,
+                                    unsigned char e,
+                                    unsigned int neighborVoxels);
 
         virtual void toLocal(Eigen::Matrix4f& p) const;
         virtual void toGlobal(Eigen::Matrix4f& p) const;
@@ -412,7 +442,9 @@ namespace VirtualRobot
         //! Convert a 4x4 matrix to a pos + ori vector
         void matrix2Vector(const Eigen::Matrix4f& m, float x[6]) const;
         void vector2Matrix(const float x[6], Eigen::Matrix4f& m) const;
-        void vector2Matrix(const Eigen::Vector3f& pos, const Eigen::Vector3f& rot, Eigen::Matrix4f& m) const;
+        void vector2Matrix(const Eigen::Vector3f& pos,
+                           const Eigen::Vector3f& rot,
+                           Eigen::Matrix4f& m) const;
         virtual bool getVoxelFromPose(float x[6], unsigned int v[6]) const;
         virtual bool getVoxelFromPosition(float x[3], unsigned int v[3]) const;
 
@@ -433,25 +465,35 @@ namespace VirtualRobot
         bool getPoseFromVoxel(unsigned int x[], float v[]) const;
 
         virtual VolumeInfo computeVolumeInformation();
+
     protected:
-
         /*!
             Derived classes may implement some custom data access.
         */
-        virtual bool customLoad(std::ifstream&)
-        {
-            return true;
-        }
-        /*!
-            Derived classes may implement some custom data access.
-        */
-        virtual bool customSave(std::ofstream&)
+        virtual bool
+        customLoad(std::ifstream&)
         {
             return true;
         }
 
-        virtual void customInitialize() {}
-        virtual void customPrint() {}
+        /*!
+            Derived classes may implement some custom data access.
+        */
+        virtual bool
+        customSave(std::ofstream&)
+        {
+            return true;
+        }
+
+        virtual void
+        customInitialize()
+        {
+        }
+
+        virtual void
+        customPrint()
+        {
+        }
 
         //! Uncompress the data
         void uncompressData(const unsigned char* source, int size, unsigned char* dest);
@@ -503,7 +545,6 @@ namespace VirtualRobot
 
         //! Specifies how the rotation part (x[3],x[4],x[5]) of an 6D voxel entry is encoded.
         eOrientationType orientationType;
-
     };
 
 } // namespace VirtualRobot

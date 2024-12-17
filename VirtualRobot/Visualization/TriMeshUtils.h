@@ -27,23 +27,45 @@
 
 #include "TriMeshModel.h"
 
-namespace VirtualRobot {
-
-class TriMeshUtils
+namespace VirtualRobot
 {
-public:
-    static void CreateBoxTriangles(std::vector<TriMeshModel::triangle> &triangles, const Eigen::Matrix4f &globalPose, float width = 50.f, float height = 50.f, float depth = 50.f);
-    static std::vector<TriMeshModel::triangle> CreateBoxTriangles(const Eigen::Matrix4f &globalPose, float width = 50.f, float height = 50.f, float depth = 50.f);
-    static TriMeshModelPtr CreateBox(const Eigen::Matrix4f &globalPose, float width = 50.f, float height = 50.f, float depth = 50.f,
-                                     const VisualizationFactory::Color &color = VisualizationFactory::Color::Gray(), const std::vector<VisualizationFactory::Color>& colors = {});
-    static TriMeshModelPtr CreateSparseBoxGrid(const Eigen::Matrix4f &globalPose, const std::vector<Eigen::Vector3f>& positions,
-                                               float width = 50.f, float height = 50.f, float depth = 50.f,
-                                               const VisualizationFactory::Color &color = VisualizationFactory::Color::Gray(),
-                                               const std::vector<VisualizationFactory::Color>& colors = {});
 
-    static std::optional<Eigen::Vector3f> sampleSurfacePoint(const std::vector<float>& cumulativeAreas, double totalArea, const VirtualRobot::TriMeshModel& tri);
-    //! Uniformly samples points on the surface of a trimesh model and can be used to create a point cloud of the model
-    static std::vector<Eigen::Vector3f> uniformSampling(const VirtualRobot::TriMeshModel& tri, unsigned int n = 1000);
-};
+    class TriMeshUtils
+    {
+    public:
+        static void CreateBoxTriangles(std::vector<TriMeshModel::triangle>& triangles,
+                                       const Eigen::Matrix4f& globalPose,
+                                       float width = 50.f,
+                                       float height = 50.f,
+                                       float depth = 50.f);
+        static std::vector<TriMeshModel::triangle>
+        CreateBoxTriangles(const Eigen::Matrix4f& globalPose,
+                           float width = 50.f,
+                           float height = 50.f,
+                           float depth = 50.f);
+        static TriMeshModelPtr
+        CreateBox(const Eigen::Matrix4f& globalPose,
+                  float width = 50.f,
+                  float height = 50.f,
+                  float depth = 50.f,
+                  const VisualizationFactory::Color& color = VisualizationFactory::Color::Gray(),
+                  const std::vector<VisualizationFactory::Color>& colors = {});
+        static TriMeshModelPtr CreateSparseBoxGrid(
+            const Eigen::Matrix4f& globalPose,
+            const std::vector<Eigen::Vector3f>& positions,
+            float width = 50.f,
+            float height = 50.f,
+            float depth = 50.f,
+            const VisualizationFactory::Color& color = VisualizationFactory::Color::Gray(),
+            const std::vector<VisualizationFactory::Color>& colors = {});
+
+        static std::optional<Eigen::Vector3f>
+        sampleSurfacePoint(const std::vector<float>& cumulativeAreas,
+                           double totalArea,
+                           const VirtualRobot::TriMeshModel& tri);
+        //! Uniformly samples points on the surface of a trimesh model and can be used to create a point cloud of the model
+        static std::vector<Eigen::Vector3f> uniformSampling(const VirtualRobot::TriMeshModel& tri,
+                                                            unsigned int n = 1000);
+    };
 
 } // namespace VirtualRobot

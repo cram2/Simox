@@ -20,45 +20,61 @@
  */
 
 #include "Grid3D.h"
-#include "cmath"
+
 #include "Helpers.h"
+#include "cmath"
 
 namespace math
 {
-    Grid3D::Grid3D(Eigen::Vector3f p1, Eigen::Vector3f p2, int stepsX, int stepsY, int stepsZ)
-        : p1(p1), p2(p2), stepsX(stepsX), stepsY(stepsY), stepsZ(stepsZ)
-    { }
-
-    Grid3DPtr Grid3D::CreateFromBox(Eigen::Vector3f p1, Eigen::Vector3f p2, float stepLength)
+    Grid3D::Grid3D(Eigen::Vector3f p1, Eigen::Vector3f p2, int stepsX, int stepsY, int stepsZ) :
+        p1(p1), p2(p2), stepsX(stepsX), stepsY(stepsY), stepsZ(stepsZ)
     {
-        Eigen::Vector3f steps = (p2 - p1) / stepLength;
-        return Grid3DPtr(new Grid3D(p1, p2, std::round(steps.x()), std::round(steps.y()), std::round(steps.z())));
     }
 
-    Grid3DPtr Grid3D::CreateFromCenterAndSize(const Eigen::Vector3f& center, const Eigen::Vector3f& size, float stepLength)
+    Grid3DPtr
+    Grid3D::CreateFromBox(Eigen::Vector3f p1, Eigen::Vector3f p2, float stepLength)
+    {
+        Eigen::Vector3f steps = (p2 - p1) / stepLength;
+        return Grid3DPtr(new Grid3D(
+            p1, p2, std::round(steps.x()), std::round(steps.y()), std::round(steps.z())));
+    }
+
+    Grid3DPtr
+    Grid3D::CreateFromCenterAndSize(const Eigen::Vector3f& center,
+                                    const Eigen::Vector3f& size,
+                                    float stepLength)
     {
         return CreateFromBox(center - size / 2, center + size / 2, stepLength);
     }
 
-    Grid3DPtr Grid3D::CreateFromCenterAndSteps(const Eigen::Vector3f& center, const Eigen::Vector3f& steps, float stepLength)
+    Grid3DPtr
+    Grid3D::CreateFromCenterAndSteps(const Eigen::Vector3f& center,
+                                     const Eigen::Vector3f& steps,
+                                     float stepLength)
     {
-        return Grid3DPtr(new Grid3D(center - steps * stepLength / 2, center + steps * stepLength / 2, std::round(steps.x()), std::round(steps.y()), std::round(steps.z())));
+        return Grid3DPtr(new Grid3D(center - steps * stepLength / 2,
+                                    center + steps * stepLength / 2,
+                                    std::round(steps.x()),
+                                    std::round(steps.y()),
+                                    std::round(steps.z())));
     }
 
-
-    Eigen::Vector3f Grid3D::Get(int x, int y, int z) const
+    Eigen::Vector3f
+    Grid3D::Get(int x, int y, int z) const
     {
         return Eigen::Vector3f(Helpers::Lerp(p1.x(), p2.x(), 0, stepsX, x),
                                Helpers::Lerp(p1.y(), p2.y(), 0, stepsY, y),
                                Helpers::Lerp(p1.z(), p2.z(), 0, stepsZ, z));
     }
 
-    Eigen::Vector3f Grid3D::Get(const Eigen::Vector3i& index) const
+    Eigen::Vector3f
+    Grid3D::Get(const Eigen::Vector3i& index) const
     {
         return Get(index.x(), index.y(), index.z());
     }
 
-    std::vector<Eigen::Vector3f> Grid3D::AllGridPoints() const
+    std::vector<Eigen::Vector3f>
+    Grid3D::AllGridPoints() const
     {
         std::vector<Eigen::Vector3f> points;
         for (int x = 0; x <= stepsX; x++)
@@ -74,12 +90,14 @@ namespace math
         return points;
     }
 
-    Eigen::Vector3i Grid3D::GetFirstIndex() const
+    Eigen::Vector3i
+    Grid3D::GetFirstIndex() const
     {
         return Eigen::Vector3i::Zero();
     }
 
-    bool Grid3D::IncrementIndex(Eigen::Vector3i& index) const
+    bool
+    Grid3D::IncrementIndex(Eigen::Vector3i& index) const
     {
         Eigen::Vector3i steps = Steps();
         for (int i = 0; i < 3; i++)
@@ -94,7 +112,8 @@ namespace math
         return false;
     }
 
-    bool Grid3D::IndexValid(const Eigen::Vector3i& index) const
+    bool
+    Grid3D::IndexValid(const Eigen::Vector3i& index) const
     {
         Eigen::Vector3i steps = Steps();
         for (int i = 0; i < 3; i++)
@@ -106,4 +125,4 @@ namespace math
         }
         return true;
     }
-}
+} // namespace math

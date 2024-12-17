@@ -1,32 +1,39 @@
 #include "GenericGraspPlanner.h"
 
+#include <VirtualRobot/CollisionDetection/CollisionChecker.h>
 #include <VirtualRobot/Grasping/Grasp.h>
+#include <VirtualRobot/Nodes/RobotNode.h>
 #include <VirtualRobot/Robot.h>
 #include <VirtualRobot/RobotConfig.h>
-#include <VirtualRobot/Nodes/RobotNode.h>
 #include <VirtualRobot/math/Helpers.h>
-#include <VirtualRobot/CollisionDetection/CollisionChecker.h>
 
-
-#include "../GraspQuality/GraspQualityMeasureWrenchSpace.h"
-#include "../GraspQuality/GraspQualityMeasure.h"
 #include "../ApproachMovementGenerator.h"
+#include "../GraspQuality/GraspQualityMeasure.h"
+#include "../GraspQuality/GraspQualityMeasureWrenchSpace.h"
 
 
 using namespace std;
-
 
 namespace GraspStudio
 {
 
 
-    GenericGraspPlanner::GenericGraspPlanner(VirtualRobot::GraspSetPtr graspSet, GraspStudio::GraspQualityMeasurePtr graspQuality, GraspStudio::ApproachMovementGeneratorPtr approach, float minQuality, bool forceClosure)
-        : GraspPlanner(graspSet), graspQuality(graspQuality), approach(approach), minQuality(minQuality), forceClosure(forceClosure)
+    GenericGraspPlanner::GenericGraspPlanner(VirtualRobot::GraspSetPtr graspSet,
+                                             GraspStudio::GraspQualityMeasurePtr graspQuality,
+                                             GraspStudio::ApproachMovementGeneratorPtr approach,
+                                             float minQuality,
+                                             bool forceClosure) :
+        GraspPlanner(graspSet),
+        graspQuality(graspQuality),
+        approach(approach),
+        minQuality(minQuality),
+        forceClosure(forceClosure)
     {
         THROW_VR_EXCEPTION_IF(!graspQuality, "NULL grasp quality...");
         THROW_VR_EXCEPTION_IF(!approach, "NULL approach...");
         THROW_VR_EXCEPTION_IF(!graspQuality->getObject(), "no object...");
-        THROW_VR_EXCEPTION_IF(graspQuality->getObject() != approach->getObject(), "graspQuality and approach have to use the same object.");
+        THROW_VR_EXCEPTION_IF(graspQuality->getObject() != approach->getObject(),
+                              "graspQuality and approach have to use the same object.");
         object = graspQuality->getObject();
         eef = approach->getEEF();
         THROW_VR_EXCEPTION_IF(!eef, "NULL eef in approach...");
@@ -37,10 +44,12 @@ namespace GraspStudio
         retreatOnLowContacts = true;
     }
 
-    GenericGraspPlanner::~GenericGraspPlanner()
-        = default;
+    GenericGraspPlanner::~GenericGraspPlanner() = default;
 
-    int GenericGraspPlanner::plan(int nrGrasps, int timeOutMS, VirtualRobot::SceneObjectSetPtr obstacles)
+    int
+    GenericGraspPlanner::plan(int nrGrasps,
+                              int timeOutMS,
+                              VirtualRobot::SceneObjectSetPtr obstacles)
     {
         startTime = std::chrono::system_clock::now();
         this->timeOutDuration = std::chrono::milliseconds(timeOutMS);
@@ -50,11 +59,14 @@ namespace GraspStudio
 
         if (verbose)
         {
-            GRASPSTUDIO_INFO << ": Searching " << nrGrasps << " grasps for EEF '" << approach->getEEF()->getName()
-                             << "' and object '" << graspQuality->getObject()->getName() << "'.\n"
+            GRASPSTUDIO_INFO << ": Searching " << nrGrasps << " grasps for EEF '"
+                             << approach->getEEF()->getName() << "' and object '"
+                             << graspQuality->getObject()->getName() << "'.\n"
                              << "timeout set to " << timeOutMS << " ms.\n";
-            GRASPSTUDIO_INFO << ": Approach movements are generated with " << approach->getName() << std::endl;
-            GRASPSTUDIO_INFO << ": Grasps are evaluated with " << graspQuality->getName() << std::endl;
+            GRASPSTUDIO_INFO << ": Approach movements are generated with " << approach->getName()
+                             << std::endl;
+            GRASPSTUDIO_INFO << ": Grasps are evaluated with " << graspQuality->getName()
+                             << std::endl;
         }
 
         while (!timeout() && nGraspsCreated < nrGrasps)
@@ -80,14 +92,16 @@ namespace GraspStudio
             const auto endt = std::chrono::system_clock::now();
             const auto dt = endt - startTime;
             const auto dtms = std::chrono::duration_cast<std::chrono::milliseconds>(dt);
-            GRASPSTUDIO_INFO << ": created " << nGraspsCreated << " valid grasps in " << nLoop << " loops"
-                              << "\n took " << dtms.count() << " ms " << std::endl;
+            GRASPSTUDIO_INFO << ": created " << nGraspsCreated << " valid grasps in " << nLoop
+                             << " loops"
+                             << "\n took " << dtms.count() << " ms " << std::endl;
         }
 
         return nGraspsCreated;
     }
 
-    bool GenericGraspPlanner::moveEEFAway(const Eigen::Vector3f& approachDir, float step, int maxLoops)
+    bool
+    GenericGraspPlanner::moveEEFAway(const Eigen::Vector3f& approachDir, float step, int maxLoops)
     {
         VR_ASSERT(eef);
         VR_ASSERT(approach);
@@ -126,7 +140,8 @@ namespace GraspStudio
         return finishedContactsOK;
     }
 
-    VirtualRobot::GraspPtr GenericGraspPlanner::planGrasp(VirtualRobot::SceneObjectSetPtr obstacles)
+    VirtualRobot::GraspPtr
+    GenericGraspPlanner::planGrasp(VirtualRobot::SceneObjectSetPtr obstacles)
     {
         auto start_time = chrono::high_resolution_clock::now();
         std::string graspPlannerName = "Simox - GraspStudio - " + graspQuality->getName();
@@ -173,7 +188,9 @@ namespace GraspStudio
             {
                 if (verbose)
                 {
-                    VR_INFO << "Low number of contacts, retreating hand (might be useful for a small object)" << std::endl;
+                    VR_INFO << "Low number of contacts, retreating hand (might be useful for a "
+                               "small object)"
+                            << std::endl;
                 }
                 if (moveEEFAway(approach->getApproachDirGlobal(), 5.0f, 10))
                 {
@@ -204,9 +221,12 @@ namespace GraspStudio
         Eigen::Matrix4f poseObject = object->getGlobalPose();
         Eigen::Matrix4f poseTcp = tcp->toLocalCoordinateSystem(poseObject);
 
-        VirtualRobot::GraspPtr grasp(new VirtualRobot::Grasp(
-                                         graspName.str(), robot->getType(), eef->getName(), poseTcp,
-                                         graspPlannerName, 0 /*score*/));
+        VirtualRobot::GraspPtr grasp(new VirtualRobot::Grasp(graspName.str(),
+                                                             robot->getType(),
+                                                             eef->getName(),
+                                                             poseTcp,
+                                                             graspPlannerName,
+                                                             0 /*score*/));
 
         // set joint config
         grasp->setConfiguration(eef->getConfiguration()->getRobotNodeJointValueMap());
@@ -240,7 +260,8 @@ namespace GraspStudio
         {
             if (verbose)
             {
-                GRASPSTUDIO_INFO << ": ignoring grasp hypothesis, low number of contacts" << std::endl;
+                GRASPSTUDIO_INFO << ": ignoring grasp hypothesis, low number of contacts"
+                                 << std::endl;
             }
             // result not valid due to low number of contacts
             float ms = getTimeMS();
@@ -283,7 +304,8 @@ namespace GraspStudio
         // found valid grasp
         if (verbose)
         {
-            GRASPSTUDIO_INFO << ": Found grasp with " << contacts.size() << " contacts, score: " << score << std::endl;
+            GRASPSTUDIO_INFO << ": Found grasp with " << contacts.size()
+                             << " contacts, score: " << score << std::endl;
         }
 
         float ms = getTimeMS();
@@ -298,26 +320,30 @@ namespace GraspStudio
         return grasp;
     }
 
-    VirtualRobot::EndEffector::ContactInfoVector GenericGraspPlanner::getContacts() const
+    VirtualRobot::EndEffector::ContactInfoVector
+    GenericGraspPlanner::getContacts() const
     {
         return contacts;
     }
 
-    void GenericGraspPlanner::setParameters(float minQuality, bool forceClosure)
+    void
+    GenericGraspPlanner::setParameters(float minQuality, bool forceClosure)
     {
         this->minQuality = minQuality;
         this->forceClosure = forceClosure;
     }
 
-    void GenericGraspPlanner::setRetreatOnLowContacts(bool enable)
+    void
+    GenericGraspPlanner::setRetreatOnLowContacts(bool enable)
     {
         retreatOnLowContacts = enable;
     }
 
-    bool GenericGraspPlanner::timeout()
+    bool
+    GenericGraspPlanner::timeout()
     {
-        return timeOutDuration.count() <= 0
-               || std::chrono::system_clock::now() > (startTime + timeOutDuration);
+        return timeOutDuration.count() <= 0 ||
+               std::chrono::system_clock::now() > (startTime + timeOutDuration);
     }
 
-} // namespace
+} // namespace GraspStudio

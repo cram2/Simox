@@ -1,15 +1,16 @@
 
 #include "CollisionModelDummy.h"
 
+#include <algorithm>
+
 #include "../../CollisionChecker.h"
 #include "CollisionCheckerDummy.h"
-#include <algorithm>
 
 namespace VirtualRobot
 {
 
-    CollisionModelDummy::CollisionModelDummy(CollisionCheckerPtr pColChecker)
-        : CollisionModelImplementation(pColChecker)
+    CollisionModelDummy::CollisionModelDummy(CollisionCheckerPtr pColChecker) :
+        CollisionModelImplementation(pColChecker)
     {
         if (!pColChecker)
         {
@@ -19,14 +20,13 @@ namespace VirtualRobot
         VR_WARNING << ": THIS IS A DUMMY IMPLEMENTATION WITHOUT ANY FUNCTIONALITY..." << endl;
     }
 
-
     CollisionModelDummy::~CollisionModelDummy()
     {
         destroyData();
     }
 
-
-    void CollisionModelDummy::destroyData()
+    void
+    CollisionModelDummy::destroyData()
     {
     }
 
@@ -36,4 +36,4 @@ namespace VirtualRobot
 
     }*/
 
-} // namespace
+} // namespace VirtualRobot

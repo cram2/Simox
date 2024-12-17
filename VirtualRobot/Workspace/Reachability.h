@@ -25,7 +25,6 @@
 #include "../VirtualRobot.h"
 #include "WorkspaceRepresentation.h"
 
-
 namespace VirtualRobot
 {
 
@@ -41,10 +40,13 @@ namespace VirtualRobot
             I.E. think of an arm of a humanoid where the reachability is linked to the shoulder.
             When the torso moves, the reachability also changes it's position according to the position of the shoulder.
     */
-    class VIRTUAL_ROBOT_IMPORT_EXPORT Reachability : public WorkspaceRepresentation, public std::enable_shared_from_this<Reachability>
+    class VIRTUAL_ROBOT_IMPORT_EXPORT Reachability :
+        public WorkspaceRepresentation,
+        public std::enable_shared_from_this<Reachability>
     {
     public:
         friend class CoinVisualizationFactory;
+
     public:
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
@@ -70,9 +72,7 @@ namespace VirtualRobot
         WorkspaceRepresentationPtr clone() override;
 
     protected:
-
     };
 
 
 } // namespace VirtualRobot
-

@@ -1,9 +1,8 @@
 
 #include "SimoxMotionState.h"
-#include "BulletEngine.h"
+
 #include "../../DynamicsWorld.h"
-
-
+#include "BulletEngine.h"
 
 
 using namespace VirtualRobot;
@@ -12,8 +11,8 @@ namespace SimDynamics
 {
 
 
-    SimoxMotionState::SimoxMotionState(VirtualRobot::SceneObjectPtr sceneObject)
-        : btDefaultMotionState()
+    SimoxMotionState::SimoxMotionState(VirtualRobot::SceneObjectPtr sceneObject) :
+        btDefaultMotionState()
     {
         this->sceneObject = sceneObject;
         initalGlobalPose.setIdentity();
@@ -48,10 +47,10 @@ namespace SimDynamics
         setGlobalPose(initalGlobalPose);
     }
 
-    SimoxMotionState::~SimoxMotionState()
-    = default;
+    SimoxMotionState::~SimoxMotionState() = default;
 
-    void SimoxMotionState::setWorldTransform(const btTransform& worldPose)
+    void
+    SimoxMotionState::setWorldTransform(const btTransform& worldPose)
     {
         // Check callbacks
         if (callbacks.size() > 0)
@@ -68,7 +67,8 @@ namespace SimDynamics
         _transform = worldPose; // com position
 #ifdef _DEBUG
 
-        if (std::isnan(_transform.getOrigin().x()) || std::isnan(_transform.getOrigin().y()) || std::isnan(_transform.getOrigin().z()))
+        if (std::isnan(_transform.getOrigin().x()) || std::isnan(_transform.getOrigin().y()) ||
+            std::isnan(_transform.getOrigin().z()))
         {
             VR_ERROR << "NAN transform!!!" << std::endl;
         }
@@ -81,12 +81,14 @@ namespace SimDynamics
         setGlobalPoseSimox(BulletEngine::getPoseEigen(_graphicsTransfrom));
     }
 
-    void SimoxMotionState::getWorldTransform(btTransform& worldTrans) const
+    void
+    SimoxMotionState::getWorldTransform(btTransform& worldTrans) const
     {
         worldTrans = _transform;
     }
 
-    void SimoxMotionState::setGlobalPoseSimox(const Eigen::Matrix4f& worldPose)
+    void
+    SimoxMotionState::setGlobalPoseSimox(const Eigen::Matrix4f& worldPose)
     {
         if (!sceneObject)
         {
@@ -136,7 +138,7 @@ namespace SimDynamics
                 std::vector<BulletRobot::LinkInfo> links = bdr->getLinks(rn);
 
                 // update all involved joint values
-                for (auto & link : links)
+                for (auto& link : links)
                 {
                     if (link.nodeJoint)
                     {
@@ -165,7 +167,8 @@ namespace SimDynamics
         }
     }
 
-    void SimoxMotionState::setGlobalPose(const Eigen::Matrix4f& pose)
+    void
+    SimoxMotionState::setGlobalPose(const Eigen::Matrix4f& pose)
     {
         initalGlobalPose = pose;
         /* convert to local coord system, apply comoffset and convert back*/
@@ -177,14 +180,14 @@ namespace SimDynamics
         updateTransform();
     }
 
-
-
-    std::vector<SimoxMotionStateCallback*> SimoxMotionState::getCallbacks()
+    std::vector<SimoxMotionStateCallback*>
+    SimoxMotionState::getCallbacks()
     {
         return callbacks;
     }
 
-    void SimoxMotionState::_setCOM(const Eigen::Vector3f& com)
+    void
+    SimoxMotionState::_setCOM(const Eigen::Vector3f& com)
     {
         this->com = com;
         Eigen::Matrix4f comM = Eigen::Matrix4f::Identity();
@@ -192,22 +195,25 @@ namespace SimDynamics
         _comOffset = BulletEngine::getPoseBullet(comM);
     }
 
-    void SimoxMotionState::setCOM(const Eigen::Vector3f& com)
+    void
+    SimoxMotionState::setCOM(const Eigen::Vector3f& com)
     {
         _setCOM(com);
         updateTransform();
     }
 
-    Eigen::Vector3f SimoxMotionState::getCOM() const
+    Eigen::Vector3f
+    SimoxMotionState::getCOM() const
     {
         return com;
     }
 
-    void SimoxMotionState::updateTransform()
+    void
+    SimoxMotionState::updateTransform()
     {
         //Eigen::Matrix4f m = Eigen::Matrix4f::Identity();
         //m.block(0,3,3,1) = com;
         setWorldTransform(m_startWorldTrans);
     }
 
-}
+} // namespace SimDynamics

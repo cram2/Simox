@@ -20,31 +20,32 @@
  */
 
 #include "GaussianObjectModel.h"
-#include "MathForwardDefinitions.h"
-#include "Kernels.h"
 
+#include "Kernels.h"
+#include "MathForwardDefinitions.h"
 
 namespace math
 {
-    GaussianObjectModel::GaussianObjectModel(float noise)
-        : noise(noise)
+    GaussianObjectModel::GaussianObjectModel(float noise) : noise(noise)
     {
-        model = gpModel = GaussianImplicitSurface3DPtr(new GaussianImplicitSurface3D(std::unique_ptr<WilliamsPlusKernel>(new WilliamsPlusKernel)));
+        model = gpModel = GaussianImplicitSurface3DPtr(new GaussianImplicitSurface3D(
+            std::unique_ptr<WilliamsPlusKernel>(new WilliamsPlusKernel)));
     }
 
-    void GaussianObjectModel::AddContact(Contact contact)
+    void
+    GaussianObjectModel::AddContact(Contact contact)
     {
         ImplicitObjectModel::AddContact(contact);
     }
 
-
-
-    void GaussianObjectModel::Update()
+    void
+    GaussianObjectModel::Update()
     {
         gpModel->Calculate(CreateSamples(), noise);
     }
 
-    std::vector<float> GaussianObjectModel::GetContactWeights()
+    std::vector<float>
+    GaussianObjectModel::GetContactWeights()
     {
         std::vector<float> result;
         for (size_t i = 0; i < contacts->size(); ++i)
@@ -54,7 +55,8 @@ namespace math
         return result;
     }
 
-    std::vector<DataR3R1> GaussianObjectModel::CreateSamples()
+    std::vector<DataR3R1>
+    GaussianObjectModel::CreateSamples()
     {
         std::vector<DataR3R1> samples;
         for (Contact c : *contacts)
@@ -65,4 +67,4 @@ namespace math
         }
         return samples;
     }
-}
+} // namespace math

@@ -22,12 +22,10 @@
 
 #define BOOST_TEST_MODULE VirtualRobot_MecanumPlatformKinematics
 
-#include <VirtualRobot/VirtualRobotTest.h>
-
 #include <iostream>
 
 #include <VirtualRobot/IK/platform/MecanumPlatformKinematics.h>
-
+#include <VirtualRobot/VirtualRobotTest.h>
 
 
 BOOST_AUTO_TEST_SUITE(MecanumPlatformKinematics)
@@ -35,13 +33,8 @@ BOOST_AUTO_TEST_SUITE(MecanumPlatformKinematics)
 BOOST_AUTO_TEST_CASE(testExample)
 {
     Eigen::IOFormat vecfmt(5, 0, "", ", ", "", "", "(", ")");
-    
-    const VirtualRobot::MecanumPlatformKinematicsParams params
-    {
-        .l1 = 250,
-        .l2 = 300,
-        .R = 95.f
-    };
+
+    const VirtualRobot::MecanumPlatformKinematicsParams params{.l1 = 250, .l2 = 300, .R = 95.f};
 
     const VirtualRobot::MecanumPlatformKinematics p(params);
 
@@ -51,16 +44,9 @@ BOOST_AUTO_TEST_CASE(testExample)
     BOOST_CHECK_EQUAL(true, true);
 }
 
-
-
 BOOST_AUTO_TEST_CASE(testInv)
 {
-    const VirtualRobot::MecanumPlatformKinematicsParams params
-    {
-        .l1 = 250,
-        .l2 = 300,
-        .R = 95.f
-    };
+    const VirtualRobot::MecanumPlatformKinematicsParams params{.l1 = 250, .l2 = 300, .R = 95.f};
 
     const VirtualRobot::MecanumPlatformKinematics p(params);
 
@@ -76,16 +62,9 @@ BOOST_AUTO_TEST_CASE(testInv)
     BOOST_TEST(vAngle == velocities(2), boost::test_tools::tolerance(0.001));
 }
 
-
-
 BOOST_AUTO_TEST_CASE(testMoveForwardCartesianVel)
 {
-    const VirtualRobot::MecanumPlatformKinematicsParams params
-    {
-        .l1 = 250,
-        .l2 = 300,
-        .R = 95.f
-    };
+    const VirtualRobot::MecanumPlatformKinematicsParams params{.l1 = 250, .l2 = 300, .R = 95.f};
 
     const VirtualRobot::MecanumPlatformKinematics p(params);
 
@@ -97,15 +76,9 @@ BOOST_AUTO_TEST_CASE(testMoveForwardCartesianVel)
     BOOST_TEST(0.0 == velocities(2), boost::test_tools::tolerance(0.001));
 }
 
-
 BOOST_AUTO_TEST_CASE(testMoveForwardWheelVel)
 {
-    const VirtualRobot::MecanumPlatformKinematicsParams params
-    {
-        .l1 = 250,
-        .l2 = 300,
-        .R = 95.f
-    };
+    const VirtualRobot::MecanumPlatformKinematicsParams params{.l1 = 250, .l2 = 300, .R = 95.f};
 
     const VirtualRobot::MecanumPlatformKinematics p(params);
 

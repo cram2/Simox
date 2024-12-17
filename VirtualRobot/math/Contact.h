@@ -21,11 +21,10 @@
 
 #pragma once
 
-#include "../VirtualRobot.h"
-#include "MathForwardDefinitions.h"
 #include <sstream>
 
-
+#include "../VirtualRobot.h"
+#include "MathForwardDefinitions.h"
 
 namespace math
 {
@@ -36,11 +35,14 @@ namespace math
         Contact(Eigen::Vector3f position, Eigen::Vector3f normal);
         Contact(float px, float py, float pz, float nx, float ny, float nz);
 
-        Eigen::Vector3f Position() const
+        Eigen::Vector3f
+        Position() const
         {
             return position;
         }
-        Eigen::Vector3f Normal() const
+
+        Eigen::Vector3f
+        Normal() const
         {
             return normal;
         }
@@ -49,9 +51,9 @@ namespace math
 
         std::string ToString();
         static Contact Lerp(Contact a, Contact b, float f);
+
     private:
         Eigen::Vector3f position;
         Eigen::Vector3f normal;
     };
-}
-
+} // namespace math

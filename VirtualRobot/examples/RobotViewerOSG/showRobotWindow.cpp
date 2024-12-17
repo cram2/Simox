@@ -1,27 +1,28 @@
 
 #include "showRobotWindow.h"
-#include "VirtualRobot/EndEffector/EndEffector.h"
-#include "VirtualRobot/Workspace/Reachability.h"
-
-#include <QFileDialog>
-#include <Eigen/Geometry>
 
 #include <time.h>
-#include <vector>
-#include <iostream>
-#include <cmath>
 
+#include <cmath>
+#include <iostream>
+#include <sstream>
+#include <vector>
+
+#include <QFileDialog>
+
+#include <Eigen/Geometry>
+
+#include "VirtualRobot/EndEffector/EndEffector.h"
+#include "VirtualRobot/Workspace/Reachability.h"
 #include <osg/Shape>
 #include <osg/ShapeDrawable>
 #include <osgDB/WriteFile>
-#include <sstream>
 using namespace std;
 using namespace VirtualRobot;
 
 float TIMER_MS = 30.0f;
 
-showRobotWindow::showRobotWindow(std::string& sRobotFilename, Qt::WFlags flags)
-    : QMainWindow(NULL)
+showRobotWindow::showRobotWindow(std::string& sRobotFilename, Qt::WFlags flags) : QMainWindow(NULL)
 {
     VR_INFO << " start " << endl;
     //this->setCaption(QString("ShowRobot - KIT - Humanoids Group"));
@@ -45,7 +46,6 @@ showRobotWindow::showRobotWindow(std::string& sRobotFilename, Qt::WFlags flags)
     osgWidget->viewAll();
     //m_pExViewer->viewAll();
 }
-
 
 showRobotWindow::~showRobotWindow()
 {
@@ -74,7 +74,8 @@ void CShowRobotWindow::saveScreenshot()
 
 }*/
 
-void showRobotWindow::setupUI()
+void
+showRobotWindow::setupUI()
 {
     UI.setupUi(this);
     this->show();
@@ -109,10 +110,10 @@ void showRobotWindow::setupUI()
     connect(UI.comboBoxRobotNodeSet, SIGNAL(activated(int)), this, SLOT(selectRNS(int)));
     connect(UI.comboBoxJoint, SIGNAL(activated(int)), this, SLOT(selectJoint(int)));
     connect(UI.horizontalSliderPos, SIGNAL(valueChanged(int)), this, SLOT(jointValueChanged(int)));
-
 }
 
-QString showRobotWindow::formatString(const char* s, float f)
+QString
+showRobotWindow::formatString(const char* s, float f)
 {
     QString str1(s);
 
@@ -142,8 +143,8 @@ QString showRobotWindow::formatString(const char* s, float f)
     return str1;
 }
 
-
-void showRobotWindow::resetSceneryAll()
+void
+showRobotWindow::resetSceneryAll()
 {
     if (!robot)
     {
@@ -156,9 +157,8 @@ void showRobotWindow::resetSceneryAll()
     selectJoint(UI.comboBoxJoint->currentIndex());
 }
 
-
-
-void showRobotWindow::displayTriangles()
+void
+showRobotWindow::displayTriangles()
 {
     QString text1, text2, text3;
     int trisAllFull, trisRNSFull, trisJointFull;
@@ -204,7 +204,8 @@ void showRobotWindow::displayTriangles()
     UI.labelInfo3->setText(text3);
 }
 
-void showRobotWindow::robotFullModel()
+void
+showRobotWindow::robotFullModel()
 {
     if (!robot)
     {
@@ -214,10 +215,10 @@ void showRobotWindow::robotFullModel()
     bool showFullModel = UI.checkBoxFullModel->checkState() == Qt::Checked;
 
     robot->setupVisualization(showFullModel, true);
-
 }
 
-void showRobotWindow::collisionModel()
+void
+showRobotWindow::collisionModel()
 {
     if (!robot)
     {
@@ -235,7 +236,8 @@ void showRobotWindow::collisionModel()
 
     //setRobotModelShape(UI.checkBoxColModel->state() == QCheckBox::On);
     useColModel = UI.checkBoxColModel->checkState() == Qt::Checked;
-    SceneObject::VisualizationType colModel = (UI.checkBoxColModel->isChecked()) ? SceneObject::Collision : SceneObject::Full;
+    SceneObject::VisualizationType colModel =
+        (UI.checkBoxColModel->isChecked()) ? SceneObject::Collision : SceneObject::Full;
 
     visualization = robot->getVisualization<OSGVisualization>(colModel);
     osg::Node* visualisationNode = NULL;
@@ -255,40 +257,39 @@ void showRobotWindow::collisionModel()
     UI.checkBoxStructure->setEnabled(!useColModel);
     UI.checkBoxFullModel->setEnabled(!useColModel);
     UI.checkBoxRobotCoordSystems->setEnabled(!useColModel);
-
 }
 
-
-void showRobotWindow::showRobot()
+void
+showRobotWindow::showRobot()
 {
     //m_pGraspScenery->showRobot(m_pShowRobot->state() == QCheckBox::On);
 }
 
-void showRobotWindow::closeEvent(QCloseEvent* event)
+void
+showRobotWindow::closeEvent(QCloseEvent* event)
 {
     quit();
     QMainWindow::closeEvent(event);
 }
 
-
-
-
-int showRobotWindow::main()
+int
+showRobotWindow::main()
 {
     /*SoQt::show(this);
     SoQt::mainLoop();*/
     return 0;
 }
 
-
-void showRobotWindow::quit()
+void
+showRobotWindow::quit()
 {
     std::cout << "CShowRobotWindow: Closing" << std::endl;
     this->close();
     //SoQt::exitMainLoop();
 }
 
-void showRobotWindow::updateJointBox()
+void
+showRobotWindow::updateJointBox()
 {
     UI.comboBoxJoint->clear();
 
@@ -298,7 +299,8 @@ void showRobotWindow::updateJointBox()
     }
 }
 
-void showRobotWindow::updateRNSBox()
+void
+showRobotWindow::updateRNSBox()
 {
     UI.comboBoxRobotNodeSet->clear();
     UI.comboBoxRobotNodeSet->addItem(QString("<All>"));
@@ -309,7 +311,8 @@ void showRobotWindow::updateRNSBox()
     }
 }
 
-void showRobotWindow::selectRNS(int nr)
+void
+showRobotWindow::selectRNS(int nr)
 {
     currentRobotNodeSet.reset();
     cout << "Selecting RNS nr " << nr << endl;
@@ -337,7 +340,6 @@ void showRobotWindow::selectRNS(int nr)
             robot->highlight(visualization,false);
             currentRobotNodeSet->highlight(visualization,true);
         }*/
-
     }
 
     updateJointBox();
@@ -345,7 +347,8 @@ void showRobotWindow::selectRNS(int nr)
     displayTriangles();
 }
 
-void showRobotWindow::selectJoint(int nr)
+void
+showRobotWindow::selectJoint(int nr)
 {
     currentRobotNode.reset();
     cout << "Selecting Joint nr " << nr << endl;
@@ -366,7 +369,8 @@ void showRobotWindow::selectJoint(int nr)
     float j = currentRobotNode->getJointValue();
     UI.lcdNumberJointValue->display((double)j);
 
-    if (fabs(ma - mi) > 0 && (currentRobotNode->isTranslationalJoint() || currentRobotNode->isRotationalJoint()))
+    if (fabs(ma - mi) > 0 &&
+        (currentRobotNode->isTranslationalJoint() || currentRobotNode->isRotationalJoint()))
     {
         UI.horizontalSliderPos->setEnabled(true);
         int pos = (int)((j - mi) / (ma - mi) * 1000.0f);
@@ -397,7 +401,8 @@ void showRobotWindow::selectJoint(int nr)
     displayTriangles();
 }
 
-void showRobotWindow::jointValueChanged(int pos)
+void
+showRobotWindow::jointValueChanged(int pos)
 {
     int nr = UI.comboBoxJoint->currentIndex();
 
@@ -406,13 +411,16 @@ void showRobotWindow::jointValueChanged(int pos)
         return;
     }
 
-    float fPos = currentRobotNodes[nr]->getJointLimitLo() + (float)pos / 1000.0f * (currentRobotNodes[nr]->getJointLimitHi() - currentRobotNodes[nr]->getJointLimitLo());
+    float fPos =
+        currentRobotNodes[nr]->getJointLimitLo() +
+        (float)pos / 1000.0f *
+            (currentRobotNodes[nr]->getJointLimitHi() - currentRobotNodes[nr]->getJointLimitLo());
     robot->setJointValue(currentRobotNodes[nr], fPos);
     UI.lcdNumberJointValue->display((double)fPos);
-
 }
 
-void showRobotWindow::showCoordSystem()
+void
+showRobotWindow::showCoordSystem()
 {
     float size = 0.75f;
     int nr = UI.comboBoxJoint->currentIndex();
@@ -434,21 +442,23 @@ void showRobotWindow::showCoordSystem()
 
     }*/
 
-    currentRobotNodes[nr]->showCoordinateSystem(UI.checkBoxShowCoordSystem->checkState() == Qt::Checked, size);
+    currentRobotNodes[nr]->showCoordinateSystem(
+        UI.checkBoxShowCoordSystem->checkState() == Qt::Checked, size);
     // rebuild visualization
     collisionModel();
 }
 
-
-
-void showRobotWindow::selectRobot()
+void
+showRobotWindow::selectRobot()
 {
-    QString fi = QFileDialog::getOpenFileName(this, tr("Open Robot File"), QString(), tr("XML Files (*.xml)"));
+    QString fi = QFileDialog::getOpenFileName(
+        this, tr("Open Robot File"), QString(), tr("XML Files (*.xml)"));
     m_sRobotFilename = std::string(fi.toAscii());
     loadRobot();
 }
 
-void showRobotWindow::loadRobot()
+void
+showRobotWindow::loadRobot()
 {
     if (osgRobot->getNumChildren() > 0)
     {
@@ -520,7 +530,8 @@ void showRobotWindow::loadRobot()
     osgDB::writeNodeFile(*visualisationNodeFul, std::string(SIMOX_BASE_DIR "/fullModel.osg"));*/
 }
 
-void showRobotWindow::robotStructure()
+void
+showRobotWindow::robotStructure()
 {
     if (!robot)
     {
@@ -533,7 +544,8 @@ void showRobotWindow::robotStructure()
     collisionModel();
 }
 
-void showRobotWindow::robotCoordSystems()
+void
+showRobotWindow::robotCoordSystems()
 {
     if (!robot)
     {
@@ -546,7 +558,8 @@ void showRobotWindow::robotCoordSystems()
     collisionModel();
 }
 
-void showRobotWindow::closeHand()
+void
+showRobotWindow::closeHand()
 {
     if (currentEEF)
     {
@@ -554,7 +567,8 @@ void showRobotWindow::closeHand()
     }
 }
 
-void showRobotWindow::openHand()
+void
+showRobotWindow::openHand()
 {
     if (currentEEF)
     {
@@ -562,7 +576,8 @@ void showRobotWindow::openHand()
     }
 }
 
-void showRobotWindow::selectEEF(int nr)
+void
+showRobotWindow::selectEEF(int nr)
 {
     cout << "Selecting EEF nr " << nr << endl;
 
@@ -574,7 +589,8 @@ void showRobotWindow::selectEEF(int nr)
     currentEEF = eefs[nr];
 }
 
-void showRobotWindow::updateEEFBox()
+void
+showRobotWindow::updateEEFBox()
 {
     UI.comboBoxEndEffector->clear();
 

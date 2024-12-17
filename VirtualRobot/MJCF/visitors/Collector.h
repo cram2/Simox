@@ -2,7 +2,6 @@
 
 #include "../elements.h"
 
-
 namespace mjcf
 {
 
@@ -13,13 +12,15 @@ namespace mjcf
     class Collector : public Visitor
     {
     public:
-
         static std::vector<ElementT> collect(Document& document, AnyElement root);
 
-        Collector(Document& document) : Visitor(document) {}
+        Collector(Document& document) : Visitor(document)
+        {
+        }
 
         // Visitor interface
-        virtual bool visitEnter(const AnyElement& element) override
+        virtual bool
+        visitEnter(const AnyElement& element) override
         {
             if (element.is<ElementT>())
             {
@@ -28,22 +29,29 @@ namespace mjcf
             return true;
         }
 
-        std::vector<ElementT>& getCollected() { return collected; }
-        const std::vector<ElementT>& getCollected() const  { return collected; }
+        std::vector<ElementT>&
+        getCollected()
+        {
+            return collected;
+        }
+
+        const std::vector<ElementT>&
+        getCollected() const
+        {
+            return collected;
+        }
 
 
     private:
-
         std::vector<ElementT> collected;
-
     };
 
     template <class ElementT>
-    std::vector<ElementT> Collector<ElementT>::collect(Document& document, AnyElement root)
+    std::vector<ElementT>
+    Collector<ElementT>::collect(Document& document, AnyElement root)
     {
         mjcf::Collector<ElementT> collector(document);
         root.accept(collector);
         return collector.getCollected();
     }
-}
-
+} // namespace mjcf

@@ -1,9 +1,8 @@
 #include "SimoxPath.h"
 
-#include <functional>
-
 #include <stdlib.h>
 
+#include <functional>
 
 namespace simox
 {
@@ -11,8 +10,8 @@ namespace simox
     bool SimoxPath::simoxPathInitialized = false;
     std::filesystem::path SimoxPath::simoxRootPath = "";
 
-
-    void SimoxPath::init()
+    void
+    SimoxPath::init()
     {
         namespace fs = std::filesystem;
         // Adapted from VirtualRobot::RuntimeEnvironment
@@ -23,37 +22,35 @@ namespace simox
         }
         SimoxPath::simoxRootPath = "";
 
-        std::vector<std::function<void(fs::path& vrDataPath)>> sources;
+        std::vector<std::function<void(fs::path & vrDataPath)>> sources;
 
         // Test special environment variables.
-        sources.push_back([](fs::path& vrDataPath)
-        {
-            char* vrDataPathEnv = getenv("SIMOX_DATA_PATH");
-            if (!vrDataPathEnv)
+        sources.push_back(
+            [](fs::path& vrDataPath)
             {
-                vrDataPathEnv = getenv("VIRTUAL_ROBOT_DATA_PATH");
-            }
-            if (vrDataPathEnv && checkPath(vrDataPathEnv))
-            {
-                vrDataPath = fs::path(vrDataPathEnv);
-            }
-        });
+                char* vrDataPathEnv = getenv("SIMOX_DATA_PATH");
+                if (!vrDataPathEnv)
+                {
+                    vrDataPathEnv = getenv("VIRTUAL_ROBOT_DATA_PATH");
+                }
+                if (vrDataPathEnv && checkPath(vrDataPathEnv))
+                {
+                    vrDataPath = fs::path(vrDataPathEnv);
+                }
+            });
 
         // Test for Simox_DIR
-        sources.push_back([](fs::path& vrDataPath)
-        {
-            char *simox_dir = getenv("Simox_DIR");
-            if (simox_dir)
+        sources.push_back(
+            [](fs::path& vrDataPath)
             {
-                const std::vector<std::string> candidates =
+                char* simox_dir = getenv("Simox_DIR");
+                if (simox_dir)
                 {
-                    "data",
-                    "VirtualRobot/data",
-                    "../VirtualRobot/data"
-                };
-                vrDataPath = checkCandidatePaths(candidates, std::filesystem::path(simox_dir));
-            }
-        });
+                    const std::vector<std::string> candidates = {
+                        "data", "VirtualRobot/data", "../VirtualRobot/data"};
+                    vrDataPath = checkCandidatePaths(candidates, std::filesystem::path(simox_dir));
+                }
+            });
 
         auto ConstantSource = [](const std::string& value)
         {
@@ -82,17 +79,15 @@ namespace simox
 
 
         // Last chance, check for inbuild paths
-        sources.push_back([](fs::path& vrDataPath)
-        {
-            const std::vector<std::string> candidates =
+        sources.push_back(
+            [](fs::path& vrDataPath)
             {
-                "../VirtualRobot/data",
-                "../../VirtualRobot/data",
-                "../../../VirtualRobot/data",
-                "../../../../VirtualRobot/data"
-            };
-            vrDataPath = checkCandidatePaths(candidates, std::filesystem::current_path());
-        });
+                const std::vector<std::string> candidates = {"../VirtualRobot/data",
+                                                             "../../VirtualRobot/data",
+                                                             "../../../VirtualRobot/data",
+                                                             "../../../../VirtualRobot/data"};
+                vrDataPath = checkCandidatePaths(candidates, std::filesystem::current_path());
+            });
 
 
         fs::path virtualRobotDataPath;
@@ -105,11 +100,13 @@ namespace simox
             }
         }
 
-        SimoxPath::simoxRootPath = virtualRobotDataPath.parent_path().parent_path().lexically_normal();
+        SimoxPath::simoxRootPath =
+            virtualRobotDataPath.parent_path().parent_path().lexically_normal();
         simoxPathInitialized = true;
     }
 
-    bool SimoxPath::checkPath(const char* path)
+    bool
+    SimoxPath::checkPath(const char* path)
     {
         if (!path)
         {
@@ -119,13 +116,15 @@ namespace simox
         return checkPath(p);
     }
 
-    bool SimoxPath::checkPath(const std::filesystem::path& path)
+    bool
+    SimoxPath::checkPath(const std::filesystem::path& path)
     {
         return std::filesystem::is_directory(path) || std::filesystem::is_symlink(path);
     }
 
-    std::filesystem::path SimoxPath::checkCandidatePaths(
-            const std::vector<std::string>& candidates, std::filesystem::path prefix)
+    std::filesystem::path
+    SimoxPath::checkCandidatePaths(const std::vector<std::string>& candidates,
+                                   std::filesystem::path prefix)
     {
         for (const std::string& cand : candidates)
         {
@@ -137,4 +136,4 @@ namespace simox
         return "";
     }
 
-}
+} // namespace simox

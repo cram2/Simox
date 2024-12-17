@@ -22,12 +22,12 @@
 */
 #pragma once
 
-#include "VirtualRobot.h"
-#include "Nodes/Sensor.h"
-
+#include <map>
 #include <string>
 #include <vector>
-#include <map>
+
+#include "Nodes/Sensor.h"
+#include "VirtualRobot.h"
 
 namespace VirtualRobot
 {
@@ -50,10 +50,9 @@ namespace VirtualRobot
             \param rootNode The root.
         */
         static bool initializeRobot(RobotPtr robot,
-                                    std::vector<RobotNodePtr >& robotNodes,
-                                    std::map< RobotNodePtr, std::vector<std::string> > childrenMap,
+                                    std::vector<RobotNodePtr>& robotNodes,
+                                    std::map<RobotNodePtr, std::vector<std::string>> childrenMap,
                                     RobotNodePtr rootNode);
-
 
         struct robotNodeDef
         {
@@ -76,7 +75,10 @@ namespace VirtualRobot
             \param collisionChecker Optional: A collision checker to which the robot should be registered. If not set, the collision checker of the input robot is used.
             \param scaling Scale the resulting robot.
         */
-        static RobotPtr clone(RobotPtr robot, const std::string& name, CollisionCheckerPtr collisionChecker = CollisionCheckerPtr(), float scaling = 1.0f);
+        static RobotPtr clone(RobotPtr robot,
+                              const std::string& name,
+                              CollisionCheckerPtr collisionChecker = CollisionCheckerPtr(),
+                              float scaling = 1.0f);
 
         /*!
          * \brief Clones all nodesets from one robot to another that fullfill the condition that all nodes are contained in the other robot
@@ -93,7 +95,10 @@ namespace VirtualRobot
         \param name The new name
         \param addTCP Wheter the tcp of the robot node set should also be added
         */
-        static RobotPtr cloneSubSet(RobotPtr robot, RobotNodeSetPtr rns, const std::string& name, bool addTCP = false);
+        static RobotPtr cloneSubSet(RobotPtr robot,
+                                    RobotNodeSetPtr rns,
+                                    const std::string& name,
+                                    bool addTCP = false);
 
         /*!
             Creates a robot clone with reduced structure.
@@ -102,7 +107,9 @@ namespace VirtualRobot
             \param uniteWithAllChildren List of RobotNodeNames. Each listed robot ndoe is united with all of its children to one fixed RobotNode.
                                         This means that all related coordinate systems and joints will not be present in the clone. The visualizations are united.
         */
-        static RobotPtr cloneUniteSubsets(RobotPtr robot, const std::string& name, std::vector<std::string> uniteWithAllChildren);
+        static RobotPtr cloneUniteSubsets(RobotPtr robot,
+                                          const std::string& name,
+                                          std::vector<std::string> uniteWithAllChildren);
 
         /*!
          * Creates a cloned robot model that only include the given nodes by joining nodes together.
@@ -113,9 +120,10 @@ namespace VirtualRobot
          * \param otherNodeNames Other robot nodes that should be contained with a fixed transformation (given current pose if actuated joint as these are converted to RobotNodeFixed)
          * \return The reduced robot model or nullptr (if actuatedJointNames contains not only joint nodes that are in robot)
          */
-        static VirtualRobot::RobotPtr
-        createReducedModel(Robot &robot, const std::vector<std::string>& actuatedJointNames,
-                           const std::vector<std::string>& otherNodeNames = std::vector<std::string>());
+        static VirtualRobot::RobotPtr createReducedModel(
+            Robot& robot,
+            const std::vector<std::string>& actuatedJointNames,
+            const std::vector<std::string>& otherNodeNames = std::vector<std::string>());
 
         /**
          * Creates a cloned robot model that flattens the robot structure.
@@ -123,13 +131,15 @@ namespace VirtualRobot
          * @param robot The robot to clone.
          * @return The created robot.
          */
-        static VirtualRobot::RobotPtr
-        createFlattenedModel(Robot & robot);
+        static VirtualRobot::RobotPtr createFlattenedModel(Robot& robot);
 
         /*!
             Creates a clone with changed structure, so that the given robot node is the new root of the resulting kinematic tree.
         */
-        static RobotPtr cloneInversed(RobotPtr robot, const std::string& newRootName, bool cloneRNS = true, bool cloneEEF = true);
+        static RobotPtr cloneInversed(RobotPtr robot,
+                                      const std::string& newRootName,
+                                      bool cloneRNS = true,
+                                      bool cloneEEF = true);
 
         /*!
             Chenge the structure of the clone according to the given defintion.
@@ -141,7 +151,9 @@ namespace VirtualRobot
          * \param startNode Name of the start node of the original kinematic chain.
          * \param endNode Name of the end node of the original kinematic chain. Will be the new root.
          */
-        static RobotPtr cloneChangeStructure(RobotPtr robot, const std::string& startNode, const std::string& endNode);
+        static RobotPtr cloneChangeStructure(RobotPtr robot,
+                                             const std::string& startNode,
+                                             const std::string& endNode);
 
         /*!
          * \brief attach Attach an object to a robot. The object is cloned.
@@ -151,7 +163,10 @@ namespace VirtualRobot
          * \param transformation The RN to object transformation
          * \return true on succes
          */
-        static bool attach(RobotPtr robot, SceneObjectPtr o, RobotNodePtr rn, const Eigen::Matrix4f& transformation);
+        static bool attach(RobotPtr robot,
+                           SceneObjectPtr o,
+                           RobotNodePtr rn,
+                           const Eigen::Matrix4f& transformation);
 
         static bool detach(RobotPtr robot, RobotNodePtr rn);
 
@@ -166,22 +181,41 @@ namespace VirtualRobot
          * @param customSegmentLengths (Optional) RobotNode name -> custom translation length. Takes priority over sizeScaling
          * @param customSizeScaling (Optional) RobotNode name -> custom size scaling. Takes priority over customSegmentLengths.
          */
-        static void scaleLinear(Robot& robot, float sizeScaling, float weightScaling = 1.,
-                                const std::map<std::string, float>& customSegmentLengths = std::map<std::string, float>(),
-                                const std::map<std::string, float>& customSegmentSizeScaling = std::map<std::string, float>());
+        static void scaleLinear(Robot& robot,
+                                float sizeScaling,
+                                float weightScaling = 1.,
+                                const std::map<std::string, float>& customSegmentLengths =
+                                    std::map<std::string, float>(),
+                                const std::map<std::string, float>& customSegmentSizeScaling =
+                                    std::map<std::string, float>());
 
     protected:
-
         // some internal stuff
-        static RobotNodePtr createUnitedRobotNode(RobotPtr robot, const std::vector< RobotNodePtr >& nodes, RobotNodePtr parent, RobotNodePtr parentClone, const Eigen::Matrix4f& trafo, const std::vector<SensorPtr> &sensors);
-        static RobotNodePtr accumulateTransformations(RobotPtr robot, RobotNodePtr nodeA, RobotNodePtr nodeAClone, RobotNodePtr nodeB, Eigen::Matrix4f& storeTrafo);
-        static void getChildNodes(RobotNodePtr nodeA, RobotNodePtr nodeExclude, std::vector<RobotNodePtr>& appendNodes);
-        static void getChildSensorNodes(RobotNodePtr nodeA, RobotNodePtr nodeExclude, std::vector<SensorPtr>& appendNodes);
+        static RobotNodePtr createUnitedRobotNode(RobotPtr robot,
+                                                  const std::vector<RobotNodePtr>& nodes,
+                                                  RobotNodePtr parent,
+                                                  RobotNodePtr parentClone,
+                                                  const Eigen::Matrix4f& trafo,
+                                                  const std::vector<SensorPtr>& sensors);
+        static RobotNodePtr accumulateTransformations(RobotPtr robot,
+                                                      RobotNodePtr nodeA,
+                                                      RobotNodePtr nodeAClone,
+                                                      RobotNodePtr nodeB,
+                                                      Eigen::Matrix4f& storeTrafo);
+        static void getChildNodes(RobotNodePtr nodeA,
+                                  RobotNodePtr nodeExclude,
+                                  std::vector<RobotNodePtr>& appendNodes);
+        static void getChildSensorNodes(RobotNodePtr nodeA,
+                                        RobotNodePtr nodeExclude,
+                                        std::vector<SensorPtr>& appendNodes);
 
-        static void cloneRecursiveUnite(RobotPtr robot, RobotNodePtr currentNode, RobotNodePtr currentNodeClone, std::vector<std::string> uniteWithAllChildren);
+        static void cloneRecursiveUnite(RobotPtr robot,
+                                        RobotNodePtr currentNode,
+                                        RobotNodePtr currentNodeClone,
+                                        std::vector<std::string> uniteWithAllChildren);
 
         // instantiation not allowed
         RobotFactory();
         virtual ~RobotFactory();
     };
-}
+} // namespace VirtualRobot

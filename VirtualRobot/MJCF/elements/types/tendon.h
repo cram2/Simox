@@ -6,11 +6,11 @@ namespace mjcf
 {
 
 
-struct TendonSection : public Element<TendonSection>
-{
-    static const std::string tag;
-    mjcf_ElementDerivedConstructors(TendonSection)
-};
+    struct TendonSection : public Element<TendonSection>
+    {
+        static const std::string tag;
+        mjcf_ElementDerivedConstructors(TendonSection)
+    };
 
 
-}
+} // namespace mjcf

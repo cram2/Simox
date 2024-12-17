@@ -21,7 +21,8 @@
 
 namespace VirtualRobot
 {
-    Eigen::Matrix<float, 4, 3> MecanumPlatformKinematicsParams::J_inv() const
+    Eigen::Matrix<float, 4, 3>
+    MecanumPlatformKinematicsParams::J_inv() const
     {
         const float k = l1 + l2;
 
@@ -38,7 +39,8 @@ namespace VirtualRobot
         return m;
     }
 
-    Eigen::Matrix<float, 3, 4> MecanumPlatformKinematicsParams::J() const
+    Eigen::Matrix<float, 3, 4>
+    MecanumPlatformKinematicsParams::J() const
     {
         const float k = 1 / (l1 + l2);
 
@@ -78,7 +80,8 @@ namespace VirtualRobot
         return J * w;
     }
 
-    const MecanumPlatformKinematics::Params& MecanumPlatformKinematics::getParams() const
+    const MecanumPlatformKinematics::Params&
+    MecanumPlatformKinematics::getParams() const
     {
         return params;
     }

@@ -22,10 +22,10 @@
 */
 #pragma once
 
-#include "VirtualRobot/VirtualRobot.h"
-
 #include <Eigen/Core>
 #include <Eigen/Geometry>
+
+#include "VirtualRobot/VirtualRobot.h"
 
 namespace VirtualRobot
 {
@@ -64,9 +64,10 @@ namespace VirtualRobot
         const TriMeshModelPtr& getTriMeshModel();
 
 
-        virtual std::shared_ptr<CollisionModelImplementation> clone(bool deepCopy = false) const = 0;
-    protected:
+        virtual std::shared_ptr<CollisionModelImplementation>
+        clone(bool deepCopy = false) const = 0;
 
+    protected:
         //! delete all data
         virtual void destroyData() = 0;
 
@@ -78,5 +79,4 @@ namespace VirtualRobot
     };
 
 
-
-} // namespace
+} // namespace VirtualRobot

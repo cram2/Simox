@@ -1,12 +1,13 @@
 
 #pragma once
 
-#include "../../VirtualRobotImportExport.h"
-#include "../CollisionModelImplementation.h"
-#include <string>
-#include <vector>
 #include <map>
 #include <set>
+#include <string>
+#include <vector>
+
+#include "../../VirtualRobotImportExport.h"
+#include "../CollisionModelImplementation.h"
 
 namespace VirtualRobot
 {
@@ -28,8 +29,6 @@ namespace VirtualRobot
         */
         virtual ~CollisionModelDummy();
 
-
-
         /*! Stores ivModel in this collision model (and creates internal representation)
          use this method to create a collision model from an inventor node
          the inventor object is not moved around with the SetGlobalPose method!
@@ -43,19 +42,24 @@ namespace VirtualRobot
         Sets the position of the internal colModel data structure.
         No update of the pose of the IV model!
         */
-        void setGlobalPose(const Eigen::Matrix4f& m) {}//avoiding unneccessary copies
+        void
+        setGlobalPose(const Eigen::Matrix4f& m)
+        {
+        } //avoiding unneccessary copies
 
         /*! Builds a (single) collision model, but assigns triangles of IVModels with the given IDs
          This can be useful to link a collision with a part of a scene
          Returns number of triangles used for building the collision model
          */
         //virtual int BuildColModel(std::map<SoNode*,int> &mIVIDMapping, std::vector<int> & vStoreIDs, SoSeparator *pAddIVModel);
-        virtual std::shared_ptr<CollisionModelImplementation> clone(bool deepCopy = false) const{}
-    protected:
+        virtual std::shared_ptr<CollisionModelImplementation>
+        clone(bool deepCopy = false) const
+        {
+        }
 
+    protected:
         //! delete all data
         virtual void destroyData();
     };
 
-}
-
+} // namespace VirtualRobot

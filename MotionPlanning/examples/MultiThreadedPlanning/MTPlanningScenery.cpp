@@ -1,43 +1,42 @@
 #include "MTPlanningScenery.h"
 
-#include <VirtualRobot/XML/RobotIO.h>
+#include <sstream>
+
+#include <VirtualRobot/CollisionDetection/CDManager.h>
+#include <VirtualRobot/CollisionDetection/CollisionChecker.h>
+#include <VirtualRobot/EndEffector/EndEffector.h>
+#include <VirtualRobot/MathTools.h>
+#include <VirtualRobot/Nodes/RobotNode.h>
+#include <VirtualRobot/Robot.h>
 #include <VirtualRobot/Visualization/CoinVisualization/CoinVisualization.h>
 #include <VirtualRobot/Visualization/CoinVisualization/CoinVisualizationFactory.h>
-#include <VirtualRobot/CollisionDetection/CollisionChecker.h>
-#include <VirtualRobot/MathTools.h>
-#include <VirtualRobot/Robot.h>
-#include <VirtualRobot/EndEffector/EndEffector.h>
-#include <VirtualRobot/Nodes/RobotNode.h>
+#include <VirtualRobot/XML/RobotIO.h>
+
+#include "Inventor/actions/SoLineHighlightRenderAction.h"
+#include "VirtualRobot/Obstacle.h"
 #include "VirtualRobot/RobotNodeSet.h"
 #include "VirtualRobot/RuntimeEnvironment.h"
-#include "VirtualRobot/Obstacle.h"
-#include <MotionPlanning/Planner/Rrt.h>
-#include <MotionPlanning/Visualization/CoinVisualization/CoinRrtWorkspaceVisualization.h>
-#include <MotionPlanning/PostProcessing/ShortcutProcessor.h>
-#include <VirtualRobot/CollisionDetection/CDManager.h>
-
-#include <Inventor/sensors/SoTimerSensor.h>
-#include <Inventor/nodes/SoEventCallback.h>
-#include "Inventor/actions/SoLineHighlightRenderAction.h"
-#include <Inventor/nodes/SoShapeHints.h>
-#include <Inventor/nodes/SoLightModel.h>
-#include <Inventor/nodes/SoMatrixTransform.h>
-#include <Inventor/nodes/SoSeparator.h>
-#include <Inventor/nodes/SoUnits.h>
-#include <Inventor/nodes/SoSphere.h>
-#include <Inventor/nodes/SoMaterial.h>
-#include <Inventor/nodes/SoDrawStyle.h>
-#include <Inventor/nodes/SoCoordinate3.h>
-#include <Inventor/nodes/SoLineSet.h>
 #include <Inventor/nodes/SoBaseColor.h>
-#include <Inventor/nodes/SoTranslation.h>
+#include <Inventor/nodes/SoCoordinate3.h>
+#include <Inventor/nodes/SoDrawStyle.h>
+#include <Inventor/nodes/SoEventCallback.h>
+#include <Inventor/nodes/SoLightModel.h>
+#include <Inventor/nodes/SoLineSet.h>
+#include <Inventor/nodes/SoMaterial.h>
+#include <Inventor/nodes/SoMatrixTransform.h>
 #include <Inventor/nodes/SoScale.h>
-
-#include <sstream>
+#include <Inventor/nodes/SoSeparator.h>
+#include <Inventor/nodes/SoShapeHints.h>
+#include <Inventor/nodes/SoSphere.h>
+#include <Inventor/nodes/SoTranslation.h>
+#include <Inventor/nodes/SoUnits.h>
+#include <Inventor/sensors/SoTimerSensor.h>
+#include <MotionPlanning/Planner/Rrt.h>
+#include <MotionPlanning/PostProcessing/ShortcutProcessor.h>
+#include <MotionPlanning/Visualization/CoinVisualization/CoinRrtWorkspaceVisualization.h>
 using namespace std;
 using namespace VirtualRobot;
 using namespace Saba;
-
 
 MTPlanningScenery::MTPlanningScenery()
 {
@@ -75,9 +74,10 @@ MTPlanningScenery::~MTPlanningScenery()
     sceneSep->unref();
 }
 
-void MTPlanningScenery::reset()
+void
+MTPlanningScenery::reset()
 {
-    for (auto & robot : robots)
+    for (auto& robot : robots)
     {
         robot.reset();
     }
@@ -94,28 +94,28 @@ void MTPlanningScenery::reset()
         stopOptimizing();
     }
 
-    for (auto & planner : planners)
+    for (auto& planner : planners)
     {
         planner.reset();
     }
 
     planners.clear();
 
-    for (auto & CSpace : CSpaces)
+    for (auto& CSpace : CSpaces)
     {
         CSpace.reset();
     }
 
     CSpaces.clear();
 
-    for (auto & planningThread : planningThreads)
+    for (auto& planningThread : planningThreads)
     {
         planningThread.reset();
     }
 
     planningThreads.clear();
 
-    for (auto & optimizeThread : optimizeThreads)
+    for (auto& optimizeThread : optimizeThreads)
     {
         optimizeThread.reset();
     }
@@ -125,7 +125,7 @@ void MTPlanningScenery::reset()
     solutions.clear();
     optiSolutions.clear();
 
-    for (auto & visualisation : visualisations)
+    for (auto& visualisation : visualisations)
     {
         if (visualisation != nullptr)
         {
@@ -180,7 +180,8 @@ void MTPlanningScenery::reset()
     optiSolutionsForSeq.clear();*/
 }
 
-void MTPlanningScenery::buildScene()
+void
+MTPlanningScenery::buildScene()
 {
     if (obstSep)
     {
@@ -201,7 +202,8 @@ void MTPlanningScenery::buildScene()
 
     for (int i = 0; i < ob; i++)
     {
-        VirtualRobot::ObstaclePtr o = VirtualRobot::Obstacle::createBox(fCubeSize, fCubeSize, fCubeSize);
+        VirtualRobot::ObstaclePtr o =
+            VirtualRobot::Obstacle::createBox(fCubeSize, fCubeSize, fCubeSize);
 
         Eigen::Vector3f p;
         p(0) = (float)(rand() % (2 * (int)fPlayfieldSize) - (int)fPlayfieldSize);
@@ -226,7 +228,8 @@ void MTPlanningScenery::buildScene()
     environmentUnited = environment->createStaticObstacle("MultiThreadedObstacle");
 }
 
-void MTPlanningScenery::getRandomPos(float& x, float& y, float& z)
+void
+MTPlanningScenery::getRandomPos(float& x, float& y, float& z)
 {
     float fPlayfieldSize = 1000.0f;
 
@@ -257,7 +260,8 @@ void MTPlanningScenery::getRandomPos(float& x, float& y, float& z)
     }
 }
 
-void MTPlanningScenery::buildPlanningThread(bool bMultiCollisionCheckers, int id)
+void
+MTPlanningScenery::buildPlanningThread(bool bMultiCollisionCheckers, int id)
 {
     if (!environmentUnited)
     {
@@ -309,7 +313,8 @@ void MTPlanningScenery::buildPlanningThread(bool bMultiCollisionCheckers, int id
 
     if (!bMultiCollisionCheckers)
     {
-        pCSpace->exclusiveRobotAccess(true); // only needed, when one collision checker is shared between the threads
+        pCSpace->exclusiveRobotAccess(
+            true); // only needed, when one collision checker is shared between the threads
     }
 
     pCSpace->setSamplingSizeDCD(1.0f);
@@ -331,8 +336,7 @@ void MTPlanningScenery::buildPlanningThread(bool bMultiCollisionCheckers, int id
         start[2] = z;
         std::cout << "START: " << x << "," << y << "," << z << std::endl;
         pRobot->setJointValues(kinChain, start);
-    }
-    while (pCcm->isInCollision());
+    } while (pCcm->isInCollision());
 
     startPositions.push_back(start);
 
@@ -344,8 +348,7 @@ void MTPlanningScenery::buildPlanningThread(bool bMultiCollisionCheckers, int id
         goal[2] = z;
         std::cout << "GOAL: " << x << "," << y << "," << z << std::endl;
         pRobot->setJointValues(kinChain, goal);
-    }
-    while (pCcm->isInCollision());
+    } while (pCcm->isInCollision());
 
 
     goalPositions.push_back(goal);
@@ -387,10 +390,12 @@ void MTPlanningScenery::buildPlanningThread(bool bMultiCollisionCheckers, int id
 
     pRobot->setJointValues(kinChain, start);
     Eigen::Matrix4f gp = rn->getGlobalPose();
-    SoMatrixTransform* mt = CoinVisualizationFactory::getMatrixTransform(gp);//no transformation -> our scene is already in MM units
+    SoMatrixTransform* mt = CoinVisualizationFactory::getMatrixTransform(
+        gp); //no transformation -> our scene is already in MM units
     pRobot->setJointValues(kinChain, goal);
     gp = rn->getGlobalPose();
-    SoMatrixTransform* mt2 = CoinVisualizationFactory::getMatrixTransform(gp); //no transformation -> our scene is already in MM units
+    SoMatrixTransform* mt2 = CoinVisualizationFactory::getMatrixTransform(
+        gp); //no transformation -> our scene is already in MM units
 
     SoSeparator* sep1 = new SoSeparator();
     sep1->addChild(mt);
@@ -437,8 +442,8 @@ void MTPlanningScenery::buildPlanningThread(bool bMultiCollisionCheckers, int id
     startEndVisu->addChild(sep2);
 }
 
-
-PathProcessingThreadPtr MTPlanningScenery::buildOptimizeThread(CSpaceSampledPtr cspace, CSpacePathPtr path)
+PathProcessingThreadPtr
+MTPlanningScenery::buildOptimizeThread(CSpaceSampledPtr cspace, CSpacePathPtr path)
 {
 
     ShortcutProcessorPtr o(new ShortcutProcessor(path, cspace));
@@ -446,17 +451,17 @@ PathProcessingThreadPtr MTPlanningScenery::buildOptimizeThread(CSpaceSampledPtr 
     return optiThread;
 }
 
-
-void MTPlanningScenery::stopPlanning()
+void
+MTPlanningScenery::stopPlanning()
 {
     std::cout << "Stopping " << planningThreads.size() << " planning threads..." << std::endl;
 
-    for (auto & planningThread : planningThreads)
+    for (auto& planningThread : planningThreads)
     {
         planningThread->stop();
     }
 
-    for (auto & robot : robots)
+    for (auto& robot : robots)
     {
         robot->setUpdateVisualization(true);
     }
@@ -465,8 +470,8 @@ void MTPlanningScenery::stopPlanning()
     plannersStarted = false;
 }
 
-
-void MTPlanningScenery::stopOptimizing()
+void
+MTPlanningScenery::stopOptimizing()
 {
     if (!optimizeStarted)
     {
@@ -476,12 +481,12 @@ void MTPlanningScenery::stopOptimizing()
 
     std::cout << "Stopping " << optimizeThreads.size() << " optimizing threads..." << std::endl;
 
-    for (auto & optimizeThread : optimizeThreads)
+    for (auto& optimizeThread : optimizeThreads)
     {
         optimizeThread->stop();
     }
 
-    for (auto & robot : robots)
+    for (auto& robot : robots)
     {
         robot->setUpdateVisualization(true);
     }
@@ -490,8 +495,8 @@ void MTPlanningScenery::stopOptimizing()
     optimizeStarted = false;
 }
 
-
-void MTPlanningScenery::startPlanning()
+void
+MTPlanningScenery::startPlanning()
 {
     if (plannersStarted)
     {
@@ -501,12 +506,12 @@ void MTPlanningScenery::startPlanning()
 
     std::cout << "Starting " << planningThreads.size() << " planning threads..." << std::endl;
 
-    for (auto & robot : robots)
+    for (auto& robot : robots)
     {
         robot->setUpdateVisualization(false);
     }
 
-    for (auto & planningThread : planningThreads)
+    for (auto& planningThread : planningThreads)
     {
         planningThread->start();
     }
@@ -520,8 +525,8 @@ void MTPlanningScenery::startPlanning()
     plannersStarted = true;
 }
 
-
-void MTPlanningScenery::startOptimizing()
+void
+MTPlanningScenery::startOptimizing()
 {
     if (!plannersStarted)
     {
@@ -537,7 +542,7 @@ void MTPlanningScenery::startOptimizing()
 
     if (plannersStarted)
     {
-        for (auto & planningThread : planningThreads)
+        for (auto& planningThread : planningThreads)
         {
             if (planningThread->isRunning())
             {
@@ -564,12 +569,12 @@ void MTPlanningScenery::startOptimizing()
 
     int j = 0;
 
-    for (auto & robot : robots)
+    for (auto& robot : robots)
     {
         robot->setUpdateVisualization(false);
     }
 
-    for (auto & optimizeThread : optimizeThreads)
+    for (auto& optimizeThread : optimizeThreads)
     {
         if (optimizeThread)
         {
@@ -583,8 +588,8 @@ void MTPlanningScenery::startOptimizing()
     optimizeStarted = true;
 }
 
-
-void MTPlanningScenery::loadRobotMTPlanning(bool bMultiCollisionCheckers)
+void
+MTPlanningScenery::loadRobotMTPlanning(bool bMultiCollisionCheckers)
 {
     CollisionCheckerPtr pColChecker = CollisionChecker::getGlobalCollisionChecker();
 
@@ -637,7 +642,8 @@ void MTPlanningScenery::loadRobotMTPlanning(bool bMultiCollisionCheckers)
 
     if ((int)robots.size() == 1)
     {
-        std::shared_ptr<CoinVisualization> visualization = robots[0]->getVisualization(robotModelVisuColModel ? SceneObject::Full : SceneObject::Collision);
+        std::shared_ptr<CoinVisualization> visualization = robots[0]->getVisualization(
+            robotModelVisuColModel ? SceneObject::Full : SceneObject::Collision);
         //SoNode* visualisationNode = NULL;
         robotSep = new SoSeparator();
 
@@ -654,14 +660,15 @@ void MTPlanningScenery::loadRobotMTPlanning(bool bMultiCollisionCheckers)
     int trFull = pRobot->getNumFaces(false);
     int trCol = pRobot->getNumFaces(true);
 
-    std::cout << "Loaded/Cloned robot with " << trFull << "/" << trCol << " number of triangles." << std::endl;
+    std::cout << "Loaded/Cloned robot with " << trFull << "/" << trCol << " number of triangles."
+              << std::endl;
     //reset();
     std::cout << "Loaded/Cloned " << (int)robots.size() << " robots..." << std::endl;
 }
 
-
 // constructs a bounding box cube for the rrt and adds it as child to result
-void MTPlanningScenery::addBBCube(SoSeparator* result)
+void
+MTPlanningScenery::addBBCube(SoSeparator* result)
 {
     // parameters for cube
     float lineSize = 2.0;
@@ -748,8 +755,8 @@ void MTPlanningScenery::addBBCube(SoSeparator* result)
     result->addChild(s2);
 }
 
-
-void MTPlanningScenery::setRobotModelShape(bool collisionModel)
+void
+MTPlanningScenery::setRobotModelShape(bool collisionModel)
 {
     robotModelVisuColModel = collisionModel;
 
@@ -762,7 +769,8 @@ void MTPlanningScenery::setRobotModelShape(bool collisionModel)
     //sceneSep->removeChild(robotSep);
     if (robots.size() > 0)
     {
-        std::shared_ptr<CoinVisualization> visualization = robots[0]->getVisualization(robotModelVisuColModel ? SceneObject::Full : SceneObject::Collision);
+        std::shared_ptr<CoinVisualization> visualization = robots[0]->getVisualization(
+            robotModelVisuColModel ? SceneObject::Full : SceneObject::Collision);
         //SoNode* visualisationNode = NULL;
         robotSep = new SoSeparator();
 
@@ -775,8 +783,8 @@ void MTPlanningScenery::setRobotModelShape(bool collisionModel)
     }
 }
 
-
-void MTPlanningScenery::checkPlanningThreads()
+void
+MTPlanningScenery::checkPlanningThreads()
 {
     if (!plannersStarted)
     {
@@ -795,7 +803,8 @@ void MTPlanningScenery::checkPlanningThreads()
                 {
                     solutions[i] = sol->clone();
                     std::cout << "fetching solution " << i << std::endl;
-                    CoinRrtWorkspaceVisualizationPtr visu(new CoinRrtWorkspaceVisualization(robots[i], CSpaces[i], TCPName));
+                    CoinRrtWorkspaceVisualizationPtr visu(
+                        new CoinRrtWorkspaceVisualization(robots[i], CSpaces[i], TCPName));
                     visu->addCSpacePath(solutions[i]);
                     visu->addTree(planners[i]->getTree());
                     visualisations[i] = visu->getCoinVisualization();
@@ -810,8 +819,8 @@ void MTPlanningScenery::checkPlanningThreads()
     }
 }
 
-
-void MTPlanningScenery::checkOptimizeThreads()
+void
+MTPlanningScenery::checkOptimizeThreads()
 {
     if (!optimizeStarted)
     {
@@ -831,7 +840,8 @@ void MTPlanningScenery::checkOptimizeThreads()
                     std::cout << "fetching solution " << i << std::endl;
                     sceneSep->removeChild(visualisations[i]);
                     optiSolutions[i] = pOptiSol->clone();
-                    CoinRrtWorkspaceVisualizationPtr visu(new CoinRrtWorkspaceVisualization(robots[i], CSpaces[i], TCPName));
+                    CoinRrtWorkspaceVisualizationPtr visu(
+                        new CoinRrtWorkspaceVisualization(robots[i], CSpaces[i], TCPName));
                     visu->addCSpacePath(optiSolutions[i]);
                     visualisations[i] = visu->getCoinVisualization();
                     sceneSep->addChild(visualisations[i]);
@@ -846,8 +856,8 @@ void MTPlanningScenery::checkOptimizeThreads()
     }
 }
 
-
-void MTPlanningScenery::getThreadCount(int& nWorking, int& nIdle)
+void
+MTPlanningScenery::getThreadCount(int& nWorking, int& nIdle)
 {
     nWorking = 0;
     nIdle = 0;
@@ -865,8 +875,8 @@ void MTPlanningScenery::getThreadCount(int& nWorking, int& nIdle)
     }
 }
 
-
-void MTPlanningScenery::getOptimizeThreadCount(int& nWorking, int& nIdle)
+void
+MTPlanningScenery::getOptimizeThreadCount(int& nWorking, int& nIdle)
 {
     nWorking = 0;
     nIdle = 0;
@@ -884,7 +894,8 @@ void MTPlanningScenery::getOptimizeThreadCount(int& nWorking, int& nIdle)
     }
 }
 
-int MTPlanningScenery::getThreads()
+int
+MTPlanningScenery::getThreads()
 {
     return (int)(planningThreads.size());
 }

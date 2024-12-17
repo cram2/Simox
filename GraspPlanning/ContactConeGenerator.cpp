@@ -11,12 +11,13 @@
 // **************************************************************
 
 #include "ContactConeGenerator.h"
+
+#include <cassert>
 #include <cmath>
 #include <cstdio>
-#include <cassert>
+#include <fstream>
 #include <iostream>
 #include <sstream>
-#include <fstream>
 #include <string>
 
 using namespace std;
@@ -25,7 +26,9 @@ using namespace VirtualRobot;
 namespace GraspStudio
 {
 
-    ContactConeGenerator::ContactConeGenerator(int coneSamples, float frictionCoeff, float unitForce)
+    ContactConeGenerator::ContactConeGenerator(int coneSamples,
+                                               float frictionCoeff,
+                                               float unitForce)
     {
 
         this->unitForce = unitForce;
@@ -39,8 +42,10 @@ namespace GraspStudio
         for (int i = 0; i < frictionConeSamples; i++)
         {
             Eigen::Vector3f p;
-            p(0) = unitForce * (float)(cos(frictionConeAngle) * cos(i * 2.0 * M_PI / frictionConeSamples));
-            p(1) = unitForce * (float)(cos(frictionConeAngle) * sin(i * 2.0 * M_PI / frictionConeSamples));
+            p(0) = unitForce *
+                   (float)(cos(frictionConeAngle) * cos(i * 2.0 * M_PI / frictionConeSamples));
+            p(1) = unitForce *
+                   (float)(cos(frictionConeAngle) * sin(i * 2.0 * M_PI / frictionConeSamples));
             p(2) = (float)frictionConeHeight;
             frictionConeRimPoints.push_back(p);
         }
@@ -51,7 +56,10 @@ namespace GraspStudio
         frictionConeRimPoints.clear();
     }
 
-    void ContactConeGenerator::computeConePoints(const VirtualRobot::MathTools::ContactPoint& point, std::vector<VirtualRobot::MathTools::ContactPoint>& storeConePoints)
+    void
+    ContactConeGenerator::computeConePoints(
+        const VirtualRobot::MathTools::ContactPoint& point,
+        std::vector<VirtualRobot::MathTools::ContactPoint>& storeConePoints)
     {
         bool printInfo = false;
 
@@ -69,7 +77,7 @@ namespace GraspStudio
 
         //Rotate generic friction cone to align with object normals
         Eigen::Vector3f upRightNormal(0.0f, 0.0f, 1.0f);
-        MathTools::Quaternion objNormalRot =  MathTools::getRotation(upRightNormal, point.n);
+        MathTools::Quaternion objNormalRot = MathTools::getRotation(upRightNormal, point.n);
         Eigen::Matrix4f objNormalTrafo = MathTools::quat2eigen4f(objNormalRot);
 
         Eigen::Vector3f conePoint;
@@ -106,7 +114,9 @@ namespace GraspStudio
         }
     }
 
-    void ContactConeGenerator::computeConePoints(const VirtualRobot::MathTools::ContactPoint& point, std::vector<Eigen::Vector3f>& storeConePoints)
+    void
+    ContactConeGenerator::computeConePoints(const VirtualRobot::MathTools::ContactPoint& point,
+                                            std::vector<Eigen::Vector3f>& storeConePoints)
     {
         bool printInfo = false;
 
@@ -124,7 +134,8 @@ namespace GraspStudio
 
         //Rotate generic friction cone to align with object normals
         Eigen::Vector3f upRightNormal(0.0f, 0.0f, 1.0f);
-        MathTools::Quaternion objNormalRot =  MathTools::getRotation(upRightNormal, point.n); // invert?!
+        MathTools::Quaternion objNormalRot =
+            MathTools::getRotation(upRightNormal, point.n); // invert?!
         Eigen::Matrix4f objNormalTrafo = MathTools::quat2eigen4f(objNormalRot);
 
         Eigen::Vector3f conePoint;
@@ -154,20 +165,22 @@ namespace GraspStudio
         }
     }
 
-    float ContactConeGenerator::getConeAngle()
+    float
+    ContactConeGenerator::getConeAngle()
     {
         return (float)frictionConeAngle;
     }
 
-    float ContactConeGenerator::getConeRadius()
+    float
+    ContactConeGenerator::getConeRadius()
     {
         return (float)frictionConeRad;
     }
 
-    float ContactConeGenerator::getConeHeight()
+    float
+    ContactConeGenerator::getConeHeight()
     {
         return (float)frictionConeHeight;
     }
 
-} // namespace
-
+} // namespace GraspStudio

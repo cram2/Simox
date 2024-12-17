@@ -1,43 +1,43 @@
 
 #include "GraspPlannerWindow.h"
-#include "GraspPlanning/Visualization/CoinVisualization/CoinConvexHullVisualization.h"
-#include "GraspPlanning/ContactConeGenerator.h"
-#include "GraspPlanning/MeshConverter.h"
-#include "VirtualRobot/CollisionDetection/CollisionModel.h"
-#include <GraspPlanning/GraspQuality/GraspEvaluationPoseUncertainty.h>
 
-#include "VirtualRobot/EndEffector/EndEffector.h"
-#include "VirtualRobot/Workspace/Reachability.h"
-#include "VirtualRobot/ManipulationObject.h"
-#include "VirtualRobot/Grasping/Grasp.h"
-#include "VirtualRobot/IK/GenericIKSolver.h"
-#include "VirtualRobot/Grasping/GraspSet.h"
-#include "VirtualRobot/CollisionDetection/CDManager.h"
-#include "VirtualRobot/XML/ObjectIO.h"
-#include "VirtualRobot/XML/RobotIO.h"
-#include "VirtualRobot/Visualization/CoinVisualization/CoinVisualizationFactory.h"
-#include "VirtualRobot/Visualization/TriMeshModel.h"
-#include <VirtualRobot/Visualization/VisualizationNode.h>
+#include <cmath>
+#include <ctime>
+#include <iomanip>
+#include <iostream>
+#include <sstream>
+#include <vector>
 
 #include <QFileDialog>
 #include <QProgressDialog>
 
 #include <Eigen/Geometry>
 
-#include <ctime>
-#include <vector>
-#include <iostream>
-#include <iomanip>
-#include <cmath>
-#include <sstream>
+#include <VirtualRobot/Visualization/VisualizationNode.h>
 
+#include "GraspPlanning/ContactConeGenerator.h"
+#include "GraspPlanning/MeshConverter.h"
+#include "GraspPlanning/Visualization/CoinVisualization/CoinConvexHullVisualization.h"
 #include "Inventor/actions/SoLineHighlightRenderAction.h"
-#include <Inventor/nodes/SoShapeHints.h>
-#include <Inventor/nodes/SoLightModel.h>
-#include <Inventor/sensors/SoTimerSensor.h>
+#include "VirtualRobot/CollisionDetection/CDManager.h"
+#include "VirtualRobot/CollisionDetection/CollisionModel.h"
+#include "VirtualRobot/EndEffector/EndEffector.h"
+#include "VirtualRobot/Grasping/Grasp.h"
+#include "VirtualRobot/Grasping/GraspSet.h"
+#include "VirtualRobot/IK/GenericIKSolver.h"
+#include "VirtualRobot/ManipulationObject.h"
+#include "VirtualRobot/Visualization/CoinVisualization/CoinVisualizationFactory.h"
+#include "VirtualRobot/Visualization/TriMeshModel.h"
+#include "VirtualRobot/Workspace/Reachability.h"
+#include "VirtualRobot/XML/ObjectIO.h"
+#include "VirtualRobot/XML/RobotIO.h"
+#include <GraspPlanning/GraspQuality/GraspEvaluationPoseUncertainty.h>
 #include <Inventor/nodes/SoEventCallback.h>
+#include <Inventor/nodes/SoLightModel.h>
 #include <Inventor/nodes/SoMatrixTransform.h>
 #include <Inventor/nodes/SoScale.h>
+#include <Inventor/nodes/SoShapeHints.h>
+#include <Inventor/sensors/SoTimerSensor.h>
 
 
 using namespace std;
@@ -46,8 +46,11 @@ using namespace GraspStudio;
 
 //float TIMER_MS = 30.0f;
 
-GraspPlannerWindow::GraspPlannerWindow(std::string& robFile, std::string& eefName, std::string& preshape, std::string& objFile)
-    : QMainWindow(nullptr)
+GraspPlannerWindow::GraspPlannerWindow(std::string& robFile,
+                                       std::string& eefName,
+                                       std::string& preshape,
+                                       std::string& objFile) :
+    QMainWindow(nullptr)
 {
     VR_INFO << " start " << std::endl;
 
@@ -79,7 +82,6 @@ GraspPlannerWindow::GraspPlannerWindow(std::string& robFile, std::string& eefNam
     buildVisu();
 
 
-
     viewer->viewAll();
 
     /*SoSensorManager *sensor_mgr = SoDB::getSensorManager();
@@ -87,7 +89,6 @@ GraspPlannerWindow::GraspPlannerWindow(std::string& robFile, std::string& eefNam
     timer->setInterval(SbTime(TIMER_MS/1000.0f));
     sensor_mgr->insertTimerSensor(timer);*/
 }
-
 
 GraspPlannerWindow::~GraspPlannerWindow()
 {
@@ -99,7 +100,6 @@ GraspPlannerWindow::~GraspPlannerWindow()
         eefVisu->unref();
     }
 }
-
 
 /*void GraspPlannerWindow::timerCB(void * data, SoSensor * sensor)
 {
@@ -122,7 +122,8 @@ GraspPlannerWindow::~GraspPlannerWindow()
         ikWindow->updateObject(x);
 }*/
 
-void GraspPlannerWindow::setupUI()
+void
+GraspPlannerWindow::setupUI()
 {
     UI.setupUi(this);
     viewer = new SoQtExaminerViewer(UI.frameViewer, "", TRUE, SoQtExaminerViewer::BUILD_POPUP);
@@ -148,21 +149,22 @@ void GraspPlannerWindow::setupUI()
     connect(UI.pushButtonClose, SIGNAL(clicked()), this, SLOT(closeEEF()));
 
 
-
     connect(UI.checkBoxColModel, SIGNAL(clicked()), this, SLOT(colModel()));
     connect(UI.checkBoxCones, SIGNAL(clicked()), this, SLOT(frictionConeVisu()));
     connect(UI.checkBoxGrasps, SIGNAL(clicked()), this, SLOT(showGrasps()));
 }
 
-void GraspPlannerWindow::selectRobotObject(int n)
+void
+GraspPlannerWindow::selectRobotObject(int n)
 {
-    if (!robotObject) return;
+    if (!robotObject)
+        return;
 
     object = robotObject->getRobotNode(UI.comboBoxObject->itemText(n).toStdString());
 }
 
-
-void GraspPlannerWindow::resetSceneryAll()
+void
+GraspPlannerWindow::resetSceneryAll()
 {
     grasps->removeAllGrasps();
     graspsSep->removeAllChildren();
@@ -171,19 +173,20 @@ void GraspPlannerWindow::resetSceneryAll()
     //  rns->setJointValues(startConfig);
 }
 
-
-void GraspPlannerWindow::closeEvent(QCloseEvent* event)
+void
+GraspPlannerWindow::closeEvent(QCloseEvent* event)
 {
     quit();
     QMainWindow::closeEvent(event);
 }
 
-
-void GraspPlannerWindow::buildVisu()
+void
+GraspPlannerWindow::buildVisu()
 {
 
     robotSep->removeAllChildren();
-    SceneObject::VisualizationType colModel = (UI.checkBoxColModel->isChecked()) ? SceneObject::Collision : SceneObject::Full;
+    SceneObject::VisualizationType colModel =
+        (UI.checkBoxColModel->isChecked()) ? SceneObject::Collision : SceneObject::Full;
 
     if (eefCloned)
     {
@@ -215,8 +218,10 @@ void GraspPlannerWindow::buildVisu()
     {
 
 #if 1
-        SceneObject::VisualizationType colModel2 = (UI.checkBoxColModel->isChecked()) ? SceneObject::Collision : SceneObject::Full;
-        SoNode* visualisationNode = CoinVisualizationFactory::getCoinVisualization(object, colModel2);
+        SceneObject::VisualizationType colModel2 =
+            (UI.checkBoxColModel->isChecked()) ? SceneObject::Collision : SceneObject::Full;
+        SoNode* visualisationNode =
+            CoinVisualizationFactory::getCoinVisualization(object, colModel2);
 
         if (visualisationNode)
         {
@@ -227,7 +232,8 @@ void GraspPlannerWindow::buildVisu()
 
         if (UI.checkBoxColModel->isChecked())
         {
-            VirtualRobot::MathTools::ConvexHull3DPtr ch = ConvexHullGenerator::CreateConvexHull(object->getCollisionModel()->getTriMeshModel());
+            VirtualRobot::MathTools::ConvexHull3DPtr ch = ConvexHullGenerator::CreateConvexHull(
+                object->getCollisionModel()->getTriMeshModel());
             CoinConvexHullVisualizationPtr chv(new CoinConvexHullVisualization(ch));
             SoSeparator* s = chv->getCoinVisualization();
 
@@ -238,7 +244,8 @@ void GraspPlannerWindow::buildVisu()
         }
         else
         {
-            SoNode* visualisationNode = CoinVisualizationFactory::getCoinVisualization(object, SceneObject::Full);
+            SoNode* visualisationNode =
+                CoinVisualizationFactory::getCoinVisualization(object, SceneObject::Full);
 
             if (visualisationNode)
             {
@@ -261,7 +268,8 @@ void GraspPlannerWindow::buildVisu()
         float radius = cg->getConeRadius();
         float height = cg->getConeHeight();
         float scaling = 30.0f;
-        SoNode* visualisationNode = CoinVisualizationFactory::getCoinVisualization(contacts, height * scaling, radius * scaling, true);
+        SoNode* visualisationNode = CoinVisualizationFactory::getCoinVisualization(
+            contacts, height * scaling, radius * scaling, true);
 
         if (visualisationNode)
         {
@@ -277,7 +285,8 @@ void GraspPlannerWindow::buildVisu()
             ma.block(0, 3, 3, 1) = contact.contactPointFingerGlobal;
             SoMatrixTransform* m = CoinVisualizationFactory::getMatrixTransformScaleMM2M(ma);
             s->addChild(m);
-            s->addChild(CoinVisualizationFactory::CreateArrow(contact.approachDirectionGlobal, 10.0f, 1.0f));
+            s->addChild(CoinVisualizationFactory::CreateArrow(
+                contact.approachDirectionGlobal, 10.0f, 1.0f));
             frictionConeSep->addChild(s);
         }
     }
@@ -295,22 +304,24 @@ void GraspPlannerWindow::buildVisu()
     viewer->scheduleRedraw();
 }
 
-int GraspPlannerWindow::main()
+int
+GraspPlannerWindow::main()
 {
     SoQt::show(this);
     SoQt::mainLoop();
     return 0;
 }
 
-
-void GraspPlannerWindow::quit()
+void
+GraspPlannerWindow::quit()
 {
     std::cout << "GraspPlannerWindow: Closing" << std::endl;
     this->close();
     SoQt::exitMainLoop();
 }
 
-void GraspPlannerWindow::loadObject(const string& objFile)
+void
+GraspPlannerWindow::loadObject(const string& objFile)
 {
     if (!objFile.empty())
     {
@@ -321,7 +332,8 @@ void GraspPlannerWindow::loadObject(const string& objFile)
         catch (VirtualRobotException& e)
         {
             // TODO: not pretty!
-            try {
+            try
+            {
                 robotObject = RobotIO::loadRobot(objFile, RobotIO::eFullVisAsCol);
                 object = nullptr;
             }
@@ -336,10 +348,14 @@ void GraspPlannerWindow::loadObject(const string& objFile)
 
     UI.comboBoxObject->clear();
 
-    if (robotObject) {
-        for (auto robotNode : robotObject->getRobotNodes()) {
-            if (robotNode->getVisualization()) {
-                if (!object){
+    if (robotObject)
+    {
+        for (auto robotNode : robotObject->getRobotNodes())
+        {
+            if (robotNode->getVisualization())
+            {
+                if (!object)
+                {
                     object = robotNode;
                 }
                 UI.comboBoxObject->addItem(QString::fromStdString(robotNode->getName()));
@@ -372,7 +388,8 @@ void GraspPlannerWindow::loadObject(const string& objFile)
     planner->setVerbose(true);
 }
 
-void GraspPlannerWindow::loadRobot()
+void
+GraspPlannerWindow::loadRobot()
 {
     robot.reset();
     robot = RobotIO::loadRobot(robotFile);
@@ -394,7 +411,8 @@ void GraspPlannerWindow::loadRobot()
     eefVisu->ref();
 }
 
-void GraspPlannerWindow::plan()
+void
+GraspPlannerWindow::plan()
 {
 
     float timeout = UI.spinBoxTimeOut->value() * 1000.0f;
@@ -407,7 +425,8 @@ void GraspPlannerWindow::plan()
     }
     else
     {
-        planner.reset(new GraspStudio::GenericGraspPlanner(grasps, qualityMeasure, approach, quality, forceClosure));
+        planner.reset(new GraspStudio::GenericGraspPlanner(
+            grasps, qualityMeasure, approach, quality, forceClosure));
     }
 
     robot->setPropagatingJointValuesEnabled(UI.checkBoxPropagateJointValues->isChecked());
@@ -437,7 +456,8 @@ void GraspPlannerWindow::plan()
     // set to last valid grasp
     if (grasps->getSize() > 0 && eefCloned && eefCloned->getEndEffector(eefName))
     {
-        Eigen::Matrix4f mGrasp = grasps->getGrasp(grasps->getSize() - 1)->getTcpPoseGlobal(object->getGlobalPose());
+        Eigen::Matrix4f mGrasp =
+            grasps->getGrasp(grasps->getSize() - 1)->getTcpPoseGlobal(object->getGlobalPose());
         eefCloned->setGlobalPoseForRobotNode(eefCloned->getEndEffector(eefName)->getTcp(), mGrasp);
     }
 
@@ -450,9 +470,8 @@ void GraspPlannerWindow::plan()
     planner->getEvaluation().print();
 }
 
-
-
-void GraspPlannerWindow::closeEEF()
+void
+GraspPlannerWindow::closeEEF()
 {
     contacts.clear();
 
@@ -480,7 +499,8 @@ void GraspPlannerWindow::closeEEF()
     buildVisu();
 }
 
-void GraspPlannerWindow::openEEF()
+void
+GraspPlannerWindow::openEEF()
 {
     contacts.clear();
 
@@ -499,31 +519,38 @@ void GraspPlannerWindow::openEEF()
     buildVisu();
 }
 
-void GraspPlannerWindow::frictionConeVisu()
+void
+GraspPlannerWindow::frictionConeVisu()
 {
     buildVisu();
 }
 
-void GraspPlannerWindow::colModel()
+void
+GraspPlannerWindow::colModel()
 {
     buildVisu();
 }
 
-void GraspPlannerWindow::showGrasps()
+void
+GraspPlannerWindow::showGrasps()
 {
     buildVisu();
 }
 
-void GraspPlannerWindow::save()
+void
+GraspPlannerWindow::save()
 {
     if (!object)
     {
         return;
     }
 
-    ManipulationObjectPtr objectM(new ManipulationObject(object->getName(), object->getVisualization()->clone(), object->getCollisionModel()->clone()));
+    ManipulationObjectPtr objectM(new ManipulationObject(object->getName(),
+                                                         object->getVisualization()->clone(),
+                                                         object->getCollisionModel()->clone()));
     objectM->addGraspSet(grasps);
-    QString fi = QFileDialog::getSaveFileName(this, tr("Save ManipulationObject"), QString(), tr("XML Files (*.xml)"));
+    QString fi = QFileDialog::getSaveFileName(
+        this, tr("Save ManipulationObject"), QString(), tr("XML Files (*.xml)"));
     const std::string objFile(fi.toLatin1());
     bool ok = false;
 
@@ -544,7 +571,9 @@ void GraspPlannerWindow::save()
         return;
     }
 }
-void GraspPlannerWindow::planObjectBatch()
+
+void
+GraspPlannerWindow::planObjectBatch()
 {
     QString fi = QFileDialog::getExistingDirectory(this, tr("Select Base Directory"), QString());
     qApp->processEvents();
@@ -554,8 +583,10 @@ void GraspPlannerWindow::planObjectBatch()
         return;
     }
     QStringList paths;
-    for (std::filesystem::recursive_directory_iterator end, dir(fi.toUtf8().data(), std::filesystem::directory_options::follow_directory_symlink);
-         dir != end ; ++dir)
+    for (std::filesystem::recursive_directory_iterator end,
+         dir(fi.toUtf8().data(), std::filesystem::directory_options::follow_directory_symlink);
+         dir != end;
+         ++dir)
     {
         //std::string path(dir->path().c_str());
 
@@ -566,14 +597,16 @@ void GraspPlannerWindow::planObjectBatch()
             QString qs(p.c_str());
             paths.append(qs);
         }
-
     }
     paths.removeDuplicates();
     VR_INFO << "Found:  " << paths.join(", ").toStdString() << std::endl;
-    std::filesystem::path resultsCSVPath("genericgraspplanningresults-" + robot->getName() + ".csv");
+    std::filesystem::path resultsCSVPath("genericgraspplanningresults-" + robot->getName() +
+                                         ".csv");
     resultsCSVPath = std::filesystem::absolute(resultsCSVPath);
     std::ofstream fs(resultsCSVPath.string().c_str(), std::ofstream::out);
-    fs << "object," << planner->getEvaluation().GetCSVHeader() << ",RobustnessAvgQualityNoCol,RobustnessAvgForceClosureRateNoCol,RobustnessAvgQualityCol,RobustnessAvgForceClosureRateCol";
+    fs << "object," << planner->getEvaluation().GetCSVHeader()
+       << ",RobustnessAvgQualityNoCol,RobustnessAvgForceClosureRateNoCol,RobustnessAvgQualityCol,"
+          "RobustnessAvgForceClosureRateCol";
     QProgressDialog progress("Calculating grasps...", "Abort", 0, paths.size(), this);
     progress.setWindowModality(Qt::WindowModal);
     progress.show();
@@ -583,15 +616,17 @@ void GraspPlannerWindow::planObjectBatch()
     size_t bins = 20;
     for (size_t i = 0; i < bins; ++i)
     {
-        fs  << "," << "HistogramBin" << i;
+        fs << ","
+           << "HistogramBin" << i;
     }
     for (size_t i = 0; i < bins; ++i)
     {
-        fs   << "," << "HistogramWithCollisionBin" << i;
+        fs << ","
+           << "HistogramWithCollisionBin" << i;
     }
     fs << std::endl;
 
-    for (auto& path :  paths)
+    for (auto& path : paths)
     {
         try
         {
@@ -615,13 +650,19 @@ void GraspPlannerWindow::planObjectBatch()
                 for (VirtualRobot::GraspPtr& g : planner->getPlannedGrasps())
                 {
                     GraspEvaluationPoseUncertainty::PoseEvalResults result;
-                    if (!evaluateGrasp(g, eefCloned, eefCloned->getEndEffector(eefName), 100, result))
+                    if (!evaluateGrasp(
+                            g, eefCloned, eefCloned->getEndEffector(eefName), 100, result))
                     {
                         continue;
                     }
-                    VR_INFO << "Grasp " << graspSum << "/" << planner->getPlannedGrasps().size() << std::endl;
-                    histogramFC.at(std::min<int>(static_cast<int>(result.forceClosureRate * bins), bins - 1))++;
-                    histogramFCWithCollisions.at(std::min<int>(static_cast<int>(static_cast<double>(result.numForceClosurePoses) / result.numPosesTested * bins), bins - 1))++;
+                    VR_INFO << "Grasp " << graspSum << "/" << planner->getPlannedGrasps().size()
+                            << std::endl;
+                    histogramFC.at(std::min<int>(static_cast<int>(result.forceClosureRate * bins),
+                                                 bins - 1))++;
+                    histogramFCWithCollisions.at(std::min<int>(
+                        static_cast<int>(static_cast<double>(result.numForceClosurePoses) /
+                                         result.numPosesTested * bins),
+                        bins - 1))++;
                     avgRate += result.avgQuality;
                     avgForceClosureRate += result.forceClosureRate;
                     avgRateCol += result.avgQualityCol;
@@ -637,24 +678,28 @@ void GraspPlannerWindow::planObjectBatch()
                     avgRateCol /= planner->getPlannedGrasps().size();
                     avgForceClosureRateCol /= planner->getPlannedGrasps().size();
                 }
-                fs << object->getName() << "," << planner->getEvaluation().toCSVString() << "," << avgRate << "," << avgForceClosureRate << "," << avgRateCol << "," << avgForceClosureRateCol;
+                fs << object->getName() << "," << planner->getEvaluation().toCSVString() << ","
+                   << avgRate << "," << avgForceClosureRate << "," << avgRateCol << ","
+                   << avgForceClosureRateCol;
                 int i = 0;
                 for (auto bin : histogramFC)
                 {
-                    fs  <<  ", " << static_cast<double>(bin) / graspSum;
-                    std::cout << i << ": " << bin << ", " << graspSum << ", " << static_cast<double>(bin) / graspSum << std::endl;
+                    fs << ", " << static_cast<double>(bin) / graspSum;
+                    std::cout << i << ": " << bin << ", " << graspSum << ", "
+                              << static_cast<double>(bin) / graspSum << std::endl;
                     i++;
                 }
                 for (auto bin : histogramFCWithCollisions)
                 {
-                    fs  <<  ", " << static_cast<double>(bin) / graspSum;
+                    fs << ", " << static_cast<double>(bin) / graspSum;
                 }
                 fs << std::endl;
             }
         }
         catch (std::exception& e)
         {
-            VR_ERROR << "Failed to plan for " << path.toStdString() << "\nReason: \n" << e.what() << std::endl;
+            VR_ERROR << "Failed to plan for " << path.toStdString() << "\nReason: \n"
+                     << e.what() << std::endl;
         }
         progress.setValue(++i);
         qApp->processEvents();
@@ -666,23 +711,31 @@ void GraspPlannerWindow::planObjectBatch()
     VR_INFO << "Saving CSV results to " << resultsCSVPath.string() << std::endl;
 }
 
-bool GraspPlannerWindow::evaluateGrasp(VirtualRobot::GraspPtr g, VirtualRobot::RobotPtr eefRobot, VirtualRobot::EndEffectorPtr eef, int nrEvalLoops, GraspEvaluationPoseUncertainty::PoseEvalResults& results)
+bool
+GraspPlannerWindow::evaluateGrasp(VirtualRobot::GraspPtr g,
+                                  VirtualRobot::RobotPtr eefRobot,
+                                  VirtualRobot::EndEffectorPtr eef,
+                                  int nrEvalLoops,
+                                  GraspEvaluationPoseUncertainty::PoseEvalResults& results)
 {
     if (!g || !eefRobot || !eef)
     {
         return false;
     }
 
-    GraspEvaluationPoseUncertaintyPtr eval(new GraspEvaluationPoseUncertainty(GraspEvaluationPoseUncertainty::PoseUncertaintyConfig()));
+    GraspEvaluationPoseUncertaintyPtr eval(new GraspEvaluationPoseUncertainty(
+        GraspEvaluationPoseUncertainty::PoseUncertaintyConfig()));
 
     results = eval->evaluateGrasp(g, eef, object, qualityMeasure, nrEvalLoops);
 
     return true;
 }
 
-
-void GraspPlannerWindow::on_pushButtonLoadObject_clicked()
+void
+GraspPlannerWindow::on_pushButtonLoadObject_clicked()
 {
-    loadObject(QFileDialog::getOpenFileName(this, tr("Open Object File"), "", tr("XML Files (*.xml)")).toStdString());
+    loadObject(
+        QFileDialog::getOpenFileName(this, tr("Open Object File"), "", tr("XML Files (*.xml)"))
+            .toStdString());
     buildVisu();
 }

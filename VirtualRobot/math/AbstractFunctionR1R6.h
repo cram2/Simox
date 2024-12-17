@@ -25,14 +25,14 @@
 
 namespace math
 {
-    class VIRTUAL_ROBOT_IMPORT_EXPORT AbstractFunctionR1R6
-            : public SimpleAbstractFunctionR1R6
+    class VIRTUAL_ROBOT_IMPORT_EXPORT AbstractFunctionR1R6 : public SimpleAbstractFunctionR1R6
     {
     public:
         virtual Eigen::Vector3f GetPositionDerivative(float t) = 0;
         virtual Eigen::Vector3f GetOrientationDerivative(float t) = 0;
 
         virtual ~AbstractFunctionR1R6() = default;
+
     private:
     };
-}
+} // namespace math

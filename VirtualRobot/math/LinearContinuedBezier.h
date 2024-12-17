@@ -21,22 +21,42 @@
 
 #pragma once
 
-#include "MathForwardDefinitions.h"
 #include "AbstractFunctionR1R3.h"
+#include "MathForwardDefinitions.h"
 
 namespace math
 {
-    class LinearContinuedBezier
-            : public AbstractFunctionR1R3
+    class LinearContinuedBezier : public AbstractFunctionR1R3
     {
     public:
-        LinearContinuedBezier(Eigen::Vector3f p0, Eigen::Vector3f p1, Eigen::Vector3f p2, Eigen::Vector3f p3);
+        LinearContinuedBezier(Eigen::Vector3f p0,
+                              Eigen::Vector3f p1,
+                              Eigen::Vector3f p2,
+                              Eigen::Vector3f p3);
 
-        Eigen::Vector3f P0() {return p0; }
-        Eigen::Vector3f P1() {return p1; }
-        Eigen::Vector3f P2() {return p2; }
-        Eigen::Vector3f P3() {return p3; }
+        Eigen::Vector3f
+        P0()
+        {
+            return p0;
+        }
 
+        Eigen::Vector3f
+        P1()
+        {
+            return p1;
+        }
+
+        Eigen::Vector3f
+        P2()
+        {
+            return p2;
+        }
+
+        Eigen::Vector3f
+        P3()
+        {
+            return p3;
+        }
 
         Eigen::Vector3f Get(float t) override;
         Eigen::Vector3f GetDerivative(float t) override;
@@ -46,6 +66,5 @@ namespace math
         Eigen::Vector3f p1;
         Eigen::Vector3f p2;
         Eigen::Vector3f p3;
-
     };
-}
+} // namespace math

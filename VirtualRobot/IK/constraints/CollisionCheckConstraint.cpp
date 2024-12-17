@@ -22,46 +22,48 @@
  *             GNU General Public License
  */
 #include "CollisionCheckConstraint.h"
-#include "../../CollisionDetection/CDManager.h"
 
+#include "../../CollisionDetection/CDManager.h"
 #include "Nodes/RobotNode.h"
 #include "RobotNodeSet.h"
 
-namespace VirtualRobot {
-
-CollisionCheckConstraint::CollisionCheckConstraint(const RobotNodeSetPtr &rns, const CDManagerPtr &cdm) :
-    Constraint(rns),
-    cdm(cdm),
-    zeroVec(Eigen::VectorXf::Zero(rns->getSize()))
+namespace VirtualRobot
 {
-    for (unsigned i = 0; i < rns->getSize(); ++i) {
-        zeroVec(i) = 1e-10;
+
+    CollisionCheckConstraint::CollisionCheckConstraint(const RobotNodeSetPtr& rns,
+                                                       const CDManagerPtr& cdm) :
+        Constraint(rns), cdm(cdm), zeroVec(Eigen::VectorXf::Zero(rns->getSize()))
+    {
+        for (unsigned i = 0; i < rns->getSize(); ++i)
+        {
+            zeroVec(i) = 1e-10;
+        }
+        addOptimizationFunction(0, false);
     }
-    addOptimizationFunction(0, false);
-}
 
+    bool
+    CollisionCheckConstraint::checkTolerances()
+    {
+        bool result = !cdm->isInCollision();
+        return result;
+    }
 
+    double
+    CollisionCheckConstraint::optimizationFunction(unsigned int /*id*/)
+    {
+        return 0;
+    }
 
-bool CollisionCheckConstraint::checkTolerances()
-{
-    bool result = !cdm->isInCollision();
-    return result;
-}
+    Eigen::VectorXf
+    CollisionCheckConstraint::optimizationGradient(unsigned int /*id*/)
+    {
+        return zeroVec;
+    }
 
-double CollisionCheckConstraint::optimizationFunction(unsigned int /*id*/)
-{
-    return 0;
-}
+    bool
+    CollisionCheckConstraint::usingCollisionModel()
+    {
+        return true;
+    }
 
-Eigen::VectorXf CollisionCheckConstraint::optimizationGradient(unsigned int /*id*/)
-{
-    return zeroVec;
-}
-
-
-bool CollisionCheckConstraint::usingCollisionModel()
-{
-    return true;
-}
-
-}
+} // namespace VirtualRobot

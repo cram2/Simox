@@ -6,23 +6,24 @@
 
 #define BOOST_TEST_MODULE Saba_SabaCSpaceTest
 
-#include <VirtualRobot/VirtualRobotTest.h>
-#include <VirtualRobot/XML/RobotIO.h>
-#include <VirtualRobot/Robot.h>
-#include <VirtualRobot/RobotNodeSet.h>
-#include <VirtualRobot/CollisionDetection/CollisionChecker.h>
-#include <VirtualRobot/CollisionDetection/CollisionModel.h>
-#include <VirtualRobot/Obstacle.h>
-#include <CSpace/CSpaceSampled.h>
-#include <VirtualRobot/CollisionDetection/CDManager.h>
 #include <string>
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
+#include <VirtualRobot/CollisionDetection/CDManager.h>
+#include <VirtualRobot/CollisionDetection/CollisionChecker.h>
+#include <VirtualRobot/CollisionDetection/CollisionModel.h>
+#include <VirtualRobot/Obstacle.h>
+#include <VirtualRobot/Robot.h>
+#include <VirtualRobot/RobotNodeSet.h>
+#include <VirtualRobot/VirtualRobotTest.h>
+#include <VirtualRobot/XML/RobotIO.h>
+
+#include <CSpace/CSpaceSampled.h>
+
 
 BOOST_AUTO_TEST_SUITE(CSpace)
-
 
 BOOST_AUTO_TEST_CASE(testCSpace)
 {
@@ -37,9 +38,10 @@ BOOST_AUTO_TEST_CASE(testCSpace)
         "</Robot>";
     VirtualRobot::RobotPtr rob = VirtualRobot::RobotIO::createRobotFromString(robotString);
     BOOST_REQUIRE(rob);
-    std::vector< std::string > nodes;
+    std::vector<std::string> nodes;
     nodes.push_back(std::string("Joint1"));
-    VirtualRobot::RobotNodeSetPtr rns = VirtualRobot::RobotNodeSet::createRobotNodeSet(rob, "nodeSet", nodes);
+    VirtualRobot::RobotNodeSetPtr rns =
+        VirtualRobot::RobotNodeSet::createRobotNodeSet(rob, "nodeSet", nodes);
     VirtualRobot::CDManagerPtr cdm(new VirtualRobot::CDManager());
     Saba::CSpaceSampledPtr cspace(new Saba::CSpaceSampled(rob, cdm, rns));
     BOOST_REQUIRE(cspace);
@@ -132,7 +134,6 @@ BOOST_AUTO_TEST_CASE(testCSpace)
     BOOST_CHECK_CLOSE(d, 0.75f * (float)M_PI + 0.4f * 0.5f * (float)M_PI, 0.01f);
     d = cspace->interpolate(p1, p2, 0, 0.9f);
     BOOST_CHECK_CLOSE(d, 0.75f * (float)M_PI + 0.1f * 0.5f * (float)M_PI, 0.01f);
-
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -1,9 +1,10 @@
 #include "WorkspaceDataArray.h"
 
-#include <fstream>
-#include <cmath>
 #include <cfloat>
 #include <climits>
+#include <cmath>
+#include <fstream>
+
 #include "Compression/CompressionBZip2.h"
 
 namespace VirtualRobot
@@ -11,20 +12,28 @@ namespace VirtualRobot
     using std::cout;
     using std::endl;
 
-    void WorkspaceDataArray::reset(const int x, const int y, const int z)
+    void
+    WorkspaceDataArray::reset(const int x, const int y, const int z)
     {
         if (data[x * sizeTr0 + y * sizeTr1 + z])
         {
-            delete [] data[x * sizeTr0 + y * sizeTr1 + z];
+            delete[] data[x * sizeTr0 + y * sizeTr1 + z];
             data[x * sizeTr0 + y * sizeTr1 + z] = NULL;
         }
     }
 
-    WorkspaceDataArray::WorkspaceDataArray(unsigned int size1, unsigned int size2, unsigned int size3,
-                                           unsigned int size4, unsigned int size5, unsigned int size6, bool adjustOnOverflow)
+    WorkspaceDataArray::WorkspaceDataArray(unsigned int size1,
+                                           unsigned int size2,
+                                           unsigned int size3,
+                                           unsigned int size4,
+                                           unsigned int size5,
+                                           unsigned int size6,
+                                           bool adjustOnOverflow)
     {
-        unsigned long long sizeTr = (unsigned long long)size1 * (unsigned long long)size2 * (unsigned long long)size3;
-        unsigned long long sizeRot = (unsigned long long)size4 * (unsigned long long)size5 * (unsigned long long)size6;
+        unsigned long long sizeTr =
+            (unsigned long long)size1 * (unsigned long long)size2 * (unsigned long long)size3;
+        unsigned long long sizeRot =
+            (unsigned long long)size4 * (unsigned long long)size5 * (unsigned long long)size6;
         sizes[0] = size1;
         sizes[1] = size2;
         sizes[2] = size3;
@@ -38,12 +47,14 @@ namespace VirtualRobot
 
         if (sizeRot > UINT_MAX || sizeTr > UINT_MAX)
         {
-            VR_ERROR << "Could not assign " << sizeRot << " bytes of memory (>UINT_MAX). Reduce size of reachability space..." << std::endl;
+            VR_ERROR << "Could not assign " << sizeRot
+                     << " bytes of memory (>UINT_MAX). Reduce size of reachability space..."
+                     << std::endl;
         }
 
         try
         {
-            data = new unsigned char* [(unsigned int)sizeTr];
+            data = new unsigned char*[(unsigned int)sizeTr];
 
             for (unsigned int x = 0; x < size1; x++)
             {
@@ -58,12 +69,15 @@ namespace VirtualRobot
         }
         catch (const std::exception& e)
         {
-            VR_ERROR << "Exception: " << e.what() << endl << "Could not assign " << sizeRot << " bytes of memory. Reduce size of reachability space..." << std::endl;
+            VR_ERROR << "Exception: " << e.what() << endl
+                     << "Could not assign " << sizeRot
+                     << " bytes of memory. Reduce size of reachability space..." << std::endl;
             throw;
         }
         catch (...)
         {
-            VR_ERROR << "Could not assign " << sizeRot << " bytes of memory. Reduce size of reachability space..." << std::endl;
+            VR_ERROR << "Could not assign " << sizeRot
+                     << " bytes of memory. Reduce size of reachability space..." << std::endl;
             throw;
         }
 
@@ -82,8 +96,10 @@ namespace VirtualRobot
             this->sizes[i] = other->sizes[i];
         }
 
-        unsigned long long sizeTr = (unsigned long long)sizes[0] * (unsigned long long)sizes[1] * (unsigned long long)sizes[2];
-        unsigned long long sizeRot = (unsigned long long)sizes[3] * (unsigned long long)sizes[4] * (unsigned long long)sizes[5];
+        unsigned long long sizeTr = (unsigned long long)sizes[0] * (unsigned long long)sizes[1] *
+                                    (unsigned long long)sizes[2];
+        unsigned long long sizeRot = (unsigned long long)sizes[3] * (unsigned long long)sizes[4] *
+                                     (unsigned long long)sizes[5];
         sizeTr0 = sizes[1] * sizes[2];
         sizeTr1 = sizes[2];
         sizeRot0 = sizes[4] * sizes[5];
@@ -91,12 +107,14 @@ namespace VirtualRobot
 
         if (sizeRot > UINT_MAX || sizeTr > UINT_MAX)
         {
-            VR_ERROR << "Could not assign " << sizeRot << " bytes of memory (>UINT_MAX). Reduce size of reachability space..." << std::endl;
+            VR_ERROR << "Could not assign " << sizeRot
+                     << " bytes of memory (>UINT_MAX). Reduce size of reachability space..."
+                     << std::endl;
         }
 
         try
         {
-            data = new unsigned char* [(unsigned int)sizeTr];
+            data = new unsigned char*[(unsigned int)sizeTr];
 
             for (unsigned int x = 0; x < sizes[0]; x++)
             {
@@ -109,7 +127,9 @@ namespace VirtualRobot
                         if (other->data[pos] != nullptr)
                         {
                             data[pos] = new unsigned char[(unsigned int)sizeRot];
-                            memcpy(data[pos], other->data[pos], (unsigned int)sizeRot * sizeof(unsigned char));
+                            memcpy(data[pos],
+                                   other->data[pos],
+                                   (unsigned int)sizeRot * sizeof(unsigned char));
                         }
                         else
                         {
@@ -121,12 +141,15 @@ namespace VirtualRobot
         }
         catch (const std::exception& e)
         {
-            VR_ERROR << "Exception: " << e.what() << endl << "Could not assign " << sizeRot << " bytes of memory. Reduce size of reachability space..." << std::endl;
+            VR_ERROR << "Exception: " << e.what() << endl
+                     << "Could not assign " << sizeRot
+                     << " bytes of memory. Reduce size of reachability space..." << std::endl;
             throw;
         }
         catch (...)
         {
-            VR_ERROR << "Could not assign " << sizeRot << " bytes of memory. Reduce size of reachability space..." << std::endl;
+            VR_ERROR << "Could not assign " << sizeRot
+                     << " bytes of memory. Reduce size of reachability space..." << std::endl;
             throw;
         }
 
@@ -152,17 +175,22 @@ namespace VirtualRobot
         delete[] data;
     }
 
-    unsigned int WorkspaceDataArray::getSizeTr() const
+    unsigned int
+    WorkspaceDataArray::getSizeTr() const
     {
         return sizes[0] * sizes[1] * sizes[2];
     }
 
-    unsigned int WorkspaceDataArray::getSizeRot() const
+    unsigned int
+    WorkspaceDataArray::getSizeRot() const
     {
         return sizes[3] * sizes[4] * sizes[5];
     }
 
-    void WorkspaceDataArray::setDatum(float x[6], unsigned char value, const WorkspaceRepresentation* workspace)
+    void
+    WorkspaceDataArray::setDatum(float x[6],
+                                 unsigned char value,
+                                 const WorkspaceRepresentation* workspace)
     {
         // get voxels
         unsigned int v[6];
@@ -173,7 +201,14 @@ namespace VirtualRobot
         }
     }
 
-    void WorkspaceDataArray::setDatum(unsigned int x0, unsigned int x1, unsigned int x2, unsigned int x3, unsigned int x4, unsigned int x5, unsigned char value)
+    void
+    WorkspaceDataArray::setDatum(unsigned int x0,
+                                 unsigned int x1,
+                                 unsigned int x2,
+                                 unsigned int x3,
+                                 unsigned int x4,
+                                 unsigned int x5,
+                                 unsigned char value)
     {
         ensureData(x0, x1, x2);
         unsigned int posTr = 0, posRot = 0;
@@ -192,7 +227,8 @@ namespace VirtualRobot
         }
     }
 
-    void WorkspaceDataArray::setDatum(unsigned int x[], unsigned char value)
+    void
+    WorkspaceDataArray::setDatum(unsigned int x[], unsigned char value)
     {
         ensureData(x[0], x[1], x[2]);
         unsigned int posTr = 0, posRot = 0;
@@ -211,31 +247,41 @@ namespace VirtualRobot
         }
     }
 
-    void WorkspaceDataArray::ensureData(unsigned int x, unsigned int y, unsigned int z)
+    void
+    WorkspaceDataArray::ensureData(unsigned int x, unsigned int y, unsigned int z)
     {
         if (data[x * sizeTr0 + y * sizeTr1 + z])
         {
             return;
         }
 
-        unsigned long long sizeRot = (unsigned long long)sizes[3] * (unsigned long long)sizes[4] * (unsigned long long)sizes[5];
+        unsigned long long sizeRot = (unsigned long long)sizes[3] * (unsigned long long)sizes[4] *
+                                     (unsigned long long)sizes[5];
         data[x * sizeTr0 + y * sizeTr1 + z] = new unsigned char[(unsigned int)sizeRot];
-        memset(data[x * sizeTr0 + y * sizeTr1 + z], 0, (unsigned int)sizeRot * sizeof(unsigned char));
+        memset(
+            data[x * sizeTr0 + y * sizeTr1 + z], 0, (unsigned int)sizeRot * sizeof(unsigned char));
     }
 
-    void WorkspaceDataArray::setDataRot(unsigned char* data, unsigned int x, unsigned int y, unsigned int z)
+    void
+    WorkspaceDataArray::setDataRot(unsigned char* data,
+                                   unsigned int x,
+                                   unsigned int y,
+                                   unsigned int z)
     {
         ensureData(x, y, z);
-        memcpy(this->data[x * sizeTr0 + y * sizeTr1 + z], data, getSizeRot()*sizeof(unsigned char));
+        memcpy(
+            this->data[x * sizeTr0 + y * sizeTr1 + z], data, getSizeRot() * sizeof(unsigned char));
     }
 
-    const unsigned char* WorkspaceDataArray::getDataRot(unsigned int x, unsigned int y, unsigned int z)
+    const unsigned char*
+    WorkspaceDataArray::getDataRot(unsigned int x, unsigned int y, unsigned int z)
     {
         ensureData(x, y, z);
         return data[x * sizeTr0 + y * sizeTr1 + z];
     }
 
-    unsigned char WorkspaceDataArray::get(float x[6], const WorkspaceRepresentation* workspace)
+    unsigned char
+    WorkspaceDataArray::get(float x[6], const WorkspaceRepresentation* workspace)
     {
         unsigned int v[6];
 
@@ -247,7 +293,8 @@ namespace VirtualRobot
         return 0;
     }
 
-    int WorkspaceDataArray::getMaxSummedAngleReachablity()
+    int
+    WorkspaceDataArray::getMaxSummedAngleReachablity()
     {
         int maxValue = 0;
 
@@ -269,7 +316,9 @@ namespace VirtualRobot
 
         return maxValue;
     }
-    int WorkspaceDataArray::sumAngleReachabilities(int x0, int x1, int x2)
+
+    int
+    WorkspaceDataArray::sumAngleReachabilities(int x0, int x1, int x2)
     {
         int res = 0;
 
@@ -292,7 +341,13 @@ namespace VirtualRobot
         return res;
     }
 
-    unsigned char WorkspaceDataArray::get(unsigned int x0, unsigned int x1, unsigned int x2, unsigned int x3, unsigned int x4, unsigned int x5)
+    unsigned char
+    WorkspaceDataArray::get(unsigned int x0,
+                            unsigned int x1,
+                            unsigned int x2,
+                            unsigned int x3,
+                            unsigned int x4,
+                            unsigned int x5)
     {
         unsigned int posTr = 0, posRot = 0;
         getPos(x0, x1, x2, x3, x4, x5, posTr, posRot);
@@ -307,7 +362,8 @@ namespace VirtualRobot
         }
     }
 
-    unsigned char WorkspaceDataArray::get(unsigned int x[])
+    unsigned char
+    WorkspaceDataArray::get(unsigned int x[])
     {
         unsigned int posTr = 0, posRot = 0;
         getPos(x, posTr, posRot);
@@ -322,7 +378,8 @@ namespace VirtualRobot
         }
     }
 
-    void WorkspaceDataArray::binarize()
+    void
+    WorkspaceDataArray::binarize()
     {
         unsigned int posTr = 0, posRot = 0;
 
@@ -355,7 +412,8 @@ namespace VirtualRobot
         maxEntry = minValidValue;
     }
 
-    void WorkspaceDataArray::bisectData()
+    void
+    WorkspaceDataArray::bisectData()
     {
         unsigned int posTr = 0, posRot = 0;
 
@@ -391,7 +449,10 @@ namespace VirtualRobot
         }
     }
 
-    void WorkspaceDataArray::setDatumCheckNeighbors(unsigned int x[6], unsigned char value, unsigned int neighborVoxels)
+    void
+    WorkspaceDataArray::setDatumCheckNeighbors(unsigned int x[6],
+                                               unsigned char value,
+                                               unsigned int neighborVoxels)
     {
         setDatum(x, value);
 
@@ -428,12 +489,19 @@ namespace VirtualRobot
                             {
                                 if (get(a, b, c, d, e, f) < value)
                                 {
-                                    setDatum((unsigned int)a, (unsigned int)b, (unsigned int)c, (unsigned int)d, (unsigned int)e, (unsigned int)f, value);
+                                    setDatum((unsigned int)a,
+                                             (unsigned int)b,
+                                             (unsigned int)c,
+                                             (unsigned int)d,
+                                             (unsigned int)e,
+                                             (unsigned int)f,
+                                             value);
                                 }
                             }
     }
 
-    void WorkspaceDataArray::increaseDatum(float x[6], const WorkspaceRepresentation* workspace)
+    void
+    WorkspaceDataArray::increaseDatum(float x[6], const WorkspaceRepresentation* workspace)
     {
         // get voxels
         unsigned int v[6];
@@ -444,7 +512,13 @@ namespace VirtualRobot
         }
     }
 
-    void WorkspaceDataArray::increaseDatum(unsigned int x0, unsigned int x1, unsigned int x2, unsigned int x3, unsigned int x4, unsigned int x5)
+    void
+    WorkspaceDataArray::increaseDatum(unsigned int x0,
+                                      unsigned int x1,
+                                      unsigned int x2,
+                                      unsigned int x3,
+                                      unsigned int x4,
+                                      unsigned int x5)
     {
         ensureData(x0, x1, x2);
         unsigned int posTr = 0, posRot = 0;
@@ -471,7 +545,8 @@ namespace VirtualRobot
         }
     }
 
-    void WorkspaceDataArray::increaseDatum(unsigned int x[])
+    void
+    WorkspaceDataArray::increaseDatum(unsigned int x[])
     {
         ensureData(x[0], x[1], x[2]);
         unsigned int posTr = 0, posRot = 0;
@@ -498,7 +573,8 @@ namespace VirtualRobot
         }
     }
 
-    void WorkspaceDataArray::clear()
+    void
+    WorkspaceDataArray::clear()
     {
         for (unsigned int x = 0; x < sizes[0]; x++)
         {
@@ -508,7 +584,7 @@ namespace VirtualRobot
                 {
                     if (data[x * sizeTr0 + y * sizeTr1 + z])
                     {
-                        delete [] data[x * sizeTr0 + y * sizeTr1 + z];
+                        delete[] data[x * sizeTr0 + y * sizeTr1 + z];
                         data[x * sizeTr0 + y * sizeTr1 + z] = nullptr;
                     }
                 }
@@ -519,7 +595,8 @@ namespace VirtualRobot
         voxelFilledCount = 0;
     }
 
-    bool WorkspaceDataArray::hasEntry(unsigned int x, unsigned int y, unsigned int z)
+    bool
+    WorkspaceDataArray::hasEntry(unsigned int x, unsigned int y, unsigned int z)
     {
         if (/*x < 0 || y < 0 || z < 0 ||*/ x >= sizes[0] || y >= sizes[1] || z >= sizes[2])
         {
@@ -529,12 +606,14 @@ namespace VirtualRobot
         return (data[x * sizeTr0 + y * sizeTr1 + z] != nullptr);
     }
 
-    WorkspaceData* WorkspaceDataArray::clone()
+    WorkspaceData*
+    WorkspaceDataArray::clone()
     {
         return new WorkspaceDataArray(this);
     }
 
-    bool WorkspaceDataArray::save(std::ofstream& file)
+    bool
+    WorkspaceDataArray::save(std::ofstream& file)
     {
         //int size = 0;
         //int maxCompressedSize = sizes[3]*sizes[4]*sizes[5]*3;
@@ -567,7 +646,7 @@ namespace VirtualRobot
                     }
                     else
                     {
-                        dataBlock = (void*) emptyData;
+                        dataBlock = (void*)emptyData;
                     }
 
                     if (!bzip2->write(dataBlock, blockSize))
@@ -579,7 +658,7 @@ namespace VirtualRobot
                     }
                 }
 
-        delete [] emptyData;
+        delete[] emptyData;
 
         bzip2->close();
         return true;

@@ -4,7 +4,7 @@
 * @copyright  2018 Rainer Kartmann
 */
 
-#define BOOST_TEST_MODULE SimoxUtility/json/EigenConversionTest
+#define BOOST_TEST_MODULE SimoxUtility / json / EigenConversionTest
 
 #include <boost/test/included/unit_test.hpp>
 
@@ -14,24 +14,23 @@
 #include <SimoxUtility/json/eigen_conversion.h>
 #include <SimoxUtility/math/pose/pose.h>
 
-
 namespace Eigen
 {
-    bool operator==(const Eigen::Quaternionf& lhs, const Eigen::Quaternionf& rhs)
+    bool
+    operator==(const Eigen::Quaternionf& lhs, const Eigen::Quaternionf& rhs)
     {
         return lhs.isApprox(rhs, 0);
     }
 
-    std::ostream& operator<<(std::ostream& os, const Eigen::Quaternionf& rhs)
+    std::ostream&
+    operator<<(std::ostream& os, const Eigen::Quaternionf& rhs)
     {
         os << "[ " << rhs.w() << " | " << rhs.x() << " " << rhs.y() << " " << rhs.z() << " ]";
         return os;
     }
-}
+} // namespace Eigen
 
 BOOST_AUTO_TEST_SUITE(JsonEigenConversionTest)
-
-
 
 BOOST_AUTO_TEST_CASE(test_Matrix4f_non_transform)
 {
@@ -55,8 +54,8 @@ BOOST_AUTO_TEST_CASE(test_Matrix4f_non_transform)
 
 BOOST_AUTO_TEST_CASE(test_Matrix4f_transform)
 {
-    Eigen::Matrix4f in = simox::math::pose(Eigen::Vector3f { 3, 2, 3 },
-                                      Eigen::AngleAxisf( 1.2f, Eigen::Vector3f(1,2,3).normalized()));
+    Eigen::Matrix4f in = simox::math::pose(
+        Eigen::Vector3f{3, 2, 3}, Eigen::AngleAxisf(1.2f, Eigen::Vector3f(1, 2, 3).normalized()));
     Eigen::Matrix4f out = out.Zero();
 
     nlohmann::json j;
@@ -69,7 +68,6 @@ BOOST_AUTO_TEST_CASE(test_Matrix4f_transform)
     out = j.get<Eigen::Matrix4f>();
     BOOST_CHECK_EQUAL(in, out);
 }
-
 
 BOOST_AUTO_TEST_CASE(test_Vector3f)
 {
@@ -91,7 +89,6 @@ BOOST_AUTO_TEST_CASE(test_Vector3f)
     BOOST_CHECK_EQUAL(in, out);
 }
 
-
 BOOST_AUTO_TEST_CASE(test_Vector3f_from_xyz)
 {
     Eigen::Vector3f in(0, -1, 2.5), out;
@@ -109,10 +106,10 @@ BOOST_AUTO_TEST_CASE(test_Vector3f_from_xyz)
     BOOST_CHECK_EQUAL(in, out);
 }
 
-
 BOOST_AUTO_TEST_CASE(test_Quaternionf)
 {
-    Eigen::Quaternionf in { Eigen::AngleAxisf(static_cast<float>(M_PI), Eigen::Vector3f(1, 1, 1).normalized()) };
+    Eigen::Quaternionf in{
+        Eigen::AngleAxisf(static_cast<float>(M_PI), Eigen::Vector3f(1, 1, 1).normalized())};
     Eigen::Quaternionf out = out.Identity();
 
     nlohmann::json j;
@@ -124,7 +121,6 @@ BOOST_AUTO_TEST_CASE(test_Quaternionf)
     out = j.get<Eigen::Quaternionf>();
     BOOST_CHECK_EQUAL(in, out);
 }
-
 
 BOOST_AUTO_TEST_CASE(test_Matrix4f_transform_from_pos_ori)
 {
@@ -158,7 +154,6 @@ BOOST_AUTO_TEST_CASE(test_Matrix4f_transform_from_pos_ori)
     out = j.get<Eigen::Matrix4f>();
     BOOST_CHECK_EQUAL(in, out);
 }
-
 
 BOOST_AUTO_TEST_CASE(test_from_json_Vector3d)
 {

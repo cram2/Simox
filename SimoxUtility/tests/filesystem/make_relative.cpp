@@ -4,7 +4,7 @@
 * @copyright  2020 Andre Meixner
 */
 
-#define BOOST_TEST_MODULE SimoxUtility/filesystem/make_relative
+#define BOOST_TEST_MODULE SimoxUtility / filesystem / make_relative
 
 #include <boost/test/included/unit_test.hpp>
 

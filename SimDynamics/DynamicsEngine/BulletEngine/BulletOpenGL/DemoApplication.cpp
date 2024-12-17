@@ -13,31 +13,29 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 #include "DemoApplication.h"
-#include "LinearMath/btIDebugDraw.h"
-#include "BulletDynamics/Dynamics/btDynamicsWorld.h"
-
-#include "BulletDynamics/ConstraintSolver/btPoint2PointConstraint.h"//picking
-#include "BulletDynamics/ConstraintSolver/btGeneric6DofConstraint.h"//picking
-
-#include "BulletCollision/CollisionShapes/btCollisionShape.h"
-#include "BulletCollision/CollisionShapes/btBoxShape.h"
-#include "BulletCollision/CollisionShapes/btSphereShape.h"
-#include "BulletCollision/CollisionShapes/btCompoundShape.h"
-#include "BulletCollision/CollisionShapes/btUniformScalingShape.h"
-#include "BulletDynamics/ConstraintSolver/btConstraintSolver.h"
-#include "GL_ShapeDrawer.h"
-#include "LinearMath/btQuickprof.h"
-#include "LinearMath/btDefaultMotionState.h"
-#include "LinearMath/btSerializer.h"
-#include "GLDebugFont.h"
 
 #include "../DetectBulletVersion.h"
+#include "BulletCollision/CollisionShapes/btBoxShape.h"
+#include "BulletCollision/CollisionShapes/btCollisionShape.h"
+#include "BulletCollision/CollisionShapes/btCompoundShape.h"
+#include "BulletCollision/CollisionShapes/btSphereShape.h"
+#include "BulletCollision/CollisionShapes/btUniformScalingShape.h"
+#include "BulletDynamics/ConstraintSolver/btConstraintSolver.h"
+#include "BulletDynamics/ConstraintSolver/btGeneric6DofConstraint.h" //picking
+#include "BulletDynamics/ConstraintSolver/btPoint2PointConstraint.h" //picking
+#include "BulletDynamics/Dynamics/btDynamicsWorld.h"
+#include "GLDebugFont.h"
+#include "GL_ShapeDrawer.h"
+#include "LinearMath/btDefaultMotionState.h"
+#include "LinearMath/btIDebugDraw.h"
+#include "LinearMath/btQuickprof.h"
+#include "LinearMath/btSerializer.h"
 
 extern bool gDisableDeactivation;
 int numObjects = 0;
 const int maxNumObjects = 16384;
 btTransform startTransforms[maxNumObjects];
-btCollisionShape* gShapePtr[maxNumObjects];//1 rigidbody has 1 shape (no re-use of shapes)
+btCollisionShape* gShapePtr[maxNumObjects]; //1 rigidbody has 1 shape (no re-use of shapes)
 #define SHOW_NUM_DEEP_PENETRATIONS 1
 
 extern int gNumClampedCcdMotions;
@@ -58,7 +56,7 @@ extern int gTotalBytesAlignedAllocs;
 
 
 DemoApplication::DemoApplication()
-//see btIDebugDraw.h for modes
+    //see btIDebugDraw.h for modes
     :
     m_dynamicsWorld(nullptr),
     m_pickConstraint(nullptr),
@@ -101,8 +99,6 @@ DemoApplication::DemoApplication()
     m_enableshadows = false;
 }
 
-
-
 DemoApplication::~DemoApplication()
 {
 #ifndef BT_NO_PROFILE
@@ -120,23 +116,24 @@ DemoApplication::~DemoApplication()
     }
 }
 
-
-void DemoApplication::overrideGLShapeDrawer(GL_ShapeDrawer* shapeDrawer)
+void
+DemoApplication::overrideGLShapeDrawer(GL_ShapeDrawer* shapeDrawer)
 {
     shapeDrawer->enableTexture(m_shapeDrawer->hasTextureEnabled());
     delete m_shapeDrawer;
     m_shapeDrawer = shapeDrawer;
 }
 
-void DemoApplication::myinit()
+void
+DemoApplication::myinit()
 {
 
-    GLfloat light_ambient[] = { btScalar(0.2), btScalar(0.2), btScalar(0.2), btScalar(1.0) };
-    GLfloat light_diffuse[] = { btScalar(1.0), btScalar(1.0), btScalar(1.0), btScalar(1.0) };
-    GLfloat light_specular[] = { btScalar(1.0), btScalar(1.0), btScalar(1.0), btScalar(1.0)};
+    GLfloat light_ambient[] = {btScalar(0.2), btScalar(0.2), btScalar(0.2), btScalar(1.0)};
+    GLfloat light_diffuse[] = {btScalar(1.0), btScalar(1.0), btScalar(1.0), btScalar(1.0)};
+    GLfloat light_specular[] = {btScalar(1.0), btScalar(1.0), btScalar(1.0), btScalar(1.0)};
     /*  light_position is NOT default value */
-    GLfloat light_position0[] = { btScalar(1.0), btScalar(10.0), btScalar(1.0), btScalar(0.0)};
-    GLfloat light_position1[] = { btScalar(-1.0), btScalar(-10.0), btScalar(-1.0), btScalar(0.0) };
+    GLfloat light_position0[] = {btScalar(1.0), btScalar(10.0), btScalar(1.0), btScalar(0.0)};
+    GLfloat light_position1[] = {btScalar(-1.0), btScalar(-10.0), btScalar(-1.0), btScalar(0.0)};
 
     glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
     glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
@@ -163,20 +160,20 @@ void DemoApplication::myinit()
     //  glCullFace(GL_BACK);
 }
 
-
-void    DemoApplication::setCameraDistance(float dist)
+void
+DemoApplication::setCameraDistance(float dist)
 {
-    m_cameraDistance  = dist;
+    m_cameraDistance = dist;
 }
 
-float   DemoApplication::getCameraDistance()
+float
+DemoApplication::getCameraDistance()
 {
     return m_cameraDistance;
 }
 
-
-
-void DemoApplication::toggleIdle()
+void
+DemoApplication::toggleIdle()
 {
     if (m_idle)
     {
@@ -188,17 +185,15 @@ void DemoApplication::toggleIdle()
     }
 }
 
-
-
-
-void DemoApplication::updateCamera()
+void
+DemoApplication::updateCamera()
 {
 
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    btScalar rele = m_ele * btScalar(0.01745329251994329547);// rads per deg
-    btScalar razi = m_azi * btScalar(0.01745329251994329547);// rads per deg
+    btScalar rele = m_ele * btScalar(0.01745329251994329547); // rads per deg
+    btScalar razi = m_azi * btScalar(0.01745329251994329547); // rads per deg
 
 
     btQuaternion rot(m_cameraUp, razi);
@@ -255,21 +250,30 @@ void DemoApplication::updateCamera()
     else
     {
         //      glFrustum (-aspect, aspect, -1.0, 1.0, 1.0, 10000.0);
-        glFrustum(-aspect * m_frustumZNear, aspect * m_frustumZNear, -m_frustumZNear, m_frustumZNear, m_frustumZNear, m_frustumZFar);
+        glFrustum(-aspect * m_frustumZNear,
+                  aspect * m_frustumZNear,
+                  -m_frustumZNear,
+                  m_frustumZNear,
+                  m_frustumZNear,
+                  m_frustumZFar);
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
-        gluLookAt(m_cameraPosition[0], m_cameraPosition[1], m_cameraPosition[2],
-                  m_cameraTargetPosition[0], m_cameraTargetPosition[1], m_cameraTargetPosition[2],
-                  m_cameraUp.getX(), m_cameraUp.getY(), m_cameraUp.getZ());
+        gluLookAt(m_cameraPosition[0],
+                  m_cameraPosition[1],
+                  m_cameraPosition[2],
+                  m_cameraTargetPosition[0],
+                  m_cameraTargetPosition[1],
+                  m_cameraTargetPosition[2],
+                  m_cameraUp.getX(),
+                  m_cameraUp.getY(),
+                  m_cameraUp.getZ());
     }
-
 }
-
-
 
 const float STEPSIZE = 5;
 
-void DemoApplication::stepLeft()
+void
+DemoApplication::stepLeft()
 {
     m_azi -= STEPSIZE;
 
@@ -280,7 +284,9 @@ void DemoApplication::stepLeft()
 
     updateCamera();
 }
-void DemoApplication::stepRight()
+
+void
+DemoApplication::stepRight()
 {
     m_azi += STEPSIZE;
 
@@ -291,7 +297,9 @@ void DemoApplication::stepRight()
 
     updateCamera();
 }
-void DemoApplication::stepFront()
+
+void
+DemoApplication::stepFront()
 {
     m_ele += STEPSIZE;
 
@@ -302,7 +310,9 @@ void DemoApplication::stepFront()
 
     updateCamera();
 }
-void DemoApplication::stepBack()
+
+void
+DemoApplication::stepBack()
 {
     m_ele -= STEPSIZE;
 
@@ -313,7 +323,9 @@ void DemoApplication::stepBack()
 
     updateCamera();
 }
-void DemoApplication::zoomIn()
+
+void
+DemoApplication::zoomIn()
 {
     m_cameraDistance -= btScalar(m_zoomStepSize);
     updateCamera();
@@ -322,25 +334,17 @@ void DemoApplication::zoomIn()
     {
         m_cameraDistance = btScalar(0.1);
     }
-
 }
-void DemoApplication::zoomOut()
+
+void
+DemoApplication::zoomOut()
 {
     m_cameraDistance += btScalar(m_zoomStepSize);
     updateCamera();
-
 }
 
-
-
-
-
-
-
-
-
-
-void DemoApplication::reshape(int w, int h)
+void
+DemoApplication::reshape(int w, int h)
 {
     GLDebugResetFont(w, h);
 
@@ -351,9 +355,8 @@ void DemoApplication::reshape(int w, int h)
     updateCamera();
 }
 
-
-
-void DemoApplication::keyboardCallback(unsigned char key, int x, int y)
+void
+DemoApplication::keyboardCallback(unsigned char key, int x, int y)
 {
     (void)x;
     (void)y;
@@ -394,14 +397,12 @@ void DemoApplication::keyboardCallback(unsigned char key, int x, int y)
                 }
 
                 delete obj;
-
-
             }
 
             break;
         }
 
-        case 'q' :
+        case 'q':
 #ifdef BT_USE_FREEGLUT
             //return from glutMainLoop(), detect memory leaks etc.
             glutLeaveMainLoop();
@@ -410,39 +411,39 @@ void DemoApplication::keyboardCallback(unsigned char key, int x, int y)
 #endif
             break;
 
-        case 'l' :
+        case 'l':
             stepLeft();
             break;
 
-        case 'r' :
+        case 'r':
             stepRight();
             break;
 
-        case 'f' :
+        case 'f':
             stepFront();
             break;
 
-        case 'b' :
+        case 'b':
             stepBack();
             break;
 
-        case 'z' :
+        case 'z':
             zoomIn();
             break;
 
-        case 'x' :
+        case 'x':
             zoomOut();
             break;
 
-        case 'i' :
+        case 'i':
             toggleIdle();
             break;
 
-        case 'g' :
+        case 'g':
             m_enableshadows = !m_enableshadows;
             break;
 
-        case 'u' :
+        case 'u':
             m_shapeDrawer->enableTexture(!m_shapeDrawer->enableTexture(false));
             break;
 
@@ -485,7 +486,7 @@ void DemoApplication::keyboardCallback(unsigned char key, int x, int y)
         case '=':
         {
             int maxSerializeBufferSize = 1024 * 1024 * 5;
-            btDefaultSerializer*    serializer = new btDefaultSerializer(maxSerializeBufferSize);
+            btDefaultSerializer* serializer = new btDefaultSerializer(maxSerializeBufferSize);
             //serializer->setSerializationFlags(BT_SERIALIZE_NO_DUPLICATE_ASSERT);
             m_dynamicsWorld->serialize(serializer);
             FILE* f2 = fopen("testFile.bullet", "wb");
@@ -493,7 +494,6 @@ void DemoApplication::keyboardCallback(unsigned char key, int x, int y)
             fclose(f2);
             delete serializer;
             break;
-
         }
 
         case 'm':
@@ -532,7 +532,7 @@ void DemoApplication::keyboardCallback(unsigned char key, int x, int y)
 
             break;
 
-        case 't' :
+        case 't':
             if (m_debugMode & btIDebugDraw::DBG_DrawText)
             {
                 m_debugMode = m_debugMode & (~btIDebugDraw::DBG_DrawText);
@@ -568,7 +568,7 @@ void DemoApplication::keyboardCallback(unsigned char key, int x, int y)
 
             break;
 
-        case 'c' :
+        case 'c':
             if (m_debugMode & btIDebugDraw::DBG_DrawContactPoints)
             {
                 m_debugMode = m_debugMode & (~btIDebugDraw::DBG_DrawContactPoints);
@@ -580,7 +580,7 @@ void DemoApplication::keyboardCallback(unsigned char key, int x, int y)
 
             break;
 
-        case 'C' :
+        case 'C':
             if (m_debugMode & btIDebugDraw::DBG_DrawConstraints)
             {
                 m_debugMode = m_debugMode & (~btIDebugDraw::DBG_DrawConstraints);
@@ -592,7 +592,7 @@ void DemoApplication::keyboardCallback(unsigned char key, int x, int y)
 
             break;
 
-        case 'L' :
+        case 'L':
             if (m_debugMode & btIDebugDraw::DBG_DrawConstraintLimits)
             {
                 m_debugMode = m_debugMode & (~btIDebugDraw::DBG_DrawConstraintLimits);
@@ -604,7 +604,7 @@ void DemoApplication::keyboardCallback(unsigned char key, int x, int y)
 
             break;
 
-        case 'd' :
+        case 'd':
             if (m_debugMode & btIDebugDraw::DBG_NoDeactivation)
             {
                 m_debugMode = m_debugMode & (~btIDebugDraw::DBG_NoDeactivation);
@@ -626,15 +626,13 @@ void DemoApplication::keyboardCallback(unsigned char key, int x, int y)
             break;
 
 
-
-
-        case 'o' :
+        case 'o':
         {
-            m_ortho = !m_ortho;//m_stepping = !m_stepping;
+            m_ortho = !m_ortho; //m_stepping = !m_stepping;
             break;
         }
 
-        case 's' :
+        case 's':
             clientMoveAndDisplay();
             break;
 
@@ -684,12 +682,10 @@ void DemoApplication::keyboardCallback(unsigned char key, int x, int y)
     {
         getDynamicsWorld()->getDebugDrawer()->setDebugMode(m_debugMode);
     }
-
-
-
 }
 
-void    DemoApplication::setDebugMode(int mode)
+void
+DemoApplication::setDebugMode(int mode)
 {
     m_debugMode = mode;
 
@@ -699,12 +695,8 @@ void    DemoApplication::setDebugMode(int mode)
     }
 }
 
-
-
-
-
-
-void DemoApplication::moveAndDisplay()
+void
+DemoApplication::moveAndDisplay()
 {
     if (!m_idle)
     {
@@ -716,16 +708,15 @@ void DemoApplication::moveAndDisplay()
     }
 }
 
-
-
-
-void DemoApplication::displayCallback()
+void
+DemoApplication::displayCallback()
 {
 }
 
 #define NUM_SPHERES_ON_DIAGONAL 9
 
-void    DemoApplication::setShootBoxShape()
+void
+DemoApplication::setShootBoxShape()
 {
     if (!m_shootBoxShape)
     {
@@ -735,7 +726,8 @@ void    DemoApplication::setShootBoxShape()
     }
 }
 
-void    DemoApplication::shootBox(const btVector3& destination)
+void
+DemoApplication::shootBox(const btVector3& destination)
 {
 
     if (m_dynamicsWorld)
@@ -752,7 +744,8 @@ void    DemoApplication::shootBox(const btVector3& destination)
         body->setLinearFactor(btVector3(1, 1, 1));
         //body->setRestitution(1);
 
-        btVector3 linVel(destination[0] - camPos[0], destination[1] - camPos[1], destination[2] - camPos[2]);
+        btVector3 linVel(
+            destination[0] - camPos[0], destination[1] - camPos[1], destination[2] - camPos[2]);
         linVel.normalize();
         linVel *= m_ShootBoxInitialSpeed;
 
@@ -761,25 +754,23 @@ void    DemoApplication::shootBox(const btVector3& destination)
         body->setLinearVelocity(linVel);
         body->setAngularVelocity(btVector3(0, 0, 0));
         body->setCcdMotionThreshold(0.5);
-        body->setCcdSweptSphereRadius(0.4f);//value should be smaller (embedded) than the half extends of the box (see ::setShootBoxShape)
+        body->setCcdSweptSphereRadius(
+            0.4f); //value should be smaller (embedded) than the half extends of the box (see ::setShootBoxShape)
         //      printf("shootBox uid=%d\n", body->getBroadphaseHandle()->getUid());
         //      printf("camPos=%f,%f,%f\n",camPos.getX(),camPos.getY(),camPos.getZ());
         //      printf("destination=%f,%f,%f\n",destination.getX(),destination.getY(),destination.getZ());
-
     }
 }
-
 
 int gPickingConstraintId = 0;
 btVector3 gOldPickingPos;
 btVector3 gHitPos(-1, -1, -1);
-btScalar gOldPickingDist  = 0.f;
-btRigidBody* pickedBody = nullptr;//for deactivation state
+btScalar gOldPickingDist = 0.f;
+btRigidBody* pickedBody = nullptr; //for deactivation state
 
-
-btVector3   DemoApplication::getRayTo(int x, int y)
+btVector3
+DemoApplication::getRayTo(int x, int y)
 {
-
 
 
     if (m_ortho)
@@ -797,8 +788,10 @@ btVector3   DemoApplication::getRayTo(int x, int y)
         btScalar u = x / btScalar(m_glutScreenWidth);
         btScalar v = (m_glutScreenHeight - y) / btScalar(m_glutScreenHeight);
 
-        btVector3   p(0, 0, 0);
-        p.setValue((1.0f - u) * lower.getX() + u * upper.getX(), (1.0f - v) * lower.getY() + v * upper.getY(), m_cameraTargetPosition.getZ());
+        btVector3 p(0, 0, 0);
+        p.setValue((1.0f - u) * lower.getX() + u * upper.getX(),
+                   (1.0f - v) * lower.getY() + v * upper.getY(),
+                   m_cameraTargetPosition.getZ());
         return p;
     }
 
@@ -808,7 +801,7 @@ btVector3   DemoApplication::getRayTo(int x, int y)
     float tanFov = (top - bottom) * 0.5f / nearPlane;
     float fov = btScalar(2.0) * btAtan(tanFov);
 
-    btVector3   rayFrom = getCameraPosition();
+    btVector3 rayFrom = getCameraPosition();
     btVector3 rayForward = (getCameraTargetPosition() - getCameraPosition());
     rayForward.normalize();
     float farPlane = 10000.f;
@@ -849,8 +842,8 @@ btVector3   DemoApplication::getRayTo(int x, int y)
 
 btScalar mousePickClamping = 30.f;
 
-
-void DemoApplication::mouseFunc(int button, int state, int x, int y)
+void
+DemoApplication::mouseFunc(int button, int state, int x, int y)
 {
     if (state == 0)
     {
@@ -923,13 +916,9 @@ void DemoApplication::mouseFunc(int button, int state, int x, int y)
                 }
 
 #endif
-
-
-
             }
             else
             {
-
             }
 
             break;
@@ -970,10 +959,9 @@ void DemoApplication::mouseFunc(int button, int state, int x, int y)
                         gOldPickingPos = rayTo;
                         gHitPos = pickPos;
 
-                        gOldPickingDist  = (pickPos - rayFrom).length();
+                        gOldPickingDist = (pickPos - rayFrom).length();
                     }
                 }
-
             }
             else
             {
@@ -981,17 +969,16 @@ void DemoApplication::mouseFunc(int button, int state, int x, int y)
             }
 
             break;
-
         }
 
         default:
         {
         }
     }
-
 }
 
-void DemoApplication::pickObject(const btVector3& pickPos, const btCollisionObject* hitObj)
+void
+DemoApplication::pickObject(const btVector3& pickPos, const btCollisionObject* hitObj)
 {
 
     btRigidBody* body = (btRigidBody*)btRigidBody::upcast(hitObj);
@@ -1054,18 +1041,15 @@ void DemoApplication::pickObject(const btVector3& pickPos, const btCollisionObje
                             p2p->setParam(BT_CONSTRAINT_ERP,0.1,1);
                             p2p->setParam(BT_CONSTRAINT_ERP,0.1,2);
                             */
-
-
             }
 
             //save mouse position for dragging
-
         }
     }
-
 }
 
-void DemoApplication::removePickingConstraint()
+void
+DemoApplication::removePickingConstraint()
 {
     if (m_pickConstraint && m_dynamicsWorld)
     {
@@ -1079,7 +1063,8 @@ void DemoApplication::removePickingConstraint()
     }
 }
 
-void    DemoApplication::mouseMotionFunc(int x, int y)
+void
+DemoApplication::mouseMotionFunc(int x, int y)
 {
 
     if (m_pickConstraint)
@@ -1088,7 +1073,8 @@ void    DemoApplication::mouseMotionFunc(int x, int y)
 
         if (m_pickConstraint->getConstraintType() == D6_CONSTRAINT_TYPE)
         {
-            btGeneric6DofConstraint* pickCon = static_cast<btGeneric6DofConstraint*>(m_pickConstraint);
+            btGeneric6DofConstraint* pickCon =
+                static_cast<btGeneric6DofConstraint*>(m_pickConstraint);
 
             if (pickCon)
             {
@@ -1118,11 +1104,11 @@ void    DemoApplication::mouseMotionFunc(int x, int y)
 
                 pickCon->getFrameOffsetA().setOrigin(newPivotB);
             }
-
         }
         else
         {
-            btPoint2PointConstraint* pickCon = static_cast<btPoint2PointConstraint*>(m_pickConstraint);
+            btPoint2PointConstraint* pickCon =
+                static_cast<btPoint2PointConstraint*>(m_pickConstraint);
 
             if (pickCon)
             {
@@ -1198,8 +1184,6 @@ void    DemoApplication::mouseMotionFunc(int x, int y)
             {
                 m_cameraDistance = btScalar(0.1);
             }
-
-
         }
     }
 
@@ -1207,13 +1191,12 @@ void    DemoApplication::mouseMotionFunc(int x, int y)
     m_mouseOldX = x;
     m_mouseOldY = y;
     updateCamera();
-
-
 }
 
-
-
-btRigidBody*    DemoApplication::localCreateRigidBody(float mass, const btTransform& startTransform, btCollisionShape* shape)
+btRigidBody*
+DemoApplication::localCreateRigidBody(float mass,
+                                      const btTransform& startTransform,
+                                      btCollisionShape* shape)
 {
     btAssert((!shape || shape->getShapeType() != INVALID_SHAPE_PROXYTYPE));
 
@@ -1241,7 +1224,7 @@ btRigidBody*    DemoApplication::localCreateRigidBody(float mass, const btTransf
 #else
     btRigidBody* body = new btRigidBody(mass, 0, shape, localInertia);
     body->setWorldTransform(startTransform);
-#endif//
+#endif //
 
     m_dynamicsWorld->addRigidBody(body);
 
@@ -1249,7 +1232,8 @@ btRigidBody*    DemoApplication::localCreateRigidBody(float mass, const btTransf
 }
 
 //See http://www.lighthouse3d.com/opengl/glut/index.php?bmpfontortho
-void DemoApplication::setOrthographicProjection()
+void
+DemoApplication::setOrthographicProjection()
 {
 
     // switch to projection mode
@@ -1270,10 +1254,10 @@ void DemoApplication::setOrthographicProjection()
     // mover the origin from the bottom left corner
     // to the upper left corner
     glTranslatef(btScalar(0), btScalar(-m_glutScreenHeight), btScalar(0));
-
 }
 
-void DemoApplication::resetPerspectiveProjection()
+void
+DemoApplication::resetPerspectiveProjection()
 {
 
     glMatrixMode(GL_PROJECTION);
@@ -1282,19 +1266,17 @@ void DemoApplication::resetPerspectiveProjection()
     updateCamera();
 }
 
-
-
-
 extern CProfileIterator* m_profileIterator;
 
-void DemoApplication::displayProfileString(int xOffset, int yStart, char* message)
+void
+DemoApplication::displayProfileString(int xOffset, int yStart, char* message)
 {
     glRasterPos3f(btScalar(xOffset), btScalar(yStart), btScalar(0));
     GLDebugDrawString(xOffset, yStart, message);
 }
 
-
-void DemoApplication::showProfileInfo(int& xOffset, int& yStart, int yIncr)
+void
+DemoApplication::showProfileInfo(int& xOffset, int& yStart, int yIncr)
 {
 #ifndef BT_NO_PROFILE
 
@@ -1317,16 +1299,20 @@ void DemoApplication::showProfileInfo(int& xOffset, int& yStart, int yIncr)
 
         m_profileIterator->First();
 
-        double parent_time = m_profileIterator->Is_Root() ? time_since_reset : m_profileIterator->Get_Current_Parent_Total_Time();
+        double parent_time = m_profileIterator->Is_Root()
+                                 ? time_since_reset
+                                 : m_profileIterator->Get_Current_Parent_Total_Time();
 
         {
-            sprintf(blockTime, "--- Profiling: %s (total running time: %.3f ms) ---",    m_profileIterator->Get_Current_Parent_Name(), parent_time);
+            sprintf(blockTime,
+                    "--- Profiling: %s (total running time: %.3f ms) ---",
+                    m_profileIterator->Get_Current_Parent_Name(),
+                    parent_time);
             displayProfileString(xOffset, yStart, blockTime);
             yStart += yIncr;
             sprintf(blockTime, "press (1,2...) to display child timings, or 0 for parent");
             displayProfileString(xOffset, yStart, blockTime);
             yStart += yIncr;
-
         }
 
 
@@ -1336,49 +1322,56 @@ void DemoApplication::showProfileInfo(int& xOffset, int& yStart, int yIncr)
         {
             double current_total_time = m_profileIterator->Get_Current_Total_Time();
             accumulated_time += current_total_time;
-            double fraction = parent_time > SIMD_EPSILON ? (current_total_time / parent_time) * 100 : 0.f;
+            double fraction =
+                parent_time > SIMD_EPSILON ? (current_total_time / parent_time) * 100 : 0.f;
 
-            sprintf(blockTime, "%d -- %s (%.2f %%) :: %.3f ms / frame (%d calls)",
-                    ++i, m_profileIterator->Get_Current_Name(), fraction,
-                    (current_total_time / (double)frames_since_reset), m_profileIterator->Get_Current_Total_Calls());
+            sprintf(blockTime,
+                    "%d -- %s (%.2f %%) :: %.3f ms / frame (%d calls)",
+                    ++i,
+                    m_profileIterator->Get_Current_Name(),
+                    fraction,
+                    (current_total_time / (double)frames_since_reset),
+                    m_profileIterator->Get_Current_Total_Calls());
             displayProfileString(xOffset, yStart, blockTime);
             yStart += yIncr;
             totalTime += current_total_time;
         }
 
-        sprintf(blockTime, "%s (%.3f %%) :: %.3f ms", "Unaccounted",
+        sprintf(blockTime,
+                "%s (%.3f %%) :: %.3f ms",
+                "Unaccounted",
                 // (min(0, time_since_reset - totalTime) / time_since_reset) * 100);
-                parent_time > SIMD_EPSILON ? ((parent_time - accumulated_time) / parent_time) * 100 : 0.f, parent_time - accumulated_time);
+                parent_time > SIMD_EPSILON ? ((parent_time - accumulated_time) / parent_time) * 100
+                                           : 0.f,
+                parent_time - accumulated_time);
 
         displayProfileString(xOffset, yStart, blockTime);
         yStart += yIncr;
-
 
 
         sprintf(blockTime, "-------------------------------------------------");
         displayProfileString(xOffset, yStart, blockTime);
         yStart += yIncr;
-
     }
 #else
-    (void) xOffset, (void) yStart, (void) yIncr;
-#endif//BT_NO_PROFILE
+    (void)xOffset, (void)yStart, (void)yIncr;
+#endif //BT_NO_PROFILE
 }
 
-
 //
-void    DemoApplication::renderscene(int pass)
+void
+DemoApplication::renderscene(int pass)
 {
-    btScalar    m[16];
+    btScalar m[16];
     btMatrix3x3 rot;
     rot.setIdentity();
-    const int   numObjects = m_dynamicsWorld->getNumCollisionObjects();
+    const int numObjects = m_dynamicsWorld->getNumCollisionObjects();
     btVector3 wireColor(1, 0, 0);
 
     for (int i = 0; i < numObjects; i++)
     {
-        btCollisionObject*  colObj = m_dynamicsWorld->getCollisionObjectArray()[i];
-        btRigidBody*        body = btRigidBody::upcast(colObj);
+        btCollisionObject* colObj = m_dynamicsWorld->getCollisionObjectArray()[i];
+        btRigidBody* body = btRigidBody::upcast(colObj);
 
         if (body && body->getMotionState())
         {
@@ -1434,20 +1427,31 @@ void    DemoApplication::renderscene(int pass)
         //      m_dynamicsWorld->getDebugDrawer()->drawAabb(aabbMin,aabbMax,btVector3(1,1,1));
 
 
-        if (!(getDebugMode()& btIDebugDraw::DBG_DrawWireframe))
+        if (!(getDebugMode() & btIDebugDraw::DBG_DrawWireframe))
         {
             switch (pass)
             {
-                case    0:
-                    m_shapeDrawer->drawOpenGL(m, colObj->getCollisionShape(), wireColor, getDebugMode(), aabbMin, aabbMax);
+                case 0:
+                    m_shapeDrawer->drawOpenGL(m,
+                                              colObj->getCollisionShape(),
+                                              wireColor,
+                                              getDebugMode(),
+                                              aabbMin,
+                                              aabbMax);
                     break;
 
-                case    1:
-                    m_shapeDrawer->drawShadow(m, m_sundirection * rot, colObj->getCollisionShape(), aabbMin, aabbMax);
+                case 1:
+                    m_shapeDrawer->drawShadow(
+                        m, m_sundirection * rot, colObj->getCollisionShape(), aabbMin, aabbMax);
                     break;
 
-                case    2:
-                    m_shapeDrawer->drawOpenGL(m, colObj->getCollisionShape(), wireColor * btScalar(0.3), 0, aabbMin, aabbMax);
+                case 2:
+                    m_shapeDrawer->drawOpenGL(m,
+                                              colObj->getCollisionShape(),
+                                              wireColor * btScalar(0.3),
+                                              0,
+                                              aabbMin,
+                                              aabbMax);
                     break;
             }
         }
@@ -1455,7 +1459,8 @@ void    DemoApplication::renderscene(int pass)
 }
 
 //
-void DemoApplication::renderme()
+void
+DemoApplication::renderme()
 {
     myinit();
 
@@ -1534,39 +1539,39 @@ void DemoApplication::renderme()
                 counter++;
                 std::map<std::string, hidden::ProfileBlock*>::iterator iter;
 
-                for (iter = btProfiler::mProfileBlocks.begin(); iter != btProfiler::mProfileBlocks.end(); ++iter)
+                for (iter = btProfiler::mProfileBlocks.begin();
+                     iter != btProfiler::mProfileBlocks.end();
+                     ++iter)
                 {
                     char blockTime[128];
-                    sprintf(blockTime, "%s: %lf", &((*iter).first[0]), btProfiler::getBlockTime((*iter).first, btProfiler::BLOCK_CYCLE_SECONDS)); //BLOCK_TOTAL_PERCENT));
+                    sprintf(blockTime,
+                            "%s: %lf",
+                            &((*iter).first[0]),
+                            btProfiler::getBlockTime(
+                                (*iter).first,
+                                btProfiler::BLOCK_CYCLE_SECONDS)); //BLOCK_TOTAL_PERCENT));
                     glRasterPos3f(xOffset, yStart, 0);
                     GLDebugDrawString(BMF_GetFont(BMF_kHelvetica10), blockTime);
                     yStart += yIncr;
-
                 }
-
             }
 
 #endif //USE_QUICKPROF
-
-
 
 
             resetPerspectiveProjection();
         }
 
         glDisable(GL_LIGHTING);
-
-
     }
 
     updateCamera();
-
 }
 
 #include "BulletCollision/BroadphaseCollision/btAxisSweep3.h"
 
-
-void    DemoApplication::clientResetScene()
+void
+DemoApplication::clientResetScene()
 {
     removePickingConstraint();
 
@@ -1596,8 +1601,6 @@ void    DemoApplication::clientResetScene()
         btCollisionObjectArray copyArray = m_dynamicsWorld->getCollisionObjectArray();
 
 
-
-
         for (i = 0; i < numObjects; i++)
         {
             btCollisionObject* colObj = copyArray[i];
@@ -1607,7 +1610,8 @@ void    DemoApplication::clientResetScene()
             {
                 if (body->getMotionState())
                 {
-                    btDefaultMotionState* myMotionState = (btDefaultMotionState*)body->getMotionState();
+                    btDefaultMotionState* myMotionState =
+                        (btDefaultMotionState*)body->getMotionState();
                     myMotionState->m_graphicsWorldTrans = myMotionState->m_startWorldTrans;
                     body->setCenterOfMassTransform(myMotionState->m_graphicsWorldTrans);
                     colObj->setInterpolationWorldTransform(myMotionState->m_startWorldTrans);
@@ -1620,7 +1624,10 @@ void    DemoApplication::clientResetScene()
                 //removed cached contact points (this is not necessary if all objects have been removed from the dynamics world)
                 if (m_dynamicsWorld->getBroadphase()->getOverlappingPairCache())
                 {
-                    m_dynamicsWorld->getBroadphase()->getOverlappingPairCache()->cleanProxyFromPairs(colObj->getBroadphaseHandle(), getDynamicsWorld()->getDispatcher());
+                    m_dynamicsWorld->getBroadphase()
+                        ->getOverlappingPairCache()
+                        ->cleanProxyFromPairs(colObj->getBroadphaseHandle(),
+                                              getDynamicsWorld()->getDispatcher());
                 }
 
                 btRigidBody* body = btRigidBody::upcast(colObj);
@@ -1631,13 +1638,10 @@ void    DemoApplication::clientResetScene()
                     btRigidBody::upcast(colObj)->setAngularVelocity(btVector3(0, 0, 0));
                 }
             }
-
         }
 
         ///reset some internal cached data in the broadphase
         m_dynamicsWorld->getBroadphase()->resetPool(getDynamicsWorld()->getDispatcher());
         m_dynamicsWorld->getConstraintSolver()->reset();
-
     }
-
 }

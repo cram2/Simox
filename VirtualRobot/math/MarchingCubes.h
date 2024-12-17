@@ -21,55 +21,68 @@
 
 #pragma once
 
-#include "MathForwardDefinitions.h"
-#include "Array3D.h"
-#include "Triangle.h"
 #include <queue>
 
+#include "Array3D.h"
+#include "MathForwardDefinitions.h"
+#include "Triangle.h"
 
 namespace math
 {
 
- // code from https://nucleardevs.wordpress.com/2011/11/17/marching-cubes-sourcecode/
+    // code from https://nucleardevs.wordpress.com/2011/11/17/marching-cubes-sourcecode/
     class MarchingCubes
     {
     public:
-        void Init(int size, Eigen::Vector3f center, Eigen::Vector3f start, int steps, float stepLength, GridCacheFloat3Ptr cache);
+        void Init(int size,
+                  Eigen::Vector3f center,
+                  Eigen::Vector3f start,
+                  int steps,
+                  float stepLength,
+                  GridCacheFloat3Ptr cache);
         PrimitivePtr Process(float isolevel);
         void Process(float isolevel, PrimitivePtr primitive); //TODO ref
         PrimitivePtr ProcessSingleSurfaceOptimized(float isolevel, Index3 start);
         void ProcessSingleSurfaceOptimized(float isolevel, PrimitivePtr primitive, Index3 start);
-        static PrimitivePtr Calculate(Eigen::Vector3f center, Eigen::Vector3f start, int steps, float stepLength, SimpleAbstractFunctionR3R1Ptr modelPtr, float isolevel);
+        static PrimitivePtr Calculate(Eigen::Vector3f center,
+                                      Eigen::Vector3f start,
+                                      int steps,
+                                      float stepLength,
+                                      SimpleAbstractFunctionR3R1Ptr modelPtr,
+                                      float isolevel);
 
     private:
-      struct GridCell{
-          public:
-              Eigen::Vector3f P[8];
-      };
+        struct GridCell
+        {
+        public:
+            Eigen::Vector3f P[8];
+        };
 
-      typedef std::shared_ptr<Array3D<GridCell>> Array3DGridCellPtr;
-      typedef std::shared_ptr<std::queue<Index3>> FringePtr;
+        typedef std::shared_ptr<Array3D<GridCell>> Array3DGridCellPtr;
+        typedef std::shared_ptr<std::queue<Index3>> FringePtr;
 
-      int _size;
-      GridCacheFloat3Ptr Gdata;
-      Array3DGridCellPtr _grids;
-      Triangle _triangles[16];
+        int _size;
+        GridCacheFloat3Ptr Gdata;
+        Array3DGridCellPtr _grids;
+        Triangle _triangles[16];
 
-      static const int _edgeTable[256];
-      static const char _triTable[256][16];
+        static const int _edgeTable[256];
+        static const char _triTable[256][16];
 
 
-      float GetVal(int x, int y, int z, int i);
-      Eigen::Vector3f GetPos(int x, int y, int z, int i);
-      void AddAndMark(int x, int y, int z, FringePtr fringe, Array3DBoolPtr marked);
-      bool IsValidIndex(int x, int y, int z);
+        float GetVal(int x, int y, int z, int i);
+        Eigen::Vector3f GetPos(int x, int y, int z, int i);
+        void AddAndMark(int x, int y, int z, FringePtr fringe, Array3DBoolPtr marked);
+        bool IsValidIndex(int x, int y, int z);
 
-      int Polygonise(int x, int y, int z, float isolevel);
+        int Polygonise(int x, int y, int z, float isolevel);
 
-      static Eigen::Vector3f VertexInterp(float isolevel, Eigen::Vector3f p1, Eigen::Vector3f p2, float valp1, float valp2);
+        static Eigen::Vector3f VertexInterp(float isolevel,
+                                            Eigen::Vector3f p1,
+                                            Eigen::Vector3f p2,
+                                            float valp1,
+                                            float valp2);
 
-      void Build(PrimitivePtr res, int tianglesNum);
-
+        void Build(PrimitivePtr res, int tianglesNum);
     };
-}
-
+} // namespace math

@@ -24,17 +24,25 @@
 #include "AbstractFunctionR1R3.h"
 #include "MathForwardDefinitions.h"
 
-
 namespace math
 {
 
-    class Line
-            : public AbstractFunctionR1R3
+    class Line : public AbstractFunctionR1R3
     {
     public:
         Line(Eigen::Vector3f pos, Eigen::Vector3f dir);
-        Eigen::Vector3f Pos(){return pos;}
-        Eigen::Vector3f Dir(){return dir;}
+
+        Eigen::Vector3f
+        Pos()
+        {
+            return pos;
+        }
+
+        Eigen::Vector3f
+        Dir()
+        {
+            return dir;
+        }
 
         Line Normalized() const;
         Eigen::Vector3f Get(float t) override;
@@ -44,8 +52,8 @@ namespace math
         float GetT(Eigen::Vector3f p) const;
         std::string ToString() const;
 
-        bool IntersectsTriangle(Triangle tri, float& t)  const;
-        bool IntersectsPrimitive(PrimitivePtr p, float& t)  const;
+        bool IntersectsTriangle(Triangle tri, float& t) const;
+        bool IntersectsPrimitive(PrimitivePtr p, float& t) const;
 
         static Line FromPoints(Eigen::Vector3f p1, Eigen::Vector3f p2);
         static Line FromPoses(const Eigen::Matrix4f& p1, const Eigen::Matrix4f& p2);
@@ -56,5 +64,4 @@ namespace math
         Eigen::Vector3f pos;
         Eigen::Vector3f dir;
     };
-}
-
+} // namespace math

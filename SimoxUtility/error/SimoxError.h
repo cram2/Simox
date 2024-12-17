@@ -3,7 +3,6 @@
 #include <stdexcept>
 #include <string>
 
-
 namespace simox::error
 {
     /**
@@ -12,8 +11,6 @@ namespace simox::error
     class SimoxError : public std::runtime_error
     {
     public:
-
         SimoxError(const std::string& message);
-
     };
-}
+} // namespace simox::error

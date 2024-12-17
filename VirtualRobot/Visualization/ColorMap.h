@@ -31,11 +31,20 @@ namespace VirtualRobot
     class VIRTUAL_ROBOT_IMPORT_EXPORT ColorMap
     {
     public:
-
         enum type
         {
-            eIntensity, eHot, eRed, eGreen, eBlue, eHotAlpha, eRedAlpha, eBlueAlpha, eGreenAlpha, eGray
+            eIntensity,
+            eHot,
+            eRed,
+            eGreen,
+            eBlue,
+            eHotAlpha,
+            eRedAlpha,
+            eBlueAlpha,
+            eGreenAlpha,
+            eGray
         };
+
         ColorMap(type t);
 
         virtual ~ColorMap();
@@ -49,20 +58,28 @@ namespace VirtualRobot
         bool getColor(float position, VirtualRobot::VisualizationFactory::Color& storeColor) const;
 
         //! Custom color maps can be created with this method.
-        static ColorMap customColorMap(std::vector< VirtualRobot::VisualizationFactory::Color > colors);
+        static ColorMap
+        customColorMap(std::vector<VirtualRobot::VisualizationFactory::Color> colors);
 
     protected:
         ColorMap();
 
-        bool addColorKey(const unsigned char R, const unsigned char G, const unsigned char B, const unsigned char A, const float Position);
+        bool addColorKey(const unsigned char R,
+                         const unsigned char G,
+                         const unsigned char B,
+                         const unsigned char A,
+                         const float Position);
 
         void create(type t);
+
         struct ColorKey
         {
             unsigned int index;
-            VisualizationFactory::Color color; // internally alpha values are stored in the transparency variable
+            VisualizationFactory::Color
+                color; // internally alpha values are stored in the transparency variable
             float position;
         };
+
         void sort();
         static bool CompareColorKey(const ColorKey& lhs, const ColorKey& rhs);
 
@@ -70,7 +87,6 @@ namespace VirtualRobot
         std::vector<float> intervals;
 
         type colorMapType;
-
     };
 
 } // namespace VirtualRobot

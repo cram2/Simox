@@ -20,18 +20,17 @@
  */
 
 #include "ContactList.h"
+
 #include <sstream>
-
-
 
 namespace math
 {
-    ContactList::ContactList()
-        : std::vector<Contact>()
+    ContactList::ContactList() : std::vector<Contact>()
     {
     }
 
-    std::vector<Eigen::Vector3f> ContactList::GetPoints()
+    std::vector<Eigen::Vector3f>
+    ContactList::GetPoints()
     {
         std::vector<Eigen::Vector3f> points;
         for (Contact c : *this)
@@ -41,7 +40,8 @@ namespace math
         return points;
     }
 
-    Contact ContactList::Last()
+    Contact
+    ContactList::Last()
     {
         if (size() == 0)
         {
@@ -53,7 +53,8 @@ namespace math
         }
     }
 
-    std::string ContactList::ToString()
+    std::string
+    ContactList::ToString()
     {
         std::stringstream ss;
         bool first1 = true;
@@ -70,7 +71,5 @@ namespace math
             }
         }
         return ss.str();
-
     }
-}
-
+} // namespace math

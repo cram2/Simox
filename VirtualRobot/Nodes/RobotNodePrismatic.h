@@ -22,15 +22,13 @@
 */
 #pragma once
 
-#include "../VirtualRobot.h"
-
-#include "RobotNode.h"
-
-#include <Eigen/Core>
-
 #include <string>
 #include <vector>
 
+#include <Eigen/Core>
+
+#include "../VirtualRobot.h"
+#include "RobotNode.h"
 
 namespace VirtualRobot
 {
@@ -45,37 +43,47 @@ namespace VirtualRobot
 
         /*!
         */
-        RobotNodePrismatic(RobotWeakPtr rob,                                     //!< The robot
-                           const std::string& name,                            //!< The name
-                           float jointLimitLo,                                 //!< lower joint limit
-                           float jointLimitHi,                                 //!< upper joint limit
-                           const Eigen::Matrix4f& preJointTransform,           //!< This transformation is applied before the translation of the joint is done
-                           const Eigen::Vector3f& translationDirection,        //!< This is the direction of the translation (local)
-                           VisualizationNodePtr visualization = VisualizationNodePtr(),    //!< A visualization model
-                           CollisionModelPtr collisionModel = CollisionModelPtr(),         //!< A collision model
-                           float jointValueOffset = 0.0f,                                  //!< An offset that is internally added to the joint value
-                           const SceneObject::Physics& p = SceneObject::Physics(),         //!< physics information
-                           CollisionCheckerPtr colChecker = CollisionCheckerPtr(),         //!< A collision checker instance (if not set, the global col checker is used)
-                           RobotNodeType type = Generic);
-        RobotNodePrismatic(RobotWeakPtr rob,                                     //!< The robot
-                           const std::string& name,                            //!< The name
-                           float jointLimitLo,                                 //!< lower joint limit
-                           float jointLimitHi,                                 //!< upper joint limit
-                           float a,                                            //!< Use DH parameters for setting up this RobotNode
-                           float d,                                            //!< Use DH parameters for setting up this RobotNode
-                           float alpha,                                        //!< Use DH parameters for setting up this RobotNode
-                           float theta,                                        //!< Use DH parameters for setting up this RobotNode
-                           VisualizationNodePtr visualization = VisualizationNodePtr(),    //!< A visualization model
-                           CollisionModelPtr collisionModel = CollisionModelPtr(),         //!< A collision model
-                           float jointValueOffset = 0.0f,                                  //!< An offset that is internally added to the joint value
-                           const SceneObject::Physics& p = SceneObject::Physics(),         //!< physics information
-                           CollisionCheckerPtr colChecker = CollisionCheckerPtr(),         //!< A collision checker instance (if not set, the global col checker is used)
-                           RobotNodeType type = Generic);
+        RobotNodePrismatic(
+            RobotWeakPtr rob, //!< The robot
+            const std::string& name, //!< The name
+            float jointLimitLo, //!< lower joint limit
+            float jointLimitHi, //!< upper joint limit
+            const Eigen::Matrix4f&
+                preJointTransform, //!< This transformation is applied before the translation of the joint is done
+            const Eigen::Vector3f&
+                translationDirection, //!< This is the direction of the translation (local)
+            VisualizationNodePtr visualization = VisualizationNodePtr(), //!< A visualization model
+            CollisionModelPtr collisionModel = CollisionModelPtr(), //!< A collision model
+            float jointValueOffset =
+                0.0f, //!< An offset that is internally added to the joint value
+            const SceneObject::Physics& p = SceneObject::Physics(), //!< physics information
+            CollisionCheckerPtr colChecker =
+                CollisionCheckerPtr(), //!< A collision checker instance (if not set, the global col checker is used)
+            RobotNodeType type = Generic);
+        RobotNodePrismatic(
+            RobotWeakPtr rob, //!< The robot
+            const std::string& name, //!< The name
+            float jointLimitLo, //!< lower joint limit
+            float jointLimitHi, //!< upper joint limit
+            float a, //!< Use DH parameters for setting up this RobotNode
+            float d, //!< Use DH parameters for setting up this RobotNode
+            float alpha, //!< Use DH parameters for setting up this RobotNode
+            float theta, //!< Use DH parameters for setting up this RobotNode
+            VisualizationNodePtr visualization = VisualizationNodePtr(), //!< A visualization model
+            CollisionModelPtr collisionModel = CollisionModelPtr(), //!< A collision model
+            float jointValueOffset =
+                0.0f, //!< An offset that is internally added to the joint value
+            const SceneObject::Physics& p = SceneObject::Physics(), //!< physics information
+            CollisionCheckerPtr colChecker =
+                CollisionCheckerPtr(), //!< A collision checker instance (if not set, the global col checker is used)
+            RobotNodeType type = Generic);
         /*!
         */
         ~RobotNodePrismatic() override;
 
-        bool initialize(SceneObjectPtr parent = SceneObjectPtr(), const std::vector<SceneObjectPtr>& children = std::vector<SceneObjectPtr>()) override;
+        bool initialize(
+            SceneObjectPtr parent = SceneObjectPtr(),
+            const std::vector<SceneObjectPtr>& children = std::vector<SceneObjectPtr>()) override;
 
         /*!
         Print status information.
@@ -88,7 +96,8 @@ namespace VirtualRobot
             In global coord system.
             \param coordSystem When not set the direction is transformed to global coord system. Otherwise any scene object can be used as coord system.
         */
-        Eigen::Vector3f getJointTranslationDirection(const SceneObjectPtr coordSystem = SceneObjectPtr()) const;
+        Eigen::Vector3f
+        getJointTranslationDirection(const SceneObjectPtr coordSystem = SceneObjectPtr()) const;
 
         /*!
             This is the original joint axis, without any transformations applied.
@@ -111,17 +120,22 @@ namespace VirtualRobot
             \param globalPose The new global pose. The joint value is *not* determined from this pose. The RobotNodeActuator is responsible for setting the corresponding joint value
             \param updateChildren Usually it is assumed that all RobotNodes are updated this way (updateChildren=false). If not, the children poses can be updated according to this node (updateCHildren=true).
         */
-        void updateVisualizationPose(const Eigen::Matrix4f& globalPose, bool updateChildren = false) override;
+        void updateVisualizationPose(const Eigen::Matrix4f& globalPose,
+                                     bool updateChildren = false) override;
 
         //! Checks if nodeType constraints are fulfilled. Otherwise an exception is thrown. Called on initialization.
         void checkValidRobotNodeType() override;
 
-        RobotNodePrismatic() {};
+        RobotNodePrismatic(){};
         void updateTransformationMatrices(const Eigen::Matrix4f& parentPose) override;
 
-        Eigen::Vector3f jointTranslationDirection;  // used when ePrismaticJoint (local coord system)
+        Eigen::Vector3f jointTranslationDirection; // used when ePrismaticJoint (local coord system)
 
-        RobotNodePtr _clone(const RobotPtr newRobot, const VisualizationNodePtr visualizationModel, const CollisionModelPtr collisionModel, CollisionCheckerPtr colChecker, float scaling) override;
+        RobotNodePtr _clone(const RobotPtr newRobot,
+                            const VisualizationNodePtr visualizationModel,
+                            const CollisionModelPtr collisionModel,
+                            CollisionCheckerPtr colChecker,
+                            float scaling) override;
         /*!
             Derived classes add custom XML tags here
         */
@@ -130,7 +144,6 @@ namespace VirtualRobot
         bool visuScaling;
         Eigen::Vector3f visuScaleFactor;
         Eigen::Vector3f unscaledLocalCoM;
-
     };
 
     typedef std::shared_ptr<RobotNodePrismatic> RobotNodePrismaticPtr;

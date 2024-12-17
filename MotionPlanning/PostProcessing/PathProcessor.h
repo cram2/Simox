@@ -34,7 +34,6 @@ namespace Saba
     class SABA_IMPORT_EXPORT PathProcessor
     {
     public:
-
         /*!
             Constructor
             Creates a local copy of p.
@@ -59,14 +58,12 @@ namespace Saba
         CSpacePathPtr getOptimizedPath();
 
     protected:
-
-        CSpacePathPtr optimizedPath;        // the optimized path
-        CSpacePathPtr path;                 // stores the original path
+        CSpacePathPtr optimizedPath; // the optimized path
+        CSpacePathPtr path; // stores the original path
         unsigned int dim;
         bool verbose;
 
         bool stopOptimization; // allows to stop a running optimization process
     };
 
-} // namespace
-
+} // namespace Saba

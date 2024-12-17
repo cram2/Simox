@@ -1,4 +1,5 @@
 #include "ConstrainedIK.h"
+
 #include <iostream>
 
 #include "../RobotFactory.h"
@@ -10,7 +11,12 @@ using namespace VirtualRobot;
 using std::cout;
 using std::endl;
 
-ConstrainedIK::ConstrainedIK(RobotPtr& robot, const RobotNodeSetPtr& nodeSet, int maxIterations, float stall_epsilon, float raise_epsilon, bool reduceRobot) :
+ConstrainedIK::ConstrainedIK(RobotPtr& robot,
+                             const RobotNodeSetPtr& nodeSet,
+                             int maxIterations,
+                             float stall_epsilon,
+                             float raise_epsilon,
+                             bool reduceRobot) :
     originalRobot(robot),
     nodeSet(nodeSet),
     maxIterations(maxIterations),
@@ -23,7 +29,7 @@ ConstrainedIK::ConstrainedIK(RobotPtr& robot, const RobotNodeSetPtr& nodeSet, in
 
     // Reduce the provided robot to only those nodes requested for the IK. This has the advantage that
     // joints not necessary for the IK (e.g. finger joints) are not updated
-    if(reduceRobot)
+    if (reduceRobot)
     {
         VR_WARNING << "Robot reduction is EXPERIMENTAL" << std::endl;
         this->robot = buildReducedRobot(originalRobot);
@@ -34,18 +40,20 @@ ConstrainedIK::ConstrainedIK(RobotPtr& robot, const RobotNodeSetPtr& nodeSet, in
     }
 }
 
-void ConstrainedIK::addConstraint(const ConstraintPtr& constraint, int priority, bool hard_constraint)
+void
+ConstrainedIK::addConstraint(const ConstraintPtr& constraint, int priority, bool hard_constraint)
 {
     constraints.push_back(constraint);
     priorities[constraint] = priority;
     hardConstraints[constraint] = hard_constraint;
-    std::sort(constraints.begin(), constraints.end(), [this](const ConstraintPtr & lhs, const ConstraintPtr & rhs)
-    {
-        return priorities[lhs] > priorities[rhs];
-    });
+    std::sort(constraints.begin(),
+              constraints.end(),
+              [this](const ConstraintPtr& lhs, const ConstraintPtr& rhs)
+              { return priorities[lhs] > priorities[rhs]; });
 }
 
-void ConstrainedIK::removeConstraint(const ConstraintPtr& constraint)
+void
+ConstrainedIK::removeConstraint(const ConstraintPtr& constraint)
 {
     auto position = std::find(constraints.begin(), constraints.end(), constraint);
 
@@ -57,29 +65,33 @@ void ConstrainedIK::removeConstraint(const ConstraintPtr& constraint)
     }
 }
 
-std::vector<ConstraintPtr> ConstrainedIK::getConstraints()
+std::vector<ConstraintPtr>
+ConstrainedIK::getConstraints()
 {
     return constraints;
 }
 
-void ConstrainedIK::addSeed(ConstrainedIK::SeedType type, const Eigen::VectorXf seed)
+void
+ConstrainedIK::addSeed(ConstrainedIK::SeedType type, const Eigen::VectorXf seed)
 {
     seeds.push_back(std::pair<SeedType, Eigen::VectorXf>(type, seed));
 }
 
-void ConstrainedIK::clearSeeds()
+void
+ConstrainedIK::clearSeeds()
 {
     seeds.clear();
 }
 
-bool ConstrainedIK::initialize()
+bool
+ConstrainedIK::initialize()
 {
     Eigen::Matrix4f P;
     int moves = 0;
 
     nodeSet->getJointValues(initialConfig);
 
-    for (auto & constraint : constraints)
+    for (auto& constraint : constraints)
     {
         constraint->initialize();
         moves += constraint->getRobotPoseForConstraint(P);
@@ -101,9 +113,10 @@ bool ConstrainedIK::initialize()
     return true;
 }
 
-bool ConstrainedIK::solve(bool stepwise)
+bool
+ConstrainedIK::solve(bool stepwise)
 {
-    if(seeds.size() != 1)
+    if (seeds.size() != 1)
     {
         // TODO: Implement seeds for IKs other that ConstrainedOptimizationIK
         VR_WARNING << "Seeds not supported by this IK implementation" << std::endl;
@@ -119,7 +132,7 @@ bool ConstrainedIK::solve(bool stepwise)
 
         bool goalReached = true;
 
-        for (auto & constraint : constraints)
+        for (auto& constraint : constraints)
         {
             if (hardConstraints[constraint] && !constraint->checkTolerances())
             {
@@ -143,37 +156,47 @@ bool ConstrainedIK::solve(bool stepwise)
         }
     }
 
-    VR_INFO << "A hard contraints failed to me the tolerance criterion after the maximum number of iterations" << std::endl;
+    VR_INFO << "A hard contraints failed to me the tolerance criterion after the maximum number of "
+               "iterations"
+            << std::endl;
     running = false;
     return false;
 }
 
-void ConstrainedIK::setMaxIterations(int maxIterations)
+void
+ConstrainedIK::setMaxIterations(int maxIterations)
 {
     this->maxIterations = maxIterations;
 }
 
-int ConstrainedIK::getMaxIterations()
+int
+ConstrainedIK::getMaxIterations()
 {
     return maxIterations;
 }
 
-bool ConstrainedIK::getRunning()
+bool
+ConstrainedIK::getRunning()
 {
     return running;
 }
 
-int ConstrainedIK::getCurrentIteration()
+int
+ConstrainedIK::getCurrentIteration()
 {
     return currentIteration;
 }
 
-void ConstrainedIK::getUnitableNodes(const RobotNodePtr &robotNode, const RobotNodeSetPtr &nodeSet, std::vector<std::string> &unitable)
+void
+ConstrainedIK::getUnitableNodes(const RobotNodePtr& robotNode,
+                                const RobotNodeSetPtr& nodeSet,
+                                std::vector<std::string>& unitable)
 {
     std::vector<RobotNodePtr> descendants;
     robotNode->collectAllRobotNodes(descendants);
 
-    for (std::vector<RobotNodePtr>::const_iterator i = descendants.begin(); i != descendants.end(); i++)
+    for (std::vector<RobotNodePtr>::const_iterator i = descendants.begin(); i != descendants.end();
+         i++)
     {
         // Skip current robot node
         if (*i == robotNode)
@@ -181,11 +204,11 @@ void ConstrainedIK::getUnitableNodes(const RobotNodePtr &robotNode, const RobotN
             continue;
         }
 
-        if(nodeSet->hasRobotNode(*i) || *i == nodeSet->getTCP())
+        if (nodeSet->hasRobotNode(*i) || *i == nodeSet->getTCP())
         {
             // Actuated joint in subtree -> recursive descent
             std::vector<SceneObjectPtr> children = robotNode->getChildren();
-            for (auto &child : children)
+            for (auto& child : children)
             {
                 RobotNodePtr childRobotNode = std::dynamic_pointer_cast<RobotNode>(child);
                 if (childRobotNode)
@@ -205,10 +228,11 @@ void ConstrainedIK::getUnitableNodes(const RobotNodePtr &robotNode, const RobotN
     }
 }
 
-RobotPtr ConstrainedIK::buildReducedRobot(const RobotPtr &original)
+RobotPtr
+ConstrainedIK::buildReducedRobot(const RobotPtr& original)
 {
     std::vector<std::string> names;
-    for(size_t i = 0; i < nodeSet->getSize(); i++)
+    for (size_t i = 0; i < nodeSet->getSize(); i++)
     {
         names.push_back(nodeSet->getNode(i)->getName());
     }
@@ -217,7 +241,7 @@ RobotPtr ConstrainedIK::buildReducedRobot(const RobotPtr &original)
     getUnitableNodes(original->getRootNode(), nodeSet, unitable);
 
     VR_INFO << "Reducing robot model by uniting " << unitable.size() << " nodes:" << std::endl;
-    for(auto &node : unitable)
+    for (auto& node : unitable)
     {
         VR_INFO << "    " << node << std::endl;
     }

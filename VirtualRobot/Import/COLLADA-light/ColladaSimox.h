@@ -1,18 +1,17 @@
 #pragma once
 
 
-#include "inventor.h"
-
 #include <VirtualRobot/VirtualRobot.h>
+
+#include "inventor.h"
 
 namespace Collada
 {
 
 
-
     struct ColladaSimoxRobotNode : InventorRobotNode
     {
-        ColladaSimoxRobotNode(VirtualRobot::RobotPtr simoxRobot, float scaleFactor) ;
+        ColladaSimoxRobotNode(VirtualRobot::RobotPtr simoxRobot, float scaleFactor);
 
         ~ColladaSimoxRobotNode();
         void initialize() override;
@@ -26,24 +25,26 @@ namespace Collada
     private:
         VirtualRobot::RobotPtr simoxRobot;
         float scaleFactor;
+
     public:
-        ColladaSimoxRobot(float scaleFactor) ;
-        ColladaRobotNodePtr robotNodeFactory() override
+        ColladaSimoxRobot(float scaleFactor);
+
+        ColladaRobotNodePtr
+        robotNodeFactory() override
         {
             return ColladaRobotNodePtr(new ColladaSimoxRobotNode(simoxRobot, scaleFactor));
         }
 
         void initialize();
-        VirtualRobot::RobotPtr getSimoxRobot()
+
+        VirtualRobot::RobotPtr
+        getSimoxRobot()
         {
             return simoxRobot;
         }
 
         ~ColladaSimoxRobot();
-
     };
 
 
-} //namespace
-
-
+} // namespace Collada

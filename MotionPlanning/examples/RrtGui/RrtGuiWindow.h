@@ -1,41 +1,44 @@
 
 #pragma once
 
-#include <VirtualRobot/VirtualRobot.h>
-#include <VirtualRobot/Robot.h>
-#include <VirtualRobot/VirtualRobotException.h>
-#include <VirtualRobot/Nodes/RobotNode.h>
-#include <VirtualRobot/XML/SceneIO.h>
-#include <VirtualRobot/Visualization/VisualizationFactory.h>
-#include <VirtualRobot/Visualization/CoinVisualization/CoinVisualization.h>
-#include <VirtualRobot/Obstacle.h>
-#include <VirtualRobot/ManipulationObject.h>
-
-#include "MotionPlanning/Saba.h"
-#include "MotionPlanning/CSpace/CSpacePath.h"
-
 #include <string.h>
-#include <QtCore/QtGlobal>
-#include <QtGui/QtGui>
-#include <QtCore/QtCore>
-
-#include <Inventor/sensors/SoTimerSensor.h>
-#include <Inventor/nodes/SoEventCallback.h>
-#include <Inventor/Qt/viewers/SoQtExaminerViewer.h>
-#include <Inventor/Qt/SoQt.h>
-#include <Inventor/nodes/SoSeparator.h>
-
 
 #include <vector>
 
+#include <QtCore/QtCore>
+#include <QtCore/QtGlobal>
+#include <QtGui/QtGui>
+
+#include <VirtualRobot/ManipulationObject.h>
+#include <VirtualRobot/Nodes/RobotNode.h>
+#include <VirtualRobot/Obstacle.h>
+#include <VirtualRobot/Robot.h>
+#include <VirtualRobot/VirtualRobot.h>
+#include <VirtualRobot/VirtualRobotException.h>
+#include <VirtualRobot/Visualization/CoinVisualization/CoinVisualization.h>
+#include <VirtualRobot/Visualization/VisualizationFactory.h>
+#include <VirtualRobot/XML/SceneIO.h>
+
+#include "MotionPlanning/CSpace/CSpacePath.h"
+#include "MotionPlanning/Saba.h"
 #include "ui_RrtGui.h"
+#include <Inventor/Qt/SoQt.h>
+#include <Inventor/Qt/viewers/SoQtExaminerViewer.h>
+#include <Inventor/nodes/SoEventCallback.h>
+#include <Inventor/nodes/SoSeparator.h>
+#include <Inventor/sensors/SoTimerSensor.h>
 
 class RrtGuiWindow : public QMainWindow
 {
     Q_OBJECT
 public:
-    RrtGuiWindow(const std::string& sceneFile, const std::string& sConf, const std::string& gConf, const std::string& rns,
-                 const std::string& colModelRob1, const std::string& colModelRob2, const std::string& colModelEnv);
+    RrtGuiWindow(const std::string& sceneFile,
+                 const std::string& sConf,
+                 const std::string& gConf,
+                 const std::string& rns,
+                 const std::string& colModelRob1,
+                 const std::string& colModelRob2,
+                 const std::string& colModelEnv);
     ~RrtGuiWindow() override;
 
     /*!< Executes the SoQt mainLoop. You need to call this in order to execute the application. */
@@ -69,7 +72,6 @@ public slots:
     void plan();
 
 protected:
-
     void loadScene();
 
     void setupUI();
@@ -85,7 +87,8 @@ protected:
     void selectColModelRobB(const std::string& colModel);
     void selectColModelEnv(const std::string& colModel);
     Ui::MainWindowRRTDemo UI;
-    SoQtExaminerViewer* viewer; /*!< Viewer to display the 3D model of the robot and the environment. */
+    SoQtExaminerViewer*
+        viewer; /*!< Viewer to display the 3D model of the robot and the environment. */
 
     SoSeparator* allSep;
     SoSeparator* sceneFileSep;
@@ -105,7 +108,7 @@ protected:
     VirtualRobot::SceneObjectSetPtr colModelRobB;
     VirtualRobot::SceneObjectSetPtr colModelEnv;
 
-    std::vector< VirtualRobot::RobotConfigPtr > configs;
+    std::vector<VirtualRobot::RobotConfigPtr> configs;
 
     std::string sceneFile;
     VirtualRobot::ScenePtr scene;
@@ -117,4 +120,3 @@ protected:
 
     std::shared_ptr<VirtualRobot::CoinVisualization> visualization;
 };
-

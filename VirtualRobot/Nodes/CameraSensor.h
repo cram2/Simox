@@ -24,13 +24,11 @@
 
 #include "Sensor.h"
 
-
 namespace VirtualRobot
 {
 
     class CameraSensor;
     typedef std::shared_ptr<CameraSensor> CameraSensorPtr;
-
 
     /*!
         A sensor for capturing simulated camera images.
@@ -48,8 +46,7 @@ namespace VirtualRobot
         CameraSensor(GraspableSensorizedObjectWeakPtr parentNode,
                      const std::string& name,
                      VisualizationNodePtr visualization = VisualizationNodePtr(),
-                     const Eigen::Matrix4f& rnTrafo = Eigen::Matrix4f::Identity()
-                    );
+                     const Eigen::Matrix4f& rnTrafo = Eigen::Matrix4f::Identity());
 
         /*!
         */
@@ -66,16 +63,14 @@ namespace VirtualRobot
 
 
     protected:
-
-
-        CameraSensor() {};
+        CameraSensor(){};
 
         /*!
         Derived classes must implement their clone method here.
         */
-        SensorPtr _clone(const GraspableSensorizedObjectPtr newNode, const VisualizationNodePtr visualizationModel, float scaling) override;
-
+        SensorPtr _clone(const GraspableSensorizedObjectPtr newNode,
+                         const VisualizationNodePtr visualizationModel,
+                         float scaling) override;
     };
 
 } // namespace VirtualRobot
-

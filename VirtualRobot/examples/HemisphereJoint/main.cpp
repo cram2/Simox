@@ -4,31 +4,28 @@
 #include <SimoxUtility/math/convert/deg_to_rad.h>
 #include <SimoxUtility/math/rescale.h>
 #include <SimoxUtility/math/statistics/measures.h>
-
-#include <VirtualRobot/RuntimeEnvironment.h>
 #include <VirtualRobot/Nodes/HemisphereJoint/Maths.h>
+#include <VirtualRobot/RuntimeEnvironment.h>
 
 
 using VirtualRobot::RuntimeEnvironment;
 
-
-int main(int argc, char* argv[])
+int
+main(int argc, char* argv[])
 {
     const Eigen::IOFormat iof(5, 0, " ", "\n", "    [", "]", "", "");
 
     RuntimeEnvironment::setCaption("Compute hemisphere joint mathematics");
 
-    RuntimeEnvironment::considerFlag(
-                "verbose", "Enable verbose output.");
-    RuntimeEnvironment::considerFlag(
-                "debug", "Branch to debug code.");
+    RuntimeEnvironment::considerFlag("verbose", "Enable verbose output.");
+    RuntimeEnvironment::considerFlag("debug", "Branch to debug code.");
 
     RuntimeEnvironment::processCommandLine(argc, argv);
 
     if (RuntimeEnvironment::hasHelpFlag()
-            // || !RuntimeEnvironment::hasValue("input")
-            //|| !RuntimeEnvironment::hasValue("output"))
-            )
+        // || !RuntimeEnvironment::hasValue("input")
+        //|| !RuntimeEnvironment::hasValue("output"))
+    )
     {
         RuntimeEnvironment::printOptions();
         return 0;
@@ -44,7 +41,7 @@ int main(int argc, char* argv[])
     {
         std::vector<double> a1s, a2s;
         int num = 100;
-        double aMin = -0.7, aMax=0.7;
+        double aMin = -0.7, aMax = 0.7;
         for (int i = 0; i < num; ++i)
         {
             double value = simox::math::rescale(double(i), double(0), double(num), aMin, aMax);
@@ -73,16 +70,17 @@ int main(int argc, char* argv[])
 
                 const time_point end = std::chrono::system_clock::now();
                 using duration = std::chrono::nanoseconds;
-                durationsUs.push_back(std::chrono::duration_cast<duration>(end - start).count() / 1000.f);
+                durationsUs.push_back(std::chrono::duration_cast<duration>(end - start).count() /
+                                      1000.f);
 
                 if (verbose)
                 {
                     std::cout << "(a1, a2) = (" << a1 << ", " << a2 << ")"
                               << "\n ->"
-                              << "\n  pos = \n" << pos.transpose().format(iof)
-                              << "\n  ori = \n" << ori.format(iof)
-                              << "\n  jac = \n" << jacobian.format(iof)
-                              << std::endl;
+                              << "\n  pos = \n"
+                              << pos.transpose().format(iof) << "\n  ori = \n"
+                              << ori.format(iof) << "\n  jac = \n"
+                              << jacobian.format(iof) << std::endl;
                 }
             }
         }
@@ -94,9 +92,8 @@ int main(int argc, char* argv[])
 
         const std::string unit = " us";
         std::cout << "Durations:"
-                  << " " << mean << " +- " << stddev << unit
-                  << ", range: [" << min << unit << " to " << max << unit <<"]"
-                  << std::endl;
+                  << " " << mean << " +- " << stddev << unit << ", range: [" << min << unit
+                  << " to " << max << unit << "]" << std::endl;
     }
     else
     {
@@ -110,9 +107,7 @@ int main(int argc, char* argv[])
         joint.computeFkOfPosition(a1, a2);
 
         const Eigen::Vector3d pos = joint.getEndEffectorTranslation();
-        std::cout << "\n  pos = \n" << pos.transpose().format(iof)
-                  << std::endl;
-
+        std::cout << "\n  pos = \n" << pos.transpose().format(iof) << std::endl;
     }
 
     return 0;

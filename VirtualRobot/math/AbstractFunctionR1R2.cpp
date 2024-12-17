@@ -19,16 +19,18 @@
  *             GNU Lesser General Public License
  */
 
-#include "../VirtualRobot.h"
 #include "AbstractFunctionR1R2.h"
+
 #include <Eigen/Geometry>
 
+#include "../VirtualRobot.h"
 
 namespace math
 {
-    Eigen::Vector2f math::AbstractFunctionR1R2::GetNormalizedNormal(float t)
+    Eigen::Vector2f
+    math::AbstractFunctionR1R2::GetNormalizedNormal(float t)
     {
         Eigen::Rotation2Df rot(M_PI_2);
         return (rot * GetDerivative(t)).normalized();
     }
-}
+} // namespace math

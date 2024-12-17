@@ -1,15 +1,17 @@
 
 #include "WorkspaceGrid.h"
-#include "../VirtualRobotException.h"
+
+#include <algorithm>
+#include <cmath>
+#include <iostream>
+
 #include "../ManipulationObject.h"
 #include "../Nodes/RobotNode.h"
 #include "../Robot.h"
+#include "../VirtualRobotException.h"
 #include "Grasping/Grasp.h"
 #include "VirtualRobot.h"
 #include "Workspace/WorkspaceData.h"
-#include <cmath>
-#include <iostream>
-#include <algorithm>
 
 
 using namespace std;
@@ -20,8 +22,19 @@ namespace VirtualRobot
 {
     constexpr int INVALID_VALUE = -1;
 
-    WorkspaceGrid::WorkspaceGrid(float fMinX, float fMaxX, float fMinY, float fMaxY, float fDiscretizeSize, const bool checkNeighbors) 
-        : minX(fMinX), maxX(fMaxX), minY(fMinY), maxY(fMaxY), discretizeSize(fDiscretizeSize), data(nullptr), checkNeighbors(checkNeighbors)
+    WorkspaceGrid::WorkspaceGrid(float fMinX,
+                                 float fMaxX,
+                                 float fMinY,
+                                 float fMaxY,
+                                 float fDiscretizeSize,
+                                 const bool checkNeighbors) :
+        minX(fMinX),
+        maxX(fMaxX),
+        minY(fMinY),
+        maxY(fMaxY),
+        discretizeSize(fDiscretizeSize),
+        data(nullptr),
+        checkNeighbors(checkNeighbors)
     {
         if (fMinX >= fMaxX || fMinY >= fMaxY)
         {
@@ -42,23 +55,25 @@ namespace VirtualRobot
         // VR_INFO << ": creating grid with " << gridSizeX << "x" << gridSizeY << " = " << gridSizeX* gridSizeY << " entries" << std::endl;
         data = new int[gridSizeX * gridSizeY];
         graspLink = new std::vector<GraspPtr>[gridSizeX * gridSizeY];
-        memset(data, INVALID_VALUE, sizeof(int)*gridSizeX * gridSizeY);
+        memset(data, INVALID_VALUE, sizeof(int) * gridSizeX * gridSizeY);
     }
 
     WorkspaceGrid::~WorkspaceGrid()
     {
-        delete []data;
-        delete []graspLink;
+        delete[] data;
+        delete[] graspLink;
     }
 
-    void WorkspaceGrid::reset()
+    void
+    WorkspaceGrid::reset()
     {
-        delete []graspLink;
+        delete[] graspLink;
         graspLink = new std::vector<GraspPtr>[gridSizeX * gridSizeY];
-        memset(data, INVALID_VALUE, sizeof(int)*gridSizeX * gridSizeY);
+        memset(data, INVALID_VALUE, sizeof(int) * gridSizeX * gridSizeY);
     }
 
-    int WorkspaceGrid::getEntry(float x, float y)
+    int
+    WorkspaceGrid::getEntry(float x, float y)
     {
         if (!data)
         {
@@ -77,7 +92,8 @@ namespace VirtualRobot
         return data[getDataPos(nPosX, nPosY)];
     }
 
-    bool WorkspaceGrid::getEntry(float x, float y, int& storeEntry, GraspPtr& storeGrasp)
+    bool
+    WorkspaceGrid::getEntry(float x, float y, int& storeEntry, GraspPtr& storeGrasp)
     {
         if (!data)
         {
@@ -98,7 +114,7 @@ namespace VirtualRobot
 
         if (nLinks > 0)
         {
-            storeGrasp = graspLink[getDataPos(nPosX, nPosY)][rand() % nLinks];    // get random grasp
+            storeGrasp = graspLink[getDataPos(nPosX, nPosY)][rand() % nLinks]; // get random grasp
         }
         else
         {
@@ -108,7 +124,8 @@ namespace VirtualRobot
         return true;
     }
 
-    bool WorkspaceGrid::getEntry(float x, float y, int& storeEntry, std::vector<GraspPtr>& storeGrasps)
+    bool
+    WorkspaceGrid::getEntry(float x, float y, int& storeEntry, std::vector<GraspPtr>& storeGrasps)
     {
         if (!data)
         {
@@ -129,7 +146,8 @@ namespace VirtualRobot
         return true;
     }
 
-    int WorkspaceGrid::getCellEntry(int cellX, int cellY)
+    int
+    WorkspaceGrid::getCellEntry(int cellX, int cellY)
     {
         if (!data)
         {
@@ -145,7 +163,8 @@ namespace VirtualRobot
         return data[getDataPos(cellX, cellY)];
     }
 
-    bool WorkspaceGrid::getCellEntry(int cellX, int cellY, int& storeEntry, GraspPtr& storeGrasp)
+    bool
+    WorkspaceGrid::getCellEntry(int cellX, int cellY, int& storeEntry, GraspPtr& storeGrasp)
     {
         if (!data)
         {
@@ -173,7 +192,11 @@ namespace VirtualRobot
         return true;
     }
 
-    bool WorkspaceGrid::getCellEntry(int cellX, int cellY, int& storeEntry, std::vector<GraspPtr>& storeGrasps)
+    bool
+    WorkspaceGrid::getCellEntry(int cellX,
+                                int cellY,
+                                int& storeEntry,
+                                std::vector<GraspPtr>& storeGrasps)
     {
         if (!data)
         {
@@ -191,7 +214,8 @@ namespace VirtualRobot
         return true;
     }
 
-    void WorkspaceGrid::setEntry(float x, float y, int value, GraspPtr grasp)
+    void
+    WorkspaceGrid::setEntry(float x, float y, int value, GraspPtr grasp)
     {
         if (!data)
         {
@@ -203,7 +227,8 @@ namespace VirtualRobot
         setCellEntry(nPosX, nPosY, value, grasp);
     }
 
-    void WorkspaceGrid::setCellEntry(int cellX, int cellY, const int value, GraspPtr grasp)
+    void
+    WorkspaceGrid::setCellEntry(int cellX, int cellY, const int value, GraspPtr grasp)
     {
         if (!data)
         {
@@ -218,26 +243,29 @@ namespace VirtualRobot
 
         int& lastVal = data[getDataPos(cellX, cellY)];
         checkAndReplaceValue(lastVal, value);
-        
+
         if (value >= MIN_VALUES_STORE_GRASPS)
         {
-            if (grasp && find(graspLink[getDataPos(cellX, cellY)].begin(), graspLink[getDataPos(cellX, cellY)].end(), grasp) == graspLink[getDataPos(cellX, cellY)].end())
+            if (grasp && find(graspLink[getDataPos(cellX, cellY)].begin(),
+                              graspLink[getDataPos(cellX, cellY)].end(),
+                              grasp) == graspLink[getDataPos(cellX, cellY)].end())
             {
                 graspLink[getDataPos(cellX, cellY)].push_back(grasp);
             }
         }
     }
 
-    void WorkspaceGrid::checkAndReplaceValue(int& val, int newVal)
+    void
+    WorkspaceGrid::checkAndReplaceValue(int& val, int newVal)
     {
         // check if cell is uninitialized
-        if(val == INVALID_VALUE)
+        if (val == INVALID_VALUE)
         {
             val = newVal;
             return;
         }
 
-        switch(mode)
+        switch (mode)
         {
             case CellUpdateMode::MIN:
                 val = std::min(val, newVal);
@@ -248,17 +276,17 @@ namespace VirtualRobot
         }
     }
 
-
-    Eigen::Vector2f WorkspaceGrid::getPosition(int cellX, int cellY) const
+    Eigen::Vector2f
+    WorkspaceGrid::getPosition(int cellX, int cellY) const
     {
         float x = minX + cellX / gridSizeX * gridExtendX;
         float y = minY + cellY / gridSizeY * gridExtendY;
 
-        return {x,y};
-
+        return {x, y};
     }
 
-    void WorkspaceGrid::setEntryCheckNeighbors(float x, float y, int value, GraspPtr grasp)
+    void
+    WorkspaceGrid::setEntryCheckNeighbors(float x, float y, int value, GraspPtr grasp)
     {
         if (!data)
         {
@@ -277,7 +305,7 @@ namespace VirtualRobot
         setCellEntry(nPosX, nPosY, value, grasp);
 
         // update neighbor cells as well
-        if(checkNeighbors)
+        if (checkNeighbors)
         {
             if (nPosX > 0 && nPosX < (gridSizeX - 1) && nPosY > 0 && nPosY < (gridSizeY - 1))
             {
@@ -291,10 +319,13 @@ namespace VirtualRobot
                 setCellEntry(nPosX + 1, nPosY + 1, value, grasp);
             }
         }
-        
     }
 
-    void WorkspaceGrid::setEntries(std::vector<WorkspaceRepresentation::WorkspaceCut2DTransformation>& wsData, const Eigen::Matrix4f& graspGlobal, GraspPtr grasp)
+    void
+    WorkspaceGrid::setEntries(
+        std::vector<WorkspaceRepresentation::WorkspaceCut2DTransformation>& wsData,
+        const Eigen::Matrix4f& graspGlobal,
+        GraspPtr grasp)
     {
         if (!data)
         {
@@ -303,14 +334,16 @@ namespace VirtualRobot
 
         const Eigen::Isometry3f global_T_grasp(graspGlobal);
 
-        for (auto & i : wsData)
+        for (auto& i : wsData)
         {
-            const auto pos = global_T_grasp * Eigen::Isometry3f(i.transformation).inverse().translation();
+            const auto pos =
+                global_T_grasp * Eigen::Isometry3f(i.transformation).inverse().translation();
             setEntryCheckNeighbors(pos.x(), pos.y(), i.value, grasp);
         }
     }
 
-    int WorkspaceGrid::getMaxEntry()
+    int
+    WorkspaceGrid::getMaxEntry()
     {
         if (!data)
         {
@@ -328,6 +361,7 @@ namespace VirtualRobot
 
         return nMax;
     }
+
     /*
     void WorkspaceGrid::visualize(SoSeparator *pStoreResult)
     {
@@ -384,7 +418,13 @@ namespace VirtualRobot
         }
     }*/
 
-    bool WorkspaceGrid::getRandomPos(int minEntry, float& storeXGlobal, float& storeYGlobal, GraspPtr& storeGrasp, int maxLoops /*= 50*/, int* entries)
+    bool
+    WorkspaceGrid::getRandomPos(int minEntry,
+                                float& storeXGlobal,
+                                float& storeYGlobal,
+                                GraspPtr& storeGrasp,
+                                int maxLoops /*= 50*/,
+                                int* entries)
     {
         if (!data)
         {
@@ -400,7 +440,7 @@ namespace VirtualRobot
             x = rand() % gridSizeX;
             y = rand() % gridSizeY;
             getCellEntry(x, y, nEntry, storeGrasp);
-            if(entries)
+            if (entries)
                 *entries = nEntry;
             if (nEntry >= minEntry)
             {
@@ -411,14 +451,18 @@ namespace VirtualRobot
             }
 
             nLoop++;
-        }
-        while (nLoop < maxLoops);
+        } while (nLoop < maxLoops);
 
         return false;
     }
 
-
-    bool WorkspaceGrid::getRandomPos(int minEntry, float& storeXGlobal, float& storeYGlobal, std::vector<GraspPtr>& storeGrasps, int maxLoops /*= 50*/, int *entries)
+    bool
+    WorkspaceGrid::getRandomPos(int minEntry,
+                                float& storeXGlobal,
+                                float& storeYGlobal,
+                                std::vector<GraspPtr>& storeGrasps,
+                                int maxLoops /*= 50*/,
+                                int* entries)
     {
         if (!data)
         {
@@ -434,7 +478,7 @@ namespace VirtualRobot
             x = rand() % gridSizeX;
             y = rand() % gridSizeY;
             getCellEntry(x, y, nEntry, storeGrasps);
-            if(entries)
+            if (entries)
                 *entries = nEntry;
             if (nEntry >= minEntry)
             {
@@ -444,13 +488,13 @@ namespace VirtualRobot
             }
 
             nLoop++;
-        }
-        while (nLoop < maxLoops);
+        } while (nLoop < maxLoops);
 
         return false;
     }
 
-    void WorkspaceGrid::setGridPosition(float x, float y)
+    void
+    WorkspaceGrid::setGridPosition(float x, float y)
     {
         minX = x - gridExtendX / 2.0f;
         maxX = x + gridExtendX / 2.0f;
@@ -458,7 +502,13 @@ namespace VirtualRobot
         maxY = y + gridExtendY / 2.0f;
     }
 
-    bool WorkspaceGrid::fillGridData(WorkspaceRepresentationPtr ws, ManipulationObjectPtr o, GraspPtr g, RobotNodePtr baseRobotNode, const float baseOrientation, const float maxAngle)
+    bool
+    WorkspaceGrid::fillGridData(WorkspaceRepresentationPtr ws,
+                                ManipulationObjectPtr o,
+                                GraspPtr g,
+                                RobotNodePtr baseRobotNode,
+                                const float baseOrientation,
+                                const float maxAngle)
     {
         if (!ws || !o || !g)
         {
@@ -470,9 +520,16 @@ namespace VirtualRobot
         return fillGridData(ws, graspGlobal, g, baseRobotNode, baseOrientation, maxAngle);
     }
 
-    bool WorkspaceGrid::fillGridData(WorkspaceRepresentationPtr ws, const Eigen::Matrix4f &global_T_grasp_orig, GraspPtr g, RobotNodePtr baseRobotNode, float baseOrientation, const float maxAngle, const float minCenterDistance)
+    bool
+    WorkspaceGrid::fillGridData(WorkspaceRepresentationPtr ws,
+                                const Eigen::Matrix4f& global_T_grasp_orig,
+                                GraspPtr g,
+                                RobotNodePtr baseRobotNode,
+                                float baseOrientation,
+                                const float maxAngle,
+                                const float minCenterDistance)
     {
-        (void) maxAngle;  // Unused.
+        (void)maxAngle; // Unused.
 
         if (!ws)
         {
@@ -491,21 +548,29 @@ namespace VirtualRobot
 
 
         Eigen::Isometry3f global_T_grasp(global_T_grasp_orig);
-        global_T_grasp.linear() = Eigen::AngleAxisf(-baseOrientation, Eigen::Vector3f::UnitZ()) * global_T_grasp.linear();
+        global_T_grasp.linear() =
+            Eigen::AngleAxisf(-baseOrientation, Eigen::Vector3f::UnitZ()) * global_T_grasp.linear();
 
 
-        WorkspaceRepresentation::WorkspaceCut2DPtr cutXY = ws->createCut(global_T_grasp.matrix(), discretizeSize, false);
+        WorkspaceRepresentation::WorkspaceCut2DPtr cutXY =
+            ws->createCut(global_T_grasp.matrix(), discretizeSize, false);
 
-        std::vector<WorkspaceRepresentation::WorkspaceCut2DTransformation> transformations = ws->createCutTransformations(cutXY, baseRobotNode, M_PI/*, isFlipped*/);
-        
+        std::vector<WorkspaceRepresentation::WorkspaceCut2DTransformation> transformations =
+            ws->createCutTransformations(cutXY, baseRobotNode, M_PI /*, isFlipped*/);
+
         // cut out a cylinder around the robot if minCenterDistance is specified
-        if(minCenterDistance > 0)
+        if (minCenterDistance > 0)
         {
-            transformations.erase(std::remove_if(transformations.begin(), transformations.end(), [&](const WorkspaceRepresentation::WorkspaceCut2DTransformation& tp){
-                
-                const Eigen::Isometry3f robot_T_tcp(tp.transformation);
-                return robot_T_tcp.translation().head<2>().norm() < minCenterDistance; 
-            }), transformations.end());
+            transformations.erase(
+                std::remove_if(transformations.begin(),
+                               transformations.end(),
+                               [&](const WorkspaceRepresentation::WorkspaceCut2DTransformation& tp)
+                               {
+                                   const Eigen::Isometry3f robot_T_tcp(tp.transformation);
+                                   return robot_T_tcp.translation().head<2>().norm() <
+                                          minCenterDistance;
+                               }),
+                transformations.end());
         }
 
         setEntries(transformations, global_T_grasp_orig.matrix(), g);
@@ -518,7 +583,11 @@ namespace VirtualRobot
         return true;
     }
 
-    void WorkspaceGrid::getExtends(float& storeMinX, float& storeMaxX, float& storeMinY, float& storeMaxY)
+    void
+    WorkspaceGrid::getExtends(float& storeMinX,
+                              float& storeMaxX,
+                              float& storeMinY,
+                              float& storeMaxY)
     {
         storeMinX = minX;
         storeMaxX = maxX;
@@ -526,69 +595,74 @@ namespace VirtualRobot
         storeMaxY = maxY;
     }
 
-    void WorkspaceGrid::getCells(int& storeCellsX, int& storeCellsY)
+    void
+    WorkspaceGrid::getCells(int& storeCellsX, int& storeCellsY)
     {
         storeCellsX = gridSizeX;
         storeCellsY = gridSizeY;
     }
 
-    float WorkspaceGrid::getDiscretizeSize() const
+    float
+    WorkspaceGrid::getDiscretizeSize() const
     {
         return discretizeSize;
     }
 
-    Eigen::Vector2f WorkspaceGrid::getMin() const
+    Eigen::Vector2f
+    WorkspaceGrid::getMin() const
     {
         return Eigen::Vector2f(minX, minY);
     }
 
-    Eigen::Vector2f WorkspaceGrid::getMax() const
+    Eigen::Vector2f
+    WorkspaceGrid::getMax() const
     {
         return Eigen::Vector2f(maxX, maxY);
     }
 
-    WorkspaceGridPtr WorkspaceGrid::MergeWorkspaceGrids(const std::vector<WorkspaceGridPtr> &grids)
+    WorkspaceGridPtr
+    WorkspaceGrid::MergeWorkspaceGrids(const std::vector<WorkspaceGridPtr>& grids)
     {
         VR_ASSERT(grids.size() >= 2);
         float totalMaxX = std::numeric_limits<float>::min();
         float totalMinX = std::numeric_limits<float>::max();
         float totalMaxY = std::numeric_limits<float>::min();
         float totalMinY = std::numeric_limits<float>::max();
-        for(auto& grid : grids)
+        for (auto& grid : grids)
         {
-//            VR_INFO << "min: " << grid->getMin() << " max: " << grid->getMax() << std::endl;
+            //            VR_INFO << "min: " << grid->getMin() << " max: " << grid->getMax() << std::endl;
             totalMinX = std::min(grid->getMin()(0), totalMinX);
             totalMinY = std::min(grid->getMin()(1), totalMinY);
             totalMaxX = std::max(grid->getMax()(0), totalMaxX);
             totalMaxY = std::max(grid->getMax()(1), totalMaxY);
         }
-        WorkspaceGridPtr resultGrid(new WorkspaceGrid(totalMinX, totalMaxX, totalMinY, totalMaxY, grids.at(0)->getDiscretizeSize()));
-//        VR_INFO << "minx : " << totalMinX << " maxX: " << totalMaxX << " step size: " << resultGrid->getDiscretizeSize() << std::endl;
-//        int sameValueCount =  0;
-//        int totalValueCount = 0;
-        for(float x = totalMinX; x < totalMaxX; x += resultGrid->getDiscretizeSize())
+        WorkspaceGridPtr resultGrid(new WorkspaceGrid(
+            totalMinX, totalMaxX, totalMinY, totalMaxY, grids.at(0)->getDiscretizeSize()));
+        //        VR_INFO << "minx : " << totalMinX << " maxX: " << totalMaxX << " step size: " << resultGrid->getDiscretizeSize() << std::endl;
+        //        int sameValueCount =  0;
+        //        int totalValueCount = 0;
+        for (float x = totalMinX; x < totalMaxX; x += resultGrid->getDiscretizeSize())
         {
-            for(float y = totalMinY; y < totalMaxY; y += resultGrid->getDiscretizeSize())
+            for (float y = totalMinY; y < totalMaxY; y += resultGrid->getDiscretizeSize())
             {
                 int min = std::numeric_limits<int>::max();
                 GraspPtr grasp;
-                for(auto& grid : grids)
+                for (auto& grid : grids)
                 {
                     int score;
                     GraspPtr tmpGrasp;
-                    if(grid->getEntry(x, y, score, tmpGrasp))
+                    if (grid->getEntry(x, y, score, tmpGrasp))
                     {
                         grasp = tmpGrasp;
                     }
                     min = std::min(score, min);
                 }
-//                totalValueCount++;
+                //                totalValueCount++;
                 resultGrid->setEntry(x, y, min, grasp);
             }
         }
-//        VR_INFO << "Same value percentage: " << (100.f * sameValueCount/totalValueCount) << std::endl;
+        //        VR_INFO << "Same value percentage: " << (100.f * sameValueCount/totalValueCount) << std::endl;
         return resultGrid;
-
     }
 
-} //  namespace
+} // namespace VirtualRobot

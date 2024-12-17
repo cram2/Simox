@@ -1,26 +1,26 @@
 
 #include "RobotConfig.h"
-#include <iostream>
-#include "Robot.h"
-#include "Nodes/RobotNode.h"
-#include "VirtualRobotException.h"
 
+#include <iostream>
+
+#include "Nodes/RobotNode.h"
+#include "Robot.h"
+#include "VirtualRobotException.h"
 
 namespace VirtualRobot
 {
     using std::cout;
     using std::endl;
 
-    RobotConfig::RobotConfig(RobotWeakPtr robot, const std::string& name)
-        : name(name),
-          robot(robot)
+    RobotConfig::RobotConfig(RobotWeakPtr robot, const std::string& name) : name(name), robot(robot)
     {
         THROW_VR_EXCEPTION_IF(!robot.lock(), "NULL robot in RobotConfig");
     }
 
-    RobotConfig::RobotConfig(RobotWeakPtr robot, const std::string& name, const std::vector< Configuration >& configs)
-        : name(name),
-          robot(robot)
+    RobotConfig::RobotConfig(RobotWeakPtr robot,
+                             const std::string& name,
+                             const std::vector<Configuration>& configs) :
+        name(name), robot(robot)
     {
         THROW_VR_EXCEPTION_IF(!robot.lock(), "NULL robot in RobotConfig");
 
@@ -30,9 +30,10 @@ namespace VirtualRobot
         }
     }
 
-    RobotConfig::RobotConfig(RobotWeakPtr robot, const std::string& name, const std::map< RobotNodePtr, float >& configs)
-        : name(name),
-          robot(robot)
+    RobotConfig::RobotConfig(RobotWeakPtr robot,
+                             const std::string& name,
+                             const std::map<RobotNodePtr, float>& configs) :
+        name(name), robot(robot)
     {
         THROW_VR_EXCEPTION_IF(!robot.lock(), "NULL robot in RobotConfig");
 
@@ -42,12 +43,15 @@ namespace VirtualRobot
         }
     }
 
-    RobotConfig::RobotConfig(RobotWeakPtr robot, const std::string& name, const std::vector< std::string >& robotNodes, const std::vector< float >& values)
-        : name(name),
-          robot(robot)
+    RobotConfig::RobotConfig(RobotWeakPtr robot,
+                             const std::string& name,
+                             const std::vector<std::string>& robotNodes,
+                             const std::vector<float>& values) :
+        name(name), robot(robot)
     {
         THROW_VR_EXCEPTION_IF(!robot.lock(), "NULL robot in RobotConfig");
-        THROW_VR_EXCEPTION_IF(robotNodes.size() != values.size(), "Vector sizes have to be equal in RobotConfig");
+        THROW_VR_EXCEPTION_IF(robotNodes.size() != values.size(),
+                              "Vector sizes have to be equal in RobotConfig");
 
         for (size_t i = 0; i < robotNodes.size(); i++)
         {
@@ -55,12 +59,15 @@ namespace VirtualRobot
         }
     }
 
-    RobotConfig::RobotConfig(RobotWeakPtr robot, const std::string& name, const std::vector< RobotNodePtr >& robotNodes, const std::vector< float >& values)
-        : name(name),
-          robot(robot)
+    RobotConfig::RobotConfig(RobotWeakPtr robot,
+                             const std::string& name,
+                             const std::vector<RobotNodePtr>& robotNodes,
+                             const std::vector<float>& values) :
+        name(name), robot(robot)
     {
         THROW_VR_EXCEPTION_IF(!robot.lock(), "NULL robot in RobotConfig");
-        THROW_VR_EXCEPTION_IF(robotNodes.size() != values.size(), "Vector sizes have to be equal in RobotConfig");
+        THROW_VR_EXCEPTION_IF(robotNodes.size() != values.size(),
+                              "Vector sizes have to be equal in RobotConfig");
 
         for (size_t i = 0; i < robotNodes.size(); i++)
         {
@@ -68,8 +75,8 @@ namespace VirtualRobot
         }
     }
 
-
-    void RobotConfig::print() const
+    void
+    RobotConfig::print() const
     {
         std::cout << "  Robot Config <" << name << ">" << std::endl;
 
@@ -79,12 +86,14 @@ namespace VirtualRobot
         }
     }
 
-    bool RobotConfig::setConfig(const Configuration& c)
+    bool
+    RobotConfig::setConfig(const Configuration& c)
     {
         return setConfig(c.name, c.value);
     }
 
-    bool RobotConfig::setConfig(const std::string& node, float value)
+    bool
+    RobotConfig::setConfig(const std::string& node, float value)
     {
         RobotPtr r = robot.lock();
 
@@ -106,7 +115,8 @@ namespace VirtualRobot
         return true;
     }
 
-    bool RobotConfig::setConfig(RobotNodePtr node, float value)
+    bool
+    RobotConfig::setConfig(RobotNodePtr node, float value)
     {
         THROW_VR_EXCEPTION_IF(!node, "Null data");
 
@@ -118,23 +128,28 @@ namespace VirtualRobot
             return false;
         }
 
-        THROW_VR_EXCEPTION_IF(!r->hasRobotNode(node), "RobotNode with name " << r->getName() << " does not belong to robot " << r->getName());
+        THROW_VR_EXCEPTION_IF(!r->hasRobotNode(node),
+                              "RobotNode with name " << r->getName() << " does not belong to robot "
+                                                     << r->getName());
 
         configs[node] = value;
         return true;
     }
 
-    VirtualRobot::RobotPtr RobotConfig::getRobot()
+    VirtualRobot::RobotPtr
+    RobotConfig::getRobot()
     {
         return robot.lock();
     }
 
-    std::string RobotConfig::getName() const
+    std::string
+    RobotConfig::getName() const
     {
         return name;
     }
 
-    RobotConfigPtr RobotConfig::clone(RobotPtr newRobot)
+    RobotConfigPtr
+    RobotConfig::clone(RobotPtr newRobot)
     {
         if (!newRobot)
         {
@@ -143,8 +158,8 @@ namespace VirtualRobot
 
         VR_ASSERT(newRobot);
 
-        std::map< RobotNodePtr, float > newConfigs;
-        std::map< RobotNodePtr, float >::iterator i = configs.begin();
+        std::map<RobotNodePtr, float> newConfigs;
+        std::map<RobotNodePtr, float>::iterator i = configs.begin();
 
         while (i != configs.end())
         {
@@ -152,7 +167,9 @@ namespace VirtualRobot
 
             if (!rn)
             {
-                VR_WARNING << "Could not completely clone RobotConfig " << name << " because new robot does not know a RobotNode with name " << i->first->getName() << std::endl;
+                VR_WARNING << "Could not completely clone RobotConfig " << name
+                           << " because new robot does not know a RobotNode with name "
+                           << i->first->getName() << std::endl;
             }
             else
             {
@@ -170,8 +187,8 @@ namespace VirtualRobot
         return result;
     }
 
-
-    bool RobotConfig::setJointValues()
+    bool
+    RobotConfig::setJointValues()
     {
         RobotPtr r = robot.lock();
 
@@ -183,7 +200,8 @@ namespace VirtualRobot
 
         WriteLockPtr lock = r->getWriteLock();
 
-        for (std::map< RobotNodePtr, float >::const_iterator i = configs.begin(); i != configs.end(); i++)
+        for (std::map<RobotNodePtr, float>::const_iterator i = configs.begin(); i != configs.end();
+             i++)
         {
             i->first->setJointValueNoUpdate(i->second);
         }
@@ -192,7 +210,8 @@ namespace VirtualRobot
         return true;
     }
 
-    bool RobotConfig::hasConfig(const std::string& name) const
+    bool
+    RobotConfig::hasConfig(const std::string& name) const
     {
         for (const auto& config : configs)
         {
@@ -205,7 +224,8 @@ namespace VirtualRobot
         return false;
     }
 
-    float RobotConfig::getConfig(const std::string& name) const
+    float
+    RobotConfig::getConfig(const std::string& name) const
     {
         if (!hasConfig(name))
         {
@@ -222,7 +242,7 @@ namespace VirtualRobot
 
         RobotNodePtr rn = r->getRobotNode(name);
         THROW_VR_EXCEPTION_IF(!rn, "Did not find robot node with name " << name);
-        std::map< RobotNodePtr, float >::const_iterator i = configs.find(rn);
+        std::map<RobotNodePtr, float>::const_iterator i = configs.find(rn);
 
         if (i == configs.end())
         {
@@ -233,10 +253,11 @@ namespace VirtualRobot
         return i->second;
     }
 
-    std::vector< RobotNodePtr > RobotConfig::getNodes() const
+    std::vector<RobotNodePtr>
+    RobotConfig::getNodes() const
     {
-        std::vector< RobotNodePtr > result;
-        std::map< RobotNodePtr, float >::const_iterator i = configs.begin();
+        std::vector<RobotNodePtr> result;
+        std::map<RobotNodePtr, float>::const_iterator i = configs.begin();
 
         while (i != configs.end())
         {
@@ -247,10 +268,11 @@ namespace VirtualRobot
         return result;
     }
 
-    std::map < std::string, float > RobotConfig::getRobotNodeJointValueMap()
+    std::map<std::string, float>
+    RobotConfig::getRobotNodeJointValueMap()
     {
-        std::map < std::string, float > result;
-        std::map< RobotNodePtr, float >::const_iterator i = configs.begin();
+        std::map<std::string, float> result;
+        std::map<RobotNodePtr, float>::const_iterator i = configs.begin();
 
         while (i != configs.end())
         {
@@ -275,7 +297,9 @@ namespace VirtualRobot
 
         return result;
     }
-    bool RobotConfig::setJointValues(RobotPtr r)
+
+    bool
+    RobotConfig::setJointValues(RobotPtr r)
     {
         if (!r)
         {
@@ -284,8 +308,8 @@ namespace VirtualRobot
 
         WriteLockPtr lock = r->getWriteLock();
 
-        std::map < std::string, float > jv = getRobotNodeJointValueMap();
-        std::map< std::string, float >::const_iterator i = jv.begin();
+        std::map<std::string, float> jv = getRobotNodeJointValueMap();
+        std::map<std::string, float>::const_iterator i = jv.begin();
 
         // first check if all nodes are present
         while (i != jv.end())
@@ -318,7 +342,8 @@ namespace VirtualRobot
         return true;
     }
 
-    bool RobotConfig::setTCP(const std::string& tcpName)
+    bool
+    RobotConfig::setTCP(const std::string& tcpName)
     {
         RobotPtr r = robot.lock();
 
@@ -340,13 +365,15 @@ namespace VirtualRobot
         return true;
     }
 
-    bool RobotConfig::setTCP(RobotNodePtr tcp)
+    bool
+    RobotConfig::setTCP(RobotNodePtr tcp)
     {
         tcpNode = tcp;
         return true;
     }
 
-    bool RobotConfig::hasTCP() const
+    bool
+    RobotConfig::hasTCP() const
     {
         if (tcpNode)
         {
@@ -355,15 +382,16 @@ namespace VirtualRobot
         return false;
     }
 
-    RobotNodePtr RobotConfig::getTCP()
+    RobotNodePtr
+    RobotConfig::getTCP()
     {
         return tcpNode;
     }
 
-
-    std::string RobotConfig::toXML(int tabs)
+    std::string
+    RobotConfig::toXML(int tabs)
     {
-        std::map < std::string, float > jv = getRobotNodeJointValueMap();
+        std::map<std::string, float> jv = getRobotNodeJointValueMap();
         std::string tcpName;
         if (tcpNode)
         {
@@ -372,7 +400,11 @@ namespace VirtualRobot
         return createXMLString(jv, name, tcpName, tabs);
     }
 
-    std::string RobotConfig::createXMLString(const std::map< std::string, float >& config, const std::string& name, const std::string& tcpName, int tabs/*=0*/)
+    std::string
+    RobotConfig::createXMLString(const std::map<std::string, float>& config,
+                                 const std::string& name,
+                                 const std::string& tcpName,
+                                 int tabs /*=0*/)
     {
         std::stringstream ss;
         std::string t;
@@ -397,11 +429,12 @@ namespace VirtualRobot
         ss << ">\n";
 
 
-        std::map< std::string, float >::const_iterator i = config.begin();
+        std::map<std::string, float>::const_iterator i = config.begin();
 
         while (i != config.end())
         {
-            ss << tt << "<Node name='" << i->first << "' unit='radian' value='" << i->second << "'/>\n";
+            ss << tt << "<Node name='" << i->first << "' unit='radian' value='" << i->second
+               << "'/>\n";
             i++;
         }
 

@@ -1,22 +1,25 @@
 #include "PoseQualityManipulability.h"
 
-#include "../Nodes/RobotNode.h"
-#include "../RobotNodeSet.h"
-#include "../Robot.h"
-#include "../IK/DifferentialIK.h"
-
-#include <Eigen/Geometry>
 #include <Eigen/Dense>
+#include <Eigen/Geometry>
+
+#include "../IK/DifferentialIK.h"
+#include "../Nodes/RobotNode.h"
+#include "../Robot.h"
+#include "../RobotNodeSet.h"
 
 using namespace std;
-
 
 namespace VirtualRobot
 {
 
 
-    PoseQualityManipulability::PoseQualityManipulability(VirtualRobot::RobotNodeSetPtr rns, ManipulabilityIndexType i)
-        : PoseQualityMeasurement(rns), manipulabilityType(i), penJointLimits(false), convertMMtoM(true)
+    PoseQualityManipulability::PoseQualityManipulability(VirtualRobot::RobotNodeSetPtr rns,
+                                                         ManipulabilityIndexType i) :
+        PoseQualityMeasurement(rns),
+        manipulabilityType(i),
+        penJointLimits(false),
+        convertMMtoM(true)
     {
         name = getTypeName();
         jacobian.reset(new VirtualRobot::DifferentialIK(rns, rns->getTCP()));
@@ -24,12 +27,10 @@ namespace VirtualRobot
         penalizeRotationFactor = 0.15f; // translation<->rotation factors
     }
 
+    PoseQualityManipulability::~PoseQualityManipulability() = default;
 
-    PoseQualityManipulability::~PoseQualityManipulability()
-    = default;
-
-
-    Eigen::MatrixXf PoseQualityManipulability::getSingularVectorCartesian()
+    Eigen::MatrixXf
+    PoseQualityManipulability::getSingularVectorCartesian()
     {
         if (verbose)
         {
@@ -81,14 +82,15 @@ namespace VirtualRobot
         return U;
     }
 
-
-
-    float PoseQualityManipulability::getManipulability(ManipulabilityIndexType i)
+    float
+    PoseQualityManipulability::getManipulability(ManipulabilityIndexType i)
     {
         return getManipulability(i, -1);
     }
 
-    float PoseQualityManipulability::getManipulability(const Eigen::VectorXf& direction, int /*considerFirstSV*/)
+    float
+    PoseQualityManipulability::getManipulability(const Eigen::VectorXf& direction,
+                                                 int /*considerFirstSV*/)
     {
         VR_ASSERT(direction.rows() == 3 || direction.rows() == 6);
         Eigen::VectorXf d(6);
@@ -125,10 +127,10 @@ namespace VirtualRobot
         }
 
         return result;
-
     }
 
-    float PoseQualityManipulability::getManipulability(ManipulabilityIndexType i, int considerFirstSV)
+    float
+    PoseQualityManipulability::getManipulability(ManipulabilityIndexType i, int considerFirstSV)
     {
         Eigen::VectorXf sv = getSingularValues();
 
@@ -184,17 +186,20 @@ namespace VirtualRobot
         return result;
     }
 
-    float PoseQualityManipulability::getPoseQuality()
+    float
+    PoseQualityManipulability::getPoseQuality()
     {
         return getManipulability(manipulabilityType);
     }
 
-    float PoseQualityManipulability::getPoseQuality(const Eigen::VectorXf& direction)
+    float
+    PoseQualityManipulability::getPoseQuality(const Eigen::VectorXf& direction)
     {
         return getManipulability(direction);
     }
 
-    Eigen::VectorXf PoseQualityManipulability::getSingularValues()
+    Eigen::VectorXf
+    PoseQualityManipulability::getSingularValues()
     {
         Eigen::MatrixXf jac = jacobian->getJacobianMatrix(rns->getTCP());
         // penalize rotation
@@ -203,13 +208,15 @@ namespace VirtualRobot
         return svd.singularValues();
     }
 
-    void PoseQualityManipulability::penalizeJointLimits(bool enable, float k /*= 50.0f*/)
+    void
+    PoseQualityManipulability::penalizeJointLimits(bool enable, float k /*= 50.0f*/)
     {
         penJointLimits = enable;
         penJointLimits_k = k;
     }
 
-    float PoseQualityManipulability::getJointLimitPenalizationFactor()
+    float
+    PoseQualityManipulability::getJointLimitPenalizationFactor()
     {
         VR_ASSERT(rns);
         float p = 1.0f;
@@ -218,7 +225,7 @@ namespace VirtualRobot
         {
             RobotNodePtr r = rns->getNode(i);
 
-            if(r->isLimitless())
+            if (r->isLimitless())
             {
                 continue;
             }
@@ -226,7 +233,8 @@ namespace VirtualRobot
             VR_ASSERT(r);
             float d = r->getJointLimitHi() - r->getJointLimitLo();
             d = d * d;
-            float a = (r->getJointValue() - r->getJointLimitLo()) * (r->getJointLimitHi() - r->getJointValue());
+            float a = (r->getJointValue() - r->getJointLimitLo()) *
+                      (r->getJointLimitHi() - r->getJointValue());
 
             if (d != 0)
             {
@@ -240,26 +248,30 @@ namespace VirtualRobot
         return result;
     }
 
-    std::string PoseQualityManipulability::getTypeName()
+    std::string
+    PoseQualityManipulability::getTypeName()
     {
         return std::string("PoseQualityManipulability");
     }
 
-    bool PoseQualityManipulability::consideringJointLimits()
+    bool
+    PoseQualityManipulability::consideringJointLimits()
     {
         return penJointLimits;
     }
 
-    PoseQualityMeasurementPtr PoseQualityManipulability::clone(RobotPtr newRobot)
+    PoseQualityMeasurementPtr
+    PoseQualityManipulability::clone(RobotPtr newRobot)
     {
         VR_ASSERT(newRobot);
         VR_ASSERT(newRobot->getRobotNodeSet(rns->getName()));
         VR_ASSERT(newRobot->getRobotNodeSet(rns->getName())->getSize() == rns->getSize());
 
-        PoseQualityManipulabilityPtr m(new PoseQualityManipulability(newRobot->getRobotNodeSet(rns->getName()), this->manipulabilityType));
+        PoseQualityManipulabilityPtr m(new PoseQualityManipulability(
+            newRobot->getRobotNodeSet(rns->getName()), this->manipulabilityType));
         m->penalizeJointLimits(this->penJointLimits, this->penJointLimits_k);
         return m;
     }
 
 
-}
+} // namespace VirtualRobot

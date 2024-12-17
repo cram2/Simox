@@ -22,10 +22,12 @@
 */
 #pragma once
 
-#include "../Saba.h"
 #include <vector>
+
 #include <Eigen/Core>
 #include <Eigen/Geometry>
+
+#include "../Saba.h"
 
 namespace Saba
 {
@@ -42,22 +44,21 @@ namespace Saba
     class SABA_IMPORT_EXPORT CSpaceNode
     {
     public:
-
         CSpaceNode();
         virtual ~CSpaceNode();
 
-        Eigen::VectorXf configuration;          //!< the configuration vector
-        int parentID;                           //!< id of parent (root node if < 0)
-        unsigned int ID;                        //!< id of CSpaceNode
+        Eigen::VectorXf configuration; //!< the configuration vector
+        int parentID; //!< id of parent (root node if < 0)
+        unsigned int ID; //!< id of CSpaceNode
 
         bool allocated;
 
         // optional
         int status;
-        float obstacleDistance;                 //!< work space distance to obstacles (-1 if the dist was not calculated)
-        float dynDomRadius;                     //!< radius for this node (used by dynamic domain RRTs)
-        std::vector<CSpaceNodePtr> children;    //!< children of this node
+        float
+            obstacleDistance; //!< work space distance to obstacles (-1 if the dist was not calculated)
+        float dynDomRadius; //!< radius for this node (used by dynamic domain RRTs)
+        std::vector<CSpaceNodePtr> children; //!< children of this node
     };
 
-} // nameaspace
-
+} // namespace Saba

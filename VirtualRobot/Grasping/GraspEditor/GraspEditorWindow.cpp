@@ -4,7 +4,6 @@
 #include <cmath>
 #include <ctime>
 #include <iostream>
-#include <ostream>
 #include <sstream>
 #include <vector>
 
@@ -29,7 +28,6 @@
 #include "VirtualRobot/XML/ObjectIO.h"
 #include "VirtualRobot/XML/RobotIO.h"
 #include "Visualization/CoinVisualization/CoinVisualizationNode.h"
-#include "spnav.h"
 #include "ui_GraspEditor.h"
 #include <Inventor/nodes/SoEventCallback.h>
 #include <Inventor/nodes/SoLightModel.h>

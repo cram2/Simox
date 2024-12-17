@@ -4,14 +4,14 @@
 * @copyright  2018 Rainer Kartmann
 */
 
-#define BOOST_TEST_MODULE SimoxUtility/json/IOTest
-
-#include <boost/test/included/unit_test.hpp>
+#define BOOST_TEST_MODULE SimoxUtility / json / IOTest
 
 #include <filesystem>
 
-#include <SimoxUtility/json/io.h>
+#include <boost/test/included/unit_test.hpp>
+
 #include <SimoxUtility/json/error.h>
+#include <SimoxUtility/json/io.h>
 
 
 namespace fs = std::filesystem;
@@ -21,7 +21,6 @@ struct Fixture
     const std::string FILENAME = "JsonIOTest.json";
 
     simox::json::json testj;
-
 
     Fixture()
     {
@@ -33,6 +32,7 @@ struct Fixture
             fs::remove(FILENAME);
         }
     }
+
     ~Fixture()
     {
         if (fs::is_regular_file(FILENAME))
@@ -44,7 +44,6 @@ struct Fixture
 
 
 BOOST_FIXTURE_TEST_SUITE(JsonIOTest, Fixture)
-
 
 BOOST_AUTO_TEST_CASE(test_read_json_existent)
 {
@@ -64,7 +63,6 @@ BOOST_AUTO_TEST_CASE(test_read_json_existent)
     BOOST_CHECK_EQUAL(j.at("i").get<int>(), testj.at("i").get<int>());
 }
 
-
 BOOST_AUTO_TEST_CASE(test_read_json_nonexistent)
 {
     // Ensure file does not exist.
@@ -74,7 +72,6 @@ BOOST_AUTO_TEST_CASE(test_read_json_nonexistent)
     simox::json::json j;
     BOOST_CHECK_THROW(j = simox::json::read(FILENAME), simox::json::error::IOError);
 }
-
 
 BOOST_AUTO_TEST_CASE(test_write_json_valid)
 {
@@ -86,7 +83,6 @@ BOOST_AUTO_TEST_CASE(test_write_json_valid)
     // Check that something has been written.
     BOOST_CHECK(fs::exists(FILENAME));
 }
-
 
 BOOST_AUTO_TEST_CASE(test_write_json_invalid)
 {
@@ -104,7 +100,6 @@ BOOST_AUTO_TEST_CASE(test_write_json_invalid)
     BOOST_CHECK(!fs::exists(FILENAME));
 }
 
-
 BOOST_AUTO_TEST_CASE(test_read_after_write_json)
 {
     // Ensure file does not exist.
@@ -121,7 +116,6 @@ BOOST_AUTO_TEST_CASE(test_read_after_write_json)
     BOOST_CHECK_EQUAL(j.at("s").get<std::string>(), testj.at("s").get<std::string>());
     BOOST_CHECK_EQUAL(j.at("i").get<int>(), testj.at("i").get<int>());
 }
-
 
 
 BOOST_AUTO_TEST_SUITE_END()

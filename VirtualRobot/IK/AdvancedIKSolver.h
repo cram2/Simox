@@ -22,16 +22,13 @@
 */
 #pragma once
 
-#include "../VirtualRobot.h"
-
-#include "../Nodes/RobotNode.h"
-#include "../RobotNodeSet.h"
-#include "IKSolver.h"
-
 #include <string>
 #include <vector>
 
-
+#include "../Nodes/RobotNode.h"
+#include "../RobotNodeSet.h"
+#include "../VirtualRobot.h"
+#include "IKSolver.h"
 
 namespace VirtualRobot
 {
@@ -42,10 +39,11 @@ namespace VirtualRobot
     * Can consider reachability information.
     * Can handle ManipulationObjects and associated grasping information.
     */
-    class VIRTUAL_ROBOT_IMPORT_EXPORT AdvancedIKSolver : public IKSolver, public std::enable_shared_from_this<AdvancedIKSolver>
+    class VIRTUAL_ROBOT_IMPORT_EXPORT AdvancedIKSolver :
+        public IKSolver,
+        public std::enable_shared_from_this<AdvancedIKSolver>
     {
     public:
-
         /*!
             @brief Initialize a IK solver without collision detection.
             \param rns The robotNodes (i.e., joints) for which the Jacobians should be calculated.
@@ -75,13 +73,13 @@ namespace VirtualRobot
         virtual void collisionDetection(CDManagerPtr avoidCollision);
 
 
-
         /*!
             Here, the default values of the maximum allowed error in translation and orientation can be changed.
             \param maxErrorPositionMM The maximum position error that is allowed, given in millimeter.
             \param maxErrorOrientationRad The maximum orientation error that is allowed, given in radian (0.02 is approx 1 degree).
         */
-        virtual void setMaximumError(float maxErrorPositionMM = 1.0f, float maxErrorOrientationRad = 0.02);
+        virtual void setMaximumError(float maxErrorPositionMM = 1.0f,
+                                     float maxErrorOrientationRad = 0.02);
 
         /*!
             When set, the reachability data is used to quickly decide if a given pose or grasp is reachable or not.
@@ -96,8 +94,9 @@ namespace VirtualRobot
             \param maxLoops An optional parameter, if multiple tries should be made
             \return true on success
         */
-        virtual bool solve(const Eigen::Matrix4f& globalPose, CartesianSelection selection = All, int maxLoops = 1) = 0;
-
+        virtual bool solve(const Eigen::Matrix4f& globalPose,
+                           CartesianSelection selection = All,
+                           int maxLoops = 1) = 0;
 
 
         /*!
@@ -106,7 +105,8 @@ namespace VirtualRobot
             \param selection Select the parts of the global pose that should be used for IK solving. (e.g. you can just consider the position and ignore the target orientation)
             \return The joint angles are returned as std::vector
         */
-        virtual std::vector<float> solveNoRNSUpdate(const Eigen::Matrix4f& globalPose, CartesianSelection selection = All);
+        virtual std::vector<float> solveNoRNSUpdate(const Eigen::Matrix4f& globalPose,
+                                                    CartesianSelection selection = All);
 
         /*!
             Convenient method to solve IK queries without considering orientations.
@@ -120,15 +120,23 @@ namespace VirtualRobot
             \param maxLoops How many tries.
             \return On success: The grasp for which an IK-solution was found, otherwise an empty GraspPtr
         */
-        virtual GraspPtr solve(ManipulationObjectPtr object, CartesianSelection selection = All, int maxLoops = 1);
-        virtual bool solve(ManipulationObjectPtr object, GraspPtr grasp, CartesianSelection selection = All, int maxLoops = 1);
+        virtual GraspPtr
+        solve(ManipulationObjectPtr object, CartesianSelection selection = All, int maxLoops = 1);
+        virtual bool solve(ManipulationObjectPtr object,
+                           GraspPtr grasp,
+                           CartesianSelection selection = All,
+                           int maxLoops = 1);
 
 
         /*!
             Try to find a solution for grasping the object with the given GraspSet.
             \return On success: The grasp for which an IK-solution was found, otherwise an empty GraspPtr
         */
-        virtual GraspPtr sampleSolution(ManipulationObjectPtr object, GraspSetPtr graspSet, CartesianSelection selection = All, bool removeGraspFromSet = false, int maxLoops = 1);
+        virtual GraspPtr sampleSolution(ManipulationObjectPtr object,
+                                        GraspSetPtr graspSet,
+                                        CartesianSelection selection = All,
+                                        bool removeGraspFromSet = false,
+                                        int maxLoops = 1);
 
         /*!
             This method returns true, when no reachability data is specified for this IK solver.
@@ -143,10 +151,11 @@ namespace VirtualRobot
         void setVerbose(bool enable);
 
     protected:
-
-
         //! This method should deliver solution sample out of the set of possible solutions
-        virtual bool _sampleSolution(const Eigen::Matrix4f& globalPose, CartesianSelection selection, int maxLoops = 1)
+        virtual bool
+        _sampleSolution(const Eigen::Matrix4f& globalPose,
+                        CartesianSelection selection,
+                        int maxLoops = 1)
         {
             return solve(globalPose, selection, maxLoops);
         }
@@ -166,4 +175,3 @@ namespace VirtualRobot
 
     typedef std::shared_ptr<AdvancedIKSolver> AdvancedIKSolverPtr;
 } // namespace VirtualRobot
-

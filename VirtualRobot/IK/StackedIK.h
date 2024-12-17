@@ -22,12 +22,11 @@
 */
 #pragma once
 
-#include "VirtualRobot/VirtualRobot.h"
-#include "VirtualRobot/IK/JacobiProvider.h"
-#include "VirtualRobot/RobotNodeSet.h"
-#include "VirtualRobot/Nodes/RobotNode.h"
 #include "VirtualRobot/IK/HierarchicalIK.h"
-
+#include "VirtualRobot/IK/JacobiProvider.h"
+#include "VirtualRobot/Nodes/RobotNode.h"
+#include "VirtualRobot/RobotNodeSet.h"
+#include "VirtualRobot/VirtualRobot.h"
 
 namespace VirtualRobot
 {
@@ -36,11 +35,13 @@ namespace VirtualRobot
     public:
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-        StackedIK(RobotNodeSetPtr rns, JacobiProvider::InverseJacobiMethod method = JacobiProvider::eSVD);
+        StackedIK(RobotNodeSetPtr rns,
+                  JacobiProvider::InverseJacobiMethod method = JacobiProvider::eSVD);
 
         virtual ~StackedIK();
 
-        Eigen::VectorXf computeStep(const std::vector<JacobiProviderPtr>& jacDefs, float stepSize = 0.2f);
+        Eigen::VectorXf computeStep(const std::vector<JacobiProviderPtr>& jacDefs,
+                                    float stepSize = 0.2f);
 
         void setVerbose(bool v);
 
@@ -53,6 +54,3 @@ namespace VirtualRobot
     typedef std::shared_ptr<StackedIK> StackedIKPtr;
 
 } // namespace VirtualRobot
-
-
-

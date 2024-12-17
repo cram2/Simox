@@ -1,23 +1,22 @@
 
 #include "ContactSensor.h"
-#include "ContactSensorFactory.h"
+
 #include "../XML/BaseIO.h"
+#include "ContactSensorFactory.h"
 
 namespace VirtualRobot
 {
 
     ContactSensor::ContactSensor(GraspableSensorizedObjectWeakPtr parentNode,
-                                 const std::string& name)
-        : Sensor(parentNode, name)
-        , timestamp(0.0)
+                                 const std::string& name) :
+        Sensor(parentNode, name), timestamp(0.0)
     {
     }
 
+    ContactSensor::~ContactSensor() = default;
 
-    ContactSensor::~ContactSensor()
-    = default;
-
-    void ContactSensor::print(bool printChildren, bool printDecoration) const
+    void
+    ContactSensor::print(bool printChildren, bool printDecoration) const
     {
         if (printDecoration)
         {
@@ -27,14 +26,17 @@ namespace VirtualRobot
         Sensor::print(printChildren, false);
     }
 
-
-    SensorPtr ContactSensor::_clone(const GraspableSensorizedObjectPtr newParentNode, const VisualizationNodePtr /*visualizationModel*/, float /*scaling*/)
+    SensorPtr
+    ContactSensor::_clone(const GraspableSensorizedObjectPtr newParentNode,
+                          const VisualizationNodePtr /*visualizationModel*/,
+                          float /*scaling*/)
     {
-        SensorPtr result(new ContactSensor(newParentNode, name/*, rnTransformation*/));
+        SensorPtr result(new ContactSensor(newParentNode, name /*, rnTransformation*/));
         return result;
     }
 
-    std::string ContactSensor::toXML(const std::string& /*modelPath*/, int tabs)
+    std::string
+    ContactSensor::toXML(const std::string& /*modelPath*/, int tabs)
     {
         std::stringstream ss;
         std::string t = "\t";
@@ -51,7 +53,8 @@ namespace VirtualRobot
         return ss.str();
     }
 
-    void ContactSensor::updateSensors(const ContactSensor::ContactFrame& frame, double dt)
+    void
+    ContactSensor::updateSensors(const ContactSensor::ContactFrame& frame, double dt)
     {
         this->frame = frame;
         timestamp += dt;

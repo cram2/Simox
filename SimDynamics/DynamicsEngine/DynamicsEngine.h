@@ -26,7 +26,6 @@
 #include "DynamicsObject.h"
 #include "DynamicsRobot.h"
 
-
 namespace SimDynamics
 {
     /*!
@@ -41,11 +40,12 @@ namespace SimDynamics
             gravity << 0, 0, -9.81f;
         }
 
-        virtual ~DynamicsEngineConfig() {}
+        virtual ~DynamicsEngineConfig()
+        {
+        }
 
         Eigen::Vector3f gravity;
     };
-
 
     typedef std::shared_ptr<DynamicsEngineConfig> DynamicsEngineConfigPtr;
 
@@ -62,7 +62,8 @@ namespace SimDynamics
             Constructor
             \param engineMutex Optionally, all engine access methods can be protected by an external mutex. If not set, an internal mutex is creeated.
         */
-        DynamicsEngine(std::shared_ptr <std::recursive_mutex> engineMutex = std::shared_ptr<std::recursive_mutex>());
+        DynamicsEngine(std::shared_ptr<std::recursive_mutex> engineMutex =
+                           std::shared_ptr<std::recursive_mutex>());
 
         /*!
         */
@@ -73,7 +74,7 @@ namespace SimDynamics
         */
         virtual bool init(DynamicsEngineConfigPtr config);
 
-        void setMutex(std::shared_ptr <std::recursive_mutex> engineMutex);
+        void setMutex(std::shared_ptr<std::recursive_mutex> engineMutex);
 
         Eigen::Vector3f getGravity();
 
@@ -83,8 +84,12 @@ namespace SimDynamics
         virtual bool addRobot(DynamicsRobotPtr r);
         virtual bool removeRobot(DynamicsRobotPtr r);
 
-        virtual bool attachObjectToRobot(const std::string& robotName, const std::string& nodeName, DynamicsObjectPtr object);
-        virtual bool attachObjectToRobot(DynamicsRobotPtr r, const std::string& nodeName, DynamicsObjectPtr object);
+        virtual bool attachObjectToRobot(const std::string& robotName,
+                                         const std::string& nodeName,
+                                         DynamicsObjectPtr object);
+        virtual bool attachObjectToRobot(DynamicsRobotPtr r,
+                                         const std::string& nodeName,
+                                         DynamicsObjectPtr object);
 
         virtual bool detachObjectFromRobot(const std::string& robotName, DynamicsObjectPtr object);
         virtual bool detachObjectFromRobot(DynamicsRobotPtr r, DynamicsObjectPtr object);
@@ -109,7 +114,9 @@ namespace SimDynamics
             Set floor. A standard floor object is created and added to the dynamics world.
             \param friction If <=0.0, the standard friction parameter for novel objects is used.
         */
-        virtual void createFloorPlane(const Eigen::Vector3f& pos, const Eigen::Vector3f& up, float friction = 0.0f);
+        virtual void createFloorPlane(const Eigen::Vector3f& pos,
+                                      const Eigen::Vector3f& up,
+                                      float friction = 0.0f);
 
         virtual void removeFloorPlane();
         /*!
@@ -140,7 +147,8 @@ namespace SimDynamics
         */
         virtual bool checkCollisionEnabled(DynamicsObject* o1);
 
-        DynamicsObjectPtr getFloor()
+        DynamicsObjectPtr
+        getFloor()
         {
             return floor;
         }
@@ -148,7 +156,10 @@ namespace SimDynamics
         /*!
            Stores current floor description to floorPos and floorUp.
         */
-        void getFloorInfo(Eigen::Vector3f& floorPos, Eigen::Vector3f& floorUp, double& floorExtendMM, double& floorDepthMM);
+        void getFloorInfo(Eigen::Vector3f& floorPos,
+                          Eigen::Vector3f& floorUp,
+                          double& floorExtendMM,
+                          double& floorDepthMM);
 
         struct DynamicsContactInfo
         {
@@ -183,7 +194,7 @@ namespace SimDynamics
         */
         virtual void activateAllObjects();
 
-        typedef std::shared_ptr< std::scoped_lock<std::recursive_mutex> > MutexLockPtr;
+        typedef std::shared_ptr<std::scoped_lock<std::recursive_mutex>> MutexLockPtr;
 
         /*!
             This lock can be used to protect data access. It locks the mutex until deletion.
@@ -208,7 +219,7 @@ namespace SimDynamics
         std::vector<DynamicsObjectPtr> objects;
         std::vector<DynamicsRobotPtr> robots;
 
-        std::map < DynamicsObject*, std::vector<DynamicsObject*> > collisionDisabled;
+        std::map<DynamicsObject*, std::vector<DynamicsObject*>> collisionDisabled;
         std::vector<DynamicsObject*> collisionToAllDisabled;
         DynamicsObjectPtr floor;
 
@@ -218,12 +229,10 @@ namespace SimDynamics
         double floorExtendMM;
         double floorDepthMM;
 
-        std::shared_ptr <std::recursive_mutex> engineMutexPtr;
-
+        std::shared_ptr<std::recursive_mutex> engineMutexPtr;
     };
 
     typedef std::shared_ptr<DynamicsEngine> DynamicsEnginePtr;
 
 
 } // namespace SimDynamics
-

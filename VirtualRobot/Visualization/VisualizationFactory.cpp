@@ -8,7 +8,6 @@
 
 #include <VirtualRobot/Visualization/VisualizationNode.h>
 
-
 namespace VirtualRobot
 {
 
@@ -21,7 +20,6 @@ namespace VirtualRobot
             visu->setLocalPose(displacement);
         }
     }
-
 
     VisualizationNodePtr
     VisualizationFactory::createBox(float /*width*/,
@@ -91,7 +89,6 @@ namespace VirtualRobot
         return nullptr;
     }
 
-
     VisualizationNodePtr
     VisualizationFactory::createTorus(float /*radius*/,
                                       float /*tubeRadius*/,
@@ -112,6 +109,7 @@ namespace VirtualRobot
     {
         return nullptr;
     }
+
     VisualizationNodePtr
     VisualizationFactory::createText(const std::string& /*text*/,
                                      bool /*billboard*/,
@@ -160,10 +158,10 @@ namespace VirtualRobot
     }
 
     VisualizationNodePtr
-    VisualizationFactory::createArrow(const Eigen::Vector3f&  /*n*/,
-                                      float  /*length*/,
-                                      float  /*width*/,
-                                      const Color&  /*color*/)
+    VisualizationFactory::createArrow(const Eigen::Vector3f& /*n*/,
+                                      float /*length*/,
+                                      float /*width*/,
+                                      const Color& /*color*/)
     {
         return nullptr;
     }

@@ -22,15 +22,14 @@
 */
 #pragma once
 
-#include "GraspStudio.h"
-#include "ApproachMovementGenerator.h"
-
-#include <VirtualRobot/SceneObject.h>
-
 #include <memory>
 #include <random>
 #include <vector>
 
+#include <VirtualRobot/SceneObject.h>
+
+#include "ApproachMovementGenerator.h"
+#include "GraspStudio.h"
 
 namespace GraspStudio
 {
@@ -62,8 +61,10 @@ namespace GraspStudio
          *      If true, the probability of a face being selected is proportional to its area.
          *      If false, all faces are selected with equal probability.
         */
-        ApproachMovementSurfaceNormal(VirtualRobot::SceneObjectPtr object, VirtualRobot::EndEffectorPtr eef,
-                                      const std::string& graspPreshape = "", float maxRetreatDist = 0.0f,
+        ApproachMovementSurfaceNormal(VirtualRobot::SceneObjectPtr object,
+                                      VirtualRobot::EndEffectorPtr eef,
+                                      const std::string& graspPreshape = "",
+                                      float maxRetreatDist = 0.0f,
                                       bool useFaceAreaDistribution = false);
         //! Destructor
         virtual ~ApproachMovementSurfaceNormal() override;
@@ -75,7 +76,8 @@ namespace GraspStudio
         bool getPositionOnObject(Eigen::Vector3f& storePos, Eigen::Vector3f& storeApproachDir);
 
         //! Sets EEF to a position so that the Z component of the GCP coord system is aligned with -approachDir
-        bool virtual setEEFToApproachPose(const Eigen::Vector3f& position, const Eigen::Vector3f& approachDir);
+        bool virtual setEEFToApproachPose(const Eigen::Vector3f& position,
+                                          const Eigen::Vector3f& approachDir);
 
         void moveEEFAway(const Eigen::Vector3f& approachDir, float step, int maxLoops = 1000);
 
@@ -84,9 +86,8 @@ namespace GraspStudio
 
 
     protected:
-
         /// The random engine.
-        std::default_random_engine randomEngine { std::random_device{}() };
+        std::default_random_engine randomEngine{std::random_device{}()};
 
         /// Uniform distribiton over face indices.
         std::uniform_int_distribution<std::size_t> distribUniform;
@@ -101,7 +102,5 @@ namespace GraspStudio
 
         /// Distribution to draw random retreat distances from.
         std::uniform_real_distribution<float> distribRetreatDistance;
-
     };
-}
-
+} // namespace GraspStudio

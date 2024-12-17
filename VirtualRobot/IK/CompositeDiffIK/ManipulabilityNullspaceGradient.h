@@ -17,12 +17,12 @@
 */
 
 #pragma once
-#include "CompositeDiffIK.h"
-#include <VirtualRobot/Manipulability/AbstractManipulabilityTracking.h>
-
 #include <memory>
 #include <set>
 
+#include <VirtualRobot/Manipulability/AbstractManipulabilityTracking.h>
+
+#include "CompositeDiffIK.h"
 
 namespace VirtualRobot
 {
@@ -31,7 +31,8 @@ namespace VirtualRobot
     public:
         NullspaceManipulability(AbstractManipulabilityTrackingPtr manipulabilityTracking,
                                 const Eigen::MatrixXd& manipulabilityDesired,
-                                const Eigen::MatrixXd &gainMatrix = Eigen::MatrixXd(), bool jointLimitAvoidance = false);
+                                const Eigen::MatrixXd& gainMatrix = Eigen::MatrixXd(),
+                                bool jointLimitAvoidance = false);
 
         AbstractManipulabilityTrackingPtr manipulabilityTracking;
         Eigen::MatrixXd manipulabilityDesired;
@@ -46,4 +47,4 @@ namespace VirtualRobot
         std::vector<CompositeDiffIK::NullspaceTargetStep> ikSteps;
     };
     typedef std::shared_ptr<class NullspaceManipulability> NullspaceManipulabilityPtr;
-}
+} // namespace VirtualRobot

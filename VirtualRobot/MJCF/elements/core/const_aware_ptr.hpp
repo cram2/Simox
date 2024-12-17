@@ -1,27 +1,50 @@
 #pragma once
 
-namespace mjcf { namespace detail
+namespace mjcf
 {
-
-    template <typename T>
-    class const_aware_ptr
+    namespace detail
     {
-    public:
-      const_aware_ptr(T* p = nullptr) : _p(p) {}
 
-      //void operator=(T* p) { this->_p = p; }
+        template <typename T>
+        class const_aware_ptr
+        {
+        public:
+            const_aware_ptr(T* p = nullptr) : _p(p)
+            {
+            }
 
-      operator T*() { return _p; }
-      operator const T*() const { return _p; }
+            //void operator=(T* p) { this->_p = p; }
 
-      operator bool() const { return _p; }
+            operator T*()
+            {
+                return _p;
+            }
 
-      T* operator->() { return _p; }
-      const T* operator->() const { return _p; }
+            operator const T*() const
+            {
+                return _p;
+            }
 
-    private:
-      T* _p;
+            operator bool() const
+            {
+                return _p;
+            }
 
-    };
+            T*
+            operator->()
+            {
+                return _p;
+            }
 
-}}
+            const T*
+            operator->() const
+            {
+                return _p;
+            }
+
+        private:
+            T* _p;
+        };
+
+    } // namespace detail
+} // namespace mjcf

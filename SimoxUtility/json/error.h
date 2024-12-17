@@ -2,7 +2,6 @@
 
 #include <SimoxUtility/error/SimoxError.h>
 
-
 namespace simox::json::error
 {
 
@@ -14,7 +13,6 @@ namespace simox::json::error
         JsonError(const std::string& message);
     };
 
-
     /**
      * @brief Indicates that IO access to a file failed.
      */
@@ -23,7 +21,6 @@ namespace simox::json::error
         IOError(const std::string& msg);
     };
 
-
     /**
      * @brief Indicates that a JSON file could not be parsed.
      */
@@ -31,7 +28,6 @@ namespace simox::json::error
     {
         ParseError(const std::string& msg);
     };
-
 
     /**
      * @brief Indicates that a JSON document could not be converted to a
@@ -42,4 +38,4 @@ namespace simox::json::error
         ConversionError(const std::string& msg);
     };
 
-}
+} // namespace simox::json::error

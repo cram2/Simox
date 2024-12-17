@@ -20,20 +20,18 @@
  *             GNU General Public License
  */
 
-#define BOOST_TEST_MODULE SimoxUtility/color/Color
+#define BOOST_TEST_MODULE SimoxUtility / color / Color
+
+#include <iostream>
 
 #include <boost/test/included/unit_test.hpp>
 
 #include <SimoxUtility/color/Color.h>
 
-#include <iostream>
-
-
 namespace
 {
 
 }
-
 
 BOOST_AUTO_TEST_CASE(test_fromRGBA_int_vs_float)
 {
@@ -41,7 +39,6 @@ BOOST_AUTO_TEST_CASE(test_fromRGBA_int_vs_float)
     BOOST_CHECK_EQUAL(simox::Color(127, 127, 127), simox::Color(.5f, .5f, .5f));
     BOOST_CHECK_EQUAL(simox::Color(255, 255, 255), simox::Color(1.f, 1.f, 1.f));
 }
-
 
 BOOST_AUTO_TEST_CASE(test_fromRGBA_from_vector3)
 {

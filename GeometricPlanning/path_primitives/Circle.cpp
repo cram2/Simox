@@ -6,7 +6,6 @@
 
 #include <GeometricPlanning/assert/assert.h>
 
-
 namespace simox::geometric_planning
 {
 
@@ -34,7 +33,7 @@ namespace simox::geometric_planning
     Circle::getPositionDerivative([[maybe_unused]] float t) const
     {
         // REQUIRE(parameterRange().isInRange(t));
-        
+
 
         // return radius * Eigen::Vector3f(-std::sin(t + M_PI_2f32), std::cos(t + M_PI_2f32), 0.0F);
 

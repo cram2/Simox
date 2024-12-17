@@ -8,6 +8,12 @@
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
+#include <GeometricPlanning/ParametricPath.h>
+#include <GeometricPlanning/assert/assert.h>
+#include <GeometricPlanning/path_primitives/CircleSegment.h>
+#include <GeometricPlanning/path_primitives/Line.h>
+#include <GeometricPlanning/path_primitives/PathPrimitive.h>
+#include <GeometricPlanning/types.h>
 #include <SimoxUtility/algorithm/string/string_tools.h>
 #include <VirtualRobot/MathTools.h>
 #include <VirtualRobot/Nodes/RobotNode.h>
@@ -20,13 +26,6 @@
 #include <VirtualRobot/math/AbstractFunctionR1R6.h>
 
 #include "VirtualRobot/VirtualRobotException.h"
-#include <GeometricPlanning/ParametricPath.h>
-#include <GeometricPlanning/assert/assert.h>
-#include <GeometricPlanning/path_primitives/CircleSegment.h>
-#include <GeometricPlanning/path_primitives/Line.h>
-#include <GeometricPlanning/path_primitives/PathPrimitive.h>
-#include <GeometricPlanning/types.h>
-
 
 namespace simox::geometric_planning
 {
@@ -64,7 +63,8 @@ namespace simox::geometric_planning
             // hack: the above is not working reliably of URDF models.
             // therefore, we only accept joints with name matching "***_joint"
 
-            return simox::alg::ends_with(node->getName(), "joint") and (node->isRotationalJoint() or node->isTranslationalJoint());
+            return simox::alg::ends_with(node->getName(), "joint") and
+                   (node->isRotationalJoint() or node->isTranslationalJoint());
         };
 
         // validate assumption
@@ -281,7 +281,8 @@ namespace simox::geometric_planning
         const Eigen::Isometry3f global_T_node(node->getGlobalPose());
         const Eigen::Isometry3f global_T_jointReference(jointReferenceNode->getGlobalPose());
 
-        const Eigen::Isometry3f jointReference_T_node = global_T_jointReference.inverse() * global_T_node;
+        const Eigen::Isometry3f jointReference_T_node =
+            global_T_jointReference.inverse() * global_T_node;
         // jointRef_T_node = jointRef_T_global * global_T_node
 
         return ParametricPath(

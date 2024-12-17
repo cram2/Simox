@@ -23,17 +23,24 @@
 
 #pragma once
 
-#include "VirtualRobot/VirtualRobot.h"
 #include "VirtualRobot/IK/Constraint.h"
 #include "VirtualRobot/IK/DifferentialIK.h"
+#include "VirtualRobot/VirtualRobot.h"
 
 namespace VirtualRobot
 {
-    class VIRTUAL_ROBOT_IMPORT_EXPORT OrientationConstraint : public Constraint, public std::enable_shared_from_this<OrientationConstraint>
+    class VIRTUAL_ROBOT_IMPORT_EXPORT OrientationConstraint :
+        public Constraint,
+        public std::enable_shared_from_this<OrientationConstraint>
     {
     public:
-        OrientationConstraint(const RobotPtr& robot, const RobotNodeSetPtr& nodeSet, const SceneObjectPtr& eef, const Eigen::Matrix3f& target,
-                       IKSolver::CartesianSelection cartesianSelection = IKSolver::All, float tolerance = 1.0f * M_PI / 180.0f, bool soft=false);
+        OrientationConstraint(const RobotPtr& robot,
+                              const RobotNodeSetPtr& nodeSet,
+                              const SceneObjectPtr& eef,
+                              const Eigen::Matrix3f& target,
+                              IKSolver::CartesianSelection cartesianSelection = IKSolver::All,
+                              float tolerance = 1.0f * M_PI / 180.0f,
+                              bool soft = false);
 
         double optimizationFunction(unsigned int id) override;
         Eigen::VectorXf optimizationGradient(unsigned int id) override;
@@ -48,11 +55,7 @@ namespace VirtualRobot
         DifferentialIKPtr ik;
         IKSolver::CartesianSelection cartesianSelection;
         float tolerance;
-
     };
 
     typedef std::shared_ptr<OrientationConstraint> OrientationConstraintPtr;
-}
-
-
-
+} // namespace VirtualRobot

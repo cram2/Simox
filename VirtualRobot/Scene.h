@@ -22,11 +22,12 @@
 */
 #pragma once
 
-#include "VirtualRobot.h"
 #include "SceneObject.h"
+#include "VirtualRobot.h"
 // #include "Visualization/CoinVisualization/CoinVisualization.h"
 
 #include <vector>
+
 #include <Eigen/Core>
 
 namespace VirtualRobot
@@ -63,7 +64,7 @@ namespace VirtualRobot
 
         RobotPtr getRobot(const std::string& name);
 
-        std::vector< RobotPtr > getRobots();
+        std::vector<RobotPtr> getRobots();
 
 
         /*!
@@ -84,7 +85,7 @@ namespace VirtualRobot
         RobotConfigPtr getRobotConfig(const std::string& robotName, const std::string& name);
         RobotConfigPtr getRobotConfig(RobotPtr robot, const std::string& name);
 
-        std::vector< RobotConfigPtr > getRobotConfigs(RobotPtr robot);
+        std::vector<RobotConfigPtr> getRobotConfigs(RobotPtr robot);
 
         /*!
             Registers the ManipulationObject to this scene. If an ManipulationObject with the same name is already registered nothing happens.
@@ -102,7 +103,7 @@ namespace VirtualRobot
 
         ManipulationObjectPtr getManipulationObject(const std::string& name);
 
-        std::vector< ManipulationObjectPtr > getManipulationObjects();
+        std::vector<ManipulationObjectPtr> getManipulationObjects();
 
         /*!
             Registers the obstacle to this scene. If an obstacle with the same name is already registered nothing happens.
@@ -120,7 +121,7 @@ namespace VirtualRobot
 
         ObstaclePtr getObstacle(const std::string& name);
 
-        std::vector< ObstaclePtr > getObstacles();
+        std::vector<ObstaclePtr> getObstacles();
 
 
         /*!
@@ -139,10 +140,8 @@ namespace VirtualRobot
 
         TrajectoryPtr getTrajectory(const std::string& name);
 
-        std::vector< TrajectoryPtr > getTrajectories();
-        std::vector< TrajectoryPtr > getTrajectories(const std::string& robotName);
-
-
+        std::vector<TrajectoryPtr> getTrajectories();
+        std::vector<TrajectoryPtr> getTrajectories(const std::string& robotName);
 
 
         /*!
@@ -161,10 +160,7 @@ namespace VirtualRobot
 
         SceneObjectSetPtr getSceneObjectSet(const std::string& name);
 
-        std::vector< SceneObjectSetPtr > getSceneObjectSets();
-
-
-
+        std::vector<SceneObjectSetPtr> getSceneObjectSets();
 
 
         RobotNodeSetPtr getRobotNodeSet(const std::string& robot, const std::string rns);
@@ -180,8 +176,13 @@ namespace VirtualRobot
                  visualisationNode = visualization->getCoinVisualization();
         */
         // template <typename T> std::shared_ptr<T> getVisualization(SceneObject::VisualizationType visuType = SceneObject::Full, bool addRobots = true, bool addObstacles = true, bool addManipulationObjects = true, bool addTrajectories = true, bool addSceneObjectSets = true);
-        std::shared_ptr<CoinVisualization> getVisualization(SceneObject::VisualizationType visuType = SceneObject::Full, bool addRobots = true, bool addObstacles = true, bool addManipulationObjects = true, bool addTrajectories = true, bool addSceneObjectSets = true);
-
+        std::shared_ptr<CoinVisualization>
+        getVisualization(SceneObject::VisualizationType visuType = SceneObject::Full,
+                         bool addRobots = true,
+                         bool addObstacles = true,
+                         bool addManipulationObjects = true,
+                         bool addTrajectories = true,
+                         bool addSceneObjectSets = true);
 
 
         /*!
@@ -190,18 +191,17 @@ namespace VirtualRobot
             \return The xml string.
         */
         std::string getXMLString(const std::string& basePath);
-    protected:
 
+    protected:
         std::string name;
 
-        std::vector< RobotPtr > robots;
-        std::map< RobotPtr, std::vector< RobotConfigPtr > > robotConfigs;
-        std::vector< ObstaclePtr > obstacles;
-        std::vector< ManipulationObjectPtr > manipulationObjects;
-        std::vector< SceneObjectSetPtr > sceneObjectSets;
-        std::vector< TrajectoryPtr > trajectories;
-
+        std::vector<RobotPtr> robots;
+        std::map<RobotPtr, std::vector<RobotConfigPtr>> robotConfigs;
+        std::vector<ObstaclePtr> obstacles;
+        std::vector<ManipulationObjectPtr> manipulationObjects;
+        std::vector<SceneObjectSetPtr> sceneObjectSets;
+        std::vector<TrajectoryPtr> trajectories;
     };
 
 
-} // namespace
+} // namespace VirtualRobot

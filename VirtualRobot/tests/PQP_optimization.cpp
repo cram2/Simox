@@ -6,14 +6,14 @@
 
 #define BOOST_TEST_MODULE VirtualRobot_PQP_optimization
 
-#include <random>
 #include <chrono>
+#include <random>
 
 #include <Eigen/Geometry>
 
-#include <VirtualRobot/VirtualRobotTest.h>
 #include <VirtualRobot/CollisionDetection/PQP/PQP++/OBB_Disjoint.h>
 #include <VirtualRobot/MathTools.h>
+#include <VirtualRobot/VirtualRobotTest.h>
 
 BOOST_AUTO_TEST_SUITE(PQP_optimization)
 
@@ -59,7 +59,8 @@ BOOST_AUTO_TEST_CASE(test_obb_disjoint)
             // force things into cache
             for (std::size_t i = 0; i < 10; ++i)
             {
-                dummy += static_cast<unsigned long>(PQP::OBB_Processor::obb_disjoint_with_loops(B, T, a, b));
+                dummy += static_cast<unsigned long>(
+                    PQP::OBB_Processor::obb_disjoint_with_loops(B, T, a, b));
             }
         }
 
@@ -95,7 +96,7 @@ BOOST_AUTO_TEST_CASE(test_obb_disjoint)
         }
 
 
-        if(i % N/100 == 0)
+        if (i % N / 100 == 0)
         {
             BOOST_CHECK_EQUAL(old, wloops);
         }
@@ -108,7 +109,7 @@ BOOST_AUTO_TEST_CASE(test_obb_disjoint)
     }
     std::cout << "t old        = " << told.count() << '\n';
     std::cout << "t with loops = " << twloops.count() << '\n';
-    std::cout << "rel speedup  = " << 1.f* told.count() / twloops.count() << '\n';
+    std::cout << "rel speedup  = " << 1.f * told.count() / twloops.count() << '\n';
 }
 
 

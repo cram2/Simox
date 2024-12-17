@@ -22,34 +22,35 @@
 */
 
 #include "ConstrainedIKWindow.h"
-#include "VirtualRobot/Visualization/CoinVisualization/CoinVisualizationNode.h"
-#include "VirtualRobot/Visualization/CoinVisualization/CoinVisualizationFactory.h"
+
+#include <VirtualRobot/Random.h>
+
 #include "VirtualRobot/EndEffector/EndEffector.h"
 #include "VirtualRobot/IK/ConstrainedHierarchicalIK.h"
 #include "VirtualRobot/IK/ConstrainedStackedIK.h"
-#include <VirtualRobot/Random.h>
+#include "VirtualRobot/Visualization/CoinVisualization/CoinVisualizationFactory.h"
+#include "VirtualRobot/Visualization/CoinVisualization/CoinVisualizationNode.h"
 
 #ifdef USE_NLOPT
 #include "VirtualRobot/IK/ConstrainedOptimizationIK.h"
 #endif
 
-#include <Inventor/nodes/SoCube.h>
-#include <Inventor/nodes/SoTransform.h>
-#include <Inventor/nodes/SoUnits.h>
-#include <Inventor/nodes/SoSphere.h>
-
 #include <ctime>
-#include <vector>
 #include <iostream>
 #include <sstream>
+#include <vector>
+
+#include <Inventor/nodes/SoCube.h>
+#include <Inventor/nodes/SoSphere.h>
+#include <Inventor/nodes/SoTransform.h>
+#include <Inventor/nodes/SoUnits.h>
 
 using namespace std;
 using namespace VirtualRobot;
 
 float TIMER_MS = 30.0f;
 
-ConstrainedIKWindow::ConstrainedIKWindow(std::string& sRobotFilename)
-    : QMainWindow(nullptr)
+ConstrainedIKWindow::ConstrainedIKWindow(std::string& sRobotFilename) : QMainWindow(nullptr)
 {
     robotFilename = sRobotFilename;
     sceneSep = new SoSeparator();
@@ -72,13 +73,13 @@ ConstrainedIKWindow::ConstrainedIKWindow(std::string& sRobotFilename)
     exViewer->viewAll();
 }
 
-
 ConstrainedIKWindow::~ConstrainedIKWindow()
 {
     sceneSep->unref();
 }
 
-void ConstrainedIKWindow::setupUI()
+void
+ConstrainedIKWindow::setupUI()
 {
     UI.setupUi(this);
     exViewer = new SoQtExaminerViewer(UI.frameViewer, "", TRUE, SoQtExaminerViewer::BUILD_POPUP);
@@ -138,7 +139,8 @@ void ConstrainedIKWindow::setupUI()
 #endif
 }
 
-void ConstrainedIKWindow::resetSceneryAll()
+void
+ConstrainedIKWindow::resetSceneryAll()
 {
     if (!robot)
     {
@@ -153,9 +155,8 @@ void ConstrainedIKWindow::resetSceneryAll()
     exViewer->render();
 }
 
-
-
-void ConstrainedIKWindow::collisionModel()
+void
+ConstrainedIKWindow::collisionModel()
 {
     if (!robot)
     {
@@ -180,30 +181,31 @@ void ConstrainedIKWindow::collisionModel()
     exViewer->render();
 }
 
-
-void ConstrainedIKWindow::closeEvent(QCloseEvent* event)
+void
+ConstrainedIKWindow::closeEvent(QCloseEvent* event)
 {
     quit();
     QMainWindow::closeEvent(event);
 }
 
-
-int ConstrainedIKWindow::main()
+int
+ConstrainedIKWindow::main()
 {
     SoQt::show(this);
     SoQt::mainLoop();
     return 0;
 }
 
-
-void ConstrainedIKWindow::quit()
+void
+ConstrainedIKWindow::quit()
 {
     std::cout << "ConstrainedIKWindow: Closing" << std::endl;
     this->close();
     SoQt::exitMainLoop();
 }
 
-void ConstrainedIKWindow::updateKCBox()
+void
+ConstrainedIKWindow::updateKCBox()
 {
     UI.comboBoxKC->clear();
 
@@ -216,7 +218,7 @@ void ConstrainedIKWindow::updateKCBox()
     robot->getRobotNodeSets(rns);
     kinChains.clear();
 
-    for (auto & rn : rns)
+    for (auto& rn : rns)
     {
         if (rn->isKinematicChain())
         {
@@ -226,7 +228,8 @@ void ConstrainedIKWindow::updateKCBox()
     }
 }
 
-void ConstrainedIKWindow::computePoseError()
+void
+ConstrainedIKWindow::computePoseError()
 {
     // Compute target pose
     Eigen::Vector3f pos, rpy;
@@ -254,12 +257,13 @@ void ConstrainedIKWindow::computePoseError()
     UI.labelOri->setText(qd3);
 }
 
-void ConstrainedIKWindow::computeTSRError()
+void
+ConstrainedIKWindow::computeTSRError()
 {
-
 }
 
-void ConstrainedIKWindow::selectKC(int nr)
+void
+ConstrainedIKWindow::selectKC(int nr)
 {
     std::cout << "Selecting kinematic chain nr " << nr << std::endl;
 
@@ -296,15 +300,17 @@ void ConstrainedIKWindow::selectKC(int nr)
     collisionModel();
 }
 
-void ConstrainedIKWindow::selectIK(int nr)
+void
+ConstrainedIKWindow::selectIK(int nr)
 {
-    if(nr == 0)
+    if (nr == 0)
     {
         UI.comboBoxKC->setCurrentIndex(0);
     }
 }
 
-void ConstrainedIKWindow::solve()
+void
+ConstrainedIKWindow::solve()
 {
     if (!kc || !tcp)
     {
@@ -314,7 +320,7 @@ void ConstrainedIKWindow::solve()
 
     ConstrainedIKPtr ik;
 
-    switch(UI.ikSolver->currentIndex())
+    switch (UI.ikSolver->currentIndex())
     {
         case 0:
             VR_INFO << "Using Constrainbed Hierarchical IK" << std::endl;
@@ -338,18 +344,18 @@ void ConstrainedIKWindow::solve()
             return;
     }
 
-    if(UI.tsrGroup->isChecked())
+    if (UI.tsrGroup->isChecked())
     {
         ik->addConstraint(tsrConstraint);
     }
 
-    if(UI.poseGroup->isChecked())
+    if (UI.poseGroup->isChecked())
     {
         ik->addConstraint(positionConstraint);
         ik->addConstraint(orientationConstraint);
     }
 
-    if(UI.balanceGroup->isChecked())
+    if (UI.balanceGroup->isChecked())
     {
         ik->addConstraint(balanceConstraint);
     }
@@ -360,7 +366,7 @@ void ConstrainedIKWindow::solve()
     bool result = ik->solve();
     clock_t endT = clock();
 
-    VR_INFO << "IK " << (result? "Successful" : "Failed") << std::endl;
+    VR_INFO << "IK " << (result ? "Successful" : "Failed") << std::endl;
 
     float runtime = (float)(((float)(endT - startT) / (float)CLOCKS_PER_SEC) * 1000.0f);
     QString qd = "Time: ";
@@ -371,16 +377,16 @@ void ConstrainedIKWindow::solve()
     std::vector<RobotNodePtr> nodes = kc->getAllRobotNodes();
 
     std::cout << "Joint values: " << std::endl;
-    for (auto &node : nodes)
+    for (auto& node : nodes)
     {
         std::cout << node->getName() << ": " << node->getJointValue() << std::endl;
     }
 
-    if(UI.poseGroup->isChecked())
+    if (UI.poseGroup->isChecked())
     {
         computePoseError();
     }
-    if(UI.poseGroup->isChecked())
+    if (UI.poseGroup->isChecked())
     {
         computeTSRError();
     }
@@ -388,73 +394,80 @@ void ConstrainedIKWindow::solve()
     exViewer->render();
 }
 
-void ConstrainedIKWindow::updateTSR(double /*value*/)
+void
+ConstrainedIKWindow::updateTSR(double /*value*/)
 {
     Eigen::Matrix<float, 6, 2> bounds;
-    bounds << -fabs(UI.tsrLowX->value() - UI.tsrHighX->value()) / 2, fabs(UI.tsrLowX->value() - UI.tsrHighX->value()) / 2,
-              -fabs(UI.tsrLowY->value() - UI.tsrHighY->value()) / 2, fabs(UI.tsrLowY->value() - UI.tsrHighY->value()) / 2,
-              -fabs(UI.tsrLowZ->value() - UI.tsrHighZ->value()) / 2, fabs(UI.tsrLowZ->value() - UI.tsrHighZ->value()) / 2,
-              -M_PI, M_PI,
-              -M_PI, M_PI,
-              -M_PI, M_PI;
-              /*UI.tsrLowRoll->value(), UI.tsrHighRoll->value(),
+    bounds << -fabs(UI.tsrLowX->value() - UI.tsrHighX->value()) / 2,
+        fabs(UI.tsrLowX->value() - UI.tsrHighX->value()) / 2,
+        -fabs(UI.tsrLowY->value() - UI.tsrHighY->value()) / 2,
+        fabs(UI.tsrLowY->value() - UI.tsrHighY->value()) / 2,
+        -fabs(UI.tsrLowZ->value() - UI.tsrHighZ->value()) / 2,
+        fabs(UI.tsrLowZ->value() - UI.tsrHighZ->value()) / 2, -M_PI, M_PI, -M_PI, M_PI, -M_PI, M_PI;
+    /*UI.tsrLowRoll->value(), UI.tsrHighRoll->value(),
               UI.tsrLowPitch->value(), UI.tsrHighPitch->value(),
               UI.tsrLowYaw->value(), UI.tsrHighYaw->value();*/
 
     Eigen::Matrix4f transformation = Eigen::Matrix4f::Identity();
-    transformation(0,3) = UI.tsrLowX->value() + fabs(UI.tsrLowX->value() - UI.tsrHighX->value()) / 2;
-    transformation(1,3) = UI.tsrLowY->value() + fabs(UI.tsrLowY->value() - UI.tsrHighY->value()) / 2;
-    transformation(2,3) = UI.tsrLowZ->value() + fabs(UI.tsrLowZ->value() - UI.tsrHighZ->value()) / 2;
+    transformation(0, 3) =
+        UI.tsrLowX->value() + fabs(UI.tsrLowX->value() - UI.tsrHighX->value()) / 2;
+    transformation(1, 3) =
+        UI.tsrLowY->value() + fabs(UI.tsrLowY->value() - UI.tsrHighY->value()) / 2;
+    transformation(2, 3) =
+        UI.tsrLowZ->value() + fabs(UI.tsrLowZ->value() - UI.tsrHighZ->value()) / 2;
 
-    tsrConstraint.reset(new TSRConstraint(robot, kc, tcp, transformation, Eigen::Matrix4f::Identity(), bounds));
+    tsrConstraint.reset(
+        new TSRConstraint(robot, kc, tcp, transformation, Eigen::Matrix4f::Identity(), bounds));
 
     tsrSep->removeAllChildren();
     VisualizationFactory::Color color(1, 0, 0, 0.5);
     tsrSep->addChild(CoinVisualizationFactory::getCoinVisualization(tsrConstraint, color));
 }
 
-void ConstrainedIKWindow::randomTSR(bool quiet)
+void
+ConstrainedIKWindow::randomTSR(bool quiet)
 {
     // Store joint angles
     RobotConfigPtr originalConfig(new RobotConfig(robot, "original config"));
     kc->getJointValues(originalConfig);
 
     // Apply random joint angles
-    for(unsigned int i = 0; i < kc->getSize(); i++)
+    for (unsigned int i = 0; i < kc->getSize(); i++)
     {
         RobotNodePtr node = kc->getNode(i);
 
-        float v = node->getJointLimitLo() + (node->getJointLimitHi() - node->getJointLimitLo()) * (rand()%1000 / 1000.0);
+        float v = node->getJointLimitLo() +
+                  (node->getJointLimitHi() - node->getJointLimitLo()) * (rand() % 1000 / 1000.0);
         node->setJointValue(v);
     }
 
     // Obtain TCP pose
     Eigen::Matrix4f tcpPose = kc->getTCP()->getGlobalPose();
 
-    if(!quiet)
+    if (!quiet)
     {
         VR_INFO << "Sampled TCP Pose: " << std::endl << tcpPose << std::endl;
     }
 
     // Relax TCP pose randomly to form a TSR
-    float lowX = tcpPose(0,3) - rand()%100;
-    float highX = tcpPose(0,3) + rand()%100;
-    float lowY = tcpPose(1,3) - rand()%100;
-    float highY = tcpPose(1,3) + rand()%100;
-    float lowZ = tcpPose(2,3) - rand()%100;
-    float highZ = tcpPose(2,3) + rand()%100;
+    float lowX = tcpPose(0, 3) - rand() % 100;
+    float highX = tcpPose(0, 3) + rand() % 100;
+    float lowY = tcpPose(1, 3) - rand() % 100;
+    float highY = tcpPose(1, 3) + rand() % 100;
+    float lowZ = tcpPose(2, 3) - rand() % 100;
+    float highZ = tcpPose(2, 3) + rand() % 100;
 
     Eigen::Vector3f rpy;
     MathTools::eigen4f2rpy(tcpPose, rpy);
 
-    float lowRoll = rpy.x() - (M_PI / 4) * (rand()%100 / 100.0);
-    float highRoll = rpy.x() + (M_PI / 4) * (rand()%100 / 100.0);
-    float lowPitch = rpy.y() - (M_PI / 4) * (rand()%100 / 100.0);
-    float highPitch = rpy.y() + (M_PI / 4) * (rand()%100 / 100.0);
-    float lowYaw = rpy.z() - (M_PI / 4) * (rand()%100 / 100.0);
-    float highYaw = rpy.z() + (M_PI / 4) * (rand()%100 / 100.0);
+    float lowRoll = rpy.x() - (M_PI / 4) * (rand() % 100 / 100.0);
+    float highRoll = rpy.x() + (M_PI / 4) * (rand() % 100 / 100.0);
+    float lowPitch = rpy.y() - (M_PI / 4) * (rand() % 100 / 100.0);
+    float highPitch = rpy.y() + (M_PI / 4) * (rand() % 100 / 100.0);
+    float lowYaw = rpy.z() - (M_PI / 4) * (rand() % 100 / 100.0);
+    float highYaw = rpy.z() + (M_PI / 4) * (rand() % 100 / 100.0);
 
-    if(!quiet)
+    if (!quiet)
     {
         VR_INFO << "Random TSR: " << std::endl
                 << "    [" << lowX << ", " << highX << "]," << std::endl
@@ -485,9 +498,10 @@ void ConstrainedIKWindow::randomTSR(bool quiet)
     kc->setJointValues(originalConfig);
 }
 
-void ConstrainedIKWindow::enableTSR()
+void
+ConstrainedIKWindow::enableTSR()
 {
-    if(UI.tsrGroup->isChecked())
+    if (UI.tsrGroup->isChecked())
     {
         updateTSR(0);
     }
@@ -497,7 +511,8 @@ void ConstrainedIKWindow::enableTSR()
     }
 }
 
-void ConstrainedIKWindow::updatePose(double /*value*/)
+void
+ConstrainedIKWindow::updatePose(double /*value*/)
 {
     Eigen::Vector3f pos, rpy;
     pos << UI.poseX->value(), UI.poseY->value(), UI.poseZ->value();
@@ -506,9 +521,9 @@ void ConstrainedIKWindow::updatePose(double /*value*/)
     Eigen::Matrix4f pose;
     MathTools::posrpy2eigen4f(pos, rpy, pose);
 
-    positionConstraint.reset(new PositionConstraint(robot, kc, tcp, pose.block<3,1>(0,3)));
+    positionConstraint.reset(new PositionConstraint(robot, kc, tcp, pose.block<3, 1>(0, 3)));
 
-    orientationConstraint.reset(new OrientationConstraint(robot, kc, tcp, pose.block<3,3>(0,0)));
+    orientationConstraint.reset(new OrientationConstraint(robot, kc, tcp, pose.block<3, 3>(0, 0)));
     orientationConstraint->setOptimizationFunctionFactor(1000);
 
     poseSep->removeAllChildren();
@@ -516,25 +531,27 @@ void ConstrainedIKWindow::updatePose(double /*value*/)
     poseSep->addChild(CoinVisualizationFactory::getCoinVisualization(positionConstraint, color));
 }
 
-void ConstrainedIKWindow::randomPose(bool quiet)
+void
+ConstrainedIKWindow::randomPose(bool quiet)
 {
     // Store joint angles
     RobotConfigPtr originalConfig(new RobotConfig(robot, "original config"));
     kc->getJointValues(originalConfig);
 
     // Apply random joint angles
-    for(unsigned int i = 0; i < kc->getSize(); i++)
+    for (unsigned int i = 0; i < kc->getSize(); i++)
     {
         RobotNodePtr node = kc->getNode(i);
 
-        float v = node->getJointLimitLo() + (node->getJointLimitHi() - node->getJointLimitLo()) * (rand()%1000 / 1000.0);
+        float v = node->getJointLimitLo() +
+                  (node->getJointLimitHi() - node->getJointLimitLo()) * (rand() % 1000 / 1000.0);
         node->setJointValue(v);
     }
 
     // Obtain TCP pose
     Eigen::Matrix4f tcpPose = kc->getTCP()->getGlobalPose();
 
-    if(!quiet)
+    if (!quiet)
     {
         VR_INFO << "Sampled TCP Pose: " << std::endl << tcpPose << std::endl;
     }
@@ -542,9 +559,9 @@ void ConstrainedIKWindow::randomPose(bool quiet)
     Eigen::Vector3f rpy;
     MathTools::eigen4f2rpy(tcpPose, rpy);
 
-    UI.poseX->setValue(tcpPose(0,3));
-    UI.poseY->setValue(tcpPose(1,3));
-    UI.poseZ->setValue(tcpPose(2,3));
+    UI.poseX->setValue(tcpPose(0, 3));
+    UI.poseY->setValue(tcpPose(1, 3));
+    UI.poseZ->setValue(tcpPose(2, 3));
     UI.poseRoll->setValue(rpy.x());
     UI.posePitch->setValue(rpy.y());
     UI.poseYaw->setValue(rpy.z());
@@ -555,9 +572,10 @@ void ConstrainedIKWindow::randomPose(bool quiet)
     kc->setJointValues(originalConfig);
 }
 
-void ConstrainedIKWindow::enablePose()
+void
+ConstrainedIKWindow::enablePose()
 {
-    if(UI.poseGroup->isChecked())
+    if (UI.poseGroup->isChecked())
     {
         updatePose(0);
     }
@@ -567,11 +585,13 @@ void ConstrainedIKWindow::enablePose()
     }
 }
 
-void ConstrainedIKWindow::enableBalance()
+void
+ConstrainedIKWindow::enableBalance()
 {
-    if(UI.balanceGroup->isChecked())
+    if (UI.balanceGroup->isChecked())
     {
-        RobotNodePtr contactNode = robot->getRobotNode(UI.lineEditContactNode->text().toStdString());
+        RobotNodePtr contactNode =
+            robot->getRobotNode(UI.lineEditContactNode->text().toStdString());
 
         SceneObjectSetPtr contactNodes(new SceneObjectSet);
         contactNodes->addSceneObject(contactNode);
@@ -580,7 +600,8 @@ void ConstrainedIKWindow::enableBalance()
     }
 }
 
-void ConstrainedIKWindow::performanceEvaluation()
+void
+ConstrainedIKWindow::performanceEvaluation()
 {
 
     VirtualRobot::PRNG64Bit().seed(UI.evaluationRandomSeed->value());
@@ -593,9 +614,9 @@ void ConstrainedIKWindow::performanceEvaluation()
     float totalJointAngles = 0;
 
     int num = UI.evaluationNumberOfRuns->value();
-    for(int i = 0; i < num; i++)
+    for (int i = 0; i < num; i++)
     {
-        VR_INFO << "Evaluation run " << (i+1) << std::endl;
+        VR_INFO << "Evaluation run " << (i + 1) << std::endl;
 
         // Reset joint angles to zero
         std::vector<RobotNodePtr> rn;
@@ -603,7 +624,7 @@ void ConstrainedIKWindow::performanceEvaluation()
         std::vector<float> jv(rn.size(), 0.0f);
         robot->setJointValues(rn, jv);
 
-        switch(ikSolver)
+        switch (ikSolver)
         {
             case 0:
                 ik.reset(new ConstrainedHierarchicalIK(robot, kc));
@@ -624,20 +645,20 @@ void ConstrainedIKWindow::performanceEvaluation()
                 return;
         }
 
-        if(UI.tsrGroup->isChecked())
+        if (UI.tsrGroup->isChecked())
         {
             randomTSR(true);
             ik->addConstraint(tsrConstraint);
         }
 
-        if(UI.poseGroup->isChecked())
+        if (UI.poseGroup->isChecked())
         {
             randomPose(true);
             ik->addConstraint(positionConstraint);
             ik->addConstraint(orientationConstraint);
         }
 
-        if(UI.balanceGroup->isChecked())
+        if (UI.balanceGroup->isChecked())
         {
             ik->addConstraint(balanceConstraint);
         }
@@ -651,20 +672,21 @@ void ConstrainedIKWindow::performanceEvaluation()
         resultSuccessful += (int)result;
         totalTime += (float)(((float)(endT - startT) / (float)CLOCKS_PER_SEC) * 1000.0f);
 
-        for(unsigned int i = 0; i < kc->getSize(); i++)
+        for (unsigned int i = 0; i < kc->getSize(); i++)
         {
             totalJointAngles += fabs(kc->getNode(i)->getJointValue());
         }
     }
 
-    VR_INFO << std::endl << "Evaluation result:"
-            << std::endl << "    Success rate: " << (100 * (resultSuccessful / (float)num)) << "%"
-            << std::endl << "    Avg. runtime: " << (totalTime / num) << "ms"
-            << std::endl << "    Joint angle sum: " << totalJointAngles << "rad"
-            << std::endl;
+    VR_INFO << std::endl
+            << "Evaluation result:" << std::endl
+            << "    Success rate: " << (100 * (resultSuccessful / (float)num)) << "%" << std::endl
+            << "    Avg. runtime: " << (totalTime / num) << "ms" << std::endl
+            << "    Joint angle sum: " << totalJointAngles << "rad" << std::endl;
 }
 
-void ConstrainedIKWindow::loadRobot()
+void
+ConstrainedIKWindow::loadRobot()
 {
     std::cout << "ConstrainedIKWindow: Loading robot" << std::endl;
     robotSep->removeAllChildren();

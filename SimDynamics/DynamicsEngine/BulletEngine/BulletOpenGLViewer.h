@@ -23,8 +23,8 @@
 
 #pragma once
 
-#include "../../SimDynamics.h"
 #include "../../DynamicsWorld.h"
+#include "../../SimDynamics.h"
 #include "BulletEngine.h"
 
 #ifdef _WINDOWS
@@ -35,14 +35,14 @@
 #define PlatformDemoApplication GlutDemoApplication
 #endif
 
-#include <btBulletDynamicsCommon.h>
-#include "BulletOpenGL/GlutStuff.h"
-#include "BulletOpenGL/GL_ShapeDrawer.h"
-#include <LinearMath/btIDebugDraw.h>
 #include "BulletOpenGL/GLDebugDrawer.h"
+#include "BulletOpenGL/GL_ShapeDrawer.h"
+#include "BulletOpenGL/GlutStuff.h"
+#include <LinearMath/btIDebugDraw.h>
+#include <btBulletDynamicsCommon.h>
 
 #ifdef _WIN32
-#pragma warning(disable: 4275)
+#pragma warning(disable : 4275)
 #endif
 
 namespace SimDynamics
@@ -61,9 +61,8 @@ namespace SimDynamics
         void myinit() override;
 
         virtual void enableContraintsDebugDrawing();
+
     protected:
-
-
         /*static DemoApplication* Create()
         {
             BulletOpenGLViewer* demo = new BulletOpenGLViewer;
@@ -80,8 +79,6 @@ namespace SimDynamics
         BulletEnginePtr bulletEngine;
     };
 
-
     typedef std::shared_ptr<BulletOpenGLViewer> BulletOpenGLViewerPtr;
 
-} // namespace
-
+} // namespace SimDynamics

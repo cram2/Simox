@@ -1,36 +1,33 @@
 #pragma once
 
-#include <VirtualRobot/VirtualRobot.h>
-#include <VirtualRobot/Robot.h>
-#include <VirtualRobot/VirtualRobotException.h>
-#include <VirtualRobot/Nodes/RobotNode.h>
-#include <VirtualRobot/XML/SceneIO.h>
-#include <VirtualRobot/Visualization/VisualizationFactory.h>
-#include <VirtualRobot/Visualization/CoinVisualization/CoinVisualization.h>
-#include <VirtualRobot/Obstacle.h>
-#include <VirtualRobot/ManipulationObject.h>
-
-#include <GraspPlanning/GraspStudio.h>
-#include <GraspPlanning/GraspQuality/GraspQualityMeasureWrenchSpace.h>
-
-#include "MotionPlanning/Saba.h"
-#include "MotionPlanning/CSpace/CSpacePath.h"
-
 #include <string.h>
-#include <QtCore/QtGlobal>
-#include <QtGui/QtGui>
-#include <QtCore/QtCore>
-
-#include <Inventor/sensors/SoTimerSensor.h>
-#include <Inventor/nodes/SoEventCallback.h>
-#include <Inventor/Qt/viewers/SoQtExaminerViewer.h>
-#include <Inventor/Qt/SoQt.h>
-#include <Inventor/nodes/SoSeparator.h>
-
 
 #include <vector>
 
+#include <QtCore/QtCore>
+#include <QtCore/QtGlobal>
+#include <QtGui/QtGui>
+
+#include <VirtualRobot/ManipulationObject.h>
+#include <VirtualRobot/Nodes/RobotNode.h>
+#include <VirtualRobot/Obstacle.h>
+#include <VirtualRobot/Robot.h>
+#include <VirtualRobot/VirtualRobot.h>
+#include <VirtualRobot/VirtualRobotException.h>
+#include <VirtualRobot/Visualization/CoinVisualization/CoinVisualization.h>
+#include <VirtualRobot/Visualization/VisualizationFactory.h>
+#include <VirtualRobot/XML/SceneIO.h>
+
+#include "MotionPlanning/CSpace/CSpacePath.h"
+#include "MotionPlanning/Saba.h"
 #include "ui_PlatformDemo.h"
+#include <GraspPlanning/GraspQuality/GraspQualityMeasureWrenchSpace.h>
+#include <GraspPlanning/GraspStudio.h>
+#include <Inventor/Qt/SoQt.h>
+#include <Inventor/Qt/viewers/SoQtExaminerViewer.h>
+#include <Inventor/nodes/SoEventCallback.h>
+#include <Inventor/nodes/SoSeparator.h>
+#include <Inventor/sensors/SoTimerSensor.h>
 
 class PlatformWindow : public QMainWindow
 {
@@ -68,7 +65,6 @@ public slots:
     void plan();
 
 protected:
-
     struct planSet
     {
         std::string rns;
@@ -84,8 +80,6 @@ protected:
         eElasticBands
     };
 
-
-
     void loadScene();
     void optimizeSolution(postProcessingMethod postProcessing, int nrSteps);
 
@@ -94,20 +88,21 @@ protected:
     void buildRRTVisu();
 
     void selectRNS(const std::string& rns);
-    void setStart(Eigen::VectorXf &goalConf);
-    void setGoal(Eigen::VectorXf &goalConf);
+    void setStart(Eigen::VectorXf& goalConf);
+    void setGoal(Eigen::VectorXf& goalConf);
 
     static void timerCB(void* data, SoSensor* sensor);
     void buildRrtVisu();
     void selectColModelRob(const std::string& colModel);
     void selectColModelEnv(const std::string& colModel);
 
-    void updateDistVisu(const Eigen::Vector3f &a, const Eigen::Vector3f &b);
+    void updateDistVisu(const Eigen::Vector3f& a, const Eigen::Vector3f& b);
 
     void showOptizerForces(Saba::ElasticBandProcessorPtr postProcessing, Saba::CSpacePathPtr s);
 
     Ui::MainWindowPlatformdemo UI;
-    SoQtExaminerViewer* viewer; /*!< Viewer to display the 3D model of the robot and the environment. */
+    SoQtExaminerViewer*
+        viewer; /*!< Viewer to display the 3D model of the robot and the environment. */
 
     SoSeparator* allSep;
     SoSeparator* sceneFileSep;
@@ -126,8 +121,8 @@ protected:
     VirtualRobot::RobotNodeSetPtr colModelRob;
     VirtualRobot::SceneObjectSetPtr colModelEnv;
 
-    std::vector< VirtualRobot::RobotConfigPtr > configs;
-    std::vector< VirtualRobot::ObstaclePtr > obstacles;
+    std::vector<VirtualRobot::RobotConfigPtr> configs;
+    std::vector<VirtualRobot::ObstaclePtr> obstacles;
 
 
     std::string sceneFile;
@@ -145,4 +140,3 @@ protected:
 
     Saba::BiRrtPtr rrt;
 };
-

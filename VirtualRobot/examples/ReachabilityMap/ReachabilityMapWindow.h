@@ -1,37 +1,40 @@
 
 #pragma once
 
-#include <VirtualRobot/VirtualRobot.h>
-#include <VirtualRobot/Robot.h>
-#include <VirtualRobot/VirtualRobotException.h>
-#include <VirtualRobot/Nodes/RobotNode.h>
-#include <VirtualRobot/XML/SceneIO.h>
-#include <VirtualRobot/Visualization/VisualizationFactory.h>
-#include <VirtualRobot/Visualization/CoinVisualization/CoinVisualization.h>
-#include <VirtualRobot/Obstacle.h>
 #include <string.h>
-#include <QtCore/QtGlobal>
-#include <QtGui/QtGui>
-#include <QtCore/QtCore>
-#include <VirtualRobot/Grasping/Grasp.h>
-#include <VirtualRobot/Grasping/GraspSet.h>
-
-#include <Inventor/sensors/SoTimerSensor.h>
-#include <Inventor/nodes/SoEventCallback.h>
-#include <Inventor/Qt/viewers/SoQtExaminerViewer.h>
-#include <Inventor/Qt/SoQt.h>
-#include <Inventor/nodes/SoSeparator.h>
-
 
 #include <vector>
 
+#include <QtCore/QtCore>
+#include <QtCore/QtGlobal>
+#include <QtGui/QtGui>
+
+#include <VirtualRobot/Grasping/Grasp.h>
+#include <VirtualRobot/Grasping/GraspSet.h>
+#include <VirtualRobot/Nodes/RobotNode.h>
+#include <VirtualRobot/Obstacle.h>
+#include <VirtualRobot/Robot.h>
+#include <VirtualRobot/VirtualRobot.h>
+#include <VirtualRobot/VirtualRobotException.h>
+#include <VirtualRobot/Visualization/CoinVisualization/CoinVisualization.h>
+#include <VirtualRobot/Visualization/VisualizationFactory.h>
+#include <VirtualRobot/XML/SceneIO.h>
+
 #include "ui_ReachabilityMap.h"
+#include <Inventor/Qt/SoQt.h>
+#include <Inventor/Qt/viewers/SoQtExaminerViewer.h>
+#include <Inventor/nodes/SoEventCallback.h>
+#include <Inventor/nodes/SoSeparator.h>
+#include <Inventor/sensors/SoTimerSensor.h>
 
 class ReachabilityMapWindow : public QMainWindow
 {
     Q_OBJECT
 public:
-    ReachabilityMapWindow(std::string& sRobotFile, std::string& reachFile, std::string& objFile, std::string& eef);
+    ReachabilityMapWindow(std::string& sRobotFile,
+                          std::string& reachFile,
+                          std::string& objFile,
+                          std::string& eef);
     ~ReachabilityMapWindow() override;
 
     /*!< Executes the SoQt mainLoop. You need to call this in order to execute the application. */
@@ -72,7 +75,8 @@ protected:
     void setupEnvironment();
 
     Ui::MainWindowReachability UI;
-    SoQtExaminerViewer* viewer; /*!< Viewer to display the 3D model of the robot and the environment. */
+    SoQtExaminerViewer*
+        viewer; /*!< Viewer to display the 3D model of the robot and the environment. */
 
     SoSeparator* sceneSep;
     SoSeparator* robotVisuSep;
@@ -91,13 +95,11 @@ protected:
     std::string reachFile;
     std::string objectFile;
     VirtualRobot::RobotNodeSetPtr currentRobotNodeSet;
-    std::vector < VirtualRobot::RobotNodePtr > allRobotNodes;
-    std::vector < VirtualRobot::RobotNodePtr > currentRobotNodes;
-    std::vector < VirtualRobot::RobotNodeSetPtr > robotNodeSets;
+    std::vector<VirtualRobot::RobotNodePtr> allRobotNodes;
+    std::vector<VirtualRobot::RobotNodePtr> currentRobotNodes;
+    std::vector<VirtualRobot::RobotNodeSetPtr> robotNodeSets;
 
     VirtualRobot::WorkspaceRepresentationPtr reachSpace;
     VirtualRobot::WorkspaceGridPtr reachGrid;
     VirtualRobot::RobotNodePtr currentRobotNode;
-
 };
-

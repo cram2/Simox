@@ -35,7 +35,6 @@ namespace Saba
     class SABA_IMPORT_EXPORT ShortcutProcessor : public PathProcessor
     {
     public:
-
         ShortcutProcessor(CSpacePathPtr path, CSpaceSampledPtr cspace, bool verbose = false);
         ~ShortcutProcessor() override;
 
@@ -63,7 +62,9 @@ namespace Saba
         /*!
             This method randomly choses a start and endpoint. The linear path between can be checked for validity in order to check for a shortcut.
         */
-        bool selectCandidatesRandom(int& storeStartIndex, int& storeEndIndex, int maxSolutionPathDist = 30);
+        bool selectCandidatesRandom(int& storeStartIndex,
+                                    int& storeEndIndex,
+                                    int maxSolutionPathDist = 30);
 
         /*!
             Checks linear path between start and end index. Therefore the cspace is queried.
@@ -79,7 +80,6 @@ namespace Saba
 
 
     protected:
-
         bool initSolution();
 
         // returns number of kicked nodes
@@ -87,5 +87,4 @@ namespace Saba
         CSpaceSampledPtr cspace;
     };
 
-}// namespace
-
+} // namespace Saba

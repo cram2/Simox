@@ -23,9 +23,9 @@
 */
 #pragma once
 
-#include "VirtualRobot/VirtualRobot.h"
 #include "VirtualRobot/IK/ConstrainedIK.h"
 #include "VirtualRobot/IK/Constraint.h"
+#include "VirtualRobot/VirtualRobot.h"
 
 namespace nlopt
 {
@@ -36,10 +36,15 @@ namespace VirtualRobot
 {
     typedef std::shared_ptr<nlopt::opt> OptimizerPtr;
 
-    class VIRTUAL_ROBOT_IMPORT_EXPORT ConstrainedOptimizationIK : public ConstrainedIK, public std::enable_shared_from_this<ConstrainedOptimizationIK>
+    class VIRTUAL_ROBOT_IMPORT_EXPORT ConstrainedOptimizationIK :
+        public ConstrainedIK,
+        public std::enable_shared_from_this<ConstrainedOptimizationIK>
     {
     public:
-        ConstrainedOptimizationIK(RobotPtr& robot, const RobotNodeSetPtr& nodeSet, float timeout = 0.5, float globalTolerance = std::numeric_limits<float>::quiet_NaN());
+        ConstrainedOptimizationIK(RobotPtr& robot,
+                                  const RobotNodeSetPtr& nodeSet,
+                                  float timeout = 0.5,
+                                  float globalTolerance = std::numeric_limits<float>::quiet_NaN());
 
         bool initialize() override;
         bool solve(bool stepwise = false) override;
@@ -52,11 +57,17 @@ namespace VirtualRobot
         void setRandomSamplingDisplacementFactor(float displacementFactor);
 
     protected:
-        static double optimizationFunctionWrapper(const std::vector<double> &x, std::vector<double> &gradient, void *data);
-        static double optimizationConstraintWrapper(const std::vector<double> &x, std::vector<double> &gradient, void *data);
+        static double optimizationFunctionWrapper(const std::vector<double>& x,
+                                                  std::vector<double>& gradient,
+                                                  void* data);
+        static double optimizationConstraintWrapper(const std::vector<double>& x,
+                                                    std::vector<double>& gradient,
+                                                    void* data);
 
-        double optimizationFunction(const std::vector<double> &x, std::vector<double> &gradient);
-        double optimizationConstraint(const std::vector<double> &x, std::vector<double> &gradient, const OptimizationFunctionSetup &setup);
+        double optimizationFunction(const std::vector<double>& x, std::vector<double>& gradient);
+        double optimizationConstraint(const std::vector<double>& x,
+                                      std::vector<double>& gradient,
+                                      const OptimizationFunctionSetup& setup);
 
         struct AdditionalOutputData
         {
@@ -69,17 +80,22 @@ namespace VirtualRobot
 
             std::vector<ConstraintInfo> data;
 
-            std::string toString()
+            std::string
+            toString()
             {
                 std::stringstream ss;
                 for (ConstraintInfo c : data)
                 {
-                    ss << "Constraint: " << c.constraintName << " Error: " << c.error << " Success: " << c.success << "\n";
+                    ss << "Constraint: " << c.constraintName << " Error: " << c.error
+                       << " Success: " << c.success << "\n";
                 }
                 return ss.str();
             }
         };
-        bool hardOptimizationFunction(const std::vector<double> &x, double &error, AdditionalOutputData &data);
+
+        bool hardOptimizationFunction(const std::vector<double>& x,
+                                      double& error,
+                                      AdditionalOutputData& data);
 
     protected:
         RobotNodeSetPtr nodeSet;
@@ -96,10 +112,7 @@ namespace VirtualRobot
 
         float functionValueTolerance;
         float optimizationValueTolerance;
-
     };
 
     typedef std::shared_ptr<ConstrainedOptimizationIK> ConstrainedOptimizationIKPtr;
-}
-
-
+} // namespace VirtualRobot

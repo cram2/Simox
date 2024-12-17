@@ -22,10 +22,10 @@
 */
 #pragma once
 
-#include "SimDynamics.h"
 #include "DynamicsEngine/DynamicsEngine.h"
 #include "DynamicsEngine/DynamicsObject.h"
 #include "DynamicsEngine/DynamicsRobot.h"
+#include "SimDynamics.h"
 
 namespace SimDynamics
 {
@@ -95,7 +95,9 @@ namespace SimDynamics
             \param pos The displacement
             \param up The up vector. Currently supported: (+/-1,0,0), (0,+/-1,0) or (0,0,+/-1).
         */
-        void createFloorPlane(const Eigen::Vector3f& pos = Eigen::Vector3f(0, 0, 0), const Eigen::Vector3f& up = Eigen::Vector3f(0, 0, 1.0f), float friction = -1);
+        void createFloorPlane(const Eigen::Vector3f& pos = Eigen::Vector3f(0, 0, 0),
+                              const Eigen::Vector3f& up = Eigen::Vector3f(0, 0, 1.0f),
+                              float friction = -1);
         void removeFloorPlane();
         /*!
             Since VirtualRobot usually uses MM and most physics engines like M, the models are automatically converted if this bool is set.
@@ -111,6 +113,7 @@ namespace SimDynamics
 
         // see http://en.wikipedia.org/wiki/Singleton_pattern for details about correct implementations of singletons in C++
         friend class Cleanup;
+
         class Cleanup
         {
         public:
@@ -122,8 +125,6 @@ namespace SimDynamics
 
         // The engine interface
         DynamicsEnginePtr engine;
-
     };
 
-}
-
+} // namespace SimDynamics

@@ -6,8 +6,8 @@
 #include <filesystem>
 #include <functional>
 #include <iomanip>
-#include <iterator>
 #include <iostream>
+#include <iterator>
 
 #include <Eigen/Dense>
 
@@ -1866,7 +1866,7 @@ namespace VirtualRobot
                          std::back_inserter(matchingAffordances),
                          isMatchingType);
         }
-        
+
         // refine selection by removing all non-matching affordances
         for (auto& affordanceLocation : matchingAffordances)
         {

@@ -13,7 +13,6 @@
 
 #include <SimoxUtility/shapes/AxisAlignedBoundingBox.h>
 
-
 namespace
 {
     struct PointT
@@ -21,7 +20,6 @@ namespace
         float x = 0, y = 0, z = 0;
     };
 } // namespace
-
 
 BOOST_AUTO_TEST_CASE(test_AABB_from_points_eigen)
 {
@@ -42,7 +40,6 @@ BOOST_AUTO_TEST_CASE(test_AABB_from_points_custom)
     BOOST_CHECK_EQUAL(aabb.min(), Eigen::Vector3f(-2, 0, -1));
     BOOST_CHECK_EQUAL(aabb.max(), Eigen::Vector3f(2, 0, 1));
 }
-
 
 BOOST_AUTO_TEST_CASE(test_overlaps)
 {
@@ -66,7 +63,7 @@ BOOST_AUTO_TEST_CASE(test_overlaps)
     BOOST_CHECK(not is_colliding(lhs, AABB(Vector3f(-1, -6, -3), Vector3f(1, -3, 3))));
     BOOST_CHECK(not is_colliding(lhs, AABB(Vector3f(-1, -2, 4), Vector3f(1, 2, 10))));
     BOOST_CHECK(not is_colliding(lhs, AABB(Vector3f(1.1, 2.1, 3.1), Vector3f(2, 3, 4))));
-    BOOST_CHECK(not is_colliding(lhs, AABB(Vector3f(-2, -3, -4), Vector3f(- 1.1, -2.1, -3.1))));
+    BOOST_CHECK(not is_colliding(lhs, AABB(Vector3f(-2, -3, -4), Vector3f(-1.1, -2.1, -3.1))));
 
     // rhs in lhs.
     BOOST_CHECK(is_colliding(lhs, AABB(Vector3f(-0.5, -1.0, -1.5), Vector3f(0.5, 1.0, 1.5))));

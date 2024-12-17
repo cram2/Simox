@@ -4,13 +4,11 @@
 
 #include "BodySanitizer.h"
 
-
 namespace VirtualRobot::mujoco
 {
     class MergedBodyList
     {
     public:
-
         MergedBodyList();
         MergedBodyList(const std::string& bodyName);
 
@@ -21,14 +19,11 @@ namespace VirtualRobot::mujoco
 
 
     private:
-
         void updateMergedBodyName();
 
         std::string mergedBodyName;
         std::vector<std::string> originalBodyNames;
-
     };
-
 
     /**
      * @brief A body sanitizer merging massless bodies to new bodies.
@@ -43,7 +38,6 @@ namespace VirtualRobot::mujoco
     class MergingBodySanitizer : public BodySanitizer
     {
     public:
-
         /// Constructor.
         MergingBodySanitizer(RobotPtr robot);
 
@@ -67,7 +61,6 @@ namespace VirtualRobot::mujoco
 
 
     private:
-
         void sanitizeRecursive(mjcf::Body body);
         void sanitizeLeafBody(mjcf::Body body);
 
@@ -82,7 +75,6 @@ namespace VirtualRobot::mujoco
 
         // Results.
         std::vector<MergedBodyList> mergedBodyLists;
-
     };
 
-}
+} // namespace VirtualRobot::mujoco

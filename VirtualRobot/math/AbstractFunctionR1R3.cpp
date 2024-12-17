@@ -21,15 +21,14 @@
 
 #include "AbstractFunctionR1R3.h"
 
-
 namespace math
 {
     AbstractFunctionR1R3::AbstractFunctionR1R3()
     {
     }
 
-
-    float AbstractFunctionR1R3::FindClosestPoint(Eigen::Vector3f p, float t1, float t2, int segments)
+    float
+    AbstractFunctionR1R3::FindClosestPoint(Eigen::Vector3f p, float t1, float t2, int segments)
     {
         float minT = t1;
         float minD = (Get(minT) - p).squaredNorm();
@@ -44,23 +43,25 @@ namespace math
             }
         }
         return minT;
-
     }
 
-
-    float AbstractFunctionR1R3::MoveLengthOnCurve(float x, float l, int steps)
+    float
+    AbstractFunctionR1R3::MoveLengthOnCurve(float x, float l, int steps)
     {
         float dl = l / steps;
         for (int i = 0; i < steps; i++)
         {
             float d = GetDerivative(x).norm();
-            x += dl / (float)std::sqrt(1 + d * d); // move by dl on curve: tangential vector: (1, df/dx), normalize to dl
+            x += dl /
+                 (float)std::sqrt(
+                     1 +
+                     d * d); // move by dl on curve: tangential vector: (1, df/dx), normalize to dl
         }
         return x;
     }
 
-
-    float AbstractFunctionR1R3::GetLength(float t1, float t2, int steps)
+    float
+    AbstractFunctionR1R3::GetLength(float t1, float t2, int steps)
     {
         Eigen::Vector3f p0 = Get(t1);
         float l = 0;
@@ -74,8 +75,8 @@ namespace math
         return l;
     }
 
-
-    std::vector<Eigen::Vector3f> AbstractFunctionR1R3::Sample(float t1, float t2, int segments)
+    std::vector<Eigen::Vector3f>
+    AbstractFunctionR1R3::Sample(float t1, float t2, int segments)
     {
         std::vector<Eigen::Vector3f> result;
         for (float f : Segments(t1, t2, segments))
@@ -85,8 +86,8 @@ namespace math
         return result;
     }
 
-
-    std::vector<float> AbstractFunctionR1R3::Segments(float t1, float t2, int segments)
+    std::vector<float>
+    AbstractFunctionR1R3::Segments(float t1, float t2, int segments)
     {
         std::vector<float> result;
 
@@ -96,4 +97,4 @@ namespace math
         }
         return result;
     }
-}
+} // namespace math

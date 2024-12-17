@@ -1,48 +1,58 @@
 
 #include "GraspRrtWindow.h"
-#include "VirtualRobot/EndEffector/EndEffector.h"
-#include "VirtualRobot/Scene.h"
-#include "VirtualRobot/Workspace/Reachability.h"
-#include "VirtualRobot/ManipulationObject.h"
-#include "VirtualRobot/Grasping/Grasp.h"
-#include "VirtualRobot/IK/GenericIKSolver.h"
-#include "VirtualRobot/Grasping/GraspSet.h"
-#include "VirtualRobot/Obstacle.h"
-#include "VirtualRobot/CollisionDetection/CDManager.h"
-#include "VirtualRobot/XML/ObjectIO.h"
-#include "VirtualRobot/XML/RobotIO.h"
-#include "VirtualRobot/Visualization/CoinVisualization/CoinVisualizationFactory.h"
-#include "MotionPlanning/CSpace/CSpaceSampled.h"
-#include "MotionPlanning/Planner/Rrt.h"
-#include "MotionPlanning/Planner/GraspRrt.h"
-#include "MotionPlanning/PostProcessing/ShortcutProcessor.h"
-#include <MotionPlanning/Visualization/CoinVisualization/CoinRrtWorkspaceVisualization.h>
+
+#include <cmath>
+#include <ctime>
+#include <iostream>
+#include <sstream>
+#include <vector>
+
 #include <QFileDialog>
+
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
-#include <ctime>
-#include <vector>
-#include <iostream>
-#include <cmath>
 
 #include "Inventor/actions/SoLineHighlightRenderAction.h"
-#include <Inventor/nodes/SoShapeHints.h>
-#include <Inventor/nodes/SoLightModel.h>
-#include <Inventor/sensors/SoTimerSensor.h>
+#include "MotionPlanning/CSpace/CSpaceSampled.h"
+#include "MotionPlanning/Planner/GraspRrt.h"
+#include "MotionPlanning/Planner/Rrt.h"
+#include "MotionPlanning/PostProcessing/ShortcutProcessor.h"
+#include "VirtualRobot/CollisionDetection/CDManager.h"
+#include "VirtualRobot/EndEffector/EndEffector.h"
+#include "VirtualRobot/Grasping/Grasp.h"
+#include "VirtualRobot/Grasping/GraspSet.h"
+#include "VirtualRobot/IK/GenericIKSolver.h"
+#include "VirtualRobot/ManipulationObject.h"
+#include "VirtualRobot/Obstacle.h"
+#include "VirtualRobot/Scene.h"
+#include "VirtualRobot/Visualization/CoinVisualization/CoinVisualizationFactory.h"
+#include "VirtualRobot/Workspace/Reachability.h"
+#include "VirtualRobot/XML/ObjectIO.h"
+#include "VirtualRobot/XML/RobotIO.h"
 #include <Inventor/nodes/SoEventCallback.h>
+#include <Inventor/nodes/SoLightModel.h>
 #include <Inventor/nodes/SoMatrixTransform.h>
-
-#include <sstream>
+#include <Inventor/nodes/SoShapeHints.h>
+#include <Inventor/sensors/SoTimerSensor.h>
+#include <MotionPlanning/Visualization/CoinVisualization/CoinRrtWorkspaceVisualization.h>
 using namespace std;
 using namespace VirtualRobot;
 
 float TIMER_MS = 200.0f;
 
-GraspRrtWindow::GraspRrtWindow(const std::string& sceneFile, const std::string& sConf, const std::string& goalObject,
-                               const std::string& rns, const std::string& rnsB, const std::string& eefName, const std::string& eefNameB,
-                               const std::string& colModelRob1, const std::string& colModelRob1B, const std::string& colModelRob2, const std::string& colModelRob2B,
-                               const std::string& colModelEnv)
-    : QMainWindow(nullptr)
+GraspRrtWindow::GraspRrtWindow(const std::string& sceneFile,
+                               const std::string& sConf,
+                               const std::string& goalObject,
+                               const std::string& rns,
+                               const std::string& rnsB,
+                               const std::string& eefName,
+                               const std::string& eefNameB,
+                               const std::string& colModelRob1,
+                               const std::string& colModelRob1B,
+                               const std::string& colModelRob2,
+                               const std::string& colModelRob2B,
+                               const std::string& colModelEnv) :
+    QMainWindow(nullptr)
 {
     VR_INFO << " start " << std::endl;
 
@@ -74,12 +84,10 @@ GraspRrtWindow::GraspRrtWindow(const std::string& sceneFile, const std::string& 
     loadScene();
 
 
-
     selectPlanSet(0);
 
     selectStart(sConf);
     selectTargetObject(goalObject);
-
 
 
     if (sConf != "")
@@ -120,21 +128,20 @@ GraspRrtWindow::GraspRrtWindow(const std::string& sceneFile, const std::string& 
     sensor_mgr->insertTimerSensor(timer);
 }
 
-
 GraspRrtWindow::~GraspRrtWindow()
 {
     allSep->unref();
 }
 
-
-void GraspRrtWindow::timerCB(void* data, SoSensor* /*sensor*/)
+void
+GraspRrtWindow::timerCB(void* data, SoSensor* /*sensor*/)
 {
     GraspRrtWindow* ikWindow = static_cast<GraspRrtWindow*>(data);
     ikWindow->redraw();
 }
 
-
-void GraspRrtWindow::setupUI()
+void
+GraspRrtWindow::setupUI()
 {
     UI.setupUi(this);
     viewer = new SoQtExaminerViewer(UI.frameViewer, "", TRUE, SoQtExaminerViewer::BUILD_POPUP);
@@ -169,31 +176,32 @@ void GraspRrtWindow::setupUI()
     connect(UI.comboBoxRNS, SIGNAL(activated(int)), this, SLOT(selectRNS(int)));
     connect(UI.comboBoxEEF, SIGNAL(activated(int)), this, SLOT(selectEEF(int)));
     connect(UI.comboBoxColModelRobot, SIGNAL(activated(int)), this, SLOT(selectColModelRobA(int)));
-    connect(UI.comboBoxColModelRobotStatic, SIGNAL(activated(int)), this, SLOT(selectColModelRobB(int)));
+    connect(UI.comboBoxColModelRobotStatic,
+            SIGNAL(activated(int)),
+            this,
+            SLOT(selectColModelRobB(int)));
     connect(UI.comboBoxColModelEnv, SIGNAL(activated(int)), this, SLOT(selectColModelEnv(int)));
 
     connect(UI.pushButtonGraspPose, SIGNAL(clicked()), this, SLOT(testGraspPose()));
 
     connect(UI.pushButtonOpen, SIGNAL(clicked()), this, SLOT(openEEF()));
     connect(UI.pushButtonClose, SIGNAL(clicked()), this, SLOT(closeEEF()));
-
 }
 
-
-
-
-void GraspRrtWindow::closeEvent(QCloseEvent* event)
+void
+GraspRrtWindow::closeEvent(QCloseEvent* event)
 {
     quit();
     QMainWindow::closeEvent(event);
 }
 
-
-void GraspRrtWindow::buildVisu()
+void
+GraspRrtWindow::buildVisu()
 {
     sceneFileSep->removeAllChildren();
 
-    SceneObject::VisualizationType colModel = (UI.checkBoxColModel->isChecked()) ? SceneObject::Collision : SceneObject::Full;
+    SceneObject::VisualizationType colModel =
+        (UI.checkBoxColModel->isChecked()) ? SceneObject::Collision : SceneObject::Full;
 
     if (scene)
     {
@@ -217,7 +225,7 @@ void GraspRrtWindow::buildVisu()
     {
         SoSeparator* eefVisu = CoinVisualizationFactory::CreateEndEffectorVisualization(eef);
 
-        for (auto & grasp : grasps)
+        for (auto& grasp : grasps)
         {
 
             Eigen::Matrix4f m = grasp->getTcpPoseGlobal(targetObject->getGlobalPose());
@@ -249,24 +257,27 @@ void GraspRrtWindow::buildVisu()
     redraw();
 }
 
-int GraspRrtWindow::main()
+int
+GraspRrtWindow::main()
 {
     SoQt::show(this);
     SoQt::mainLoop();
     return 0;
 }
 
-
-void GraspRrtWindow::quit()
+void
+GraspRrtWindow::quit()
 {
     std::cout << "GraspRrtWindow: Closing" << std::endl;
     this->close();
     SoQt::exitMainLoop();
 }
 
-void GraspRrtWindow::loadSceneWindow()
+void
+GraspRrtWindow::loadSceneWindow()
 {
-    QString fi = QFileDialog::getOpenFileName(this, tr("Open Scene File"), QString(), tr("XML Files (*.xml)"));
+    QString fi = QFileDialog::getOpenFileName(
+        this, tr("Open Scene File"), QString(), tr("XML Files (*.xml)"));
 
     if (fi == "")
     {
@@ -277,7 +288,8 @@ void GraspRrtWindow::loadSceneWindow()
     loadScene();
 }
 
-void GraspRrtWindow::loadScene()
+void
+GraspRrtWindow::loadScene()
 {
     robot.reset();
     scene = SceneIO::loadScene(sceneFile);
@@ -288,7 +300,7 @@ void GraspRrtWindow::loadScene()
         return;
     }
 
-    std::vector< RobotPtr > robots = scene->getRobots();
+    std::vector<RobotPtr> robots = scene->getRobots();
 
     if (robots.size() != 1)
     {
@@ -311,11 +323,10 @@ void GraspRrtWindow::loadScene()
 
     UI.comboBoxStart->clear();
 
-    for (auto & config : configs)
+    for (auto& config : configs)
     {
         QString qtext = config->getName().c_str();
         UI.comboBoxStart->addItem(qtext);
-
     }
 
     UI.comboBoxStart->setCurrentIndex(0);
@@ -332,11 +343,10 @@ void GraspRrtWindow::loadScene()
 
     UI.comboBoxGoal->clear();
 
-    for (auto & obstacle : obstacles)
+    for (auto& obstacle : obstacles)
     {
         QString qtext = obstacle->getName().c_str();
         UI.comboBoxGoal->addItem(qtext);
-
     }
 
     UI.comboBoxGoal->setCurrentIndex(0);
@@ -347,7 +357,7 @@ void GraspRrtWindow::loadScene()
     UI.comboBoxColModelEnv->clear();
     QString qtext;
 
-    for (auto & sos : soss)
+    for (auto& sos : soss)
     {
         qtext = sos->getName().c_str();
         UI.comboBoxColModelEnv->addItem(qtext);
@@ -386,7 +396,7 @@ void GraspRrtWindow::loadScene()
     UI.comboBoxColModelRobotStatic->clear();
     UI.comboBoxRNS->clear();
 
-    for (auto & rns : rnss)
+    for (auto& rns : rnss)
     {
         qtext = rns->getName().c_str();
         UI.comboBoxColModelRobot->addItem(qtext);
@@ -401,7 +411,8 @@ void GraspRrtWindow::loadScene()
     buildVisu();
 }
 
-void GraspRrtWindow::selectStart(const std::string& conf)
+void
+GraspRrtWindow::selectStart(const std::string& conf)
 {
     for (size_t i = 0; i < configs.size(); i++)
     {
@@ -416,7 +427,8 @@ void GraspRrtWindow::selectStart(const std::string& conf)
     VR_ERROR << "No configuration with name <" << conf << "> found..." << std::endl;
 }
 
-void GraspRrtWindow::selectTargetObject(const std::string& conf)
+void
+GraspRrtWindow::selectTargetObject(const std::string& conf)
 {
     for (size_t i = 0; i < obstacles.size(); i++)
     {
@@ -431,14 +443,15 @@ void GraspRrtWindow::selectTargetObject(const std::string& conf)
     VR_ERROR << "No obstacle with name <" << conf << "> found..." << std::endl;
 }
 
-void GraspRrtWindow::selectRNS(const std::string& rns)
+void
+GraspRrtWindow::selectRNS(const std::string& rns)
 {
     if (!robot)
     {
         return;
     }
 
-    std::vector< RobotNodeSetPtr > rnss = robot->getRobotNodeSets();
+    std::vector<RobotNodeSetPtr> rnss = robot->getRobotNodeSets();
 
     for (size_t i = 0; i < rnss.size(); i++)
     {
@@ -453,7 +466,8 @@ void GraspRrtWindow::selectRNS(const std::string& rns)
     VR_ERROR << "No rns with name <" << rns << "> found..." << std::endl;
 }
 
-void GraspRrtWindow::selectEEF(const std::string& eefName)
+void
+GraspRrtWindow::selectEEF(const std::string& eefName)
 {
     if (!robot)
     {
@@ -491,14 +505,15 @@ void GraspRrtWindow::selectEEF(const std::string& eefName)
     VR_ERROR << "No eef with name <" << eefName << "> found..." << std::endl;*/
 }
 
-void GraspRrtWindow::selectColModelRobA(const std::string& colModel)
+void
+GraspRrtWindow::selectColModelRobA(const std::string& colModel)
 {
     if (!robot)
     {
         return;
     }
 
-    std::vector< RobotNodeSetPtr > rnss = robot->getRobotNodeSets();
+    std::vector<RobotNodeSetPtr> rnss = robot->getRobotNodeSets();
 
     for (size_t i = 0; i < rnss.size(); i++)
     {
@@ -512,14 +527,16 @@ void GraspRrtWindow::selectColModelRobA(const std::string& colModel)
 
     VR_ERROR << "No col model set with name <" << colModel << "> found..." << std::endl;
 }
-void GraspRrtWindow::selectColModelRobB(const std::string& colModel)
+
+void
+GraspRrtWindow::selectColModelRobB(const std::string& colModel)
 {
     if (!robot)
     {
         return;
     }
 
-    std::vector< RobotNodeSetPtr > rnss = robot->getRobotNodeSets();
+    std::vector<RobotNodeSetPtr> rnss = robot->getRobotNodeSets();
 
     for (size_t i = 0; i < rnss.size(); i++)
     {
@@ -533,14 +550,16 @@ void GraspRrtWindow::selectColModelRobB(const std::string& colModel)
 
     VR_ERROR << "No col model set with name <" << colModel << "> found..." << std::endl;
 }
-void GraspRrtWindow::selectColModelEnv(const std::string& colModel)
+
+void
+GraspRrtWindow::selectColModelEnv(const std::string& colModel)
 {
     if (!scene)
     {
         return;
     }
 
-    std::vector< SceneObjectSetPtr > rnss = scene->getSceneObjectSets();
+    std::vector<SceneObjectSetPtr> rnss = scene->getSceneObjectSets();
 
     for (size_t i = 0; i < rnss.size(); i++)
     {
@@ -555,7 +574,8 @@ void GraspRrtWindow::selectColModelEnv(const std::string& colModel)
     VR_ERROR << "No scene object set with name <" << colModel << "> found..." << std::endl;
 }
 
-void GraspRrtWindow::selectStart(int nr)
+void
+GraspRrtWindow::selectStart(int nr)
 {
     if (nr < 0 || nr >= (int)configs.size())
     {
@@ -576,7 +596,8 @@ void GraspRrtWindow::selectStart(int nr)
     }
 }
 
-void GraspRrtWindow::selectTargetObject(int nr)
+void
+GraspRrtWindow::selectTargetObject(int nr)
 {
     if (nr < 0 || nr >= (int)obstacles.size())
     {
@@ -597,7 +618,8 @@ void GraspRrtWindow::selectTargetObject(int nr)
     graspQuality->calculateOWS(points);
 }
 
-void GraspRrtWindow::selectRNS(int nr)
+void
+GraspRrtWindow::selectRNS(int nr)
 {
     this->rns.reset();
 
@@ -606,7 +628,7 @@ void GraspRrtWindow::selectRNS(int nr)
         return;
     }
 
-    std::vector< RobotNodeSetPtr > rnss = robot->getRobotNodeSets();
+    std::vector<RobotNodeSetPtr> rnss = robot->getRobotNodeSets();
 
     if (nr < 0 || nr >= (int)rnss.size())
     {
@@ -616,7 +638,8 @@ void GraspRrtWindow::selectRNS(int nr)
     this->rns = rnss[nr];
 }
 
-void GraspRrtWindow::selectEEF(int nr)
+void
+GraspRrtWindow::selectEEF(int nr)
 {
     this->eef.reset();
 
@@ -632,7 +655,8 @@ void GraspRrtWindow::selectEEF(int nr)
         this->eef = eefs[nr];*/
 }
 
-void GraspRrtWindow::selectColModelRobA(int nr)
+void
+GraspRrtWindow::selectColModelRobA(int nr)
 {
     colModelRobA.reset();
 
@@ -641,7 +665,7 @@ void GraspRrtWindow::selectColModelRobA(int nr)
         return;
     }
 
-    std::vector< RobotNodeSetPtr > rnss = robot->getRobotNodeSets();
+    std::vector<RobotNodeSetPtr> rnss = robot->getRobotNodeSets();
 
     if (nr < 0 || nr >= (int)rnss.size())
     {
@@ -651,7 +675,8 @@ void GraspRrtWindow::selectColModelRobA(int nr)
     this->colModelRobA = robot->getRobotNodeSet(rnss[nr]->getName());
 }
 
-void GraspRrtWindow::selectColModelRobB(int nr)
+void
+GraspRrtWindow::selectColModelRobB(int nr)
 {
     colModelRobB.reset();
 
@@ -660,7 +685,7 @@ void GraspRrtWindow::selectColModelRobB(int nr)
         return;
     }
 
-    std::vector< RobotNodeSetPtr > rnss = robot->getRobotNodeSets();
+    std::vector<RobotNodeSetPtr> rnss = robot->getRobotNodeSets();
 
     if (nr < 0 || nr >= (int)rnss.size())
     {
@@ -670,7 +695,8 @@ void GraspRrtWindow::selectColModelRobB(int nr)
     this->colModelRobB = robot->getRobotNodeSet(rnss[nr]->getName());
 }
 
-void GraspRrtWindow::selectColModelEnv(int nr)
+void
+GraspRrtWindow::selectColModelEnv(int nr)
 {
     colModelEnv.reset();
 
@@ -679,7 +705,7 @@ void GraspRrtWindow::selectColModelEnv(int nr)
         return;
     }
 
-    std::vector< SceneObjectSetPtr > rnss = scene->getSceneObjectSets();
+    std::vector<SceneObjectSetPtr> rnss = scene->getSceneObjectSets();
 
     if (nr < 0 || nr >= (int)rnss.size())
     {
@@ -689,7 +715,8 @@ void GraspRrtWindow::selectColModelEnv(int nr)
     this->colModelEnv = scene->getSceneObjectSet(rnss[nr]->getName());
 }
 
-void GraspRrtWindow::buildRRTVisu()
+void
+GraspRrtWindow::buildRRTVisu()
 {
     rrtSep->removeAllChildren();
 
@@ -698,7 +725,8 @@ void GraspRrtWindow::buildRRTVisu()
         return;
     }
 
-    std::shared_ptr<Saba::CoinRrtWorkspaceVisualization> w(new Saba::CoinRrtWorkspaceVisualization(robot, cspace, eef->getGCP()->getName()));
+    std::shared_ptr<Saba::CoinRrtWorkspaceVisualization> w(
+        new Saba::CoinRrtWorkspaceVisualization(robot, cspace, eef->getGCP()->getName()));
 
     if (UI.checkBoxShowRRT->isChecked())
     {
@@ -725,7 +753,8 @@ void GraspRrtWindow::buildRRTVisu()
     rrtSep->addChild(sol);
 }
 
-void GraspRrtWindow::testInit()
+void
+GraspRrtWindow::testInit()
 {
     // setup collision detection
     if (!test_cspace)
@@ -757,14 +786,16 @@ void GraspRrtWindow::testInit()
     test_cspace->setSamplingSizeDCD(samplDCD);
     float minGraspScore = (float)UI.doubleSpinBoxMinGraspScore->value();
 
-    test_graspRrt.reset(new Saba::GraspRrt(test_cspace, eef, targetObject, graspQuality, colModelEnv, 0.1f, minGraspScore));
+    test_graspRrt.reset(new Saba::GraspRrt(
+        test_cspace, eef, targetObject, graspQuality, colModelEnv, 0.1f, minGraspScore));
 
     test_graspRrt->setStart(startConfig);
     eef->getGCP()->showCoordinateSystem(true);
     test_graspRrt->init();
 }
 
-void GraspRrtWindow::testGraspPose()
+void
+GraspRrtWindow::testGraspPose()
 {
     if (!robot || !rns || !eef || !graspQuality)
     {
@@ -788,7 +819,8 @@ void GraspRrtWindow::testGraspPose()
     o->setGlobalPose(globalGrasp);
     o->showCoordinateSystem(true);
     graspsSep->removeAllChildren();
-    graspsSep->addChild(VirtualRobot::CoinVisualizationFactory::getCoinVisualization(o, VirtualRobot::SceneObject::Full));
+    graspsSep->addChild(VirtualRobot::CoinVisualizationFactory::getCoinVisualization(
+        o, VirtualRobot::SceneObject::Full));
 
     // move towards object
     Eigen::Matrix4f p = eef->getGCP()->getGlobalPose();
@@ -814,9 +846,10 @@ void GraspRrtWindow::testGraspPose()
     std::cout << p2 << std::endl;*/
 }
 
-void GraspRrtWindow::plan()
+void
+GraspRrtWindow::plan()
 {
-    if (not (robot and rns and eef and graspQuality))
+    if (not(robot and rns and eef and graspQuality))
     {
         return;
     }
@@ -849,7 +882,7 @@ void GraspRrtWindow::plan()
     cspace->setSamplingSizeDCD(sampleSizeDCD);
 
     Saba::GraspRrtPtr graspRrt = std::make_shared<Saba::GraspRrt>(
-                cspace, eef, targetObject, graspQuality, colModelEnv, 0.1f, minGraspScore);
+        cspace, eef, targetObject, graspQuality, colModelEnv, 0.1f, minGraspScore);
 
     graspRrt->setStart(startConfig);
 
@@ -860,7 +893,7 @@ void GraspRrtWindow::plan()
         solution = graspRrt->getSolution();
 
         Saba::ShortcutProcessorPtr postProcessing =
-                std::make_shared<Saba::ShortcutProcessor>(solution, cspace, false);
+            std::make_shared<Saba::ShortcutProcessor>(solution, cspace, false);
         int steps = 100;
         solutionOptimized = postProcessing->optimize(steps);
 
@@ -873,10 +906,13 @@ void GraspRrtWindow::plan()
         for (size_t i = 0; i < graspInfoVector.size(); i++)
         {
             std::cout << "processing grasp " << i << std::endl;
-            VirtualRobot::GraspPtr g = std::make_shared<VirtualRobot::Grasp>(
-                        "GraspRrt Grasp", robot->getType(), eef->getName(),
-                        graspInfoVector[i].handToObjectTransform, "GraspRrt",
-                        graspInfoVector[i].graspScore);
+            VirtualRobot::GraspPtr g =
+                std::make_shared<VirtualRobot::Grasp>("GraspRrt Grasp",
+                                                      robot->getType(),
+                                                      eef->getName(),
+                                                      graspInfoVector[i].handToObjectTransform,
+                                                      "GraspRrt",
+                                                      graspInfoVector[i].graspScore);
             grasps.push_back(g);
         }
     }
@@ -890,15 +926,20 @@ void GraspRrtWindow::plan()
     buildVisu();
 }
 
-void GraspRrtWindow::colModel()
+void
+GraspRrtWindow::colModel()
 {
     buildVisu();
 }
-void GraspRrtWindow::solutionSelected()
+
+void
+GraspRrtWindow::solutionSelected()
 {
     sliderSolution(UI.horizontalSliderPos->sliderPosition());
 }
-void GraspRrtWindow::sliderSolution(int pos)
+
+void
+GraspRrtWindow::sliderSolution(int pos)
 {
     if (!solution)
     {
@@ -919,7 +960,8 @@ void GraspRrtWindow::sliderSolution(int pos)
     redraw();
 }
 
-void GraspRrtWindow::redraw()
+void
+GraspRrtWindow::redraw()
 {
     viewer->scheduleRedraw();
     UI.frameViewer->update();
@@ -928,8 +970,8 @@ void GraspRrtWindow::redraw()
     viewer->scheduleRedraw();
 }
 
-
-void GraspRrtWindow::selectPlanSet(int nr)
+void
+GraspRrtWindow::selectPlanSet(int nr)
 {
     if (nr == 0)
     {
@@ -951,8 +993,8 @@ void GraspRrtWindow::selectPlanSet(int nr)
     }
 }
 
-
-void GraspRrtWindow::closeEEF()
+void
+GraspRrtWindow::closeEEF()
 {
     if (eef)
     {
@@ -962,7 +1004,8 @@ void GraspRrtWindow::closeEEF()
     redraw();
 }
 
-void GraspRrtWindow::openEEF()
+void
+GraspRrtWindow::openEEF()
 {
     if (eef)
     {

@@ -22,17 +22,23 @@
 */
 #pragma once
 
-#include "VirtualRobot/VirtualRobot.h"
 #include "VirtualRobot/IK/ConstrainedIK.h"
 #include "VirtualRobot/IK/HierarchicalIK.h"
-
+#include "VirtualRobot/VirtualRobot.h"
 
 namespace VirtualRobot
 {
-    class VIRTUAL_ROBOT_IMPORT_EXPORT ConstrainedHierarchicalIK : public ConstrainedIK, public std::enable_shared_from_this<ConstrainedHierarchicalIK>
+    class VIRTUAL_ROBOT_IMPORT_EXPORT ConstrainedHierarchicalIK :
+        public ConstrainedIK,
+        public std::enable_shared_from_this<ConstrainedHierarchicalIK>
     {
     public:
-        ConstrainedHierarchicalIK(RobotPtr& robot, const RobotNodeSetPtr& nodeSet, float stepSize = 0.2f, int maxIterations = 1000, float stall_epsilon = 0.0001, float raise_epsilon = 0.1);
+        ConstrainedHierarchicalIK(RobotPtr& robot,
+                                  const RobotNodeSetPtr& nodeSet,
+                                  float stepSize = 0.2f,
+                                  int maxIterations = 1000,
+                                  float stall_epsilon = 0.0001,
+                                  float raise_epsilon = 0.1);
 
         bool initialize() override;
         bool solveStep() override;
@@ -48,5 +54,4 @@ namespace VirtualRobot
     };
 
     typedef std::shared_ptr<ConstrainedHierarchicalIK> ConstrainedHierarchicalIKPtr;
-}
-
+} // namespace VirtualRobot

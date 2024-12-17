@@ -21,9 +21,8 @@
 
 #pragma once
 
-#include "MathForwardDefinitions.h"
 #include "LinearInterpolatedOrientation.h"
-
+#include "MathForwardDefinitions.h"
 
 namespace math
 {
@@ -31,7 +30,11 @@ namespace math
     class LinearInterpolatedPose
     {
     public:
-        LinearInterpolatedPose(const Eigen::Matrix4f& startPose, const Eigen::Matrix4f& endPose, float startT, float endT, bool clamp);
+        LinearInterpolatedPose(const Eigen::Matrix4f& startPose,
+                               const Eigen::Matrix4f& endPose,
+                               float startT,
+                               float endT,
+                               bool clamp);
 
         Eigen::Matrix4f Get(float t);
 
@@ -43,4 +46,4 @@ namespace math
         float endT;
         bool clamp;
     };
-}
+} // namespace math

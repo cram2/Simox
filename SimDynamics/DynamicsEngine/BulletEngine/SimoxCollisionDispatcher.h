@@ -22,15 +22,14 @@
 */
 #pragma once
 
-#include "../../SimDynamics.h"
-#include "BulletEngine.h"
-
-#include <btBulletCollisionCommon.h>
+#include <vector>
 
 #include <VirtualRobot/Nodes/RobotNodeActuator.h>
 #include <VirtualRobot/SceneObject.h>
 
-#include <vector>
+#include "../../SimDynamics.h"
+#include "BulletEngine.h"
+#include <btBulletCollisionCommon.h>
 
 namespace SimDynamics
 {
@@ -40,15 +39,14 @@ namespace SimDynamics
     */
     struct SIMDYNAMICS_IMPORT_EXPORT SimoxCollisionDispatcher : public btCollisionDispatcher
     {
-        SimoxCollisionDispatcher(BulletEngine* engine, btCollisionConfiguration* collisionConfiguration);
+        SimoxCollisionDispatcher(BulletEngine* engine,
+                                 btCollisionConfiguration* collisionConfiguration);
         ~SimoxCollisionDispatcher() override;
-        bool    needsCollision(const btCollisionObject *body0, const btCollisionObject *body1) override;
-        bool    needsResponse(const btCollisionObject* body0,const btCollisionObject* body1) override;
+        bool needsCollision(const btCollisionObject* body0,
+                            const btCollisionObject* body1) override;
+        bool needsResponse(const btCollisionObject* body0, const btCollisionObject* body1) override;
 
     protected:
         BulletEngine* engine;
     };
-}
-
-
-
+} // namespace SimDynamics

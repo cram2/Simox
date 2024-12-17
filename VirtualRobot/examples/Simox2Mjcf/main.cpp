@@ -1,7 +1,6 @@
 #include <filesystem>
 
 #include <VirtualRobot/RuntimeEnvironment.h>
-
 #include <VirtualRobot/XML/RobotIO.h>
 #include <VirtualRobot/XML/mujoco/RobotMjcf.h>
 
@@ -11,38 +10,36 @@ using VirtualRobot::RuntimeEnvironment;
 
 namespace fs = std::filesystem;
 
-
 /**
  * Loads a Simox robot and converts it to Mujoco's XML format (MJCF).
  * The converted file is stored in a directory mjcf/ placed in the directory
  * of the input file.
  */
-int main(int argc, char* argv[])
+int
+main(int argc, char* argv[])
 {
     RuntimeEnvironment::setCaption("Convert Simox XML to MJCF (Mujoco XML)");
 
-    RuntimeEnvironment::considerKey(
-                "robot", "The Simox robot model to convert. (required)");
-    RuntimeEnvironment::considerKey(
-                "outdir", "The output directory. (default: 'mjcf')");
-    RuntimeEnvironment::considerKey(
-                "mesh_rel_dir", "The mesh directory relative to outdir. (default: 'mesh')");
+    RuntimeEnvironment::considerKey("robot", "The Simox robot model to convert. (required)");
+    RuntimeEnvironment::considerKey("outdir", "The output directory. (default: 'mjcf')");
+    RuntimeEnvironment::considerKey("mesh_rel_dir",
+                                    "The mesh directory relative to outdir. (default: 'mesh')");
 
     RuntimeEnvironment::considerKey(
-                "actuator", "The actuator type to add (motor, position, velocity). (default: motor)");
+        "actuator", "The actuator type to add (motor, position, velocity). (default: motor)");
     RuntimeEnvironment::considerFlag(
-                "mount", "How to mount the robot at the world body (fixed, free, mocap). (default: fixed)");
+        "mount", "How to mount the robot at the world body (fixed, free, mocap). (default: fixed)");
 
     RuntimeEnvironment::considerFlag(
-                "rel_paths", "Store relative mesh paths instead of absolute ones. (This can "
-                             "cause problems when including the generated model from another directory.)");
+        "rel_paths",
+        "Store relative mesh paths instead of absolute ones. (This can "
+        "cause problems when including the generated model from another directory.)");
 
     RuntimeEnvironment::considerKey(
-                "scale_length", "Scaling of lengths and distances (to m). For meshes, see 'scale_mesh'. (default: 1.0)");
-    RuntimeEnvironment::considerKey(
-                "scale_mesh", "Scaling of meshes (to m). (default: 1.0)");
-    RuntimeEnvironment::considerKey(
-                "scale_mass", "Scaling of masses (to kg). (default: 1.0)");
+        "scale_length",
+        "Scaling of lengths and distances (to m). For meshes, see 'scale_mesh'. (default: 1.0)");
+    RuntimeEnvironment::considerKey("scale_mesh", "Scaling of meshes (to m). (default: 1.0)");
+    RuntimeEnvironment::considerKey("scale_mass", "Scaling of masses (to kg). (default: 1.0)");
 
     // RuntimeEnvironment::considerFlag(
     //            "verbose", "Enable verbose output.");
@@ -70,8 +67,8 @@ int main(int argc, char* argv[])
         }
     }
 
-    const fs::path outputDir = RuntimeEnvironment::checkParameter(
-                "outdir", (inputFilename.parent_path() / "mjcf"));
+    const fs::path outputDir =
+        RuntimeEnvironment::checkParameter("outdir", (inputFilename.parent_path() / "mjcf"));
     const std::string meshRelDir = RuntimeEnvironment::checkParameter("mesh_rel_dir", "mesh");
 
 
@@ -132,7 +129,7 @@ int main(int argc, char* argv[])
     std::cout << "Actuator type:      " << actuatorTypeStr << std::endl;
     std::cout << "World Mount Mode:   " << worldMountModeStr << std::endl;
 
-    std::cout << "Scaling: " <<  std::endl
+    std::cout << "Scaling: " << std::endl
               << "  - length: " << scaleLength << std::endl
               << "  - mesh:   " << scaleMesh << std::endl
               << "  - mass:   " << scaleMass << std::endl;

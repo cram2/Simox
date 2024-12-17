@@ -25,18 +25,15 @@
 #include "../VirtualRobot.h"
 #include "SimpleAbstractFunctionR3R1.h"
 
-
 namespace math
 {
-    class VIRTUAL_ROBOT_IMPORT_EXPORT AbstractFunctionR3R1 :
-            public SimpleAbstractFunctionR3R1
+    class VIRTUAL_ROBOT_IMPORT_EXPORT AbstractFunctionR3R1 : public SimpleAbstractFunctionR3R1
     {
     public:
-       virtual float GetDdx(Eigen::Vector3f pos) = 0;
-       virtual float GetDdy(Eigen::Vector3f pos) = 0;
-       virtual float GetDdz(Eigen::Vector3f pos) = 0;
+        virtual float GetDdx(Eigen::Vector3f pos) = 0;
+        virtual float GetDdy(Eigen::Vector3f pos) = 0;
+        virtual float GetDdz(Eigen::Vector3f pos) = 0;
 
     private:
     };
-}
-
+} // namespace math

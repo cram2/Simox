@@ -6,9 +6,10 @@
 
 #define BOOST_TEST_MODULE VirtualRobot_TriMeshModelTest
 
+#include <Eigen/Core>
+
 #include <VirtualRobot/VirtualRobotTest.h>
 #include <VirtualRobot/Visualization/TriMeshModel.h>
-#include <Eigen/Core>
 
 BOOST_AUTO_TEST_SUITE(Visualization)
 
@@ -38,7 +39,6 @@ BOOST_AUTO_TEST_CASE(testTriMeshModelCreation)
     BOOST_CHECK_EQUAL(model.faces.size(), 0);
 }
 
-
 BOOST_AUTO_TEST_CASE(testAddTriangleWithFace)
 {
     Eigen::Vector3f vertex1, vertex2, vertex3;
@@ -52,7 +52,6 @@ BOOST_AUTO_TEST_CASE(testAddTriangleWithFace)
     BOOST_CHECK_EQUAL(model.faces.size(), 1);
 }
 
-
 BOOST_AUTO_TEST_CASE(testAddVertex)
 {
     Eigen::Vector3f vertex;
@@ -65,7 +64,6 @@ BOOST_AUTO_TEST_CASE(testAddVertex)
     BOOST_CHECK_EQUAL(model.faces.size(), numberOfFaces);
 }
 
-
 BOOST_AUTO_TEST_CASE(testAddFace)
 {
     VirtualRobot::MathTools::TriangleFace face;
@@ -74,9 +72,8 @@ BOOST_AUTO_TEST_CASE(testAddFace)
     const unsigned int numberOfVertices = model.vertices.size();
     model.addFace(face);
     BOOST_CHECK_EQUAL(model.vertices.size(), numberOfVertices);
-    BOOST_CHECK_EQUAL(model.faces.size(), numberOfFaces  + 1);
+    BOOST_CHECK_EQUAL(model.faces.size(), numberOfFaces + 1);
 }
-
 
 BOOST_AUTO_TEST_CASE(testClear)
 {
@@ -92,7 +89,6 @@ BOOST_AUTO_TEST_CASE(testClear)
     BOOST_CHECK_EQUAL(model.faces.size(), 0);
 }
 
-
 BOOST_AUTO_TEST_CASE(testCreateNormal)
 {
     Eigen::Vector3f vertex1, vertex2, vertex3;
@@ -106,7 +102,6 @@ BOOST_AUTO_TEST_CASE(testCreateNormal)
     BOOST_CHECK_CLOSE(normal.y(), 0.5774, 0.01);
     BOOST_CHECK_CLOSE(normal.z(), 0.5774, 0.01);
 }
-
 
 BOOST_AUTO_TEST_CASE(testFlipVertexOrientation)
 {

@@ -25,38 +25,36 @@
 
 #include "../Constraint.h"
 
+namespace VirtualRobot
+{
 
-
-
-namespace VirtualRobot {
-
-/**
+    /**
  * @brief The CollisionCheckConstraint is a simple constraint for considering collisions during solving the inverse kinematics.
  *
  * This constraint does not provide a gradient. It only rejects invalid configurations in the function checkTolerances().
  */
-class VIRTUAL_ROBOT_IMPORT_EXPORT CollisionCheckConstraint : public Constraint
-{
-public:
-    /**
+    class VIRTUAL_ROBOT_IMPORT_EXPORT CollisionCheckConstraint : public Constraint
+    {
+    public:
+        /**
      * @brief CollisionCheckConstraint
      * @param rns RobotNodeSet used for the IK
      * @param cdm Already configured collision manager. Will be used for the collision check.
      */
-    CollisionCheckConstraint(const VirtualRobot::RobotNodeSetPtr & rns, const VirtualRobot::CDManagerPtr &cdm);
+        CollisionCheckConstraint(const VirtualRobot::RobotNodeSetPtr& rns,
+                                 const VirtualRobot::CDManagerPtr& cdm);
 
-    // JacobiProvider interface
-    bool checkTolerances() override;
+        // JacobiProvider interface
+        bool checkTolerances() override;
 
-    // Constraint interface
-    double optimizationFunction(unsigned int id) override;
-    Eigen::VectorXf optimizationGradient(unsigned int id) override;
-    bool usingCollisionModel() override;
-protected:
-    VirtualRobot::CDManagerPtr cdm;
-    Eigen::VectorXf zeroVec;
+        // Constraint interface
+        double optimizationFunction(unsigned int id) override;
+        Eigen::VectorXf optimizationGradient(unsigned int id) override;
+        bool usingCollisionModel() override;
 
-};
+    protected:
+        VirtualRobot::CDManagerPtr cdm;
+        Eigen::VectorXf zeroVec;
+    };
 
 } // namespace VirtualRobot
-

@@ -4,10 +4,10 @@
 * @copyright  2019 Raphael Grimm
 */
 
-#define BOOST_TEST_MODULE SimoxUtility/backport/span
+#define BOOST_TEST_MODULE SimoxUtility / backport / span
 
-#include <vector>
 #include <iostream>
+#include <vector>
 
 #include <boost/test/included/unit_test.hpp>
 
@@ -15,7 +15,7 @@
 
 BOOST_AUTO_TEST_CASE(test_apply_vector)
 {
-    const std::vector<int> vec { 1, 2, 3 };
+    const std::vector<int> vec{1, 2, 3};
     std::span span(vec);
 
     BOOST_CHECK_EQUAL(vec.size(), span.size());

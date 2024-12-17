@@ -4,10 +4,8 @@
 namespace Saba
 {
 
-    CSpaceNode::CSpaceNode()
-    = default;
+    CSpaceNode::CSpaceNode() = default;
 
-    CSpaceNode::~CSpaceNode()
-    = default;
+    CSpaceNode::~CSpaceNode() = default;
 
-}
+} // namespace Saba

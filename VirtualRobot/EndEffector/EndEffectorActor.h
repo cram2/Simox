@@ -22,15 +22,16 @@
 */
 #pragma once
 
-#include "../VirtualRobot.h"
-#include "EndEffector.h"
-
 #include <string>
 #include <vector>
 
+#include "../VirtualRobot.h"
+#include "EndEffector.h"
+
 namespace VirtualRobot
 {
-    class VIRTUAL_ROBOT_IMPORT_EXPORT EndEffectorActor : public std::enable_shared_from_this<EndEffectorActor>
+    class VIRTUAL_ROBOT_IMPORT_EXPORT EndEffectorActor :
+        public std::enable_shared_from_this<EndEffectorActor>
     {
     public:
         enum CollisionMode
@@ -48,7 +49,9 @@ namespace VirtualRobot
             float directionAndSpeed;
         };
 
-        EndEffectorActor(const std::string& name, const std::vector< ActorDefinition >& a, CollisionCheckerPtr colChecker = CollisionCheckerPtr());
+        EndEffectorActor(const std::string& name,
+                         const std::vector<ActorDefinition>& a,
+                         CollisionCheckerPtr colChecker = CollisionCheckerPtr());
 
         std::vector<ActorDefinition> getDefinition();
 
@@ -74,34 +77,49 @@ namespace VirtualRobot
             \param angle How far should the eef actor move [rad]
             Returns true if all joints do either hit their limit or are in collision, e.g. the actor cannot be moved any further.
         */
-        bool moveActorCheckCollision(EndEffectorPtr eef, EndEffector::ContactInfoVector& storeContacts, SceneObjectSetPtr obstacles = SceneObjectSetPtr(), float angle = 0.02);
+        bool moveActorCheckCollision(EndEffectorPtr eef,
+                                     EndEffector::ContactInfoVector& storeContacts,
+                                     SceneObjectSetPtr obstacles = SceneObjectSetPtr(),
+                                     float angle = 0.02);
 
         /*!
             Checks if the actor collides with one of the given obstacles
         */
-        bool isColliding(SceneObjectSetPtr obstacles, CollisionMode checkColMode = EndEffectorActor::eAll);
-        bool isColliding(EndEffectorPtr eef, SceneObjectSetPtr obstacles, EndEffector::ContactInfoVector& storeContacts, CollisionMode checkColMode = EndEffectorActor::eAll);
+        bool isColliding(SceneObjectSetPtr obstacles,
+                         CollisionMode checkColMode = EndEffectorActor::eAll);
+        bool isColliding(EndEffectorPtr eef,
+                         SceneObjectSetPtr obstacles,
+                         EndEffector::ContactInfoVector& storeContacts,
+                         CollisionMode checkColMode = EndEffectorActor::eAll);
 
         /*!
             Checks if the actor collides with the given obstacle.
             \p checkColMode If set, the collisionMode of the actor's robotNodes is checked against it (e.g. to avoid collision checks with the static part of the eef)
         */
-        bool isColliding(SceneObjectPtr obstacle, CollisionMode checkColMode = EndEffectorActor::eAll);
-        bool isColliding(EndEffectorPtr eef, SceneObjectPtr obstacle, EndEffector::ContactInfoVector& storeContacts, CollisionMode checkColMode = EndEffectorActor::eAll);
+        bool isColliding(SceneObjectPtr obstacle,
+                         CollisionMode checkColMode = EndEffectorActor::eAll);
+        bool isColliding(EndEffectorPtr eef,
+                         SceneObjectPtr obstacle,
+                         EndEffector::ContactInfoVector& storeContacts,
+                         CollisionMode checkColMode = EndEffectorActor::eAll);
 
         /*!
             Checks if the actor collides with a given second actor
         */
         bool isColliding(EndEffectorActorPtr obstacle);
-        bool isColliding(EndEffectorPtr eef, EndEffectorActorPtr obstacle, EndEffector::ContactInfoVector& storeContacts);
+        bool isColliding(EndEffectorPtr eef,
+                         EndEffectorActorPtr obstacle,
+                         EndEffector::ContactInfoVector& storeContacts);
 
         /*!
             Checks if the actor collides with a given end effector
         */
         bool isColliding(EndEffectorPtr obstacle);
-        bool isColliding(EndEffectorPtr eef, EndEffectorPtr obstacle, EndEffector::ContactInfoVector& storeContacts);
+        bool isColliding(EndEffectorPtr eef,
+                         EndEffectorPtr obstacle,
+                         EndEffector::ContactInfoVector& storeContacts);
 
-        std::vector< RobotNodePtr > getRobotNodes();
+        std::vector<RobotNodePtr> getRobotNodes();
 
         void print();
 
@@ -124,8 +142,8 @@ namespace VirtualRobot
 
         bool isAtHiLimit() const;
         bool isAtLoLimit() const;
-    private:
 
+    private:
         std::string name;
         std::vector<ActorDefinition> actors;
 
@@ -133,4 +151,3 @@ namespace VirtualRobot
     };
 
 } // namespace VirtualRobot
-

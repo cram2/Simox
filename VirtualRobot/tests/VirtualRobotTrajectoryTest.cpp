@@ -6,33 +6,35 @@
 
 #define BOOST_TEST_MODULE VirtualRobot_VirtualTrajectoryTest
 
-#include <VirtualRobot/VirtualRobot.h>
-#include <VirtualRobot/VirtualRobotTest.h>
-#include <VirtualRobot/Trajectory.h>
-#include <VirtualRobot/Robot.h>
-#include <VirtualRobot/Nodes/RobotNode.h>
-#include <VirtualRobot/RobotNodeSet.h>
-#include <VirtualRobot/XML/RobotIO.h>
-#include <VirtualRobot/VirtualRobotException.h>
 #include <string>
+
+#include <VirtualRobot/Nodes/RobotNode.h>
+#include <VirtualRobot/Robot.h>
+#include <VirtualRobot/RobotNodeSet.h>
+#include <VirtualRobot/Trajectory.h>
+#include <VirtualRobot/VirtualRobot.h>
+#include <VirtualRobot/VirtualRobotException.h>
+#include <VirtualRobot/VirtualRobotTest.h>
+#include <VirtualRobot/XML/RobotIO.h>
 
 BOOST_AUTO_TEST_SUITE(Trajectory)
 
 BOOST_AUTO_TEST_CASE(testTrajectoryInvalidCreation)
 {
-    BOOST_REQUIRE_THROW(VirtualRobot::TrajectoryPtr c(new VirtualRobot::Trajectory(VirtualRobot::RobotNodeSetPtr(), "")), VirtualRobot::VirtualRobotException);
+    BOOST_REQUIRE_THROW(VirtualRobot::TrajectoryPtr c(
+                            new VirtualRobot::Trajectory(VirtualRobot::RobotNodeSetPtr(), "")),
+                        VirtualRobot::VirtualRobotException);
 }
 
 BOOST_AUTO_TEST_CASE(testTrajectorySet)
 {
-    const std::string robotString =
-        "<Robot Type='MyDemoRobotType' RootNode='Joint1'>"
-        " <RobotNode name='Joint1'>"
-        " </RobotNode>"
-        " <RobotNodeSet name='rns1'>"
-        "  <Node name='Joint1'/>"
-        " </RobotNodeSet>"
-        "</Robot>";
+    const std::string robotString = "<Robot Type='MyDemoRobotType' RootNode='Joint1'>"
+                                    " <RobotNode name='Joint1'>"
+                                    " </RobotNode>"
+                                    " <RobotNodeSet name='rns1'>"
+                                    "  <Node name='Joint1'/>"
+                                    " </RobotNodeSet>"
+                                    "</Robot>";
     VirtualRobot::RobotPtr rob;
     BOOST_REQUIRE_NO_THROW(rob = VirtualRobot::RobotIO::createRobotFromString(robotString));
     BOOST_REQUIRE(rob);
@@ -57,20 +59,17 @@ BOOST_AUTO_TEST_CASE(testTrajectorySet)
     Eigen::VectorXf b2 = t->getPoint(1);
     BOOST_CHECK_EQUAL(a.isApprox(a2), true);
     BOOST_CHECK_EQUAL(b.isApprox(b2), true);
-
 }
-
 
 BOOST_AUTO_TEST_CASE(testTrajectoryClone)
 {
-    const std::string robotString =
-        "<Robot Type='MyDemoRobotType' RootNode='Joint1'>"
-        " <RobotNode name='Joint1'>"
-        " </RobotNode>"
-        " <RobotNodeSet name='rns1'>"
-        "  <Node name='Joint1'/>"
-        " </RobotNodeSet>"
-        "</Robot>";
+    const std::string robotString = "<Robot Type='MyDemoRobotType' RootNode='Joint1'>"
+                                    " <RobotNode name='Joint1'>"
+                                    " </RobotNode>"
+                                    " <RobotNodeSet name='rns1'>"
+                                    "  <Node name='Joint1'/>"
+                                    " </RobotNodeSet>"
+                                    "</Robot>";
     VirtualRobot::RobotPtr rob;
     BOOST_REQUIRE_NO_THROW(rob = VirtualRobot::RobotIO::createRobotFromString(robotString));
     BOOST_REQUIRE(rob);
@@ -125,17 +124,15 @@ BOOST_AUTO_TEST_CASE(testTrajectoryClone)
     BOOST_CHECK_EQUAL(tr->getPoint(pts - 1)(0), 0.0f);
 }
 
-
 BOOST_AUTO_TEST_CASE(testTrajectoryOperationsRemove)
 {
-    const std::string robotString =
-        "<Robot Type='MyDemoRobotType' RootNode='Joint1'>"
-        " <RobotNode name='Joint1'>"
-        " </RobotNode>"
-        " <RobotNodeSet name='rns1'>"
-        "  <Node name='Joint1'/>"
-        " </RobotNodeSet>"
-        "</Robot>";
+    const std::string robotString = "<Robot Type='MyDemoRobotType' RootNode='Joint1'>"
+                                    " <RobotNode name='Joint1'>"
+                                    " </RobotNode>"
+                                    " <RobotNodeSet name='rns1'>"
+                                    "  <Node name='Joint1'/>"
+                                    " </RobotNodeSet>"
+                                    "</Robot>";
     VirtualRobot::RobotPtr rob;
     BOOST_REQUIRE_NO_THROW(rob = VirtualRobot::RobotIO::createRobotFromString(robotString));
     BOOST_REQUIRE(rob);
@@ -208,17 +205,15 @@ BOOST_AUTO_TEST_CASE(testTrajectoryOperationsRemove)
     BOOST_CHECK_EQUAL(t->getPoint(2)(0), 8.0f);
 }
 
-
 BOOST_AUTO_TEST_CASE(testTrajectoryOperationsInsert)
 {
-    const std::string robotString =
-        "<Robot Type='MyDemoRobotType' RootNode='Joint1'>"
-        " <RobotNode name='Joint1'>"
-        " </RobotNode>"
-        " <RobotNodeSet name='rns1'>"
-        "  <Node name='Joint1'/>"
-        " </RobotNodeSet>"
-        "</Robot>";
+    const std::string robotString = "<Robot Type='MyDemoRobotType' RootNode='Joint1'>"
+                                    " <RobotNode name='Joint1'>"
+                                    " </RobotNode>"
+                                    " <RobotNodeSet name='rns1'>"
+                                    "  <Node name='Joint1'/>"
+                                    " </RobotNodeSet>"
+                                    "</Robot>";
     VirtualRobot::RobotPtr rob;
     BOOST_REQUIRE_NO_THROW(rob = VirtualRobot::RobotIO::createRobotFromString(robotString));
     BOOST_REQUIRE(rob);
@@ -295,14 +290,15 @@ BOOST_AUTO_TEST_CASE(testTrajectoryOperationsInsert)
     BOOST_CHECK_EQUAL(t->getPoint(2)(0), 2000.0f);
     BOOST_CHECK_EQUAL(t->getPoint(3)(0), 100.0f);
 
-    BOOST_REQUIRE_NO_THROW(t->insertTrajectory(pts + 6, t2)); // 0 1000 2000 100 0 1 300 2 3 ... 18 19 200 0 1000 2000
+    BOOST_REQUIRE_NO_THROW(
+        t->insertTrajectory(pts + 6, t2)); // 0 1000 2000 100 0 1 300 2 3 ... 18 19 200 0 1000 2000
     BOOST_CHECK_EQUAL(t->getNrOfPoints(), pts + 9);
     BOOST_CHECK_EQUAL(t->getPoint(pts + 8)(0), 2000.0f);
     BOOST_CHECK_EQUAL(t->getPoint(pts + 7)(0), 1000.0f);
     BOOST_CHECK_EQUAL(t->getPoint(pts + 6)(0), 0.0f);
     BOOST_CHECK_EQUAL(t->getPoint(pts + 5)(0), 200.0f);
 
-    std::vector< Eigen::VectorXf > pt;
+    std::vector<Eigen::VectorXf> pt;
     Eigen::VectorXf e(1);
     e(0) = 111.0f;
     pt.push_back(e);
@@ -311,23 +307,23 @@ BOOST_AUTO_TEST_CASE(testTrajectoryOperationsInsert)
     e(0) = 333.0f;
     pt.push_back(e);
 
-    BOOST_REQUIRE_NO_THROW(t->insertPosition(0, pt)); // 111 222 333 0 1000 2000 100 0 1 300 2 3 ... 18 19 200
+    BOOST_REQUIRE_NO_THROW(
+        t->insertPosition(0, pt)); // 111 222 333 0 1000 2000 100 0 1 300 2 3 ... 18 19 200
     BOOST_CHECK_EQUAL(t->getNrOfPoints(), pts + 12);
     BOOST_CHECK_EQUAL(t->getPoint(0)(0), 111.0f);
     BOOST_CHECK_EQUAL(t->getPoint(1)(0), 222.0f);
     BOOST_CHECK_EQUAL(t->getPoint(2)(0), 333.0f);
     BOOST_CHECK_EQUAL(t->getPoint(3)(0), 0.0f);
 
-    BOOST_REQUIRE_NO_THROW(t->insertPosition(pts + 12, pt)); //  111 222 333 0 1000 2000 100 0 1 300 2 3 ... 18 19 200 0 1000 2000 111 222 333
+    BOOST_REQUIRE_NO_THROW(t->insertPosition(
+        pts + 12,
+        pt)); //  111 222 333 0 1000 2000 100 0 1 300 2 3 ... 18 19 200 0 1000 2000 111 222 333
     BOOST_CHECK_EQUAL(t->getNrOfPoints(), pts + 15);
     BOOST_CHECK_EQUAL(t->getPoint(pts + 14)(0), 333.0f);
     BOOST_CHECK_EQUAL(t->getPoint(pts + 13)(0), 222.0f);
     BOOST_CHECK_EQUAL(t->getPoint(pts + 12)(0), 111.0f);
     BOOST_CHECK_EQUAL(t->getPoint(pts + 11)(0), 2000.0f);
-
 }
-
-
 
 
 BOOST_AUTO_TEST_SUITE_END()

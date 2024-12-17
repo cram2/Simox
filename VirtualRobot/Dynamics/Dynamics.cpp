@@ -1,8 +1,9 @@
 
 #include "Dynamics.h"
 
-#include <iostream>
 #include <math.h>
+
+#include <iostream>
 #include <string>
 
 #include <Eigen/Dense>

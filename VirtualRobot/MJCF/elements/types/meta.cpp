@@ -3,8 +3,7 @@
 namespace mjcf
 {
 
-const std::string MujocoRoot::tag = "mujoco";
-const std::string Include::tag = "include";
+    const std::string MujocoRoot::tag = "mujoco";
+    const std::string Include::tag = "include";
 
-}
-
+} // namespace mjcf

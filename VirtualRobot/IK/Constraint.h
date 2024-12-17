@@ -22,25 +22,27 @@
 */
 #pragma once
 
-#include "VirtualRobot/VirtualRobot.h"
 #include "VirtualRobot/IK/JacobiProvider.h"
+#include "VirtualRobot/VirtualRobot.h"
 
 class SoSeparator;
 
 namespace VirtualRobot
 {
     class Constraint;
-    typedef double (*OptimizationFunction)(std::vector<double> &gradient);
+    typedef double (*OptimizationFunction)(std::vector<double>& gradient);
 
     class OptimizationFunctionSetup
     {
-        public:
-            unsigned int id;
-            Constraint *constraint;
-            bool soft;
+    public:
+        unsigned int id;
+        Constraint* constraint;
+        bool soft;
     };
 
-    class VIRTUAL_ROBOT_IMPORT_EXPORT Constraint : public JacobiProvider, public std::enable_shared_from_this<Constraint>
+    class VIRTUAL_ROBOT_IMPORT_EXPORT Constraint :
+        public JacobiProvider,
+        public std::enable_shared_from_this<Constraint>
     {
     public:
         Constraint(const RobotNodeSetPtr& nodeSet);
@@ -51,9 +53,9 @@ namespace VirtualRobot
 
         float getErrorDifference();
 
-        const std::vector<OptimizationFunctionSetup> &getEqualityConstraints();
-        const std::vector<OptimizationFunctionSetup> &getInequalityConstraints();
-        const std::vector<OptimizationFunctionSetup> &getOptimizationFunctions();
+        const std::vector<OptimizationFunctionSetup>& getEqualityConstraints();
+        const std::vector<OptimizationFunctionSetup>& getInequalityConstraints();
+        const std::vector<OptimizationFunctionSetup>& getOptimizationFunctions();
 
         /*!
          * Each constraint implements its own optimization function that contributes to a combined
@@ -80,9 +82,9 @@ namespace VirtualRobot
         virtual bool usingCollisionModel();
 
     protected:
-        void addEqualityConstraint(unsigned int id, bool soft=false);
-        void addInequalityConstraint(unsigned int id, bool soft=false);
-        void addOptimizationFunction(unsigned int id, bool soft=false);
+        void addEqualityConstraint(unsigned int id, bool soft = false);
+        void addInequalityConstraint(unsigned int id, bool soft = false);
+        void addOptimizationFunction(unsigned int id, bool soft = false);
 
     protected:
         std::vector<OptimizationFunctionSetup> equalityConstraints;
@@ -96,5 +98,4 @@ namespace VirtualRobot
     };
 
     typedef std::shared_ptr<Constraint> ConstraintPtr;
-}
-
+} // namespace VirtualRobot

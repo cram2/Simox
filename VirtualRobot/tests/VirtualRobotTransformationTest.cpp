@@ -6,19 +6,21 @@
 
 #define BOOST_TEST_MODULE VirtualRobot_VirtualRobotTransformationTest
 
-#include <VirtualRobot/VirtualRobotTest.h>
-#include <VirtualRobot/XML/RobotIO.h>
-#include <VirtualRobot/Robot.h>
 #include <string>
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
+#include <VirtualRobot/Robot.h>
+#include <VirtualRobot/VirtualRobotTest.h>
+#include <VirtualRobot/XML/RobotIO.h>
+
 BOOST_AUTO_TEST_SUITE(RobotNode)
 
 #define FLOAT_CLOSE_TO_DIFF 1e-7f
 
-inline void CHECK_TRANSFORMATION_MATRIX(Eigen::Matrix4f& m, float x, float y, float z)
+inline void
+CHECK_TRANSFORMATION_MATRIX(Eigen::Matrix4f& m, float x, float y, float z)
 {
     // first row
     BOOST_CHECK_CLOSE(1.0f, m(0, 0), FLOAT_CLOSE_TO_DIFF);
@@ -95,7 +97,6 @@ BOOST_AUTO_TEST_CASE(testRobotNodePrismaticTransformation)
 
     CHECK_TRANSFORMATION_MATRIX(m1, 100.0f, 0, -300.0f);
     CHECK_TRANSFORMATION_MATRIX(m2, 100.0f, 200.0f, -300.0f);
-
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -21,10 +21,10 @@
 
 #pragma once
 
-#include <VirtualRobot/VirtualRobotImportExport.h>
-
 #include <Eigen/Core>
 #include <Eigen/Geometry>
+
+#include <VirtualRobot/VirtualRobotImportExport.h>
 
 namespace math
 {
@@ -35,4 +35,4 @@ namespace math
 
     private:
     };
-}
+} // namespace math

@@ -14,11 +14,10 @@ subject to the following restrictions:
 */
 
 #include "RenderTexture.h"
+
 #include <memory.h>
 
-
-renderTexture::renderTexture(int width, int height)
-    : m_height(height), m_width(width)
+renderTexture::renderTexture(int width, int height) : m_height(height), m_width(width)
 {
     m_buffer = new unsigned char[m_width * m_height * 4];
 
@@ -32,22 +31,21 @@ renderTexture::renderTexture(int width, int height)
         {
             setPixel(x, y, btVector4(float(x), float(y), 0.f, 1.f));
         }
-
     }
-
 }
 
-void renderTexture::grapicalPrintf(char* str,   void* fontData, int rasterposx, int rasterposy)
+void
+renderTexture::grapicalPrintf(char* str, void* fontData, int rasterposx, int rasterposy)
 {
     unsigned char c;
     int x = 0;
     int xx = 0;
 
-    while ((c = (unsigned char) * str++))
+    while ((c = (unsigned char)*str++))
     {
 
         x = xx;
-        unsigned char* fontPtr = (unsigned char*) fontData;
+        unsigned char* fontPtr = (unsigned char*)fontData;
         char ch = c - 32;
 
         int sx = ch % 16;
@@ -83,8 +81,5 @@ void renderTexture::grapicalPrintf(char* str,   void* fontData, int rasterposx, 
 
 renderTexture::~renderTexture()
 {
-    delete [] m_buffer;
+    delete[] m_buffer;
 }
-
-
-

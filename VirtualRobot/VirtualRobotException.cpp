@@ -16,10 +16,10 @@ namespace VirtualRobot
         this->exception += what;
     }
 
-    VirtualRobotException::~VirtualRobotException() throw()
-    = default;
+    VirtualRobotException::~VirtualRobotException() throw() = default;
 
-    const char* VirtualRobotException::what() const throw()
+    const char*
+    VirtualRobotException::what() const throw()
     {
         return exception.c_str();
     }

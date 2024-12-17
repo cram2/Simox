@@ -6,21 +6,21 @@
 
 
 #include "CoinVisualization.h"
-#include "CoinVisualizationNode.h"
-
-#include <Inventor/nodes/SoSelection.h>
-#include <Inventor/nodes/SoSeparator.h>
-#include <Inventor/nodes/SoMatrixTransform.h>
-#include <Inventor/nodes/SoUnits.h>
 
 #include <algorithm>
 
+#include "CoinVisualizationNode.h"
+#include <Inventor/nodes/SoMatrixTransform.h>
+#include <Inventor/nodes/SoSelection.h>
+#include <Inventor/nodes/SoSeparator.h>
+#include <Inventor/nodes/SoUnits.h>
+
 // For the VRML2.0 export
-#include <Inventor/actions/SoWriteAction.h>
-#include <Inventor/actions/SoToVRML2Action.h>
 #include <Inventor/VRMLnodes/SoVRMLGroup.h>
-#include <Inventor/nodes/SoRotation.h>
+#include <Inventor/actions/SoToVRML2Action.h>
+#include <Inventor/actions/SoWriteAction.h>
 #include <Inventor/nodes/SoMaterial.h>
+#include <Inventor/nodes/SoRotation.h>
 
 namespace VirtualRobot
 {
@@ -34,7 +34,8 @@ namespace VirtualRobot
         color = nullptr;
     }
 
-    CoinVisualization::CoinVisualization(const std::vector<VisualizationNodePtr>& visualizationNodes) :
+    CoinVisualization::CoinVisualization(
+        const std::vector<VisualizationNodePtr>& visualizationNodes) :
         Visualization(visualizationNodes)
     {
         selection = nullptr;
@@ -59,7 +60,8 @@ namespace VirtualRobot
         }*/
     }
 
-    bool CoinVisualization::buildVisualization()
+    bool
+    CoinVisualization::buildVisualization()
     {
         if (selection)
         {
@@ -73,7 +75,7 @@ namespace VirtualRobot
         visuRoot = new SoSeparator;
         visuRoot->ref();
 
-        if(isSelectable)
+        if (isSelectable)
         {
             selection->addChild(visuRoot);
         }
@@ -94,7 +96,8 @@ namespace VirtualRobot
 
         for (VisualizationNodePtr const& visualizationNode : visualizationNodes)
         {
-            std::shared_ptr<CoinVisualizationNode> coinVisualizationNode = std::dynamic_pointer_cast<CoinVisualizationNode>(visualizationNode);
+            std::shared_ptr<CoinVisualizationNode> coinVisualizationNode =
+                std::dynamic_pointer_cast<CoinVisualizationNode>(visualizationNode);
 
             if (coinVisualizationNode && coinVisualizationNode->getCoinVisualization())
             {
@@ -104,7 +107,8 @@ namespace VirtualRobot
         return true;
     }
 
-    bool CoinVisualization::highlight(unsigned int which, bool enable)
+    bool
+    CoinVisualization::highlight(unsigned int which, bool enable)
     {
         if (which >= visualizationNodes.size())
         {
@@ -115,7 +119,8 @@ namespace VirtualRobot
         return highlight(visualizationNodes[which], enable);
     }
 
-    bool CoinVisualization::highlight(SoNode* visu, bool enable)
+    bool
+    CoinVisualization::highlight(SoNode* visu, bool enable)
     {
         if (!visu)
         {
@@ -135,7 +140,8 @@ namespace VirtualRobot
         return true;
     }
 
-    bool CoinVisualization::highlight(VisualizationNodePtr visualizationNode, bool enable)
+    bool
+    CoinVisualization::highlight(VisualizationNodePtr visualizationNode, bool enable)
     {
         if (!selection)
         {
@@ -148,7 +154,8 @@ namespace VirtualRobot
             return false;
         }
 
-        std::shared_ptr<CoinVisualizationNode> coinVisualizationNode = std::dynamic_pointer_cast<CoinVisualizationNode>(visualizationNode);
+        std::shared_ptr<CoinVisualizationNode> coinVisualizationNode =
+            std::dynamic_pointer_cast<CoinVisualizationNode>(visualizationNode);
 
 
         if (coinVisualizationNode)
@@ -159,7 +166,8 @@ namespace VirtualRobot
         return false;
     }
 
-    bool CoinVisualization::highlight(bool enable)
+    bool
+    CoinVisualization::highlight(bool enable)
     {
         for (size_t i = 0; i < visualizationNodes.size(); i++)
         {
@@ -176,22 +184,25 @@ namespace VirtualRobot
      * processed node is of type CoinVisualizationNode.
      * Afterwards the SoSeparator is returned.
      */
-    SoNode* CoinVisualization::getCoinVisualization(bool selectable)
+    SoNode*
+    CoinVisualization::getCoinVisualization(bool selectable)
     {
         isSelectable = selectable;
         buildVisualization();
-        return selectable? selection : visuRoot;
+        return selectable ? selection : visuRoot;
     }
 
     /**
      * \return new instance of VirtualRobot::CoinVisualization with the same set of robot nodes.
      */
-    VirtualRobot::VisualizationPtr CoinVisualization::clone()
+    VirtualRobot::VisualizationPtr
+    CoinVisualization::clone()
     {
         return VisualizationPtr(new CoinVisualization(visualizationNodes));
     }
 
-    void CoinVisualization::colorize(VisualizationFactory::Color c)
+    void
+    CoinVisualization::colorize(VisualizationFactory::Color c)
     {
 
         buildVisualization();
@@ -215,7 +226,8 @@ namespace VirtualRobot
         }
     }
 
-    void CoinVisualization::setTransparency(float transparency)
+    void
+    CoinVisualization::setTransparency(float transparency)
     {
         buildVisualization();
         if (!selection || !color)
@@ -228,7 +240,7 @@ namespace VirtualRobot
         if (transparency > 1.0f)
             transparency = 1.0f;
 
-        if (transparency==1)
+        if (transparency == 1)
         {
             color->diffuseColor.setIgnored(FALSE);
             color->setOverride(FALSE);
@@ -241,7 +253,8 @@ namespace VirtualRobot
         }
     }
 
-	void CoinVisualization::exportToVRML2(std::string filename, bool useRotation)
+    void
+    CoinVisualization::exportToVRML2(std::string filename, bool useRotation)
     {
 
         SoSeparator* root = new SoSeparator;
@@ -251,7 +264,7 @@ namespace VirtualRobot
         SoRotation* rotationZ = new SoRotation();
         rotationZ->ref();
 
-        if(useRotation)
+        if (useRotation)
         {
             rotationX->rotation.setValue(SbVec3f(-1, 0, 0), float(M_PI / 2));
             rotationZ->rotation.setValue(SbVec3f(0, 0, 1), float(M_PI));

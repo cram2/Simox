@@ -1,9 +1,8 @@
 #include "SoftMinMax.h"
 
 #include <cmath>
-#include <stdexcept>
 #include <sstream>
-
+#include <stdexcept>
 
 namespace simox::math
 {
@@ -18,7 +17,8 @@ namespace simox::math
         reset(quantile, numValues);
     }
 
-    void SoftMinMax::reset(float quantile, std::size_t numValues)
+    void
+    SoftMinMax::reset(float quantile, std::size_t numValues)
     {
         minQueue = MinQueue();
         maxQueue = MaxQueue();
@@ -41,7 +41,8 @@ namespace simox::math
         allowed_heap_size_cache = allowedHeapSize();
     }
 
-    void SoftMinMax::add(float value)
+    void
+    SoftMinMax::add(float value)
     {
         if (minQueue.size() != maxQueue.size())
         {
@@ -75,10 +76,10 @@ namespace simox::math
             maxQueue.push(value);
             maxQueue.pop();
         }
-
     }
 
-    float SoftMinMax::getSoftMin() const
+    float
+    SoftMinMax::getSoftMin() const
     {
         if (maxQueue.empty())
         {
@@ -87,7 +88,8 @@ namespace simox::math
         return minQueue.top();
     }
 
-    float SoftMinMax::getSoftMax() const
+    float
+    SoftMinMax::getSoftMax() const
     {
         if (maxQueue.empty())
         {
@@ -97,14 +99,16 @@ namespace simox::math
         return maxQueue.top();
     }
 
-    std::size_t SoftMinMax::numOutsideSoftMinMax() const
+    std::size_t
+    SoftMinMax::numOutsideSoftMinMax() const
     {
         return size_t(std::ceil(quantile * num_elements));
     }
 
-    std::size_t SoftMinMax::allowedHeapSize() const
+    std::size_t
+    SoftMinMax::allowedHeapSize() const
     {
         return std::max(std::size_t(1), numOutsideSoftMinMax() + 1);
     }
 
-}
+} // namespace simox::math

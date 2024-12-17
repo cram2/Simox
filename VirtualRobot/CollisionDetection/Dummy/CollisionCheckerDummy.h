@@ -1,10 +1,11 @@
 
 #pragma once
 
-#include "../../VirtualRobotImportExport.h"
-#include "../CollisionCheckerImplementation.h"
 #include <string>
 #include <vector>
+
+#include "../../VirtualRobotImportExport.h"
+#include "../CollisionCheckerImplementation.h"
 
 class CollisionModel;
 
@@ -23,7 +24,12 @@ namespace VirtualRobot
         Collision detected if result is zero.
         Returns -1.0 if no distance calculation lib was specified (e.g. VR_COLLISION_DETECTION_PQP)
         */
-        virtual float calculateDistance(CollisionModelPtr model1, CollisionModelPtr model2, Eigen::Vector3f& P1, Eigen::Vector3f& P2, int* trID1, int* trID2);
+        virtual float calculateDistance(CollisionModelPtr model1,
+                                        CollisionModelPtr model2,
+                                        Eigen::Vector3f& P1,
+                                        Eigen::Vector3f& P2,
+                                        int* trID1,
+                                        int* trID2);
         //! tests if the two models are colliding
         virtual bool checkCollision(CollisionModelPtr model1, CollisionModelPtr model2);
 
@@ -37,7 +43,8 @@ namespace VirtualRobot
         /*!
         Does the underlying collision detection library support discrete collision detection.
         */
-        static bool IsSupported_CollisionDetection()
+        static bool
+        IsSupported_CollisionDetection()
         {
             return false;
         }
@@ -45,7 +52,8 @@ namespace VirtualRobot
         /*!
         Does the underlying collision detection library support continuous collision detection.
         */
-        static bool IsSupported_ContinuousCollisionDetection()
+        static bool
+        IsSupported_ContinuousCollisionDetection()
         {
             return false;
         }
@@ -53,7 +61,8 @@ namespace VirtualRobot
         /*!
         Does the underlying collision detection library support distance calculations.
         */
-        static bool IsSupported_DistanceCalculations()
+        static bool
+        IsSupported_DistanceCalculations()
         {
             return false;
         }
@@ -62,7 +71,8 @@ namespace VirtualRobot
         Does the underlying collision detection library support threadsafe access.
         E.g. multiple threads query the collision checker asynchronously.
         */
-        static bool IsSupported_Multithreading_Threadsafe()
+        static bool
+        IsSupported_Multithreading_Threadsafe()
         {
             return false;
         }
@@ -71,11 +81,11 @@ namespace VirtualRobot
         Does the underlying collision detection library support multiple instances of the collision checker.
         E.g. one per thread.
         */
-        static bool IsSupported_Multithreading_MultipleColCheckers()
+        static bool
+        IsSupported_Multithreading_MultipleColCheckers()
         {
             return false;
         }
     };
 
-}
-
+} // namespace VirtualRobot

@@ -21,9 +21,10 @@
 
 #pragma once
 
+#include <Eigen/Dense>
+
 #include "../VirtualRobot.h"
 #include "Plane.h"
-#include <Eigen/Dense>
 
 namespace math
 {
@@ -33,4 +34,4 @@ namespace math
     public:
         static Plane Fit(const std::vector<Eigen::Vector3f>& points);
     };
-}
+} // namespace math

@@ -22,11 +22,12 @@
 */
 #pragma once
 
+#include <vector>
+
+#include <Eigen/Core>
+
 #include "../VirtualRobot.h"
 #include "VisualizationFactory.h"
-
-#include <vector>
-#include <Eigen/Core>
 
 namespace VirtualRobot
 {
@@ -34,7 +35,6 @@ namespace VirtualRobot
     class VIRTUAL_ROBOT_IMPORT_EXPORT Visualization
     {
     public:
-
         Visualization(const VisualizationNodePtr visualizationNode);
         Visualization(const std::vector<VisualizationNodePtr>& visualizationNodes);
         virtual ~Visualization();
@@ -74,12 +74,14 @@ namespace VirtualRobot
         //! get total number of faces (i.e. triangles) of all visualizations that are stored in this object
         virtual int getNumFaces();
 
-        static std::string getFactoryName()
+        static std::string
+        getFactoryName()
         {
             return "AbstractFactoryMethod";
         }
 
-        std::vector<VisualizationNodePtr> getVisualizationNodes()
+        std::vector<VisualizationNodePtr>
+        getVisualizationNodes()
         {
             return visualizationNodes;
         }
@@ -89,4 +91,3 @@ namespace VirtualRobot
     };
 
 } // namespace VirtualRobot
-

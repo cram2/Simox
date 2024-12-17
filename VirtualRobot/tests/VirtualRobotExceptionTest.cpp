@@ -6,9 +6,10 @@
 
 #define BOOST_TEST_MODULE VirtualRobot_VirtualRobotExceptionTests
 
-#include <VirtualRobot/VirtualRobotTest.h>
-#include <VirtualRobot/VirtualRobotException.h>
 #include <string>
+
+#include <VirtualRobot/VirtualRobotException.h>
+#include <VirtualRobot/VirtualRobotTest.h>
 
 BOOST_AUTO_TEST_CASE(testVirtualRobotExceptionMacro)
 {
@@ -19,7 +20,8 @@ BOOST_AUTO_TEST_CASE(testVirtualRobotExceptionMacro)
 BOOST_AUTO_TEST_CASE(testVirtualRobotConditionalExceptionMacroThrow)
 {
     const std::string exceptionString = "Testing VR Exception";
-    BOOST_CHECK_THROW(THROW_VR_EXCEPTION_IF(true, exceptionString), VirtualRobot::VirtualRobotException);
+    BOOST_CHECK_THROW(THROW_VR_EXCEPTION_IF(true, exceptionString),
+                      VirtualRobot::VirtualRobotException);
 }
 
 BOOST_AUTO_TEST_CASE(testVirtualRobotConditionalExceptionMacroNoThrow)

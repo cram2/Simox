@@ -22,59 +22,82 @@
 */
 #pragma once
 
-#include "VirtualRobot/VirtualRobot.h"
+#include <string>
+
+#include <Eigen/Core>
+
+#include "SimoxUtility/color/Color.h"
 #include "VirtualRobot/AbstractFactoryMethod.h"
 #include "VirtualRobot/BoundingBox.h"
 #include "VirtualRobot/Primitive.h"
-#include "SimoxUtility/color/Color.h"
-
-#include <Eigen/Core>
-#include <string>
+#include "VirtualRobot/VirtualRobot.h"
 
 namespace VirtualRobot
 {
     class VisualizationNode;
 
-    class VIRTUAL_ROBOT_IMPORT_EXPORT VisualizationFactory  : public ::AbstractFactoryMethod<VisualizationFactory, void*>
+    class VIRTUAL_ROBOT_IMPORT_EXPORT VisualizationFactory :
+        public ::AbstractFactoryMethod<VisualizationFactory, void*>
     {
     public:
-
         struct Color
         {
             Color() = default;
-            Color(float r, float g, float b, float transparency = 0.0f): r(r), g(g), b(b), transparency(transparency) {}
+
+            Color(float r, float g, float b, float transparency = 0.0f) :
+                r(r), g(g), b(b), transparency(transparency)
+            {
+            }
+
             float r = 0.5f, g = 0.5f, b = 0.5f;
             float transparency = 1;
-            bool isNone() const
+
+            bool
+            isNone() const
             {
                 return transparency >= 1.0f;
             }
-            static Color Blue(float transparency = 0.0f)
+
+            static Color
+            Blue(float transparency = 0.0f)
             {
                 return Color(0.2f, 0.2f, 1.0f, transparency);
             }
-            static Color Red(float transparency = 0.0f)
+
+            static Color
+            Red(float transparency = 0.0f)
             {
                 return Color(1.0f, 0.2f, 0.2f, transparency);
             }
-            static Color Green(float transparency = 0.0f)
+
+            static Color
+            Green(float transparency = 0.0f)
             {
                 return Color(0.2f, 1.0f, 0.2f, transparency);
             }
-            static Color Black(float transparency = 0.0f)
+
+            static Color
+            Black(float transparency = 0.0f)
             {
                 return Color(0, 0, 0, transparency);
             }
-            static Color Gray()
+
+            static Color
+            Gray()
             {
                 return Color(0.5f, 0.5f, 0.5f, 0);
             }
-            static Color None()
+
+            static Color
+            None()
             {
                 return Color(0.0f, 0.0f, 0.0f, 1.0f);
             }
 
-            Color(const simox::Color& sc): Color(sc.r / 255., sc.g / 255., sc.b / 255., 1. - sc.a / 255.){}
+            Color(const simox::Color& sc) :
+                Color(sc.r / 255., sc.g / 255., sc.b / 255., 1. - sc.a / 255.)
+            {
+            }
         };
 
         struct PhongMaterial
@@ -95,28 +118,43 @@ namespace VirtualRobot
         VisualizationFactory() = default;
         virtual ~VisualizationFactory() = default;
 
-        virtual void init(int& /*argc*/, char* /*argv*/[], const std::string& /*appName*/)
+        virtual void
+        init(int& /*argc*/, char* /*argv*/[], const std::string& /*appName*/)
         {
         }
 
-        virtual VisualizationNodePtr getVisualizationFromPrimitives(const std::vector<Primitive::PrimitivePtr>& /*primitives*/, bool /*boundingBox*/ = false, const Color& /*color*/ = Color::Gray())
+        virtual VisualizationNodePtr
+        getVisualizationFromPrimitives(const std::vector<Primitive::PrimitivePtr>& /*primitives*/,
+                                       bool /*boundingBox*/ = false,
+                                       const Color& /*color*/ = Color::Gray())
         {
             return nullptr;
         }
-        virtual VisualizationNodePtr getVisualizationFromFile(const std::string& /*filename*/, bool /*boundingBox*/ = false, float /*scaleX*/ = 1.0f, float /*scaleY*/ = 1.0f, float /*scaleZ*/ = 1.0f)
+
+        virtual VisualizationNodePtr
+        getVisualizationFromFile(const std::string& /*filename*/,
+                                 bool /*boundingBox*/ = false,
+                                 float /*scaleX*/ = 1.0f,
+                                 float /*scaleY*/ = 1.0f,
+                                 float /*scaleZ*/ = 1.0f)
         {
             return nullptr;
         }
-        virtual VisualizationNodePtr getVisualizationFromFile(const std::ifstream& /*ifs*/, bool /*boundingBox*/ = false, float /*scaleX*/ = 1.0f, float /*scaleY*/ = 1.0f, float /*scaleZ*/ = 1.0f)
+
+        virtual VisualizationNodePtr
+        getVisualizationFromFile(const std::ifstream& /*ifs*/,
+                                 bool /*boundingBox*/ = false,
+                                 float /*scaleX*/ = 1.0f,
+                                 float /*scaleY*/ = 1.0f,
+                                 float /*scaleZ*/ = 1.0f)
         {
             return nullptr;
         }
-        
+
         // virtual VisualizationNodePtr createPlane(const MathTools::Plane& plane, float extend, float transparency,  float colorR = 0.5f, float colorG = 0.5f, float colorB = 0.5f)
         // {
         //     return createPlane(plane.p, plane.n, extend, transparency, colorR, colorG, colorB);
         // }
-        
 
 
         virtual VisualizationNodePtr
@@ -211,19 +249,28 @@ namespace VirtualRobot
             \param axesWidth The width of the axes.
             \return A VisualizationNode containing the visualization.
         */
-        virtual VisualizationNodePtr createEllipse(float /*x*/, float /*y*/, float /*z*/, bool /*showAxes*/ = true, float /*axesHeight*/ = 4.0f, float /*axesWidth*/ = 8.0f)
+        virtual VisualizationNodePtr
+        createEllipse(float /*x*/,
+                      float /*y*/,
+                      float /*z*/,
+                      bool /*showAxes*/ = true,
+                      float /*axesHeight*/ = 4.0f,
+                      float /*axesWidth*/ = 8.0f)
         {
             return nullptr;
         }
+
         /*!
             Move local visualization by homogeneous matrix m. (MM)
         */
-        virtual void applyDisplacement(VisualizationNodePtr visu, const Eigen::Matrix4f& displacement);
+        virtual void applyDisplacement(VisualizationNodePtr visu,
+                                       const Eigen::Matrix4f& displacement);
 
         /*!
             Create an empty VisualizationNode.
         */
-        virtual VisualizationNodePtr createVisualization()
+        virtual VisualizationNodePtr
+        createVisualization()
         {
             return nullptr;
         }
@@ -231,7 +278,8 @@ namespace VirtualRobot
         /*!
             Create a united visualization.
         */
-        virtual VisualizationNodePtr createUnitedVisualization(const std::vector<VisualizationNodePtr>& /*visualizations*/) const
+        virtual VisualizationNodePtr
+        createUnitedVisualization(const std::vector<VisualizationNodePtr>& /*visualizations*/) const
         {
             return nullptr;
         }
@@ -240,10 +288,12 @@ namespace VirtualRobot
             Here, a manual cleanup can be called, no Coin3D access possible after this.
             Usually no need to call cleanup explicitly, since cleanup is performed automatically at application exit.
         */
-        virtual void cleanup() {}
-
+        virtual void
+        cleanup()
+        {
+        }
     };
-    
+
     using ColorPtr = std::shared_ptr<VisualizationFactory::Color>;
 
 } // namespace VirtualRobot

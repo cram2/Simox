@@ -27,13 +27,17 @@
 
 namespace VirtualRobot
 {
-    class VIRTUAL_ROBOT_IMPORT_EXPORT ReferenceConfigurationConstraint : public Constraint, public std::enable_shared_from_this<ReferenceConfigurationConstraint>
+    class VIRTUAL_ROBOT_IMPORT_EXPORT ReferenceConfigurationConstraint :
+        public Constraint,
+        public std::enable_shared_from_this<ReferenceConfigurationConstraint>
     {
     public:
         ReferenceConfigurationConstraint(const RobotPtr& robot, const RobotNodeSetPtr& nodeSet);
-        ReferenceConfigurationConstraint(const RobotPtr& robot, const RobotNodeSetPtr& nodeSet, const Eigen::VectorXf &reference);
+        ReferenceConfigurationConstraint(const RobotPtr& robot,
+                                         const RobotNodeSetPtr& nodeSet,
+                                         const Eigen::VectorXf& reference);
 
-        void setReferenceConfiguration(const Eigen::VectorXf &config);
+        void setReferenceConfiguration(const Eigen::VectorXf& config);
         Eigen::VectorXf getReferenceConfiguration();
 
         double optimizationFunction(unsigned int id) override;
@@ -46,5 +50,4 @@ namespace VirtualRobot
     };
 
     typedef std::shared_ptr<ReferenceConfigurationConstraint> ReferenceConfigurationConstraintPtr;
-}
-
+} // namespace VirtualRobot

@@ -38,31 +38,46 @@ namespace GraspStudio
         minQuality = 0.0f;
     }
 
-    void GraspPlannerEvaluation::print()
+    void
+    GraspPlannerEvaluation::print()
     {
         std::cout << (*this) << std::endl;
     }
 
-    std::string GraspPlannerEvaluation::GetCSVHeader()
+    std::string
+    GraspPlannerEvaluation::GetCSVHeader()
     {
         std::stringstream fs;
-        fs << "minQuality" << ","
-           << "nrGraspsGenerated" << ","
-           << "nrGraspsValid" << ","
-           << "nrGraspsInValid" << ","
-           << "nrGraspsValidPrecision" << ","
-           << "nrGraspsValidPower" << ","
-           << "nrGraspsInvalidCollision" << ","
-           << "nrGraspsInvalidFC" << ","
-           << "nrGraspsInvalidContacts" << ","
-           << "AverageDurationMS" << ","
-           << "percPowerGrasps" << ","
-           << "percPrecGraps" << ","
+        fs << "minQuality"
+           << ","
+           << "nrGraspsGenerated"
+           << ","
+           << "nrGraspsValid"
+           << ","
+           << "nrGraspsInValid"
+           << ","
+           << "nrGraspsValidPrecision"
+           << ","
+           << "nrGraspsValidPower"
+           << ","
+           << "nrGraspsInvalidCollision"
+           << ","
+           << "nrGraspsInvalidFC"
+           << ","
+           << "nrGraspsInvalidContacts"
+           << ","
+           << "AverageDurationMS"
+           << ","
+           << "percPowerGrasps"
+           << ","
+           << "percPrecGraps"
+           << ","
            << "avgScore";
         return fs.str();
     }
 
-    std::string GraspPlannerEvaluation::toCSVString() const
+    std::string
+    GraspPlannerEvaluation::toCSVString() const
     {
         float timeAcc = 0;
         float avgTime = 0;
@@ -104,23 +119,16 @@ namespace GraspStudio
 
 
         std::stringstream fs;
-        fs << minQuality << ","
-           << nrGraspsGenerated << ","
-           << nrGraspsValid << ","
+        fs << minQuality << "," << nrGraspsGenerated << "," << nrGraspsValid << ","
            << (nrGraspsInvalidCollision + nrGraspsInvalidFC + nrGraspsInvalidContacts) << ","
-           << nrGraspsValidPrecision << ","
-           << nrGraspsValidPower << ","
-           << nrGraspsInvalidCollision << ","
-           << nrGraspsInvalidFC << ","
-           << nrGraspsInvalidContacts << ","
-           << avgTime << ","
-           << percPower << ","
-           << percPrec << ","
-           << avgScore;
+           << nrGraspsValidPrecision << "," << nrGraspsValidPower << "," << nrGraspsInvalidCollision
+           << "," << nrGraspsInvalidFC << "," << nrGraspsInvalidContacts << "," << avgTime << ","
+           << percPower << "," << percPrec << "," << avgScore;
         return fs.str();
     }
 
-    std::ostream& operator<<(std::ostream& os, const GraspPlannerEvaluation& rhs)
+    std::ostream&
+    operator<<(std::ostream& os, const GraspPlannerEvaluation& rhs)
     {
         os << "---------------- GRASP PLANNER EVALUATION -----------" << std::endl;
         if (rhs.fcCheck)
@@ -135,8 +143,9 @@ namespace GraspStudio
 
         os << "nrGraspsGenerated: " << rhs.nrGraspsGenerated << std::endl;
         os << "nrGraspsValid: " << rhs.nrGraspsValid << std::endl;
-        os << "nrGraspsInValid: " << (rhs.nrGraspsInvalidCollision + rhs.nrGraspsInvalidFC
-                                      + rhs.nrGraspsInvalidContacts) << std::endl;
+        os << "nrGraspsInValid: "
+           << (rhs.nrGraspsInvalidCollision + rhs.nrGraspsInvalidFC + rhs.nrGraspsInvalidContacts)
+           << std::endl;
         os << "nrGraspsValidPrecision: " << rhs.nrGraspsValidPrecision << std::endl;
         os << "nrGraspsValidPower: " << rhs.nrGraspsValidPower << std::endl;
         os << "nrGraspsInvalidCollision: " << rhs.nrGraspsInvalidCollision << std::endl;
@@ -171,11 +180,12 @@ namespace GraspStudio
         os << "Time complete: " << timeAcc << " ms" << std::endl;
         if (nrGrasps > 0)
         {
-            os << "Avg time per grasp (valid&invalid): " <<
-               static_cast<float>(timeAcc) / static_cast<float>(nrGrasps) << " ms" << std::endl;
+            os << "Avg time per grasp (valid&invalid): "
+               << static_cast<float>(timeAcc) / static_cast<float>(nrGrasps) << " ms" << std::endl;
             float percPower = static_cast<float>(nrPower) / static_cast<float>(nrGrasps);
             float percPrec = static_cast<float>(nrPrecision) / static_cast<float>(nrGrasps);
-            os << "Precision grasps: " << nrPrecision << " -> " << percPrec * 100 << "%" << std::endl;
+            os << "Precision grasps: " << nrPrecision << " -> " << percPrec * 100 << "%"
+               << std::endl;
             os << "Power grasps: " << nrPower << " -> " << percPower * 100 << "%" << std::endl;
         }
         if (nrValid > 0)
@@ -184,12 +194,12 @@ namespace GraspStudio
         }
         if (rhs.nrGraspsGenerated > 0)
             os << "Percentage of valid grasps: "
-               << static_cast<float>(rhs.nrGraspsValid) / static_cast<float>(rhs.nrGraspsGenerated) * 100.0f
+               << static_cast<float>(rhs.nrGraspsValid) /
+                      static_cast<float>(rhs.nrGraspsGenerated) * 100.0f
                << "%" << std::endl;
 
         return os;
     }
 
 
-}
-
+} // namespace GraspStudio

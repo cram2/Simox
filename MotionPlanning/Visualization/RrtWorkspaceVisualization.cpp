@@ -1,12 +1,15 @@
 
 #include "RrtWorkspaceVisualization.h"
+
 #include "MotionPlanning/CSpace/CSpace.h"
 #include "VirtualRobot/Nodes/RobotNode.h"
 
 namespace Saba
 {
 
-    RrtWorkspaceVisualization::RrtWorkspaceVisualization(VirtualRobot::RobotPtr robot, CSpacePtr cspace, const std::string& TCPName)
+    RrtWorkspaceVisualization::RrtWorkspaceVisualization(VirtualRobot::RobotPtr robot,
+                                                         CSpacePtr cspace,
+                                                         const std::string& TCPName)
     {
         this->robot = robot;
         this->cspace = cspace;
@@ -18,8 +21,9 @@ namespace Saba
         init();
     }
 
-
-    RrtWorkspaceVisualization::RrtWorkspaceVisualization(VirtualRobot::RobotPtr robot, VirtualRobot::RobotNodeSetPtr robotNodeSet, const std::string& TCPName)
+    RrtWorkspaceVisualization::RrtWorkspaceVisualization(VirtualRobot::RobotPtr robot,
+                                                         VirtualRobot::RobotNodeSetPtr robotNodeSet,
+                                                         const std::string& TCPName)
     {
         this->robot = robot;
         cspace = CSpacePtr();
@@ -30,10 +34,10 @@ namespace Saba
         init();
     }
 
-    RrtWorkspaceVisualization::~RrtWorkspaceVisualization()
-    = default;
+    RrtWorkspaceVisualization::~RrtWorkspaceVisualization() = default;
 
-    void RrtWorkspaceVisualization::init()
+    void
+    RrtWorkspaceVisualization::init()
     {
         setPathStyle();
         setTreeStyle();
@@ -73,25 +77,31 @@ namespace Saba
         custom.lineG = 0.5f;
         custom.lineB = 0.5f;
         colors[RrtWorkspaceVisualization::eCustom] = custom;
-
     }
 
-
-    void RrtWorkspaceVisualization::setPathStyle(float lineSize, float nodeSize, float renderComplexity)
+    void
+    RrtWorkspaceVisualization::setPathStyle(float lineSize, float nodeSize, float renderComplexity)
     {
         pathLineSize = lineSize;
         pathNodeSize = nodeSize;
         pathRenderComplexity = renderComplexity;
     }
 
-    void RrtWorkspaceVisualization::setTreeStyle(float lineSize, float nodeSize, float renderComplexity)
+    void
+    RrtWorkspaceVisualization::setTreeStyle(float lineSize, float nodeSize, float renderComplexity)
     {
         treeLineSize = lineSize;
         treeNodeSize = nodeSize;
         treeRenderComplexity = renderComplexity;
     }
 
-    void RrtWorkspaceVisualization::setCustomColor(float nodeR, float nodeG, float nodeB, float lineR, float lineG, float lineB)
+    void
+    RrtWorkspaceVisualization::setCustomColor(float nodeR,
+                                              float nodeG,
+                                              float nodeB,
+                                              float lineR,
+                                              float lineG,
+                                              float lineB)
     {
         RenderColors custom;
         custom.nodeR = nodeR;
@@ -103,12 +113,13 @@ namespace Saba
         colors[RrtWorkspaceVisualization::eCustom] = custom;
     }
 
-
-    void RrtWorkspaceVisualization::reset()
+    void
+    RrtWorkspaceVisualization::reset()
     {
     }
 
-    void RrtWorkspaceVisualization::setTCPName(const std::string TCPName)
+    void
+    RrtWorkspaceVisualization::setTCPName(const std::string TCPName)
     {
         this->TCPName = TCPName;
         TCPNode = robot->getRobotNode(TCPName);
@@ -119,7 +130,8 @@ namespace Saba
         }
     }
 
-    void RrtWorkspaceVisualization::colorizeTreeNodes(int status, ColorSet colorSet)
+    void
+    RrtWorkspaceVisualization::colorizeTreeNodes(int status, ColorSet colorSet)
     {
         treeNodeStatusColor[status] = colorSet;
     }

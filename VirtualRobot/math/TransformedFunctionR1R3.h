@@ -25,14 +25,13 @@
 #include "AbstractFunctionR1R3.h"
 #include "math/MathForwardDefinitions.h"
 
-
 namespace math
 {
-    class TransformedFunctionR1R3 :
-            public AbstractFunctionR1R3
+    class TransformedFunctionR1R3 : public AbstractFunctionR1R3
     {
     public:
-        TransformedFunctionR1R3(const Eigen::Matrix4f& transformation, AbstractFunctionR1R3Ptr func);
+        TransformedFunctionR1R3(const Eigen::Matrix4f& transformation,
+                                AbstractFunctionR1R3Ptr func);
         Eigen::Vector3f Get(float t) override;
         Eigen::Vector3f GetDerivative(float t) override;
 
@@ -40,4 +39,4 @@ namespace math
         const Eigen::Matrix4f transformation;
         const AbstractFunctionR1R3Ptr func;
     };
-}
+} // namespace math

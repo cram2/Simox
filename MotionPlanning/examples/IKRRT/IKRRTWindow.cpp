@@ -1,46 +1,52 @@
 
 #include "IKRRTWindow.h"
-#include "VirtualRobot/EndEffector/EndEffector.h"
-#include "VirtualRobot/MathTools.h"
-#include "VirtualRobot/Scene.h"
-#include "VirtualRobot/Workspace/Reachability.h"
-#include "VirtualRobot/ManipulationObject.h"
-#include "VirtualRobot/Grasping/Grasp.h"
-#include "VirtualRobot/IK/GenericIKSolver.h"
-#include "VirtualRobot/Grasping/GraspSet.h"
-#include "VirtualRobot/CollisionDetection/CDManager.h"
-#include "VirtualRobot/XML/ObjectIO.h"
-#include "VirtualRobot/XML/RobotIO.h"
-#include "VirtualRobot/Visualization/CoinVisualization/CoinVisualizationFactory.h"
-#include "MotionPlanning/Planner/GraspIkRrt.h"
-#include "MotionPlanning/CSpace/CSpaceSampled.h"
-#include "MotionPlanning/PostProcessing/ShortcutProcessor.h"
-#include <MotionPlanning/Visualization/CoinVisualization/CoinRrtWorkspaceVisualization.h>
+
+#include <cmath>
+#include <ctime>
+#include <iostream>
+#include <sstream>
+#include <vector>
+
 #include <QFileDialog>
+#include <QGLWidget>
+#include <QImage>
+
 #include <Eigen/Geometry>
 
-#include <ctime>
-#include <vector>
-#include <iostream>
-#include <cmath>
-#include <QImage>
-#include <QGLWidget>
-
 #include "Inventor/actions/SoLineHighlightRenderAction.h"
-#include <Inventor/nodes/SoShapeHints.h>
-#include <Inventor/nodes/SoLightModel.h>
-#include <Inventor/sensors/SoTimerSensor.h>
+#include "MotionPlanning/CSpace/CSpaceSampled.h"
+#include "MotionPlanning/Planner/GraspIkRrt.h"
+#include "MotionPlanning/PostProcessing/ShortcutProcessor.h"
+#include "VirtualRobot/CollisionDetection/CDManager.h"
+#include "VirtualRobot/EndEffector/EndEffector.h"
+#include "VirtualRobot/Grasping/Grasp.h"
+#include "VirtualRobot/Grasping/GraspSet.h"
+#include "VirtualRobot/IK/GenericIKSolver.h"
+#include "VirtualRobot/ManipulationObject.h"
+#include "VirtualRobot/MathTools.h"
+#include "VirtualRobot/Scene.h"
+#include "VirtualRobot/Visualization/CoinVisualization/CoinVisualizationFactory.h"
+#include "VirtualRobot/Workspace/Reachability.h"
+#include "VirtualRobot/XML/ObjectIO.h"
+#include "VirtualRobot/XML/RobotIO.h"
 #include <Inventor/nodes/SoEventCallback.h>
+#include <Inventor/nodes/SoLightModel.h>
 #include <Inventor/nodes/SoMatrixTransform.h>
-
-#include <sstream>
+#include <Inventor/nodes/SoShapeHints.h>
+#include <Inventor/sensors/SoTimerSensor.h>
+#include <MotionPlanning/Visualization/CoinVisualization/CoinRrtWorkspaceVisualization.h>
 using namespace std;
 using namespace VirtualRobot;
 
 float TIMER_MS = 30.0f;
 
-IKRRTWindow::IKRRTWindow(std::string& sceneFile, std::string& reachFile, std::string& rns, std::string& eef, std::string& colModel, std::string& colModelRob)
-    : QMainWindow(nullptr)
+IKRRTWindow::IKRRTWindow(std::string& sceneFile,
+                         std::string& reachFile,
+                         std::string& rns,
+                         std::string& eef,
+                         std::string& colModel,
+                         std::string& colModelRob) :
+    QMainWindow(nullptr)
 {
     VR_INFO << " start " << std::endl;
 
@@ -87,14 +93,13 @@ IKRRTWindow::IKRRTWindow(std::string& sceneFile, std::string& reachFile, std::st
     sensor_mgr->insertTimerSensor(timer);
 }
 
-
 IKRRTWindow::~IKRRTWindow()
 {
     sceneSep->unref();
 }
 
-
-void IKRRTWindow::timerCB(void* data, SoSensor* /*sensor*/)
+void
+IKRRTWindow::timerCB(void* data, SoSensor* /*sensor*/)
 {
     IKRRTWindow* ikWindow = static_cast<IKRRTWindow*>(data);
     float x[6];
@@ -146,8 +151,8 @@ void IKRRTWindow::timerCB(void* data, SoSensor* /*sensor*/)
     }
 }
 
-
-void IKRRTWindow::setupUI()
+void
+IKRRTWindow::setupUI()
 {
     UI.setupUi(this);
     viewer = new SoQtExaminerViewer(UI.frameViewer, "", TRUE, SoQtExaminerViewer::BUILD_POPUP);
@@ -182,14 +187,15 @@ void IKRRTWindow::setupUI()
     connect(UI.horizontalSliderRo, SIGNAL(sliderReleased()), this, SLOT(sliderReleased_ObjectA()));
     connect(UI.horizontalSliderPi, SIGNAL(sliderReleased()), this, SLOT(sliderReleased_ObjectB()));
     connect(UI.horizontalSliderYa, SIGNAL(sliderReleased()), this, SLOT(sliderReleased_ObjectG()));
-    connect(UI.horizontalSliderSolution, SIGNAL(valueChanged(int)), this, SLOT(sliderSolution(int)));
+    connect(
+        UI.horizontalSliderSolution, SIGNAL(valueChanged(int)), this, SLOT(sliderSolution(int)));
 
     UI.checkBoxColCheckIK->setChecked(false);
     UI.checkBoxReachabilitySpaceIK->setChecked(false);
-
 }
 
-void IKRRTWindow::playAndSave()
+void
+IKRRTWindow::playAndSave()
 {
     if (playbackMode)
     {
@@ -202,7 +208,8 @@ void IKRRTWindow::playAndSave()
     }
 }
 
-QString IKRRTWindow::formatString(const char* s, float f)
+QString
+IKRRTWindow::formatString(const char* s, float f)
 {
     QString str1(s);
 
@@ -232,8 +239,8 @@ QString IKRRTWindow::formatString(const char* s, float f)
     return str1;
 }
 
-
-void IKRRTWindow::resetSceneryAll()
+void
+IKRRTWindow::resetSceneryAll()
 {
     if (rns && robot)
     {
@@ -241,16 +248,15 @@ void IKRRTWindow::resetSceneryAll()
     }
 }
 
-
-void IKRRTWindow::closeEvent(QCloseEvent* event)
+void
+IKRRTWindow::closeEvent(QCloseEvent* event)
 {
     quit();
     QMainWindow::closeEvent(event);
 }
 
-
-
-void IKRRTWindow::saveScreenshot()
+void
+IKRRTWindow::saveScreenshot()
 {
     static int counter = 0;
     SbString framefile;
@@ -273,16 +279,17 @@ void IKRRTWindow::saveScreenshot()
     {
         std::cout << "failed writing image " << counter << std::endl;
     }
-
 }
 
-void IKRRTWindow::buildVisu()
+void
+IKRRTWindow::buildVisu()
 {
     showCoordSystem();
 
     robotSep->removeAllChildren();
     //bool colModel = (UI.checkBoxColModel->isChecked());
-    SceneObject::VisualizationType colModel = (UI.checkBoxColModel->isChecked()) ? SceneObject::Collision : SceneObject::Full;
+    SceneObject::VisualizationType colModel =
+        (UI.checkBoxColModel->isChecked()) ? SceneObject::Collision : SceneObject::Full;
 
     if (robot)
     {
@@ -300,8 +307,10 @@ void IKRRTWindow::buildVisu()
 
     if (object)
     {
-        SceneObject::VisualizationType colModel2 = (UI.checkBoxColModel->isChecked()) ? SceneObject::Collision : SceneObject::Full;
-        SoNode* visualisationNode = CoinVisualizationFactory::getCoinVisualization(object, colModel2);
+        SceneObject::VisualizationType colModel2 =
+            (UI.checkBoxColModel->isChecked()) ? SceneObject::Collision : SceneObject::Full;
+        SoNode* visualisationNode =
+            CoinVisualizationFactory::getCoinVisualization(object, colModel2);
 
         if (visualisationNode)
         {
@@ -313,9 +322,10 @@ void IKRRTWindow::buildVisu()
 
     if (obstacles.size() > 0)
     {
-        for (const auto & obstacle : obstacles)
+        for (const auto& obstacle : obstacles)
         {
-            SoNode* visualisationNode = CoinVisualizationFactory::getCoinVisualization(obstacle, colModel);
+            SoNode* visualisationNode =
+                CoinVisualizationFactory::getCoinVisualization(obstacle, colModel);
 
             if (visualisationNode)
             {
@@ -331,22 +341,24 @@ void IKRRTWindow::buildVisu()
     redraw();
 }
 
-int IKRRTWindow::main()
+int
+IKRRTWindow::main()
 {
     SoQt::show(this);
     SoQt::mainLoop();
     return 0;
 }
 
-
-void IKRRTWindow::quit()
+void
+IKRRTWindow::quit()
 {
     std::cout << "IKRRTWindow: Closing" << std::endl;
     this->close();
     SoQt::exitMainLoop();
 }
 
-void IKRRTWindow::loadScene()
+void
+IKRRTWindow::loadScene()
 {
     graspSet.reset();
     robot.reset();
@@ -361,7 +373,7 @@ void IKRRTWindow::loadScene()
         return;
     }
 
-    std::vector< RobotPtr > robots = scene->getRobots();
+    std::vector<RobotPtr> robots = scene->getRobots();
 
     if (robots.size() != 1)
     {
@@ -372,7 +384,7 @@ void IKRRTWindow::loadScene()
     robot = robots[0];
 
 
-    std::vector< ManipulationObjectPtr > objects = scene->getManipulationObjects();
+    std::vector<ManipulationObjectPtr> objects = scene->getManipulationObjects();
 
     if (objects.size() < 1)
     {
@@ -404,7 +416,6 @@ void IKRRTWindow::loadScene()
         {
             VR_ERROR << "Need a correct RNS in robot" << std::endl;
         }
-
     }
 
     if (rns)
@@ -413,11 +424,10 @@ void IKRRTWindow::loadScene()
     }
 
     buildVisu();
-
 }
 
-
-void IKRRTWindow::closeEEF()
+void
+IKRRTWindow::closeEEF()
 {
     if (eef)
     {
@@ -425,10 +435,10 @@ void IKRRTWindow::closeEEF()
     }
 
     redraw();
-
 }
 
-void IKRRTWindow::openEEF()
+void
+IKRRTWindow::openEEF()
 {
     if (eef)
     {
@@ -436,12 +446,10 @@ void IKRRTWindow::openEEF()
     }
 
     redraw();
-
 }
 
-
-
-void IKRRTWindow::updateObject(float x[6])
+void
+IKRRTWindow::updateObject(float x[6])
 {
     if (object)
     {
@@ -454,50 +462,55 @@ void IKRRTWindow::updateObject(float x[6])
         object->setGlobalPose(m);
         std::cout << "object " << std::endl;
         std::cout << m << std::endl;
-
     }
 
     redraw();
-
 }
 
-void IKRRTWindow::sliderReleased_ObjectX()
+void
+IKRRTWindow::sliderReleased_ObjectX()
 {
     UI.horizontalSliderX->setValue(0);
     buildVisu();
 }
 
-void IKRRTWindow::sliderReleased_ObjectY()
+void
+IKRRTWindow::sliderReleased_ObjectY()
 {
     UI.horizontalSliderY->setValue(0);
     buildVisu();
 }
 
-void IKRRTWindow::sliderReleased_ObjectZ()
+void
+IKRRTWindow::sliderReleased_ObjectZ()
 {
     UI.horizontalSliderZ->setValue(0);
     buildVisu();
 }
 
-void IKRRTWindow::sliderReleased_ObjectA()
+void
+IKRRTWindow::sliderReleased_ObjectA()
 {
     UI.horizontalSliderRo->setValue(0);
     buildVisu();
 }
 
-void IKRRTWindow::sliderReleased_ObjectB()
+void
+IKRRTWindow::sliderReleased_ObjectB()
 {
     UI.horizontalSliderPi->setValue(0);
     buildVisu();
 }
 
-void IKRRTWindow::sliderReleased_ObjectG()
+void
+IKRRTWindow::sliderReleased_ObjectG()
 {
     UI.horizontalSliderYa->setValue(0);
     buildVisu();
 }
 
-void IKRRTWindow::showCoordSystem()
+void
+IKRRTWindow::showCoordSystem()
 {
     if (eef)
     {
@@ -517,7 +530,8 @@ void IKRRTWindow::showCoordSystem()
     }
 }
 
-void IKRRTWindow::buildRRTVisu()
+void
+IKRRTWindow::buildRRTVisu()
 {
     rrtSep->removeAllChildren();
 
@@ -531,7 +545,8 @@ void IKRRTWindow::buildRRTVisu()
         return;
     }
 
-    std::shared_ptr<Saba::CoinRrtWorkspaceVisualization> w(new Saba::CoinRrtWorkspaceVisualization(robot, cspace, eef->getTcpName()));
+    std::shared_ptr<Saba::CoinRrtWorkspaceVisualization> w(
+        new Saba::CoinRrtWorkspaceVisualization(robot, cspace, eef->getTcpName()));
 
     if (tree)
     {
@@ -554,13 +569,15 @@ void IKRRTWindow::buildRRTVisu()
     rrtSep->addChild(sol);
 }
 
-void IKRRTWindow::buildGraspSetVisu()
+void
+IKRRTWindow::buildGraspSetVisu()
 {
     graspsSep->removeAllChildren();
 
     if (UI.checkBoxGraspSet->isChecked() && eef && graspSet && object)
     {
-        SoSeparator* visu = CoinVisualizationFactory::CreateGraspSetVisualization(graspSet, eef, object->getGlobalPose());
+        SoSeparator* visu = CoinVisualizationFactory::CreateGraspSetVisualization(
+            graspSet, eef, object->getGlobalPose());
 
         if (visu)
         {
@@ -577,7 +594,8 @@ void IKRRTWindow::buildGraspSetVisu()
 
         if (rg->getSize() > 0)
         {
-            SoSeparator* visu = CoinVisualizationFactory::CreateGraspSetVisualization(rg, eef, object->getGlobalPose());
+            SoSeparator* visu = CoinVisualizationFactory::CreateGraspSetVisualization(
+                rg, eef, object->getGlobalPose());
 
             if (visu)
             {
@@ -587,8 +605,8 @@ void IKRRTWindow::buildGraspSetVisu()
     }
 }
 
-
-void IKRRTWindow::reachVisu()
+void
+IKRRTWindow::reachVisu()
 {
     if (!robot || !reachSpace)
     {
@@ -599,7 +617,8 @@ void IKRRTWindow::reachVisu()
 
     if (UI.checkBoxReachabilitySpace->checkState() == Qt::Checked)
     {
-        SoNode* visualisationNode = CoinVisualizationFactory::getCoinVisualization(reachSpace, VirtualRobot::ColorMap::eRed, true);
+        SoNode* visualisationNode = CoinVisualizationFactory::getCoinVisualization(
+            reachSpace, VirtualRobot::ColorMap::eRed, true);
 
         if (visualisationNode)
         {
@@ -618,7 +637,8 @@ void IKRRTWindow::reachVisu()
     }
 }
 
-void IKRRTWindow::loadReach()
+void
+IKRRTWindow::loadReach()
 {
     reachabilitySep->removeAllChildren();
 
@@ -646,7 +666,9 @@ void IKRRTWindow::loadReach()
 
     buildVisu();
 }
-void IKRRTWindow::planIKRRT()
+
+void
+IKRRTWindow::planIKRRT()
 {
 
     GenericIKSolverPtr ikSolver(new GenericIKSolver(rns));
@@ -704,11 +726,11 @@ void IKRRTWindow::planIKRRT()
     {
         VR_INFO << " Planning succeeded " << std::endl;
         solution = ikRrt->getSolution();
-        Saba::ShortcutProcessorPtr postProcessing(new Saba::ShortcutProcessor(solution, cspace, false));
+        Saba::ShortcutProcessorPtr postProcessing(
+            new Saba::ShortcutProcessor(solution, cspace, false));
         solutionOptimized = postProcessing->optimize(100);
         tree = ikRrt->getTree();
         tree2 = ikRrt->getTree2();
-
     }
     else
     {
@@ -720,12 +742,14 @@ void IKRRTWindow::planIKRRT()
     buildVisu();
 }
 
-void IKRRTWindow::colModel()
+void
+IKRRTWindow::colModel()
 {
     buildVisu();
 }
 
-void IKRRTWindow::searchIK()
+void
+IKRRTWindow::searchIK()
 {
     GenericIKSolverPtr ikSolver(new GenericIKSolver(rns));
 
@@ -764,7 +788,8 @@ void IKRRTWindow::searchIK()
     redraw();
 }
 
-void IKRRTWindow::sliderSolution(int pos)
+void
+IKRRTWindow::sliderSolution(int pos)
 {
     if (!solution)
     {
@@ -787,7 +812,8 @@ void IKRRTWindow::sliderSolution(int pos)
     //saveScreenshot();
 }
 
-void IKRRTWindow::redraw()
+void
+IKRRTWindow::redraw()
 {
     viewer->scheduleRedraw();
     UI.frameViewer->update();

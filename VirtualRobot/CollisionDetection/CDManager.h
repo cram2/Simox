@@ -26,12 +26,11 @@
 
 #pragma once
 
-#include "VirtualRobot/VirtualRobot.h"
-#include "VirtualRobot/SceneObjectSet.h"
-
-#include <vector>
 #include <string>
+#include <vector>
 
+#include "VirtualRobot/SceneObjectSet.h"
+#include "VirtualRobot/VirtualRobot.h"
 
 namespace VirtualRobot
 {
@@ -72,18 +71,21 @@ namespace VirtualRobot
         void addCollisionModelPair(SceneObjectSetPtr m1, SceneObjectSetPtr m2);
         void addCollisionModelPair(SceneObjectPtr m1, SceneObjectSetPtr m2);
         void addCollisionModelPair(SceneObjectPtr m1, SceneObjectPtr m2);
-        template<class SetT>
+
+        template <class SetT>
         typename std::enable_if<std::is_base_of<SceneObjectSet, SetT>::value>::type
         addCollisionModelPair(const std::shared_ptr<SetT>& m1, const std::shared_ptr<SetT>& m2)
         {
-            addCollisionModelPair(std::dynamic_pointer_cast<SceneObjectSet>(m1), std::dynamic_pointer_cast<SceneObjectSet>(m2));
+            addCollisionModelPair(std::dynamic_pointer_cast<SceneObjectSet>(m1),
+                                  std::dynamic_pointer_cast<SceneObjectSet>(m2));
         }
 
         /*!
             Here single collision models can be added. Internally they are wrapped by a SceneObjectSet.
         */
         void addCollisionModel(SceneObjectPtr m);
-        void addCollisionModel(const std::vector<RobotNodePtr>& nodes, const std::string& setName = "");
+        void addCollisionModel(const std::vector<RobotNodePtr>& nodes,
+                               const std::string& setName = "");
 
 
         bool hasSceneObjectSet(SceneObjectSetPtr m);
@@ -116,7 +118,11 @@ namespace VirtualRobot
             Stores nearest positions and corresponding IDs, where P1 and trID1 is used to store the data of m and
             P2 and trID2 is used to store the data of this CDManager.
         */
-        float getDistance(SceneObjectSetPtr m, Eigen::Vector3f& P1, Eigen::Vector3f& P2, int& trID1, int& trID2);
+        float getDistance(SceneObjectSetPtr m,
+                          Eigen::Vector3f& P1,
+                          Eigen::Vector3f& P2,
+                          int& trID1,
+                          int& trID2);
 
 
         //! All SceneObjectSets that have been added.
@@ -131,13 +137,17 @@ namespace VirtualRobot
         bool _hasSceneObjectSet(SceneObjectSetPtr m);
 
         bool isInCollision(SceneObjectSetPtr m, std::vector<SceneObjectSetPtr>& sets);
-        float getDistance(SceneObjectSetPtr m, std::vector<SceneObjectSetPtr>& sets, Eigen::Vector3f& P1, Eigen::Vector3f& P2, int& trID1, int& trID2);
+        float getDistance(SceneObjectSetPtr m,
+                          std::vector<SceneObjectSetPtr>& sets,
+                          Eigen::Vector3f& P1,
+                          Eigen::Vector3f& P2,
+                          int& trID1,
+                          int& trID2);
         float getDistance(SceneObjectSetPtr m, std::vector<SceneObjectSetPtr>& sets);
-        std::vector< SceneObjectSetPtr > colModels;
+        std::vector<SceneObjectSetPtr> colModels;
         CollisionCheckerPtr colChecker;
 
-        std::map<SceneObjectSetPtr, std::vector<SceneObjectSetPtr> > colModelPairs;
-
+        std::map<SceneObjectSetPtr, std::vector<SceneObjectSetPtr>> colModelPairs;
     };
 
-}
+} // namespace VirtualRobot

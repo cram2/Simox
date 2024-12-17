@@ -20,12 +20,13 @@
  */
 
 #include "AbstractFunctionR2R3.h"
-#include "Contact.h"
-#include "Plane.h"
+
 #include <stdexcept>
 
 #include <Eigen/Geometry>
 
+#include "Contact.h"
+#include "Plane.h"
 
 namespace math
 {
@@ -33,56 +34,68 @@ namespace math
     {
     }
 
-    Eigen::Vector3f AbstractFunctionR2R3::GetNormal(float u, float v)
+    Eigen::Vector3f
+    AbstractFunctionR2R3::GetNormal(float u, float v)
     {
         Eigen::Vector3f dduVec = GetDdu(u, v);
         Eigen::Vector3f ddvVec = GetDdv(u, v);
         return dduVec.cross(ddvVec);
     }
 
-    Plane AbstractFunctionR2R3::GetContactPlane(float u, float v)
+    Plane
+    AbstractFunctionR2R3::GetContactPlane(float u, float v)
     {
         return Plane(GetPoint(u, v), GetDdu(u, v), GetDdv(u, v));
     }
 
-    Contact AbstractFunctionR2R3::GetContact(float u, float v)
+    Contact
+    AbstractFunctionR2R3::GetContact(float u, float v)
     {
         return Contact(GetPoint(u, v), GetNormal(u, v));
     }
 
-    Eigen::Vector3f AbstractFunctionR2R3::GetNormal(Eigen::Vector2f uv)
+    Eigen::Vector3f
+    AbstractFunctionR2R3::GetNormal(Eigen::Vector2f uv)
     {
         return GetNormal(uv.x(), uv.y());
     }
 
-    Eigen::Vector3f AbstractFunctionR2R3::GetDdu(Eigen::Vector2f uv)
+    Eigen::Vector3f
+    AbstractFunctionR2R3::GetDdu(Eigen::Vector2f uv)
     {
         return GetDdu(uv.x(), uv.y());
     }
 
-    Eigen::Vector3f AbstractFunctionR2R3::GetDdv(Eigen::Vector2f uv)
+    Eigen::Vector3f
+    AbstractFunctionR2R3::GetDdv(Eigen::Vector2f uv)
     {
         return GetDdv(uv.x(), uv.y());
     }
 
-    Eigen::Vector2f AbstractFunctionR2R3::GetUVFromPos(Eigen::Vector3f pos)
+    Eigen::Vector2f
+    AbstractFunctionR2R3::GetUVFromPos(Eigen::Vector3f pos)
     {
         float u, v;
-        GetUV(pos,  u,  v);
-        return  Eigen::Vector2f(u, v);
+        GetUV(pos, u, v);
+        return Eigen::Vector2f(u, v);
     }
 
-    Eigen::Vector3f AbstractFunctionR2R3::GetVector(Eigen::Vector2f pos, Eigen::Vector2f dir)
+    Eigen::Vector3f
+    AbstractFunctionR2R3::GetVector(Eigen::Vector2f pos, Eigen::Vector2f dir)
     {
         return GetDdu(pos) * dir.x() + GetDdv(pos) * dir.y();
     }
 
-    float AbstractFunctionR2R3::GetDistance(Eigen::Vector3f pos, AbstractFunctionR2R3::ProjectionType projection)
+    float
+    AbstractFunctionR2R3::GetDistance(Eigen::Vector3f pos,
+                                      AbstractFunctionR2R3::ProjectionType projection)
     {
         return (GetPointOnFunction(pos, projection) - pos).norm();
     }
 
-    Eigen::Vector3f AbstractFunctionR2R3::GetPointOnFunction(Eigen::Vector3f pos, AbstractFunctionR2R3::ProjectionType projection)
+    Eigen::Vector3f
+    AbstractFunctionR2R3::GetPointOnFunction(Eigen::Vector3f pos,
+                                             AbstractFunctionR2R3::ProjectionType projection)
     {
         switch (projection)
         {
@@ -95,15 +108,17 @@ namespace math
         }
     }
 
-    Eigen::Vector3f AbstractFunctionR2R3::ProjectPointOntoFunction(Eigen::Vector3f pos)
+    Eigen::Vector3f
+    AbstractFunctionR2R3::ProjectPointOntoFunction(Eigen::Vector3f pos)
     {
         float u, v;
         GetUV(pos, u, v);
         return GetPoint(u, v);
     }
 
-    Eigen::Vector3f AbstractFunctionR2R3::FindClosestPoint(Eigen::Vector3f /*pos*/, float /*epsilon*/)
+    Eigen::Vector3f
+    AbstractFunctionR2R3::FindClosestPoint(Eigen::Vector3f /*pos*/, float /*epsilon*/)
     {
         throw std::runtime_error("FindClosestPoint is not implemented");
     }
-}
+} // namespace math

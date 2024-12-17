@@ -1,18 +1,17 @@
 #include "Reachability.h"
 
-#include "../VirtualRobotException.h"
-#include "../Grasping/GraspSet.h"
-#include "../Grasping/Grasp.h"
-#include "WorkspaceData.h"
-#include "../ManipulationObject.h"
-
-#include <cmath>
 #include <cfloat>
 #include <climits>
+#include <cmath>
+
+#include "../Grasping/Grasp.h"
+#include "../Grasping/GraspSet.h"
+#include "../ManipulationObject.h"
+#include "../VirtualRobotException.h"
+#include "WorkspaceData.h"
 
 namespace VirtualRobot
 {
-
 
 
     Reachability::Reachability(RobotPtr robot) : WorkspaceRepresentation(robot)
@@ -46,17 +45,20 @@ namespace VirtualRobot
             robot->setJointValues(nodeSet, c);
         }*/
 
-    bool Reachability::isReachable(const Eigen::Matrix4f& globalPose)
+    bool
+    Reachability::isReachable(const Eigen::Matrix4f& globalPose)
     {
         return isCovered(globalPose);
     }
 
-    VirtualRobot::GraspSetPtr Reachability::getReachableGrasps(GraspSetPtr grasps, ManipulationObjectPtr object)
+    VirtualRobot::GraspSetPtr
+    Reachability::getReachableGrasps(GraspSetPtr grasps, ManipulationObjectPtr object)
     {
         THROW_VR_EXCEPTION_IF(!object, "no object");
         THROW_VR_EXCEPTION_IF(!grasps, "no grasps");
 
-        GraspSetPtr result(new GraspSet(grasps->getName(), grasps->getRobotType(), grasps->getEndEffector()));
+        GraspSetPtr result(
+            new GraspSet(grasps->getName(), grasps->getRobotType(), grasps->getEndEffector()));
 
         for (unsigned int i = 0; i < grasps->getSize(); i++)
         {
@@ -71,12 +73,14 @@ namespace VirtualRobot
         return result;
     }
 
-    Eigen::Matrix4f Reachability::sampleReachablePose()
+    Eigen::Matrix4f
+    Reachability::sampleReachablePose()
     {
         return sampleCoveredPose();
     }
 
-    VirtualRobot::WorkspaceRepresentationPtr Reachability::clone()
+    VirtualRobot::WorkspaceRepresentationPtr
+    Reachability::clone()
     {
         VirtualRobot::ReachabilityPtr res(new Reachability(robot));
         res->setOrientationType(this->orientationType);

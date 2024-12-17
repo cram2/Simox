@@ -23,17 +23,19 @@
 
 #pragma once
 
-#include "../VirtualRobot.h"
-
-#include <string>
 #include <map>
+#include <string>
+
+#include "../VirtualRobot.h"
 
 namespace VirtualRobot
 {
     class Gravity
     {
     public:
-        Gravity(VirtualRobot::RobotPtr robot, VirtualRobot::RobotNodeSetPtr rnsJoints, VirtualRobot::RobotNodeSetPtr rnsBodies);
+        Gravity(VirtualRobot::RobotPtr robot,
+                VirtualRobot::RobotNodeSetPtr rnsJoints,
+                VirtualRobot::RobotNodeSetPtr rnsBodies);
         virtual ~Gravity();
 
         /*!
@@ -42,18 +44,26 @@ namespace VirtualRobot
          */
         std::map<std::string, float> computeGravityTorque();
 
-        void computeGravityTorque(std::vector<float> &storeValues);
+        void computeGravityTorque(std::vector<float>& storeValues);
         Eigen::Vector3f getGravityVec() const;
-        void setGravityVec(const Eigen::Vector3f &value);
+        void setGravityVec(const Eigen::Vector3f& value);
         std::map<std::string, float> getMasses();
+
     protected:
         struct GravityData;
         typedef std::shared_ptr<GravityData> GravityDataPtr;
+
         struct GravityData : std::enable_shared_from_this<GravityData>
         {
             GravityData();
-            static GravityDataPtr create(SceneObjectPtr node, const std::vector<VirtualRobot::RobotNodePtr> &joints, const std::vector<VirtualRobot::RobotNodePtr> &bodies, std::vector<GravityDataPtr> &dataVec);
-            void init(SceneObjectPtr node, const std::vector<VirtualRobot::RobotNodePtr> &joints, const std::vector<VirtualRobot::RobotNodePtr> &bodies, std::vector<GravityDataPtr> &dataVec);
+            static GravityDataPtr create(SceneObjectPtr node,
+                                         const std::vector<VirtualRobot::RobotNodePtr>& joints,
+                                         const std::vector<VirtualRobot::RobotNodePtr>& bodies,
+                                         std::vector<GravityDataPtr>& dataVec);
+            void init(SceneObjectPtr node,
+                      const std::vector<VirtualRobot::RobotNodePtr>& joints,
+                      const std::vector<VirtualRobot::RobotNodePtr>& bodies,
+                      std::vector<GravityDataPtr>& dataVec);
             std::map<std::string, GravityDataPtr> children;
             SceneObjectPtr node;
             float massSum = 0.0f;
@@ -62,6 +72,7 @@ namespace VirtualRobot
             bool computeCoM = false;
             void computeCoMAndTorque(Eigen::Vector3f& comPositionGlobal);
         };
+
         std::vector<GravityDataPtr> gravityDataHelperVec;
         GravityDataPtr gravityDataHelperRoot;
 
@@ -80,6 +91,4 @@ namespace VirtualRobot
     typedef std::shared_ptr<Gravity> GravityPtr;
 
 
-}
-
-
+} // namespace VirtualRobot

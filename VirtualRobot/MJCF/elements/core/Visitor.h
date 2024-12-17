@@ -2,13 +2,11 @@
 
 #include <VirtualRobot/Util/xml/tinyxml2.h>
 
-
 namespace mjcf
 {
     class AnyElement;
     class Document;
     class Visitor;
-
 
     class Visitor
     {
@@ -30,25 +28,30 @@ namespace mjcf
 
 
     public:
-
         Visitor(Document& document);
         virtual ~Visitor() = default;
 
-        virtual bool visitEnter(const AnyElement&) { return true; }
-        virtual bool visitExit(const AnyElement&) { return true; }
+        virtual bool
+        visitEnter(const AnyElement&)
+        {
+            return true;
+        }
 
+        virtual bool
+        visitExit(const AnyElement&)
+        {
+            return true;
+        }
 
         Adapter* adapter();
         const Adapter* adapter() const;
 
 
     private:
-
         const AnyElement cast(const tinyxml2::XMLElement& element);
 
         Document& document;
-        Adapter _adapter { *this };
-
+        Adapter _adapter{*this};
     };
 
-}
+} // namespace mjcf
