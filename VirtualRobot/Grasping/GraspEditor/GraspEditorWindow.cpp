@@ -893,7 +893,7 @@ namespace VirtualRobot
             auto virtual_object = currentGrasp->getObjectNode(robotEEF);
             if (virtual_object)
             {
-                Eigen::Matrix4f m;
+                Eigen::Matrix4f m = Eigen::Matrix4f::Identity();
                 MathTools::posrpy2eigen4f(x, m);
 
                 Eigen::Matrix4f localTransformation = virtual_object->getLocalTransformation();
