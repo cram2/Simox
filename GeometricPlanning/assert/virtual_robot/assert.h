@@ -4,6 +4,7 @@
 #include <sstream>
 
 #include <VirtualRobot/VirtualRobot.h>
+#include "VirtualRobot/Assert.h"
 
 #define REQUIRE(a) VR_ASSERT(a)
 #define REQUIRE_MESSAGE(a, b) VR_ASSERT_MESSAGE(a, b)

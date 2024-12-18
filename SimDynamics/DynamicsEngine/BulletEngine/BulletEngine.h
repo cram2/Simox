@@ -26,6 +26,7 @@
 
 #include "../DynamicsEngine.h"
 #include "BulletRobot.h"
+#include "VirtualRobot/Assert.h"
 #include "btBulletDynamicsCommon.h"
 
 namespace internal
