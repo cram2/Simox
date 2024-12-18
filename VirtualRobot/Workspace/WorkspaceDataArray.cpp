@@ -5,6 +5,7 @@
 #include <cmath>
 #include <fstream>
 
+#include "Assert.h"
 #include "Compression/CompressionBZip2.h"
 #include "Logging.h"
 

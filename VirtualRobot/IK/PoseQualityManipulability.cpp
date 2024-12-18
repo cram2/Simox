@@ -7,6 +7,7 @@
 #include "../Nodes/RobotNode.h"
 #include "../Robot.h"
 #include "../RobotNodeSet.h"
+#include "Assert.h"
 #include "Logging.h"
 
 using namespace std;

@@ -10,6 +10,7 @@
 #include <SimoxUtility/math/pose/pose.h>
 #include <SimoxUtility/meta/enum/EnumNames.hpp>
 
+#include "Assert.h"
 #include "Nodes/Sensor.h"
 #include "Robot.h"
 #include "VirtualRobotException.h"

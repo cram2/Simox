@@ -9,6 +9,7 @@
 #include "../Nodes/RobotNode.h"
 #include "../Robot.h"
 #include "../VirtualRobotException.h"
+#include "Assert.h"
 #include "Grasping/Grasp.h"
 #include "VirtualRobot.h"
 #include "Workspace/WorkspaceData.h"

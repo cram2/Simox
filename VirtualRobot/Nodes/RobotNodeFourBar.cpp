@@ -11,6 +11,7 @@
 #include <SimoxUtility/math/pose/pose.h>
 #include <SimoxUtility/meta/enum/EnumNames.hpp>
 
+#include "Assert.h"
 #include "Nodes/FourBar/Joint.h"
 #include "Nodes/Sensor.h"
 #include "Robot.h"

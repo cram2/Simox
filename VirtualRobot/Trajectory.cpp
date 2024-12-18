@@ -5,6 +5,7 @@
 
 #include <VirtualRobot/Visualization/VisualizationFactory.h>
 
+#include "Assert.h"
 #include "Logging.h"
 #include "Robot.h"
 #include "VirtualRobot/Nodes/RobotNode.h"

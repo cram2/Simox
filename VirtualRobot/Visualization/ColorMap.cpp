@@ -6,6 +6,7 @@
 
 
 #include "ColorMap.h"
+#include "Assert.h"
 
 namespace VirtualRobot
 {

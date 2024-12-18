@@ -4,6 +4,7 @@
 #include <VirtualRobot/RobotNodeSet.h>
 #include <VirtualRobot/VirtualRobotException.h>
 
+#include "Assert.h"
 #include "VirtualRobot/Nodes/RobotNode.h"
 
 using namespace VirtualRobot;

@@ -9,6 +9,7 @@
 
 #include <SimoxUtility/math/pose/invert.h>
 
+#include "Assert.h"
 #include "CollisionDetection/CollisionModel.h"
 #include "EndEffector/EndEffector.h"
 #include "Logging.h"
