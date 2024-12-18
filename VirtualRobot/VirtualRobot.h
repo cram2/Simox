@@ -22,7 +22,6 @@
 */
 #pragma once
 
-#include <VirtualRobot/Assert.h> // convenience include for assertions. Will be removed in the future.
 #include <VirtualRobot/VirtualRobotImportExport.h>
 
 /*! \defgroup VirtualRobot The VirtualRobot Library
