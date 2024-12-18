@@ -45,6 +45,7 @@ mobile manipulators or service and humanoid robots.
 #endif
 
 #include "VirtualRobot/VirtualRobot.h"
+#include "VirtualRobot/Logging.h"
 #include "VirtualRobot/VirtualRobotException.h"
 
 
