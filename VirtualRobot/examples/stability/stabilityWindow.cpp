@@ -5,6 +5,7 @@
 #include "VirtualRobot/CollisionDetection/CollisionChecker.h"
 #include "VirtualRobot/EndEffector/EndEffector.h"
 #include "VirtualRobot/IK/CoMIK.h"
+#include "VirtualRobot/Logging.h"
 #include "VirtualRobot/Visualization/CoinVisualization/CoinVisualizationFactory.h"
 #include "VirtualRobot/Visualization/CoinVisualization/CoinVisualizationNode.h"
 #include "VirtualRobot/Workspace/Reachability.h"

@@ -29,6 +29,7 @@
 
 #include <VirtualRobot/Robot.h>
 
+#include "Logging.h"
 #include "Nodes/RobotNode.h"
 #include "RobotNodeSet.h"
 

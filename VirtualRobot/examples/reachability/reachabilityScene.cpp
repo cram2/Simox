@@ -16,6 +16,7 @@
 #include <VirtualRobot/Workspace/Manipulability.h>
 #include <VirtualRobot/XML/RobotIO.h>
 
+#include "VirtualRobot/Logging.h"
 #include "VirtualRobot/Workspace/NaturalPosture.h"
 #include "reachabilityWindow.h"
 #include <Inventor/Qt/SoQt.h>

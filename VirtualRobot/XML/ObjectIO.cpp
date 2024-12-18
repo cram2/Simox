@@ -7,6 +7,7 @@
 #include "../ManipulationObject.h"
 #include "../VirtualRobotException.h"
 #include "../Visualization/TriMeshModel.h"
+#include "Logging.h"
 #include "RobotIO.h"
 #include "VirtualRobot.h"
 #include "rapidxml.hpp"

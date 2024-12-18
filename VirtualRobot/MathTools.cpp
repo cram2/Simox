@@ -13,6 +13,7 @@
 
 #include <VirtualRobot/Random.h>
 
+#include "Logging.h"
 #include "VirtualRobotException.h"
 
 #define MIN_TO_ZERO (1e-6f)

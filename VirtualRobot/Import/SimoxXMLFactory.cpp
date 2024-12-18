@@ -4,6 +4,7 @@
 
 #include "../XML/RobotIO.h"
 #include "../XML/rapidxml.hpp"
+#include "Logging.h"
 #include "VirtualRobotException.h"
 
 namespace VirtualRobot

@@ -17,6 +17,7 @@
 #include "../RobotConfig.h"
 #include "../VirtualRobotException.h"
 #include "../Workspace/Reachability.h"
+#include "Logging.h"
 
 namespace VirtualRobot
 {

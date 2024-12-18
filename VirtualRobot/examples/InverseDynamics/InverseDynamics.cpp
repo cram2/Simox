@@ -7,6 +7,7 @@
 #include <VirtualRobot/Tools/Gravity.h>
 #include <VirtualRobot/XML/RobotIO.h>
 
+#include "VirtualRobot/Logging.h"
 #include "VirtualRobot/VirtualRobotException.h"
 #include <rbdl/Kinematics.h>
 using std::cout;

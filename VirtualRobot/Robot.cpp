@@ -7,6 +7,7 @@
 #include "CollisionDetection/CollisionChecker.h"
 #include "CollisionDetection/CollisionModel.h"
 #include "EndEffector/EndEffector.h"
+#include "Logging.h"
 #include "Nodes/RobotNode.h"
 #include "Nodes/Sensor.h"
 #include "RobotConfig.h"

@@ -17,6 +17,7 @@
 
 #include "Inventor/actions/SoLineHighlightRenderAction.h"
 #include "VirtualRobot/EndEffector/EndEffector.h"
+#include "VirtualRobot/Logging.h"
 #include "VirtualRobot/Workspace/Reachability.h"
 #include <Inventor/nodes/SoLightModel.h>
 #include <Inventor/nodes/SoShapeHints.h>

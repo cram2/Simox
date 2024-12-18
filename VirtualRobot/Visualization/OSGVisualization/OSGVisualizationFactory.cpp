@@ -17,6 +17,7 @@
 #include "../../Workspace/Reachability.h"
 #include "../TriMeshModel.h"
 #include "../VisualizationNode.h"
+#include "Logging.h"
 #include "OSGVisualization.h"
 #include "OSGVisualizationNode.h"
 #include <osg/BoundingBox>

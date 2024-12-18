@@ -5,6 +5,7 @@
 #include <VirtualRobot/ManipulationObject.h>
 #include <VirtualRobot/Visualization/TriMeshModel.h>
 
+#include "Logging.h"
 #include <Inventor/SbImage.h>
 #include <Inventor/nodes/SoCoordinate3.h>
 #include <Inventor/nodes/SoIndexedFaceSet.h>

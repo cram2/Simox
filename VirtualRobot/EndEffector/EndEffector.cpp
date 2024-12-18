@@ -5,6 +5,7 @@
 */
 
 #include "EndEffector.h"
+#include <iostream>
 
 #include "../CollisionDetection/CollisionChecker.h"
 #include "../Obstacle.h"
@@ -14,6 +15,7 @@
 #include "../SceneObjectSet.h"
 #include "../VirtualRobotException.h"
 #include "EndEffectorActor.h"
+#include "Logging.h"
 #include "Nodes/RobotNode.h"
 #include "VirtualRobot/CollisionDetection/CollisionModel.h"
 

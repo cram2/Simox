@@ -1,3 +1,4 @@
+#include "Logging.h"
 #ifdef WIN32
 #pragma warning(                                                                                   \
     disable : 4275) // non dll-interface class 'std::logic_error' used as base for dll-interface class 'boost::program_options::error'

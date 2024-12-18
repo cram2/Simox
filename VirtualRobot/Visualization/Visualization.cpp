@@ -9,6 +9,7 @@
 
 #include <iostream>
 
+#include "Logging.h"
 #include "VisualizationNode.h"
 
 namespace VirtualRobot

@@ -1,5 +1,6 @@
 
 #include "ContactSensor.h"
+#include <iostream>
 
 #include "../XML/BaseIO.h"
 #include "ContactSensorFactory.h"

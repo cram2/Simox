@@ -11,6 +11,7 @@
 #include "../Robot.h"
 #include "../VirtualRobotException.h"
 #include "DifferentialIK.h"
+#include "Logging.h"
 
 namespace VirtualRobot
 {

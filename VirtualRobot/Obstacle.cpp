@@ -6,6 +6,7 @@
 
 #include "CollisionDetection/CollisionChecker.h"
 #include "CollisionDetection/CollisionModel.h"
+#include "Logging.h"
 #include "Nodes/RobotNode.h"
 #include "VirtualRobotException.h"
 #include "Visualization/VisualizationFactory.h"

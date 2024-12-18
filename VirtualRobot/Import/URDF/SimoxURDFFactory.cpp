@@ -17,6 +17,7 @@
 #include <VirtualRobot/Visualization/CoinVisualization/CoinVisualizationFactory.h>
 #include <VirtualRobot/Visualization/VisualizationNode.h>
 
+#include "Logging.h"
 #include "MathTools.h"
 #include "Primitive.h"
 #include "VirtualRobotException.h"

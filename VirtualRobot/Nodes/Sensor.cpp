@@ -13,6 +13,7 @@
 #include "../XML/BaseIO.h"
 #include "GraspableSensorizedObject.h"
 #include "Grasping/GraspSet.h"
+#include "Logging.h"
 #include "Nodes/RobotNode.h"
 
 namespace VirtualRobot

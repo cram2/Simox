@@ -7,6 +7,7 @@
 
 #include "../Robot.h"
 #include "CollisionChecker.h"
+#include "Logging.h"
 #include "VirtualRobot/Nodes/RobotNode.h"
 
 using namespace std;

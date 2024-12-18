@@ -21,6 +21,7 @@
 #include <VirtualRobot/XML/RobotIO.h>
 
 #include "Inventor/actions/SoLineHighlightRenderAction.h"
+#include "VirtualRobot/Logging.h"
 #include "VirtualRobot/ManipulationObject.h"
 #include "VirtualRobot/Workspace/NaturalPosture.h"
 #include <Inventor/nodes/SoLightModel.h>

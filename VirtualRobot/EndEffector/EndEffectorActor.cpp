@@ -15,6 +15,7 @@
 #include "../SceneObjectSet.h"
 #include "../VirtualRobotException.h"
 #include "EndEffector.h"
+#include "Logging.h"
 
 namespace VirtualRobot
 {

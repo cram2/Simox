@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <iostream>
 
 #include "../CollisionDetection/CollisionModel.h"
 #include "../Robot.h"

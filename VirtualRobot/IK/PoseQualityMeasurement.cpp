@@ -9,6 +9,7 @@
 #include "../Robot.h"
 #include "../RobotNodeSet.h"
 #include "../VirtualRobotException.h"
+#include "Logging.h"
 
 using namespace std;
 

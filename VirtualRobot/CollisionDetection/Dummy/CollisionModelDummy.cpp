@@ -5,6 +5,7 @@
 
 #include "../../CollisionChecker.h"
 #include "CollisionCheckerDummy.h"
+#include "Logging.h"
 
 namespace VirtualRobot
 {

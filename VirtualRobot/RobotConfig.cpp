@@ -3,6 +3,7 @@
 
 #include <iostream>
 
+#include "Logging.h"
 #include "Nodes/RobotNode.h"
 #include "Robot.h"
 #include "VirtualRobotException.h"

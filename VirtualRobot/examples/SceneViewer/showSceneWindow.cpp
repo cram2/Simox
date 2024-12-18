@@ -15,6 +15,7 @@
 #include "VirtualRobot/EndEffector/EndEffector.h"
 #include "VirtualRobot/Grasping/Grasp.h"
 #include "VirtualRobot/Grasping/GraspSet.h"
+#include "VirtualRobot/Logging.h"
 #include "VirtualRobot/ManipulationObject.h"
 #include "VirtualRobot/Scene.h"
 #include "VirtualRobot/Trajectory.h"

@@ -8,6 +8,7 @@
 #include "../SceneObjectSet.h"
 #include "../Trajectory.h"
 #include "../VirtualRobotException.h"
+#include "Logging.h"
 #include "ObjectIO.h"
 #include "RobotIO.h"
 #include "rapidxml.hpp"

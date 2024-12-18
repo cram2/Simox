@@ -11,6 +11,7 @@
 #include "../RobotConfig.h"
 #include "../VirtualRobotException.h"
 #include "EndEffector/EndEffector.h"
+#include "Logging.h"
 #include "VirtualRobot/Nodes/RobotNode.h"
 
 namespace VirtualRobot

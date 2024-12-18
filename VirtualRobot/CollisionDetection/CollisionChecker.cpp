@@ -11,6 +11,7 @@
 #include "../SceneObjectSet.h"
 #include "../VirtualRobotException.h"
 #include "CollisionModel.h"
+#include "Logging.h"
 #include "VirtualRobot/Nodes/RobotNode.h"
 
 

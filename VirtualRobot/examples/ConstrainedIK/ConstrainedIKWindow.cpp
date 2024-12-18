@@ -28,6 +28,7 @@
 #include "VirtualRobot/EndEffector/EndEffector.h"
 #include "VirtualRobot/IK/ConstrainedHierarchicalIK.h"
 #include "VirtualRobot/IK/ConstrainedStackedIK.h"
+#include "VirtualRobot/Logging.h"
 #include "VirtualRobot/Visualization/CoinVisualization/CoinVisualizationFactory.h"
 #include "VirtualRobot/Visualization/CoinVisualization/CoinVisualizationNode.h"
 

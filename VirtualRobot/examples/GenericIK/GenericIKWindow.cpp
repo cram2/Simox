@@ -2,6 +2,7 @@
 #include "GenericIKWindow.h"
 
 #include "VirtualRobot/EndEffector/EndEffector.h"
+#include "VirtualRobot/Logging.h"
 #include "VirtualRobot/MathTools.h"
 #include "VirtualRobot/Visualization/CoinVisualization/CoinVisualizationNode.h"
 

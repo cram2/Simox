@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <iostream>
 
 #include <Eigen/Geometry>
 #include <Eigen/src/Geometry/AngleAxis.h>

@@ -1,4 +1,5 @@
 #include "GraspableSensorizedObject.h"
+#include <iostream>
 
 #include "EndEffector/EndEffector.h"
 #include "Grasping/GraspSet.h"

@@ -24,6 +24,7 @@
 
 #include "ConstrainedOptimizationIK.h"
 
+#include "Logging.h"
 #include "Nodes/RobotNode.h"
 #include "RobotNodeSet.h"
 #include "VirtualRobotException.h"

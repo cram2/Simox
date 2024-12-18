@@ -6,6 +6,7 @@
 #include <fstream>
 
 #include "Compression/CompressionBZip2.h"
+#include "Logging.h"
 
 namespace VirtualRobot
 {
