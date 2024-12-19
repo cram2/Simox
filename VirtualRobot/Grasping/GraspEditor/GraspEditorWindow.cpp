@@ -1,13 +1,11 @@
-
 #include "GraspEditorWindow.h"
 
+#include <QFileDialog>
 #include <cmath>
 #include <ctime>
 #include <iostream>
 #include <sstream>
 #include <vector>
-
-#include <QFileDialog>
 
 #include <Eigen/Geometry>
 
@@ -34,7 +32,11 @@
 #include <Inventor/nodes/SoShapeHints.h>
 #include <Inventor/sensors/SoTimerSensor.h>
 
-#include "spnav.h"
+//#undef SPNAV_AVAILABLE
+
+#ifdef SPNAV_AVAILABLE
+#include <spnav.h>
+#endif // SPNAV_AVAILABLE
 
 
 using namespace std;
@@ -42,13 +44,29 @@ using namespace VirtualRobot;
 
 float TIMER_MS = 30.0f;
 
+#ifdef SPNAV_AVAILABLE
+
 bool spacenav_is_open = false;
 spnav_event sev;
-double translation_scaling = 200.0;
-double rotation_scaling = 15000.0;
 
+#endif // SPNAV_AVAILABLE
+
+constexpr double MIN_ROT_SCALING = 0.00002;
+constexpr double MAX_ROT_SCALING = 0.0001;
+constexpr double MIN_TRANS_SCALING = 0.002;
+constexpr double MAX_TRANS_SCALING = 0.01;
+
+double rotation_scaling = 0.5 * (MIN_ROT_SCALING + MAX_ROT_SCALING);
+double translation_scaling = 0.5 * (MIN_TRANS_SCALING + MAX_TRANS_SCALING);
 namespace VirtualRobot
 {
+
+    enum class ControlStyle
+    {
+        HAND_COORDINATE_SYSTEM,
+        GLOBAL_COORDINATE_SYSTEM,
+        CAMERA_COORDINATE_SYSTEM
+    };
 
     GraspEditorWindow::GraspEditorWindow(std::string& objFile,
                                          std::string& robotFile,
@@ -124,6 +142,8 @@ namespace VirtualRobot
             ikWindow->updateEEF(x);
         }
 
+        #ifdef SPNAV_AVAILABLE
+
         if (!spacenav_is_open)
         {
             if (spnav_open() == -1)
@@ -147,15 +167,14 @@ namespace VirtualRobot
 
             case SPNAV_EVENT_MOTION:
 
-                x[0] = sev.motion.z / translation_scaling;
-                x[1] = -sev.motion.x / translation_scaling;
-                x[2] = -sev.motion.y / translation_scaling;
+                // An "intuitive" mapping for the hand coordinate system is [y, x, -z]
+                x[0] = sev.motion.y * translation_scaling;
+                x[1] = sev.motion.x * translation_scaling;
+                x[2] = - sev.motion.z * translation_scaling;
 
-                x[3] = sev.motion.rz / rotation_scaling;
-                x[4] = -sev.motion.rx / rotation_scaling;
-                x[5] = -sev.motion.ry / rotation_scaling;
-
-                //cout << "x: " << x[0] << " " << x[1] << " " << x[2] << " " << x[3] << " "<< x[4] << " "<< x[5] << std::endl;
+                x[3] = sev.motion.ry * rotation_scaling;
+                x[4] = sev.motion.rx * rotation_scaling;
+                x[5] = - sev.motion.rz * rotation_scaling;
 
                 ikWindow->updateEEF(x);
 
@@ -168,9 +187,44 @@ namespace VirtualRobot
                     cout << "Negative spacenav buttons not supported." << endl;
                     break;
                 }
+                
+                if (!sev.button.press) // Release event
+                    break;
 
-                cout << "Registered button event: " << sev.button.bnum << " " << sev.button.press
-                     << std::endl;
+                switch (sev.button.bnum)
+                {
+                    case 0:
+                        ikWindow->UI->sensitivityRot->setValue(
+                            ikWindow->UI->sensitivityRot->value() - 10);
+                        break;
+                    case 1:
+                        ikWindow->UI->sensitivityRot->setValue(
+                            ikWindow->UI->sensitivityRot->value() + 10);
+                        break;
+                    case 13:
+                        ikWindow->UI->sensitivityTrans->setValue(
+                            ikWindow->UI->sensitivityTrans->value() - 10);
+                        break;
+                    case 12:
+                        ikWindow->UI->sensitivityTrans->setValue(
+                            ikWindow->UI->sensitivityTrans->value() + 10);
+                        break;
+                    case 6:
+                        ikWindow->UI->disableRotation->setChecked(true);
+                        ikWindow->UI->disableTranslation->setChecked(true);
+                        break;
+                    case 7:
+                        ikWindow->UI->disableRotation->setChecked(true);
+                        break;
+                    case 8:
+                        ikWindow->UI->disableTranslation->setChecked(false);
+                        ikWindow->UI->disableRotation->setChecked(false);
+                        break;
+                    case 9:
+                        ikWindow->UI->disableTranslation->setChecked(true);
+                        break;
+                }
+
                 break;
 
             default:
@@ -180,6 +234,8 @@ namespace VirtualRobot
 
         // Get rid of remaining motion events to prevent queue from growing
         spnav_remove_events(SPNAV_EVENT_MOTION);
+
+        #endif // SPNAV_AVAILABLE
     }
 
     void
@@ -242,6 +298,38 @@ namespace VirtualRobot
         connect(UI->checkBoxGraspSet, SIGNAL(clicked()), this, SLOT(buildVisu()));
         connect(UI->grid, SIGNAL(valueChanged(int)), this, SLOT(sampleGrasps()));
 
+        connect(UI->sensitivityRot,
+                SIGNAL(valueChanged(int)),
+                this,
+                SLOT(updateRotationalSensitivity()));
+        connect(UI->sensitivityTrans,
+                SIGNAL(valueChanged(int)),
+                this,
+                SLOT(updateTranslationalSensitivity()));
+        connect(UI->disableRotation,
+                SIGNAL(stateChanged(int)),
+                this,
+                SLOT(updateRotationalSensitivity()));
+        connect(UI->disableTranslation,
+                SIGNAL(stateChanged(int)),
+                this,
+                SLOT(updateTranslationalSensitivity()));
+
+        UI->controlStyle->addItem("Hand Coodinate System",
+                                  static_cast<int>(ControlStyle::HAND_COORDINATE_SYSTEM));
+        UI->controlStyle->addItem("Global Coordinate System",
+                                  static_cast<int>(ControlStyle::GLOBAL_COORDINATE_SYSTEM));
+        //UI->controlStyle->addItem("Camera Coordinate System", static_cast<int>(ControlStyle::CAMERA_COORDINATE_SYSTEM));
+
+        #ifndef SPNAV_AVAILABLE
+        UI->labelMouse->setEnabled(false);
+        UI->labelRotation->setEnabled(false);
+        UI->sensitivityRot->setEnabled(false);
+        UI->disableRotation->setEnabled(false);
+        UI->labelTranslation->setEnabled(false);
+        UI->sensitivityTrans->setEnabled(false);
+        UI->disableTranslation->setEnabled(false);
+        #endif // SPNAV_AVAILABLE
 
         // In case of embedded use of this program it should not be possible to load an object after the editor is started
         if (embeddedGraspEditor)
@@ -461,8 +549,7 @@ namespace VirtualRobot
             {
                 dialog.setDefaultSuffix("xml");
             }
-            nameFilters << "XML Files (*.xml)"
-                        << "All Files (*.*)";
+            nameFilters << "XML Files (*.xml)" << "All Files (*.*)";
 
             dialog.setNameFilters(nameFilters);
 
@@ -729,9 +816,6 @@ namespace VirtualRobot
             return;
         }
 
-
-        //object->print();
-
         selectEEF(0);
 
         buildVisu();
@@ -898,8 +982,22 @@ namespace VirtualRobot
 
                 Eigen::Matrix4f localTransformation = virtual_object->getLocalTransformation();
 
-                // Eigen::Matrix4f newLocalTransformation = localTransformation * m; // in this case, along global axis
-                Eigen::Matrix4f newLocalTransformation = m * localTransformation; // in this case, along local axis of hand
+                Eigen::Matrix4f newLocalTransformation;
+                ControlStyle currentControlStyle =
+                    static_cast<ControlStyle>(UI->controlStyle->currentIndex());
+                switch (currentControlStyle)
+                {
+                    case ControlStyle::HAND_COORDINATE_SYSTEM:
+                        newLocalTransformation = m * localTransformation;
+                        break;
+                    case ControlStyle::GLOBAL_COORDINATE_SYSTEM:
+                        newLocalTransformation = localTransformation * m;
+                        break;
+                    case ControlStyle::CAMERA_COORDINATE_SYSTEM:
+                        // Not yet implemented
+                        newLocalTransformation = localTransformation;
+                        break;
+                }
 
                 virtual_object->setLocalTransformation(newLocalTransformation);
                 currentGrasp->setObjectTransformation(newLocalTransformation);
@@ -1056,6 +1154,40 @@ namespace VirtualRobot
                 hands.clear();
             buildVisu();
         }
+    }
+
+    void
+    GraspEditorWindow::updateRotationalSensitivity()
+    {
+        if (UI->disableRotation->isChecked())
+        {
+            rotation_scaling = 0.0;
+            UI->sensitivityRot->setEnabled(false);
+        }
+        else
+        {
+            rotation_scaling = MIN_ROT_SCALING + (UI->sensitivityRot->value() / 100.0) *
+                                                     (MAX_ROT_SCALING - MIN_ROT_SCALING);
+            UI->sensitivityRot->setEnabled(true);
+        }
+        //cout << "Rotational scaling: " << rotation_scaling << std::endl;
+    }
+
+    void
+    GraspEditorWindow::updateTranslationalSensitivity()
+    {
+        if (UI->disableTranslation->isChecked())
+        {
+            translation_scaling = 0.0;
+            UI->sensitivityTrans->setEnabled(false);
+        }
+        else
+        {
+            translation_scaling = MIN_TRANS_SCALING + (UI->sensitivityTrans->value() / 100.0) *
+                                                          (MAX_TRANS_SCALING - MIN_TRANS_SCALING);
+            UI->sensitivityTrans->setEnabled(true);
+        }
+        //cout << "Translational scaling: " << translation_scaling << std::endl;
     }
 
 } // namespace VirtualRobot

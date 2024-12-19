@@ -1,10 +1,10 @@
 
 #pragma once
 
+#include <QtGui>
 #include <vector>
 
 #include <QtCore/QtCore>
-#include <QtGui>
 #include <QtWidgets/QtWidgets>
 
 // Bug in Qt: <filesystem must come after Qt includes
@@ -30,6 +30,7 @@
 #include <Inventor/sensors/SoTimerSensor.h>
 
 // #include "ui_GraspEditor.h"
+
 
 namespace Ui
 {
@@ -81,6 +82,9 @@ namespace VirtualRobot
         void sliderReleased_ObjectA();
         void sliderReleased_ObjectB();
         void sliderReleased_ObjectG();
+        
+        void updateRotationalSensitivity();
+        void updateTranslationalSensitivity();
 
         void sampleGrasps();
 
@@ -121,6 +125,8 @@ namespace VirtualRobot
 
         VirtualRobot::RobotPtr robot;
         VirtualRobot::RobotPtr robotEEF;
+        //  VirtualRobot::RobotPtr robotEEF...;
+
         VirtualRobot::GraspableSensorizedObjectPtr object;
         VirtualRobot::RobotPtr robotObject;
         std::vector<VirtualRobot::EndEffectorPtr> eefs;
