@@ -902,7 +902,7 @@ namespace VirtualRobot
                 Eigen::Matrix4f newLocalTransformation = m * localTransformation; // in this case, along local axis of hand
 
                 virtual_object->setLocalTransformation(newLocalTransformation);
-                // currentGrasp->setObjectTransformation(newLocalTransformation);
+                currentGrasp->setObjectTransformation(newLocalTransformation);
                 virtual_object->updatePose(false);
 
 
