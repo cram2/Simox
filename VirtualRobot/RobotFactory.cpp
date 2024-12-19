@@ -9,8 +9,10 @@
 
 #include <SimoxUtility/math/pose/invert.h>
 
+#include "Assert.h"
 #include "CollisionDetection/CollisionModel.h"
 #include "EndEffector/EndEffector.h"
+#include "Logging.h"
 #include "Nodes/RobotNode.h"
 #include "Nodes/RobotNodeFixed.h"
 #include "Nodes/RobotNodeFixedFactory.h"

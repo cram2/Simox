@@ -13,6 +13,7 @@
 #include "../RobotNodeSet.h"
 #include "IK/DifferentialIK.h"
 #include "IK/IKSolver.h"
+#include "Logging.h"
 
 
 using namespace std;

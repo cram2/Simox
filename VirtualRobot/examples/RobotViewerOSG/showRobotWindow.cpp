@@ -13,6 +13,7 @@
 #include <Eigen/Geometry>
 
 #include "VirtualRobot/EndEffector/EndEffector.h"
+#include "VirtualRobot/Logging.h"
 #include "VirtualRobot/Workspace/Reachability.h"
 #include <osg/Shape>
 #include <osg/ShapeDrawable>

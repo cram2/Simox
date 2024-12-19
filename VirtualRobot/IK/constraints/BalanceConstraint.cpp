@@ -25,6 +25,7 @@
 
 #include <VirtualRobot/MathTools.h>
 
+#include "Logging.h"
 #include "Robot.h"
 #include "VirtualRobotException.h"
 

@@ -14,6 +14,7 @@
 #include <SimoxUtility/math/convert.h>
 
 #include "Inventor/actions/SoLineHighlightRenderAction.h"
+#include "Logging.h"
 #include "VirtualRobot/EndEffector/EndEffector.h"
 #include "VirtualRobot/Grasping/ChainedGrasp.h"
 #include "VirtualRobot/Grasping/GraspSet.h"

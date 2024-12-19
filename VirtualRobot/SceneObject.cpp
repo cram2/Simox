@@ -17,6 +17,7 @@
 #include "Affordances.h"
 #include "CollisionDetection/CollisionChecker.h"
 #include "CollisionDetection/CollisionModel.h"
+#include "Logging.h"
 #include "Robot.h"
 #include "VirtualRobotException.h"
 #include "Visualization/TriMeshModel.h"

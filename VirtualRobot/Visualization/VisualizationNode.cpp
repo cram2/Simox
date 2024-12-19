@@ -11,6 +11,7 @@
 
 #include <SimoxUtility/filesystem/remove_trailing_separator.h>
 
+#include "Logging.h"
 #include "TriMeshModel.h"
 #include "VirtualRobot/VirtualRobot.h"
 #include "VirtualRobot/VirtualRobotException.h"

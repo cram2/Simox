@@ -3,6 +3,7 @@
 
 #include "CollisionDetection/CollisionModel.h"
 #include "GraspableSensorizedObject.h"
+#include "Logging.h"
 #include "MathTools.h"
 #include "VirtualRobotException.h"
 #include "Visualization/VisualizationNode.h"

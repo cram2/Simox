@@ -21,6 +21,7 @@
 *
 */
 #include "GraspPlannerEvaluation.h"
+#include "VirtualRobot/Assert.h"
 
 namespace GraspStudio
 {

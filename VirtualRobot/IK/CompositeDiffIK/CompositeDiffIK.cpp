@@ -19,6 +19,7 @@
 #include "CompositeDiffIK.h"
 
 #include <cfloat>
+#include <iostream>
 
 #include <SimoxUtility/error/SimoxError.h>
 #include <VirtualRobot/Nodes/RobotNode.h>

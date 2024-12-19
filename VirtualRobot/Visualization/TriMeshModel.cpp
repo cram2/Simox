@@ -19,6 +19,7 @@
 #include "../DataStructures/nanoflann.hpp"
 #include "../Import/MeshImport/AssimpReader.h"
 #include "../VirtualRobot.h"
+#include "Logging.h"
 #include "VisualizationFactory.h"
 #include "VisualizationNode.h"
 

@@ -29,6 +29,7 @@
 #include <Eigen/Core>
 
 #include "VirtualRobot.h"
+#include "Assert.h"
 
 namespace VirtualRobot
 {

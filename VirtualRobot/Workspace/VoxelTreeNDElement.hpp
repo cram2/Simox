@@ -26,6 +26,7 @@
 #include <vector>
 
 #include "../VirtualRobot.h"
+#include "../Assert.h"
 
 //#define VoxelTreeNDElement_DEBUG_OUTPUT
 

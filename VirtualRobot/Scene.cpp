@@ -1,6 +1,7 @@
 
 #include "Scene.h"
 
+#include "Logging.h"
 #include "ManipulationObject.h"
 #include "MathTools.h"
 #include "Nodes/RobotNode.h"

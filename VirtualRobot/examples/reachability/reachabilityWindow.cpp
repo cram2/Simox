@@ -16,6 +16,7 @@
 #include "Inventor/actions/SoLineHighlightRenderAction.h"
 #include "VirtualRobot/EndEffector/EndEffector.h"
 #include "VirtualRobot/IK/PoseQualityExtendedManipulability.h"
+#include "VirtualRobot/Logging.h"
 #include "VirtualRobot/RobotNodeSet.h"
 #include "VirtualRobot/VirtualRobot.h"
 #include "VirtualRobot/Visualization/CoinVisualization/CoinVisualizationFactory.h"

@@ -10,6 +10,7 @@
 #include <algorithm>
 
 #include "CoinVisualizationNode.h"
+#include "Logging.h"
 #include <Inventor/nodes/SoMatrixTransform.h>
 #include <Inventor/nodes/SoSelection.h>
 #include <Inventor/nodes/SoSeparator.h>

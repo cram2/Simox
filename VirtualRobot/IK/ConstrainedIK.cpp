@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "../RobotFactory.h"
+#include "Logging.h"
 #include "RobotNodeSet.h"
 #include "VirtualRobot/Nodes/RobotNode.h"
 

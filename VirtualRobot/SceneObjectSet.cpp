@@ -5,6 +5,7 @@
 
 #include "CollisionDetection/CollisionChecker.h"
 #include "CollisionDetection/CollisionModel.h"
+#include "Logging.h"
 #include "ManipulationObject.h"
 #include "Obstacle.h"
 #include "RobotNodeSet.h"

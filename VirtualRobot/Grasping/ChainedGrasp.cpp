@@ -1,5 +1,6 @@
 #include "ChainedGrasp.h"
 
+#include "Logging.h"
 #include "Nodes/RobotNodeFixed.h"
 #include "VirtualRobot/EndEffector/EndEffector.h"
 #include "VirtualRobot/MathTools.h"

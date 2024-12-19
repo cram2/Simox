@@ -8,6 +8,7 @@
 #include "../Visualization/VisualizationNode.h"
 #include "../XML/BaseIO.h"
 #include "CollisionChecker.h"
+#include "Logging.h"
 
 namespace VirtualRobot
 {

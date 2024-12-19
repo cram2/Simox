@@ -5,6 +5,7 @@
 #include <iostream>
 
 #include "PathProcessingThread.h"
+#include "VirtualRobot/Assert.h"
 
 using namespace std;
 

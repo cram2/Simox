@@ -14,6 +14,7 @@
 
 #include <Eigen/Geometry>
 
+#include "Logging.h"
 #include "VirtualRobot/Visualization/TriMeshModel.h"
 
 using namespace std;

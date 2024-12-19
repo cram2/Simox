@@ -27,6 +27,7 @@
 #include "../VisualizationNode.h"
 #include "CoinVisualization.h"
 #include "CoinVisualizationNode.h"
+#include "Logging.h"
 #include "SimoxUtility/math/convert/mat3f_to_quat.h"
 #include "VirtualRobot/Robot.h"
 #include "Workspace/WorkspaceData.h"

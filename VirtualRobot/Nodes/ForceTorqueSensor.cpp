@@ -1,5 +1,6 @@
 
 #include "ForceTorqueSensor.h"
+#include <iostream>
 
 #include "../XML/BaseIO.h"
 #include "ForceTorqueSensorFactory.h"

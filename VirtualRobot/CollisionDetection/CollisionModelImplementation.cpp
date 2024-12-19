@@ -1,4 +1,5 @@
 #include "CollisionModelImplementation.h"
+#include <iostream>
 
 namespace VirtualRobot
 {

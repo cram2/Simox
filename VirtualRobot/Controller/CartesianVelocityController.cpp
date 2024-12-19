@@ -21,6 +21,7 @@
 
 #include "CartesianVelocityController.h"
 
+#include "Assert.h"
 #include "RobotNodeSet.h"
 #include "VirtualRobot/IK/DifferentialIK.h"
 #include "VirtualRobot/Nodes/RobotNode.h"

@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <iostream>
 
 #include <Eigen/Geometry>
 #include <Eigen/src/Geometry/AngleAxis.h>
@@ -10,6 +11,7 @@
 #include <SimoxUtility/math/pose/pose.h>
 #include <SimoxUtility/meta/enum/EnumNames.hpp>
 
+#include "Assert.h"
 #include "Nodes/FourBar/Joint.h"
 #include "Nodes/Sensor.h"
 #include "Robot.h"

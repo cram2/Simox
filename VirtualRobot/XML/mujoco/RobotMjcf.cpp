@@ -5,6 +5,7 @@
 #include <VirtualRobot/RobotNodeSet.h>
 #include <VirtualRobot/Visualization/VisualizationNode.h>
 
+#include "Logging.h"
 #include "MeshConverter.h"
 #include <VirtualRobotChecks.h>
 

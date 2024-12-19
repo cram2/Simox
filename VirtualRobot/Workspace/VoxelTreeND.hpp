@@ -31,6 +31,8 @@
 #include "../VirtualRobot.h"
 #include "../VirtualRobotException.h"
 #include "../XML/FileIO.h"
+#include "../Logging.h"
+#include "../Assert.h"
 #include "VoxelTreeNDElement.hpp"
 
 //#define VoxelTreeND_DEBUG_OUTPUT

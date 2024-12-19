@@ -26,6 +26,7 @@
 #include "../Visualization/ColorMap.h"
 #include "../Visualization/Visualization.h"
 #include "../Visualization/VisualizationFactory.h"
+#include "Logging.h"
 #include "MathTools.h"
 #include "SimoxUtility/math/periodic/periodic_clamp.h"
 #include "VirtualRobot.h"

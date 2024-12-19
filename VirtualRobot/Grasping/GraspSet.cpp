@@ -1,6 +1,7 @@
 
 #include "GraspSet.h"
 
+#include <iostream>
 #include <vector>
 
 #include <VirtualRobot/CollisionDetection/CollisionChecker.h>

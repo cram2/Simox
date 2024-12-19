@@ -19,6 +19,7 @@
 #include "ManipulabilityNullspaceGradient.h"
 
 #include <cfloat>
+#include <iostream>
 
 #include <VirtualRobot/Nodes/RobotNode.h>
 #include <VirtualRobot/Robot.h>

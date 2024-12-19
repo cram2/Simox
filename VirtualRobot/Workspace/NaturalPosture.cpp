@@ -19,6 +19,7 @@
 #include "IK/CompositeDiffIK/CompositeDiffIK.h"
 #include "IK/CompositeDiffIK/SoechtingNullspaceGradient.h"
 #include "IK/CompositeDiffIK/SoechtingNullspaceGradientWithWrist.h"
+#include "Logging.h"
 #include "VirtualRobot.h"
 #include "WorkspaceData.h"
 

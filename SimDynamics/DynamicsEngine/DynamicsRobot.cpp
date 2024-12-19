@@ -3,6 +3,7 @@
 #include <VirtualRobot/SceneObject.h>
 
 #include "../DynamicsWorld.h"
+#include "VirtualRobot/Assert.h"
 #include "VirtualRobot/Nodes/RobotNode.h"
 
 namespace SimDynamics

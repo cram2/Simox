@@ -28,6 +28,7 @@
 
 #include "../VirtualRobot.h"
 #include "../VirtualRobotException.h"
+#include "../Logging.h"
 #include "VoxelTree6DElement.hpp"
 
 namespace VirtualRobot

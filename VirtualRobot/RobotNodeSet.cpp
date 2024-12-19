@@ -6,6 +6,7 @@
 #include <set>
 
 #include "CollisionDetection/CollisionChecker.h"
+#include "Logging.h"
 #include "Nodes/RobotNode.h"
 #include "Robot.h"
 #include "RobotConfig.h"

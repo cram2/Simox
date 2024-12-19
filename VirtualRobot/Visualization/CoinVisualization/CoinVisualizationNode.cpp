@@ -13,6 +13,7 @@
 #include "../../XML/BaseIO.h"
 #include "../TriMeshModel.h"
 #include "CoinVisualizationFactory.h"
+#include "Logging.h"
 #include <Inventor/SbLinear.h>
 #include <Inventor/SoPrimitiveVertex.h>
 #include <Inventor/VRMLnodes/SoVRMLGroup.h>

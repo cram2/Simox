@@ -28,6 +28,7 @@
 #include "../Visualization/TriMeshModel.h"
 #include "../Visualization/VisualizationFactory.h"
 #include "../Visualization/VisualizationNode.h"
+#include "Logging.h"
 #include "Nodes/RobotNodeFourBar.h"
 #include "VirtualRobot.h"
 #include "VirtualRobot/EndEffector/EndEffectorActor.h"

@@ -50,6 +50,7 @@ This library can be used to simulate physical interactions and dynamic systems.
 #include <Eigen/Geometry>
 
 #include "VirtualRobot/VirtualRobot.h"
+#include "VirtualRobot/Logging.h"
 #include "VirtualRobot/VirtualRobotException.h"
 
 #ifdef WIN32

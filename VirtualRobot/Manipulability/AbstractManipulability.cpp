@@ -27,6 +27,7 @@
 
 #include <SimoxUtility/math/convert.h>
 
+#include "Logging.h"
 #include "VirtualRobot/Visualization/VisualizationFactory.h"
 #include "VirtualRobot/Visualization/VisualizationNode.h"
 

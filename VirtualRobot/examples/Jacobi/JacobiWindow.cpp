@@ -8,6 +8,7 @@
 
 #include "VirtualRobot/EndEffector/EndEffector.h"
 #include "VirtualRobot/IK/DifferentialIK.h"
+#include "VirtualRobot/Logging.h"
 #include "VirtualRobot/MathTools.h"
 #include "VirtualRobot/Nodes/RobotNode.h"
 #include "VirtualRobot/RobotNodeSet.h"
