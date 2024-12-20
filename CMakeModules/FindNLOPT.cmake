@@ -39,3 +39,21 @@ find_package_handle_standard_args(NLOPT
     REQUIRED_VARS NLOPT_INCLUDE_DIRS NLOPT_LIBRARIES
     VERSION_VAR   NLOPT_VERSION)
 
+# Create alias targets for nlopt and nlopt_cxx
+# ===================================
+
+if(NOT TARGET nlopt::nlopt)
+  add_library(nlopt::nlopt UNKNOWN IMPORTED)
+  set_target_properties(nlopt::nlopt PROPERTIES
+    IMPORTED_LOCATION ${NLOPT_LIBRARIES}
+    INTERFACE_INCLUDE_DIRECTORIES ${NLOPT_INCLUDE_DIRS}
+  )
+endif()
+
+if(NOT TARGET nlopt::nlopt_cxx)
+  add_library(nlopt::nlopt_cxx UNKNOWN IMPORTED)
+  set_target_properties(nlopt::nlopt_cxx PROPERTIES
+    IMPORTED_LOCATION ${NLOPT_LIBRARIES}
+    INTERFACE_INCLUDE_DIRECTORIES ${NLOPT_INCLUDE_DIRS}
+  )
+endif()

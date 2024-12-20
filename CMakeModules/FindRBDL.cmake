@@ -239,6 +239,49 @@ IF (RBDL_FOUND)
      ENDIF (RBDL_${COMPONENT}_FOUND)
    endforeach ( COMPONENT )
 
+   # Create alias targets for the RBDL libraries
+   # ===================================
+   if(NOT TARGET rbdl::rbdl)
+     add_library(rbdl::rbdl UNKNOWN IMPORTED)
+     set_target_properties(rbdl::rbdl PROPERTIES
+       IMPORTED_LOCATION ${RBDL_LIBRARY}
+       INTERFACE_INCLUDE_DIRECTORIES ${RBDL_INCLUDE_DIR}
+     )
+    endif()
+
+    if(NOT TARGET rbdl::luamodel)
+      add_library(rbdl::luamodel UNKNOWN IMPORTED)
+      set_target_properties(rbdl::luamodel PROPERTIES
+        IMPORTED_LOCATION ${RBDL_LUAMODEL_LIBRARY}
+        INTERFACE_INCLUDE_DIRECTORIES ${RBDL_LUAMODEL_INCLUDE_DIR}
+      )
+    endif()
+
+    if(NOT TARGET rbdl::urdfreader)
+      add_library(rbdl::urdfreader UNKNOWN IMPORTED)
+      set_target_properties(rbdl::urdfreader PROPERTIES
+        IMPORTED_LOCATION ${RBDL_URDFREADER_LIBRARY}
+        INTERFACE_INCLUDE_DIRECTORIES ${RBDL_URDFREADER_INCLUDE_DIR}
+      )
+    endif()
+
+    if(NOT TARGET rbdl::muscle)
+      add_library(rbdl::muscle UNKNOWN IMPORTED)
+      set_target_properties(rbdl::muscle PROPERTIES
+        IMPORTED_LOCATION ${RBDL_MUSCLE_LIBRARY}
+        INTERFACE_INCLUDE_DIRECTORIES ${RBDL_MUSCLE_INCLUDE_DIR}
+      )
+    endif()
+
+  if(NOT TARGET rbdl::geometry)
+    add_library(rbdl::geometry UNKNOWN IMPORTED)
+    set_target_properties(rbdl::geometry PROPERTIES
+      IMPORTED_LOCATION ${RBDL_GEOMETRY_LIBRARY}
+      INTERFACE_INCLUDE_DIRECTORIES ${RBDL_GEOMETRY_INCLUDE_DIR}
+    )
+  endif()
+
+
 ENDIF (RBDL_FOUND)
 
 MARK_AS_ADVANCED (
