@@ -21,12 +21,13 @@ namespace VirtualRobot
     using std::cout;
     using std::endl;
 
-    EndEffector::EndEffector(const std::string& nameString, const std::vector<EndEffectorActorPtr>& actorsVector, const std::vector<RobotNodePtr>& staticPartVector, RobotNodePtr baseNodePtr, RobotNodePtr tcpNodePtr, RobotNodePtr gcpNodePtr, std::vector< RobotConfigPtr > preshapes) :
+    EndEffector::EndEffector(const std::string& nameString, const std::vector<EndEffectorActorPtr>& actorsVector, const std::vector<RobotNodePtr>& staticPartVector, RobotNodePtr baseNodePtr, RobotNodePtr tcpNodePtr, RobotNodePtr gcpNodePtr, std::vector< RobotConfigPtr > preshapes, const std::optional<ManipulationCapabilities>& manipulationCapabilities) :
         name(nameString),
         actors(actorsVector),
         statics(staticPartVector),
         baseNode(baseNodePtr),
-        tcpNode(tcpNodePtr)
+        tcpNode(tcpNodePtr),
+        manipulationCapabilities(manipulationCapabilities)
     {
         THROW_VR_EXCEPTION_IF(!baseNode, "NULL base node not allowed!");
         THROW_VR_EXCEPTION_IF(!tcpNode, "NULL tcp node not allowed!");
@@ -86,7 +87,7 @@ namespace VirtualRobot
 
 
 
-        EndEffectorPtr eef(new EndEffector(name, newActors, newStatics, newBase, newTCP, newGCP, newPreshapes));
+        EndEffectorPtr eef(new EndEffector(name, newActors, newStatics, newBase, newTCP, newGCP, newPreshapes, manipulationCapabilities));
         newRobot->registerEndEffector(eef);
 
         // set current config to new eef
@@ -740,5 +741,43 @@ namespace VirtualRobot
         return contactCount;
     }
 
+    const std::optional<ManipulationCapabilities>&
+    EndEffector::getManipulationCapabilities() const
+    {
+        return manipulationCapabilities;
+    }
 
+    bool
+    ManipulationCapabilities::hasCapability(const std::string& affordance,
+                                            const std::string& tcp) const
+    {
+        return (std::any_of(capabilities.begin(),
+                            capabilities.end(),
+                            [&](const auto& capability) {
+                                return capability.affordance == affordance && capability.tcp == tcp;
+                            }));
+    }
+
+    bool
+    ManipulationCapabilities::hasCapability(const std::string& affordance) const
+    {
+        return (std::any_of(capabilities.begin(),
+                            capabilities.end(),
+                            [&](const auto& capability)
+                            { return capability.affordance == affordance; }));
+    }
+
+    ManipulationCapabilities::Capabilities
+    ManipulationCapabilities::getCapabilitiesForAffordance(const std::string& affordance) const
+    {
+        Capabilities result;
+        for (const auto& capability : capabilities)
+        {
+            if (capability.affordance == affordance)
+            {
+                result.push_back(capability);
+            }
+        }
+        return result;
+    }
 } // namespace VirtualRobot

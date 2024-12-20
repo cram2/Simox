@@ -27,11 +27,32 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <optional>
 #include <Eigen/Core>
 
 namespace VirtualRobot
 {
     class EndEffectorActor;
+
+    struct ManipulationCapabilities
+    {
+        struct Capability
+        {
+            std::string affordance;
+            std::string tcp;
+            std::optional<std::string> type;
+            std::optional<std::string> shape;
+        };
+
+        using Capabilities = std::vector<Capability>; 
+
+        Capabilities capabilities;
+
+        bool hasCapability(const std::string& affordance, const std::string& tcp) const;
+        bool hasCapability(const std::string& affordance) const;
+
+        Capabilities getCapabilitiesForAffordance(const std::string& affordance) const;
+    };
 
     class VIRTUAL_ROBOT_IMPORT_EXPORT EndEffector : public std::enable_shared_from_this<EndEffector>
     {
@@ -56,7 +77,7 @@ namespace VirtualRobot
         //! We need an Eigen::aligned_allocator here, otherwise access to a std::vector could crash
         typedef std::vector< ContactInfo, Eigen::aligned_allocator<ContactInfo> > ContactInfoVector;
 
-        EndEffector(const std::string& nameString, const std::vector<EndEffectorActorPtr>& actorsVector, const std::vector<RobotNodePtr>& staticPartVector, RobotNodePtr baseNodePtr, RobotNodePtr tcpNodePtr, RobotNodePtr gcpNodePtr = RobotNodePtr(), std::vector< RobotConfigPtr > preshapes = std::vector< RobotConfigPtr >());
+        EndEffector(const std::string& nameString, const std::vector<EndEffectorActorPtr>& actorsVector, const std::vector<RobotNodePtr>& staticPartVector, RobotNodePtr baseNodePtr, RobotNodePtr tcpNodePtr, RobotNodePtr gcpNodePtr = RobotNodePtr(), std::vector< RobotConfigPtr > preshapes = std::vector< RobotConfigPtr >(), const std::optional<ManipulationCapabilities>& manipulationCapabilities = std::nullopt);
 
         virtual ~EndEffector();
         /*!
@@ -193,6 +214,8 @@ namespace VirtualRobot
 
         int addStaticPartContacts(SceneObjectPtr obstacle, ContactInfoVector& contacts, const Eigen::Vector3f& approachDirGlobal, float maxDistance = 3.0f);
 
+        const std::optional<ManipulationCapabilities>& getManipulationCapabilities() const;
+
     private:
         std::string name;
         std::vector<EndEffectorActorPtr> actors;
@@ -201,7 +224,8 @@ namespace VirtualRobot
         RobotNodePtr baseNode;
         RobotNodePtr tcpNode;
         RobotNodePtr gcpNode;
+
+        std::optional<ManipulationCapabilities> manipulationCapabilities;
     };
 
 } // namespace VirtualRobot
-

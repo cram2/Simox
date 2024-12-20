@@ -462,6 +462,7 @@ namespace VirtualRobot
                         using Matrix3x2f = Eigen::Matrix<float, 3, 2>;
 
                         const Matrix3x2f velocities = jacobian.block<3, 2>(0, 0).cast<float>();
+
                         const Matrix3x2f rotAxes = jacobian.block<3, 2>(3, 0).cast<float>();
 
                         const Eigen::Matrix3f globalOri = second.firstNode->getGlobalOrientation();
@@ -477,6 +478,12 @@ namespace VirtualRobot
                         }
 
                         tmpUpdateJacobianPosition.block<3, 2>(0, i - 1) = velocitiesCoord;
+
+                        if (convertMMtoM)
+                        {
+                            tmpUpdateJacobianPosition.block<3, 2>(0, i - 1) /= 1000.f;
+                        }
+
                         tmpUpdateJacobianOrientation.block<3, 2>(0, i - 1) = rotAxesCoord;
                     }
                     else
@@ -494,12 +501,6 @@ namespace VirtualRobot
 
                     const four_bar::Joint::Jacobian jacobianInBaseD = fourBarJoint->getJacobian(global_P_tcp);
                     Eigen::Vector3f jacobianInBase = jacobianInBaseD.cast<float>();
-
-                    if (convertMMtoM) // positional part
-                    {
-                        jacobianInBase(0) /= 1000.f;
-                        jacobianInBase(1) /= 1000.f;
-                    }
 
                     axis = fourBarJoint->getJointRotationAxis(coordSystem);
 
@@ -532,6 +533,11 @@ namespace VirtualRobot
                         const Eigen::Vector3f jacobianPosInRefFrame = ref_R_base * jacobianPosInBaseFrame;
 
                         tmpUpdateJacobianPosition.block<3,1>(0, i) = jacobianPosInRefFrame;
+
+                        if (convertMMtoM) // positional part
+                        {
+                            tmpUpdateJacobianPosition.block<3,1>(0, i) /= 1000.f;
+                        }
                     }
 
                     // and the orientation part

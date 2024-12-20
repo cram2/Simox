@@ -3,6 +3,7 @@
 
 #include <filesystem>
 #include <fstream>
+#include <optional>
 #include <stdexcept>
 #include <string>
 #include <tuple>
@@ -178,6 +179,64 @@ namespace VirtualRobot
         }
 
         return m;
+    }
+
+    void 
+    BaseIO::processManipulationCapabilities(const rapidxml::xml_node<char>* XMLNode, ManipulationCapabilities& manipulationCapabilities)
+    {
+
+        const auto processManipulationCapability = [](const auto* capabiltyNode) -> std::optional<ManipulationCapabilities::Capability> 
+        {
+            ManipulationCapabilities::Capability capability;
+
+            // required member `affordance`
+            if (auto* eNode = capabiltyNode->first_attribute("affordance", 0, false))
+            {
+                capability.affordance = eNode->value();
+            }
+            else
+            {
+                VR_WARNING << "Missing member `affordance` in capability!" << std::endl;
+                return std::nullopt;
+            }
+
+            // required member `tcp`
+            if (auto* eNode = capabiltyNode->first_attribute("tcp", 0, false))
+            {
+                capability.tcp = eNode->value();
+            }
+
+            // optional member `shape`
+            if (auto* eNode = capabiltyNode->first_attribute("shape", 0, false))
+            {
+                capability.shape = eNode->value();
+            }
+
+            // optional member `affordance`
+            if (auto* eNode = capabiltyNode->first_attribute("type", 0, false))
+            {
+                capability.type = eNode->value();
+            }
+
+            return capability;
+
+        };
+
+        ManipulationCapabilities::Capabilities capabilities;
+        {
+            auto* capabiltyNode = XMLNode->first_node("capability", 0, false);
+            while(capabiltyNode != nullptr)
+            {
+                if(const auto capability = processManipulationCapability(capabiltyNode))
+                {
+                    capabilities.push_back(capability.value());
+                }
+
+                // advance to next sibling
+                capabiltyNode = capabiltyNode->next_sibling();
+            }
+            manipulationCapabilities.capabilities = capabilities;
+        }
     }
 
     void
@@ -427,7 +486,7 @@ namespace VirtualRobot
             }
             else
             {
-                VR_ERROR << "Ignoring unknown tag " << nodeName << std::endl;
+                VR_ERROR << "Ignoring unknown tag `" << nodeName << "`" << std::endl;
             }
 
             node = node->next_sibling();
@@ -1248,11 +1307,7 @@ namespace VirtualRobot
             else if (not primitives.empty())
             {
                 VisualizationFactoryPtr visualizationFactory = VisualizationFactory::first(NULL);
-
-                const auto color = simox::Color::kit_green(128);
-
-                visualizationNode =
-                    visualizationFactory->getVisualizationFromPrimitives(primitives, false, color);
+                visualizationNode = visualizationFactory->getVisualizationFromPrimitives(primitives);
             }
 
 

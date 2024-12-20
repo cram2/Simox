@@ -101,6 +101,7 @@ find_package(RBDL REQUIRED)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 #flags
+add_compile_options(-fsigned-char)
 add_compile_options(-Wall)
 add_compile_options(-Wextra)
 add_compile_options(-Wpedantic)

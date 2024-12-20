@@ -64,7 +64,7 @@ namespace simox::geometric_planning
             // hack: the above is not working reliably of URDF models.
             // therefore, we only accept joints with name matching "***_joint"
 
-            return simox::alg::ends_with(node->getName(), "joint");
+            return simox::alg::ends_with(node->getName(), "joint") and (node->isRotationalJoint() or node->isTranslationalJoint());
         };
 
         // validate assumption

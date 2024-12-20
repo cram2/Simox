@@ -150,6 +150,13 @@ namespace VirtualRobot
          * @brief Get the data held by the second node.
          * May only be called if `isFirstHemisphereJointNode()`;
          */
+        FirstData& getFirstData();
+        const FirstData& getFirstData() const;
+
+        /**
+         * @brief Get the data held by the second node.
+         * May only be called if `isSecondHemisphereJointNode()`;
+         */
         SecondData& getSecondData();
         const SecondData& getSecondData() const;
 

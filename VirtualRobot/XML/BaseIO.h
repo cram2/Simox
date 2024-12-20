@@ -44,6 +44,8 @@ namespace rapidxml
 namespace VirtualRobot
 {
 
+    class ManipulationCapabilities;
+
     /*!
         Several basic XML IO methods.
         \see RobotIO, SceneIO, ObjectIO
@@ -116,7 +118,7 @@ namespace VirtualRobot
         static std::tuple<std::string, std::map<std::string, float>> processConfigurationNode(const rapidxml::xml_node<char>* XMLNode);
 
         static void processAffordances(const rapidxml::xml_node<char>* XMLNode, SceneObject::Affordances& affordances);
-
+        static void processManipulationCapabilities(const rapidxml::xml_node<char>* XMLNode, ManipulationCapabilities& manipulationCapabilities);
 
         static std::string toXML(const Eigen::Matrix4f& m, std::string ident = "\t");
 

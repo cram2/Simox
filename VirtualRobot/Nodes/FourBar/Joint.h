@@ -61,6 +61,21 @@ namespace VirtualRobot::four_bar
 
         // Eigen::Vector2d angleToPosition(const Eigen::Vector2d& alpha) const;
 
+        /**
+         * @brief Use this function to obtain the velocity induced by the ankle motion at the knee
+         * 
+         * Let theta be the knee joint and psi be the ankle joint. Then we assume that you have the velocity of the knee joint as dtheta/dt
+         * 
+         * This function provides you with dpsi/dtheta.
+         * 
+         * Then, it is:
+         * => dpsi/dt = dpsi/dtheta * dtheta/dt 
+         * 
+         * @param kneeAngle 
+         * @return double 
+         */
+        double calculate_dAnkle_dKnee(double kneeAngle);
+
 
         // private:
         const Dimensions dims;

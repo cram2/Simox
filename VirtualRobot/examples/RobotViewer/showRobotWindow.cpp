@@ -1,39 +1,38 @@
 
 #include "showRobotWindow.h"
+
+#include <QFileDialog>
+#include <cmath>
+#include <ctime>
+#include <filesystem>
+#include <iostream>
+#include <sstream>
+#include <vector>
+
+#include <Eigen/Geometry>
+
+#include <SimoxUtility/algorithm/string/string_tools.h>
+#include <VirtualRobot/CollisionDetection/CDManager.h>
+#include <VirtualRobot/Import/RobotImporterFactory.h>
+#include <VirtualRobot/RobotFactory.h>
+#include <VirtualRobot/RuntimeEnvironment.h>
+
 #include "DiffIKWidget.h"
+#include "Inventor/actions/SoLineHighlightRenderAction.h"
 #include "SimoxUtility/algorithm/get_map_keys_values.h"
 #include "VirtualRobot/EndEffector/EndEffector.h"
 #include "VirtualRobot/VirtualRobot.h"
 #include "VirtualRobot/Workspace/Reachability.h"
-#include <VirtualRobot/RuntimeEnvironment.h>
-#include <VirtualRobot/Import/RobotImporterFactory.h>
-#include <VirtualRobot/CollisionDetection/CDManager.h>
-#include <VirtualRobot/RobotFactory.h>
-
-#include <SimoxUtility/algorithm/string/string_tools.h>
-
-#include <QFileDialog>
-#include <Eigen/Geometry>
-
-#include <ctime>
-#include <vector>
-#include <iostream>
-#include <cmath>
-
-#include "Inventor/actions/SoLineHighlightRenderAction.h"
-#include <Inventor/nodes/SoShapeHints.h>
 #include <Inventor/nodes/SoLightModel.h>
+#include <Inventor/nodes/SoShapeHints.h>
 #include <Inventor/nodes/SoUnits.h>
-#include <sstream>
-#include <filesystem>
 
 using namespace std;
 using namespace VirtualRobot;
 
 float TIMER_MS = 30.0f;
 
-showRobotWindow::showRobotWindow(std::string& sRobotFilename)
-    : QMainWindow(nullptr)
+showRobotWindow::showRobotWindow(std::string& sRobotFilename) : QMainWindow(nullptr)
 {
     VR_INFO << " start " << std::endl;
     //this->setCaption(QString("ShowRobot - KIT - Humanoids Group"));
@@ -70,7 +69,6 @@ showRobotWindow::showRobotWindow(std::string& sRobotFilename)
     viewer->viewAll();
 }
 
-
 showRobotWindow::~showRobotWindow()
 {
     robot.reset();
@@ -100,7 +98,8 @@ void CShowRobotWindow::saveScreenshot()
 
 }*/
 
-void showRobotWindow::setupUI()
+void
+showRobotWindow::setupUI()
 {
     UI.setupUi(this);
     //centralWidget()->setLayout(UI.gridLayoutViewer);
@@ -135,7 +134,8 @@ void showRobotWindow::setupUI()
     connect(UI.checkBoxPhysicsInertia, SIGNAL(clicked()), this, SLOT(displayPhysics()));
 
     connect(UI.checkBoxColModel, SIGNAL(clicked()), this, SLOT(rebuildVisualization()));
-    connect(UI.comboBoxPrimitiveModel, SIGNAL(activated(int)), this, SLOT(selectPrimitiveModel(int)));
+    connect(
+        UI.comboBoxPrimitiveModel, SIGNAL(activated(int)), this, SLOT(selectPrimitiveModel(int)));
     connect(UI.checkBoxRobotSensors, SIGNAL(clicked()), this, SLOT(showSensors()));
     connect(UI.checkBoxStructure, SIGNAL(clicked()), this, SLOT(robotStructure()));
     UI.checkBoxFullModel->setChecked(true);
@@ -148,15 +148,28 @@ void showRobotWindow::setupUI()
     connect(UI.buttonSetConfiguration, SIGNAL(clicked()), this, SLOT(setConfiguration()));
     connect(UI.horizontalSliderPos, SIGNAL(valueChanged(int)), this, SLOT(jointValueChanged(int)));
 
-    connect(UI.checkBoxDistToPtEnabled,  &QCheckBox::clicked,           this, &showRobotWindow::updatePointDistanceVisu);
-    connect(UI.doubleSpinBoxDistancePtX, qOverload<double>(&QDoubleSpinBox::valueChanged), this, &showRobotWindow::updatePointDistanceVisu);
-    connect(UI.doubleSpinBoxDistancePtY, qOverload<double>(&QDoubleSpinBox::valueChanged), this, &showRobotWindow::updatePointDistanceVisu);
-    connect(UI.doubleSpinBoxDistancePtZ, qOverload<double>(&QDoubleSpinBox::valueChanged), this, &showRobotWindow::updatePointDistanceVisu);
+    connect(UI.checkBoxDistToPtEnabled,
+            &QCheckBox::clicked,
+            this,
+            &showRobotWindow::updatePointDistanceVisu);
+    connect(UI.doubleSpinBoxDistancePtX,
+            qOverload<double>(&QDoubleSpinBox::valueChanged),
+            this,
+            &showRobotWindow::updatePointDistanceVisu);
+    connect(UI.doubleSpinBoxDistancePtY,
+            qOverload<double>(&QDoubleSpinBox::valueChanged),
+            this,
+            &showRobotWindow::updatePointDistanceVisu);
+    connect(UI.doubleSpinBoxDistancePtZ,
+            qOverload<double>(&QDoubleSpinBox::valueChanged),
+            this,
+            &showRobotWindow::updatePointDistanceVisu);
 
     connect(UI.openDiffIKButton, SIGNAL(clicked()), this, SLOT(openDiffIK()));
 }
 
-QString showRobotWindow::formatString(const char* s, float f)
+QString
+showRobotWindow::formatString(const char* s, float f)
 {
     QString str1(s);
 
@@ -186,7 +199,8 @@ QString showRobotWindow::formatString(const char* s, float f)
     return str1;
 }
 
-void showRobotWindow::resetSceneryAll()
+void
+showRobotWindow::resetSceneryAll()
 {
     if (!robot)
     {
@@ -199,7 +213,8 @@ void showRobotWindow::resetSceneryAll()
     selectJoint(UI.comboBoxJoint->currentIndex());
 }
 
-void showRobotWindow::displayTriangles()
+void
+showRobotWindow::displayTriangles()
 {
     QString text1, text2, text3;
     int trisAllFull, trisRNSFull, trisJointFull;
@@ -228,15 +243,16 @@ void showRobotWindow::displayTriangles()
     }
 
     UI.labelTriVisuTotal->setText(QString::number(trisAllFull));
-    UI.labelTriVisuRNS  ->setText(QString::number(trisRNSFull));
+    UI.labelTriVisuRNS->setText(QString::number(trisRNSFull));
     UI.labelTriVisuJoint->setText(QString::number(trisJointFull));
 
     UI.labelTriColTotal->setText(QString::number(trisAllCol));
-    UI.labelTriColRNS  ->setText(QString::number(trisRNSCol));
+    UI.labelTriColRNS->setText(QString::number(trisRNSCol));
     UI.labelTriColJoint->setText(QString::number(trisJointCol));
 }
 
-void showRobotWindow::robotFullModel()
+void
+showRobotWindow::robotFullModel()
 {
     if (!robot)
     {
@@ -249,10 +265,10 @@ void showRobotWindow::robotFullModel()
         rebuildVisualization();
 
     robot->setupVisualization(showFullModel, true);
-
 }
 
-void showRobotWindow::rebuildVisualization()
+void
+showRobotWindow::rebuildVisualization()
 {
     if (!robot)
     {
@@ -277,10 +293,10 @@ void showRobotWindow::rebuildVisualization()
         }
     }
 
-    if (UI.checkBoxFullModel->checkState() == Qt::Checked
-        || UI.checkBoxStructure->checkState() == Qt::Checked
-        || UI.checkBoxRobotSensors->checkState() == Qt::Checked
-        || UI.checkBoxRobotCoordSystems->checkState() == Qt::Checked)
+    if (UI.checkBoxFullModel->checkState() == Qt::Checked ||
+        UI.checkBoxStructure->checkState() == Qt::Checked ||
+        UI.checkBoxRobotSensors->checkState() == Qt::Checked ||
+        UI.checkBoxRobotCoordSystems->checkState() == Qt::Checked)
     {
         visualization = robot->getVisualization<CoinVisualization>(SceneObject::Full);
         SoNode* visualisationNode = nullptr;
@@ -301,10 +317,10 @@ void showRobotWindow::rebuildVisualization()
     UI.checkBoxStructure->setEnabled(!useColModel);
     UI.checkBoxRobotSensors->setEnabled(!useColModel);
     UI.checkBoxRobotCoordSystems->setEnabled(!useColModel);
-
 }
 
-void showRobotWindow::showSensors()
+void
+showRobotWindow::showSensors()
 {
     if (!robot)
     {
@@ -325,7 +341,8 @@ void showRobotWindow::showSensors()
     rebuildVisualization();
 }
 
-void showRobotWindow::displayPhysics()
+void
+showRobotWindow::displayPhysics()
 {
     if (!robot)
     {
@@ -338,17 +355,18 @@ void showRobotWindow::displayPhysics()
 
     // rebuild visualization
     rebuildVisualization();
-
 }
 
-void showRobotWindow::exportVRML()
+void
+showRobotWindow::exportVRML()
 {
     if (!robot)
     {
         return;
     }
 
-    QString fi = QFileDialog::getSaveFileName(this, tr("VRML 2.0 File"), QString(), tr("VRML Files (*.wrl)"));
+    QString fi = QFileDialog::getSaveFileName(
+        this, tr("VRML 2.0 File"), QString(), tr("VRML Files (*.wrl)"));
     std::string s = std::string(fi.toLatin1());
 
     if (s.empty())
@@ -360,14 +378,18 @@ void showRobotWindow::exportVRML()
         s += ".wrl";
     }
 
-    SceneObject::VisualizationType colModel = (UI.checkBoxColModel->isChecked()) ? SceneObject::Collision : SceneObject::Full;
+    SceneObject::VisualizationType colModel =
+        (UI.checkBoxColModel->isChecked()) ? SceneObject::Collision : SceneObject::Full;
 
     // Use currently selected node as origin
 
     robot->setPropagatingJointValuesEnabled(false);
 
-    robot->setGlobalPoseForRobotNode(robot->getRobotNode(UI.comboBoxJoint->currentText().toStdString()), Eigen::Matrix4f::Identity());
-    VR_INFO << "Using selected node " << UI.comboBoxJoint->currentText().toStdString() << " as origin for exported model." << std::endl;
+    robot->setGlobalPoseForRobotNode(
+        robot->getRobotNode(UI.comboBoxJoint->currentText().toStdString()),
+        Eigen::Matrix4f::Identity());
+    VR_INFO << "Using selected node " << UI.comboBoxJoint->currentText().toStdString()
+            << " as origin for exported model." << std::endl;
 
     robot->setPropagatingJointValuesEnabled(true);
 
@@ -375,7 +397,8 @@ void showRobotWindow::exportVRML()
     visualization->exportToVRML2(s);
 }
 
-void showRobotWindow::exportXML()
+void
+showRobotWindow::exportXML()
 {
     if (!robot)
     {
@@ -383,7 +406,8 @@ void showRobotWindow::exportXML()
     }
 
     // XML
-    QString fi = QFileDialog::getSaveFileName(this, tr("xml File"), QString(), tr("xml Files (*.xml)"));
+    QString fi =
+        QFileDialog::getSaveFileName(this, tr("xml File"), QString(), tr("xml Files (*.xml)"));
     std::string s = std::string(fi.toLatin1());
 
     if (!s.empty())
@@ -394,15 +418,16 @@ void showRobotWindow::exportXML()
         std::string fnPath = p1.parent_path().generic_string();
         RobotIO::saveXML(robot, fn, fnPath);
     }
-
 }
 
-#include <VirtualRobot/Visualization/CoinVisualization/CoinVisualizationFactory.h>
 #include <VirtualRobot/CollisionDetection/CollisionModel.h>
 #include <VirtualRobot/SceneObject.h>
-#include <VirtualRobot/Visualization/VisualizationNode.h>
+#include <VirtualRobot/Visualization/CoinVisualization/CoinVisualizationFactory.h>
 #include <VirtualRobot/Visualization/TriMeshModel.h>
-void showRobotWindow::updatePointDistanceVisu()
+#include <VirtualRobot/Visualization/VisualizationNode.h>
+
+void
+showRobotWindow::updatePointDistanceVisu()
 {
     ptDistance.sep->removeAllChildren();
     if (!UI.checkBoxDistToPtEnabled->isChecked())
@@ -412,12 +437,10 @@ void showRobotWindow::updatePointDistanceVisu()
     }
 
 
-    const Eigen::Vector3f pt = Eigen::Vector3d
-    {
-        UI.doubleSpinBoxDistancePtX->value(),
-        UI.doubleSpinBoxDistancePtY->value(),
-        UI.doubleSpinBoxDistancePtZ->value()
-    }.cast<float>();
+    const Eigen::Vector3f pt = Eigen::Vector3d{UI.doubleSpinBoxDistancePtX->value(),
+                                               UI.doubleSpinBoxDistancePtY->value(),
+                                               UI.doubleSpinBoxDistancePtZ->value()}
+                                   .cast<float>();
 
     CDManager cd;
     // add models to cd
@@ -429,13 +452,10 @@ void showRobotWindow::updatePointDistanceVisu()
         auto i3 = tri->addVertex(pt);
         tri->addFace(i1, i2, i3);
 
-        cd.addCollisionModel(
-            std::make_shared<VirtualRobot::SceneObject>(
-                "sphere",
-                std::make_shared<VirtualRobot::VisualizationNode>(tri),
-                std::make_shared<VirtualRobot::CollisionModel>(tri)
-            ));
-
+        cd.addCollisionModel(std::make_shared<VirtualRobot::SceneObject>(
+            "sphere",
+            std::make_shared<VirtualRobot::VisualizationNode>(tri),
+            std::make_shared<VirtualRobot::CollisionModel>(tri)));
     }
 
     float distance;
@@ -453,43 +473,50 @@ void showRobotWindow::updatePointDistanceVisu()
         ptDistance.sep->addChild(Factory::CreateArrow(pt2, dir, distance));
         ptDistance.sep->addChild(Factory::CreateSphere(pt, spherSize, Color::Green()));
         ptDistance.sep->addChild(Factory::CreateSphere(pt1, spherSize, Color::Blue()));
-        ptDistance.sep->addChild(Factory::CreateSphere(pt2, spherSize, Color(0,1,1)));
+        ptDistance.sep->addChild(Factory::CreateSphere(pt2, spherSize, Color(0, 1, 1)));
     }
 
     UI.labelDistancePtDist->setText(QString::number(distance));
 }
 
-void showRobotWindow::openDiffIK() {
+void
+showRobotWindow::openDiffIK()
+{
     DiffIKWidget::open(this, sceneSep);
     DiffIKWidget::update(robot);
 }
 
-void showRobotWindow::showRobot()
+void
+showRobotWindow::showRobot()
 {
     //m_pGraspScenery->showRobot(m_pShowRobot->state() == QCheckBox::On);
 }
 
-void showRobotWindow::closeEvent(QCloseEvent* event)
+void
+showRobotWindow::closeEvent(QCloseEvent* event)
 {
     quit();
     QMainWindow::closeEvent(event);
 }
 
-int showRobotWindow::main()
+int
+showRobotWindow::main()
 {
     SoQt::show(this);
     SoQt::mainLoop();
     return 0;
 }
 
-void showRobotWindow::quit()
+void
+showRobotWindow::quit()
 {
     std::cout << "CShowRobotWindow: Closing" << std::endl;
     this->close();
     SoQt::exitMainLoop();
 }
 
-void showRobotWindow::updateJointBox()
+void
+showRobotWindow::updateJointBox()
 {
     UI.comboBoxJoint->clear();
 
@@ -499,7 +526,8 @@ void showRobotWindow::updateJointBox()
     }
 }
 
-void showRobotWindow::updateRNSBox()
+void
+showRobotWindow::updateRNSBox()
 {
     UI.comboBoxRobotNodeSet->clear();
     UI.comboBoxRobotNodeSet->addItem(QString("<All>"));
@@ -510,7 +538,8 @@ void showRobotWindow::updateRNSBox()
     }
 }
 
-void showRobotWindow::selectRNS(int nr)
+void
+showRobotWindow::selectRNS(int nr)
 {
     currentRobotNodeSet.reset();
     std::cout << "Selecting RNS nr " << nr << std::endl;
@@ -539,7 +568,6 @@ void showRobotWindow::selectRNS(int nr)
             robot->highlight(visualization,false);
             currentRobotNodeSet->highlight(visualization,true);
         }*/
-
     }
 
     updateJointBox();
@@ -548,7 +576,8 @@ void showRobotWindow::selectRNS(int nr)
     displayTriangles();
 }
 
-void showRobotWindow::selectJoint(int nr)
+void
+showRobotWindow::selectJoint(int nr)
 {
     if (currentRobotNode)
     {
@@ -607,27 +636,27 @@ void showRobotWindow::selectJoint(int nr)
     displayTriangles();
 }
 
-
-void showRobotWindow::selectConfiguration(int nr)
+void
+showRobotWindow::selectConfiguration(int nr)
 {
     std::cout << "Selecting configuration nr " << nr << std::endl;
 
     currentConfiguration = currentConfigurations[nr];
 }
 
-
-void showRobotWindow::setConfiguration()
+void
+showRobotWindow::setConfiguration()
 {
     std::cout << "Setting robot to configuration `" << currentConfiguration << "`" << std::endl;
 
-    if(not robot->setToConfiguration(currentConfiguration))
+    if (not robot->setToConfiguration(currentConfiguration))
     {
         VR_WARNING << "Failed to set robot to config `" << currentConfiguration << "`!";
     }
 }
 
-
-void showRobotWindow::jointValueChanged(int pos)
+void
+showRobotWindow::jointValueChanged(int pos)
 {
     int nr = UI.comboBoxJoint->currentIndex();
 
@@ -636,10 +665,10 @@ void showRobotWindow::jointValueChanged(int pos)
         return;
     }
 
-    float fPos = currentRobotNodes[nr]->getJointLimitLo()
-            + static_cast<float>(pos) / 1000.0f
-            * (currentRobotNodes[nr]->getJointLimitHi()
-               - currentRobotNodes[nr]->getJointLimitLo());
+    float fPos =
+        currentRobotNodes[nr]->getJointLimitLo() +
+        static_cast<float>(pos) / 1000.0f *
+            (currentRobotNodes[nr]->getJointLimitHi() - currentRobotNodes[nr]->getJointLimitLo());
     robot->setJointValue(currentRobotNodes[nr], fPos);
     UI.lcdNumberJointValue->display(static_cast<double>(fPos));
 
@@ -647,7 +676,8 @@ void showRobotWindow::jointValueChanged(int pos)
     updatePointDistanceVisu();
 }
 
-void showRobotWindow::showCoordSystem()
+void
+showRobotWindow::showCoordSystem()
 {
     float size = 0.75f;
     int nr = UI.comboBoxJoint->currentIndex();
@@ -669,19 +699,21 @@ void showRobotWindow::showCoordSystem()
 
     }*/
 
-    currentRobotNodes[nr]->showCoordinateSystem(UI.checkBoxShowCoordSystem->checkState() == Qt::Checked, size);
+    currentRobotNodes[nr]->showCoordinateSystem(
+        UI.checkBoxShowCoordSystem->checkState() == Qt::Checked, size);
     // rebuild visualization
     rebuildVisualization();
 }
 
-
-
-void showRobotWindow::selectRobot()
+void
+showRobotWindow::selectRobot()
 {
     string supportedExtensions = RobotImporterFactory::getAllExtensions();
-    string supported = "Supported Formats, " + supportedExtensions + " (" + supportedExtensions + ")";
+    string supported =
+        "Supported Formats, " + supportedExtensions + " (" + supportedExtensions + ")";
     string filter = supported + ";;" + RobotImporterFactory::getAllFileFilters();
-    QString fi = QFileDialog::getOpenFileName(this, tr("Open Robot File"), QString(), tr(filter.c_str()));
+    QString fi =
+        QFileDialog::getOpenFileName(this, tr("Open Robot File"), QString(), tr(filter.c_str()));
     std::string s = m_sRobotFilename = std::string(fi.toLatin1());
 
     if (!s.empty())
@@ -690,7 +722,9 @@ void showRobotWindow::selectRobot()
         loadRobot();
     }
 }
-void showRobotWindow::reloadRobot()
+
+void
+showRobotWindow::reloadRobot()
 {
     if (!m_sRobotFilename.empty())
     {
@@ -698,7 +732,8 @@ void showRobotWindow::reloadRobot()
     }
 }
 
-void showRobotWindow::testPerformance(RobotPtr robot, RobotNodeSetPtr rns)
+void
+showRobotWindow::testPerformance(RobotPtr robot, RobotNodeSetPtr rns)
 {
     int loops = 10000;
     Eigen::VectorXf limitMin(rns->getSize());
@@ -748,7 +783,7 @@ void showRobotWindow::testPerformance(RobotPtr robot, RobotNodeSetPtr rns)
         rns->setJointValues(v);
     }
     end = clock();
-    timeMS = static_cast<float>(end - start) / static_cast<float>CLOCKS_PER_SEC * 1000.0f;
+    timeMS = static_cast<float>(end - start) / static_cast<float> CLOCKS_PER_SEC * 1000.0f;
     VR_INFO << "Time (visu off, thread on): " << timeMS / static_cast<float>(loops) << std::endl;
 
     start = clock();
@@ -766,7 +801,7 @@ void showRobotWindow::testPerformance(RobotPtr robot, RobotNodeSetPtr rns)
         rns->setJointValues(v);
     }
     end = clock();
-    timeMS = static_cast<float>(end - start) / static_cast<float>CLOCKS_PER_SEC * 1000.0f;
+    timeMS = static_cast<float>(end - start) / static_cast<float> CLOCKS_PER_SEC * 1000.0f;
     VR_INFO << "Time (visu on, thread off): " << timeMS / static_cast<float>(loops) << std::endl;
 
 
@@ -785,11 +820,12 @@ void showRobotWindow::testPerformance(RobotPtr robot, RobotNodeSetPtr rns)
         rns->setJointValues(v);
     }
     end = clock();
-    timeMS = static_cast<float>(end - start) / static_cast<float>CLOCKS_PER_SEC * 1000.0f;
+    timeMS = static_cast<float>(end - start) / static_cast<float> CLOCKS_PER_SEC * 1000.0f;
     VR_INFO << "Time (visu off, thread off): " << timeMS / static_cast<float>(loops) << std::endl;
 }
 
-void showRobotWindow::loadRobot()
+void
+showRobotWindow::loadRobot()
 {
     UI.checkBoxDistToPtEnabled->setChecked(false);
     robotSep->removeAllChildren();
@@ -813,6 +849,11 @@ void showRobotWindow::loadRobot()
         }
 
         robot = importer->loadFromFile(m_sRobotFilename, RobotIO::eFull);
+
+        //        robot = VirtualRobot::RobotFactory::createReducedModel(
+        //            *robot.get(),
+        //            robot->getRobotNodeSet("BothArms")->getNodeNames(),
+        //            {"Hand R TCP", "Hand L TCP"});
     }
     catch (VirtualRobotException& e)
     {
@@ -830,7 +871,8 @@ void showRobotWindow::loadRobot()
     updatRobotInfo();
 }
 
-void showRobotWindow::updatRobotInfo()
+void
+showRobotWindow::updatRobotInfo()
 {
     if (!robot)
     {
@@ -887,7 +929,7 @@ void showRobotWindow::updatRobotInfo()
     UI.comboBoxConfiguration->clear();
     currentConfigurations = ::simox::alg::get_keys(robot->getConfigurations());
 
-    if(not currentConfigurations.empty())
+    if (not currentConfigurations.empty())
     {
         currentConfiguration = currentConfigurations.front();
     }
@@ -912,7 +954,8 @@ void showRobotWindow::updatRobotInfo()
     viewer->viewAll();
 }
 
-void showRobotWindow::robotStructure()
+void
+showRobotWindow::robotStructure()
 {
     if (!robot)
     {
@@ -925,7 +968,8 @@ void showRobotWindow::robotStructure()
     rebuildVisualization();
 }
 
-void showRobotWindow::robotCoordSystems()
+void
+showRobotWindow::robotCoordSystems()
 {
     if (!robot)
     {
@@ -938,7 +982,8 @@ void showRobotWindow::robotCoordSystems()
     rebuildVisualization();
 }
 
-void showRobotWindow::closeHand()
+void
+showRobotWindow::closeHand()
 {
     if (currentEEF)
     {
@@ -946,7 +991,8 @@ void showRobotWindow::closeHand()
     }
 }
 
-void showRobotWindow::openHand()
+void
+showRobotWindow::openHand()
 {
     if (currentEEF)
     {
@@ -954,26 +1000,28 @@ void showRobotWindow::openHand()
     }
 }
 
-
-void showRobotWindow::selectPrimitiveModel(int nr)
+void
+showRobotWindow::selectPrimitiveModel(int nr)
 {
     std::cout << "Selecting primitive model nr " << nr << std::endl;
 
     const std::string id = UI.comboBoxPrimitiveModel->itemText(nr).toStdString();
 
-    if(id.empty())
+    if (id.empty())
     {
         robot->setPrimitiveApproximationModel({}, true);
-    }else
+    }
+    else
     {
-        const std::vector<std::string> ids = { id };
+        const std::vector<std::string> ids = {id};
         robot->setPrimitiveApproximationModel(ids, false);
     }
 
     rebuildVisualization();
 }
 
-void showRobotWindow::selectEEF(int nr)
+void
+showRobotWindow::selectEEF(int nr)
 {
     std::cout << "Selecting EEF nr " << nr << std::endl;
 
@@ -994,7 +1042,8 @@ void showRobotWindow::selectEEF(int nr)
     }
 }
 
-void showRobotWindow::selectPreshape(int nr)
+void
+showRobotWindow::selectPreshape(int nr)
 {
     std::cout << "Selecting EEF preshape nr " << nr << std::endl;
 
@@ -1016,7 +1065,8 @@ void showRobotWindow::selectPreshape(int nr)
     robot->setConfig(c);
 }
 
-void showRobotWindow::updateEEFBox()
+void
+showRobotWindow::updateEEFBox()
 {
     UI.comboBoxEndEffector->clear();
 

@@ -31,7 +31,6 @@
 #include "FourBar/Joint.h"
 #include "RobotNode.h"
 
-
 namespace VirtualRobot
 {
 
@@ -45,19 +44,20 @@ namespace VirtualRobot
         enum class Role
         {
             PASSIVE,
-            ACTIVE,
+            ACTIVE
         };
         static Role RoleFromString(const std::string& string);
 
         struct XmlInfo
         {
+            XmlInfo(Role role) : role(role)
+            {
+            }
+
             Role role;
 
             // Only set for first:
-            double theta0 = -1;
-            // double lever = -1;
-
-            std::optional<four_bar::Joint::Dimensions> dimensions;
+            std::optional<four_bar::Joint::Dimensions> dimensions = std::nullopt;
         };
 
         friend class RobotFactory;
@@ -119,7 +119,7 @@ namespace VirtualRobot
 
         Eigen::Vector3f getJointRotationAxis(const SceneObjectPtr& coordSystem) const;
 
-        // the root of the 
+        // the root of the
         Eigen::Matrix4f baseFrame(const SceneObjectPtr& coordSystem) const;
 
         four_bar::Joint::Jacobian getJacobian(const Eigen::Vector3f& global_P_eef) const;
@@ -144,22 +144,17 @@ namespace VirtualRobot
                             float scaling) override;
 
 
-    protected:
+    public:
         struct JointMath
         {
-            /// The actuator values that were used to compute the joint math.
-            // Eigen::Vector2f actuators = Eigen::Vector2f::Constant(std::numeric_limits<float>::min());
             /// The joint math.
             four_bar::Joint joint;
-
-            void update(float theta);
         };
 
         struct First
         {
             // JointMath math;
         };
-        std::optional<First> first;
 
         struct Second
         {
@@ -177,9 +172,27 @@ namespace VirtualRobot
             //     return passive->first->math;
             // }
         };
+
+        bool isActive() const;
+
+        /**
+         * @brief Get the data held by the active node.
+         * May only be called if `isActive()`;
+         */
+        Second& getActiveData();
+
+        /**
+         * @brief Get the data held by the active node.
+         * May only be called if `isActive()`;
+         */
+        const Second& getActiveData() const;
+
+        const std::optional<XmlInfo>& getXmlInfo() const;
+
+    private:
+        std::optional<First> first;
+
         std::optional<Second> active;
-
-
 
         std::optional<XmlInfo> xmlInfo;
     };
