@@ -1011,22 +1011,12 @@ namespace VirtualRobot
                 const Eigen::Matrix4f hand_T_object =
                     Eigen::Isometry3f{global_T_hand}.inverse() * global_T_object;
 
-
-                // global_T_object = global_T_hand * grasp_T_object;
-                // I = global_T_hand * grasp_T_object;
-
                 const Eigen::Matrix4f global_T_hand_desired =
                     Eigen::Isometry3f{hand_T_object}.inverse().matrix();
 
 
                 robotEEF->setGlobalPose(global_T_hand_desired);
 
-                //cout << "m:" << endl << m << std::endl;
-                //cout << "newLocalTransformation:" << endl << newLocalTransformation << std::endl;
-                //cout << "global_T_object:" << endl << global_T_object << std::endl;
-                //cout << "grasp_T_object:" << endl << hand_T_object << std::endl;
-                //cout << "global_T_hand:" << endl << global_T_hand << std::endl;
-                //cout << "global_T_hand_desired:" << endl << global_T_hand_desired << std::endl;
             }
         }
 
