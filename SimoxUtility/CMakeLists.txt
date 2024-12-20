@@ -292,6 +292,9 @@ if (difflib_FOUND)
     target_compile_definitions(SimoxUtility PUBLIC DIFFLIB_FOUND)
 endif()
 
+# nlohmann json
+target_link_libraries(SimoxUtility PUBLIC nlohmann_json::nlohmann_json)
+
 
 target_compile_options(SimoxUtility PUBLIC -include SimoxUtility/eigen/AssertAsException.h)
 

@@ -3,6 +3,7 @@
 #include <VirtualRobot/Dynamics/Dynamics.h>
 #include <VirtualRobot/Nodes/RobotNode.h>
 #include <VirtualRobot/Robot.h>
+#include <VirtualRobot/RobotNodeSet.h>
 #include <VirtualRobot/RuntimeEnvironment.h>
 #include <VirtualRobot/Tools/Gravity.h>
 #include <VirtualRobot/XML/RobotIO.h>

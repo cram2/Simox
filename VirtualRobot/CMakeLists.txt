@@ -15,10 +15,10 @@ target_link_libraries(VirtualRobot PUBLIC SimoxUtility SimoxQtUtility)
 # Setup dependencies
 #######################################################################
 ### RBDL
+
 if (Simox_USE_RBDL_LIB)
-#    target_include_directories(VirtualRobot PUBLIC "../3rdParty/rbdl/src")
-#    target_include_directories(VirtualRobot PUBLIC "../3rdParty/rbdl/include")
-    target_link_libraries(VirtualRobot LINK_PUBLIC rbdl)
+    target_include_directories(VirtualRobot SYSTEM PRIVATE ${RBDL_INCLUDE_DIR})
+    target_link_libraries(VirtualRobot LINK_PRIVATE ${RBDL_LIBRARY})
 endif()
 
 #### NLOPT

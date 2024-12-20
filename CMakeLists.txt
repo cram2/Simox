@@ -93,6 +93,10 @@ MESSAGE (STATUS "Boost found at: ${Boost_INCLUDE_DIR}")
 
 FIND_PACKAGE (difflib QUIET)
 
+find_package(nlohmann_json 3.11.3 REQUIRED)
+
+find_package(RBDL REQUIRED)
+
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -228,10 +232,10 @@ ADD_DEFINITIONS(-DSimox_TEST_DIR=\"${Simox_TEST_DIR}/\")
 set (SIMOX_EXPORT_TARGET_LIST "")
 
 if (Simox_USE_RBDL_LIB)
-    message(STATUS "Using rbdl")
-    add_subdirectory(3rdParty/rbdl)
-    list (APPEND SIMOX_EXPORT_TARGET_LIST rbdl)
-    list (APPEND Simox_LIBRARIES rbdl)
+#     message(STATUS "Using rbdl")
+#     add_subdirectory(3rdParty/rbdl)
+#     list (APPEND SIMOX_EXPORT_TARGET_LIST rbdl)
+#     list (APPEND Simox_LIBRARIES rbdl)
 endif()
 
 #######################################################################################

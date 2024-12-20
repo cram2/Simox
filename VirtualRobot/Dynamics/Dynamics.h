@@ -1,11 +1,15 @@
 #pragma once
 
 #include <set>
+#include <map>
 
-#include "../Nodes/RobotNode.h"
-#include "../RobotNodeSet.h"
-#include "../VirtualRobotImportExport.h"
-#include <rbdl/rbdl.h>
+#include "../VirtualRobot.h"
+
+namespace RigidBodyDynamics
+{
+    class Model;
+    class Body;
+}
 
 namespace VirtualRobot
 {
@@ -71,8 +75,9 @@ namespace VirtualRobot
         static std::tuple<Eigen::Matrix3d, Eigen::Vector3d, double>
         computeCombinedPhysics(const std::set<RobotNodePtr>& nodes,
                                const RobotNodePtr& referenceNode);
-        RigidBodyDynamics::Body computeCombinedBody(const std::set<RobotNodePtr>& nodes,
-                                                    const RobotNodePtr& referenceNode) const;
+        std::shared_ptr<RigidBodyDynamics::Body> 
+        computeCombinedBody(const std::set<RobotNodePtr>& nodes,
+                            const RobotNodePtr& referenceNode) const;
         bool getVerbose() const;
         void setVerbose(bool value);
 
