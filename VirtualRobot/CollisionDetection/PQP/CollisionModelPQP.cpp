@@ -1,17 +1,19 @@
 
 #include "CollisionModelPQP.h"
 
+#include "../../Visualization/TriMeshModel.h"
 #include "../CollisionChecker.h"
 #include "CollisionCheckerPQP.h"
-#include "../../Visualization/TriMeshModel.h"
 #include "Logging.h"
 #include "PQP.h"
 
 namespace VirtualRobot
 {
 
-    CollisionModelPQP::CollisionModelPQP(const TriMeshModelPtr& modelData, CollisionCheckerPtr colChecker, int id)
-        : CollisionModelImplementation(modelData, colChecker, id)
+    CollisionModelPQP::CollisionModelPQP(const TriMeshModelPtr& modelData,
+                                         CollisionCheckerPtr colChecker,
+                                         int id) :
+        CollisionModelImplementation(modelData, colChecker, id)
     {
         if (!colChecker)
         {
@@ -30,23 +32,22 @@ namespace VirtualRobot
         createPQPModel();
     }
 
-    CollisionModelPQP::CollisionModelPQP(const CollisionModelPQP &orig) :
+    CollisionModelPQP::CollisionModelPQP(const CollisionModelPQP& orig) :
         CollisionModelImplementation(orig.modelData, nullptr, orig.id)
     {
         pqpModel = orig.pqpModel;
     }
 
+    CollisionModelPQP::~CollisionModelPQP() = default;
 
-    CollisionModelPQP::~CollisionModelPQP()
-    = default;
-
-
-    void CollisionModelPQP::destroyData()
+    void
+    CollisionModelPQP::destroyData()
     {
         pqpModel.reset();
     }
 
-    void CollisionModelPQP::createPQPModel()
+    void
+    CollisionModelPQP::createPQPModel()
     {
         if (!modelData)
         {
@@ -82,7 +83,8 @@ namespace VirtualRobot
         pqpModel->EndModel();
     }
 
-    void CollisionModelPQP::print()
+    void
+    CollisionModelPQP::print()
     {
         std::cout << "   CollisionModelPQP: ";
 
@@ -147,10 +149,11 @@ namespace VirtualRobot
         std::cout << std::endl;
     }
 
-    std::shared_ptr<CollisionModelImplementation> CollisionModelPQP::clone(bool deepCopy) const
+    std::shared_ptr<CollisionModelImplementation>
+    CollisionModelPQP::clone(bool deepCopy) const
     {
         std::shared_ptr<CollisionModelPQP> p(new CollisionModelPQP(*this));
-        if(deepCopy)
+        if (deepCopy)
         {
             p->createPQPModel();
         }
@@ -160,4 +163,4 @@ namespace VirtualRobot
     }
 
 
-} // namespace
+} // namespace VirtualRobot

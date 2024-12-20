@@ -1,14 +1,14 @@
 
 #include "CollisionCheckerPQP.h"
 
-#include "CollisionModelPQP.h"
+#include <VirtualRobot/Visualization/TriMeshModel.h>
+
+#include "../../SceneObjectSet.h"
+#include "../../VirtualRobotException.h"
 #include "../CollisionChecker.h"
 #include "../CollisionModel.h"
-#include "../../SceneObjectSet.h"
+#include "CollisionModelPQP.h"
 #include "PQP.h"
-#include "../../VirtualRobotException.h"
-
-#include <VirtualRobot/Visualization/TriMeshModel.h>
 
 ///
 /// \brief Computes the intersection line between two triangles V and U
@@ -23,10 +23,15 @@
 /// \param isectpt2 Output: end point of intersection line
 /// \return
 ///
-int tri_tri_intersect_with_isectline(
-    const float V0[3], const float V1[3], const float V2[3],
-    const float U0[3], const float U1[3], const float U2[3],
-    int* coplanar, float isectpt1[3], float isectpt2[3]);
+int tri_tri_intersect_with_isectline(const float V0[3],
+                                     const float V1[3],
+                                     const float V2[3],
+                                     const float U0[3],
+                                     const float U1[3],
+                                     const float U2[3],
+                                     int* coplanar,
+                                     float isectpt1[3],
+                                     float isectpt2[3]);
 
 namespace VirtualRobot
 {
@@ -38,17 +43,26 @@ namespace VirtualRobot
         bool coplanar = false;
     };
 
-    static TriTriIntersection intersectTriangles(
-        Eigen::Vector3f const& U0, Eigen::Vector3f const& U1, Eigen::Vector3f const& U2,
-        Eigen::Vector3f const& V0, Eigen::Vector3f const& V1, Eigen::Vector3f const& V2)
+    static TriTriIntersection
+    intersectTriangles(Eigen::Vector3f const& U0,
+                       Eigen::Vector3f const& U1,
+                       Eigen::Vector3f const& U2,
+                       Eigen::Vector3f const& V0,
+                       Eigen::Vector3f const& V1,
+                       Eigen::Vector3f const& V2)
     {
         TriTriIntersection result;
 
         int coplanar = 0;
-        int intersects = tri_tri_intersect_with_isectline(V0.data(), V1.data(), V2.data(),
-                         U0.data(), U1.data(), U2.data(),
-                         &coplanar,
-                         result.startPoint.data(), result.endPoint.data());
+        int intersects = tri_tri_intersect_with_isectline(V0.data(),
+                                                          V1.data(),
+                                                          V2.data(),
+                                                          U0.data(),
+                                                          U1.data(),
+                                                          U2.data(),
+                                                          &coplanar,
+                                                          result.startPoint.data(),
+                                                          result.endPoint.data());
 
         result.intersect = (intersects != 0);
         result.coplanar = (coplanar != 0);
@@ -59,7 +73,7 @@ namespace VirtualRobot
     //----------------------------------------------------------------------
     // class CollisionChecker constructor
     //----------------------------------------------------------------------
-    CollisionCheckerPQP::CollisionCheckerPQP(): CollisionCheckerImplementation()
+    CollisionCheckerPQP::CollisionCheckerPQP() : CollisionCheckerImplementation()
     {
         automaticSizeCheck = true;
 
@@ -84,24 +98,50 @@ namespace VirtualRobot
         pqpChecker = nullptr;
     }
 
-
-    float CollisionCheckerPQP::calculateDistance(const CollisionModelPtr& model1, const CollisionModelPtr& model2, Eigen::Vector3f& P1, Eigen::Vector3f& P2, int* trID1, int* trID2)
+    float
+    CollisionCheckerPQP::calculateDistance(const CollisionModelPtr& model1,
+                                           const CollisionModelPtr& model2,
+                                           Eigen::Vector3f& P1,
+                                           Eigen::Vector3f& P2,
+                                           int* trID1,
+                                           int* trID2)
     {
-        std::shared_ptr<PQP::PQP_Model> m1 = model1->getCollisionModelImplementation()->getPQPModel();
-        std::shared_ptr<PQP::PQP_Model> m2 = model2->getCollisionModelImplementation()->getPQPModel();
+        std::shared_ptr<PQP::PQP_Model> m1 =
+            model1->getCollisionModelImplementation()->getPQPModel();
+        std::shared_ptr<PQP::PQP_Model> m2 =
+            model2->getCollisionModelImplementation()->getPQPModel();
         VR_ASSERT_MESSAGE(m1 && m2, "NULL data in ColChecker!");
 
-        float res = getMinDistance(m1, m2, model1->getCollisionModelImplementation()->getGlobalPose(), model2->getCollisionModelImplementation()->getGlobalPose(), P1, P2, trID1, trID2);
+        float res = getMinDistance(m1,
+                                   m2,
+                                   model1->getCollisionModelImplementation()->getGlobalPose(),
+                                   model2->getCollisionModelImplementation()->getGlobalPose(),
+                                   P1,
+                                   P2,
+                                   trID1,
+                                   trID2);
 
         return res;
     }
 
-#define __convEigen2Ar(sb,rot,tr) rot[0][0] = sb(0,0); rot[0][1] = sb(0,1); rot[0][2] = sb(0,2); tr[0] = sb(0,3); \
-    rot[1][0] = sb(1,0); rot[1][1] = sb(1,1); rot[1][2] = sb(1,2); tr[1] = sb(1,3); \
-    rot[2][0] = sb(2,0); rot[2][1] = sb(2,1); rot[2][2] = sb(2,2); tr[2] = sb(2,3);
+#define __convEigen2Ar(sb, rot, tr)                                                                \
+    rot[0][0] = sb(0, 0);                                                                          \
+    rot[0][1] = sb(0, 1);                                                                          \
+    rot[0][2] = sb(0, 2);                                                                          \
+    tr[0] = sb(0, 3);                                                                              \
+    rot[1][0] = sb(1, 0);                                                                          \
+    rot[1][1] = sb(1, 1);                                                                          \
+    rot[1][2] = sb(1, 2);                                                                          \
+    tr[1] = sb(1, 3);                                                                              \
+    rot[2][0] = sb(2, 0);                                                                          \
+    rot[2][1] = sb(2, 1);                                                                          \
+    rot[2][2] = sb(2, 2);                                                                          \
+    tr[2] = sb(2, 3);
 
-
-    bool CollisionCheckerPQP::checkCollision(const CollisionModelPtr& model1, const CollisionModelPtr& model2) //, Eigen::Vector3f *storeContact)
+    bool
+    CollisionCheckerPQP::checkCollision(
+        const CollisionModelPtr& model1,
+        const CollisionModelPtr& model2) //, Eigen::Vector3f *storeContact)
     {
         THROW_VR_EXCEPTION_IF(!model1, "model1 is null");
         THROW_VR_EXCEPTION_IF(!model2, "model2 is null");
@@ -123,10 +163,8 @@ namespace VirtualRobot
         const auto& P2 = Impl2->getGlobalPose();
         __convEigen2Ar(P1, R1, T1);
         __convEigen2Ar(P2, R2, T2);
-        pqpChecker->PQP_Collide(&result,
-                                R1, T1, m1.get(),
-                                R2, T2, m2.get(),
-                                PQP::PQP_FIRST_CONTACT);
+        pqpChecker->PQP_Collide(
+            &result, R1, T1, m1.get(), R2, T2, m2.get(), PQP::PQP_FIRST_CONTACT);
 
         /*if (storeContact && result.Colliding()>0)
         {
@@ -151,11 +189,15 @@ namespace VirtualRobot
         return result.Colliding() != 0;
     }
 
-    bool CollisionCheckerPQP::checkCollision(const CollisionModelPtr& model1, const Eigen::Vector3f& point, float tolerance)
+    bool
+    CollisionCheckerPQP::checkCollision(const CollisionModelPtr& model1,
+                                        const Eigen::Vector3f& point,
+                                        float tolerance)
     {
         assert(model1);
         assert(model1->getCollisionModelImplementation());
-        std::shared_ptr<PQP::PQP_Model> m1 = model1->getCollisionModelImplementation()->getPQPModel();
+        std::shared_ptr<PQP::PQP_Model> m1 =
+            model1->getCollisionModelImplementation()->getPQPModel();
         VR_ASSERT_MESSAGE(m1, "NULL data in ColChecker!");
 
         PQP::PQP_REAL R1[3][3];
@@ -170,34 +212,32 @@ namespace VirtualRobot
         {
             PQP::PQP_CollideResult result;
 
-            pqpChecker->PQP_Collide(&result,
-                                    R1, T1, m1.get(),
-                                    R2, T2, pointModel.get(),
-                                    PQP::PQP_FIRST_CONTACT);
+            pqpChecker->PQP_Collide(
+                &result, R1, T1, m1.get(), R2, T2, pointModel.get(), PQP::PQP_FIRST_CONTACT);
             return ((bool)(result.Colliding() != 0));
         }
         else
         {
             PQP::PQP_ToleranceResult result;
-            pqpChecker->PQP_Tolerance(&result,
-                                      R1, T1, m1.get(),
-                                      R2, T2, pointModel.get(),
-                                      50);
-
+            pqpChecker->PQP_Tolerance(&result, R1, T1, m1.get(), R2, T2, pointModel.get(), 50);
 
 
             return ((bool)(result.CloserThanTolerance() != 0));
         }
     }
 
-    MultiCollisionResult CollisionCheckerPQP::checkMultipleCollisions(const CollisionModelPtr& model1, const CollisionModelPtr& model2)
+    MultiCollisionResult
+    CollisionCheckerPQP::checkMultipleCollisions(const CollisionModelPtr& model1,
+                                                 const CollisionModelPtr& model2)
     {
         assert(model1);
         assert(model1->getCollisionModelImplementation());
         assert(model2);
         assert(model2->getCollisionModelImplementation());
-        std::shared_ptr<PQP::PQP_Model> m1 = model1->getCollisionModelImplementation()->getPQPModel();
-        std::shared_ptr<PQP::PQP_Model> m2 = model2->getCollisionModelImplementation()->getPQPModel();
+        std::shared_ptr<PQP::PQP_Model> m1 =
+            model1->getCollisionModelImplementation()->getPQPModel();
+        std::shared_ptr<PQP::PQP_Model> m2 =
+            model2->getCollisionModelImplementation()->getPQPModel();
 
         VR_ASSERT_MESSAGE(m1, "NULL data in ColChecker!");
         VR_ASSERT_MESSAGE(m2, "NULL data in ColChecker!");
@@ -211,10 +251,8 @@ namespace VirtualRobot
         __convEigen2Ar(model2->getGlobalPose(), R2, T2);
 
         PQP::PQP_CollideResult pqpResult;
-        pqpChecker->PQP_Collide(&pqpResult,
-                                R1, T1, m1.get(),
-                                R2, T2, m2.get(),
-                                PQP::PQP_ALL_CONTACTS);
+        pqpChecker->PQP_Collide(
+            &pqpResult, R1, T1, m1.get(), R2, T2, m2.get(), PQP::PQP_ALL_CONTACTS);
 
         int collisionCount = pqpResult.NumPairs();
 
@@ -254,7 +292,6 @@ namespace VirtualRobot
         }
         return result;
     }
-
 
     //
     // bool CollisionCheckerPQP::GetAllCollisonTriangles (SceneObjectSetPtr model1, SceneObjectSetPtr model2, std::vector<int> &storePairs)
@@ -342,10 +379,12 @@ namespace VirtualRobot
     //
 
 
-
-
     // returns min distance between the objects
-    float CollisionCheckerPQP::getMinDistance(std::shared_ptr<PQP::PQP_Model> m1, std::shared_ptr<PQP::PQP_Model> m2, const Eigen::Matrix4f& mat1, const Eigen::Matrix4f& mat2)
+    float
+    CollisionCheckerPQP::getMinDistance(std::shared_ptr<PQP::PQP_Model> m1,
+                                        std::shared_ptr<PQP::PQP_Model> m2,
+                                        const Eigen::Matrix4f& mat1,
+                                        const Eigen::Matrix4f& mat2)
     {
         PQP::PQP_DistanceResult result;
         CollisionCheckerPQP::GetPQPDistance(m1, m2, mat1, mat2, result);
@@ -353,9 +392,16 @@ namespace VirtualRobot
         return (float)result.Distance();
     }
 
-
     // returns min distance between the objects
-    float CollisionCheckerPQP::getMinDistance(std::shared_ptr<PQP::PQP_Model> m1, std::shared_ptr<PQP::PQP_Model> m2, const Eigen::Matrix4f& mat1, const Eigen::Matrix4f& mat2, Eigen::Vector3f& storeP1, Eigen::Vector3f& storeP2, int* storeID1, int* storeID2)
+    float
+    CollisionCheckerPQP::getMinDistance(std::shared_ptr<PQP::PQP_Model> m1,
+                                        std::shared_ptr<PQP::PQP_Model> m2,
+                                        const Eigen::Matrix4f& mat1,
+                                        const Eigen::Matrix4f& mat2,
+                                        Eigen::Vector3f& storeP1,
+                                        Eigen::Vector3f& storeP2,
+                                        int* storeID1,
+                                        int* storeID2)
     {
         VR_ASSERT_MESSAGE(m1 && m2, "NULL data in ColChecker!");
 
@@ -386,8 +432,12 @@ namespace VirtualRobot
         return (float)result.Distance();
     }
 
-
-    void CollisionCheckerPQP::GetPQPDistance(const std::shared_ptr<PQP::PQP_Model>& model1, const std::shared_ptr<PQP::PQP_Model>& model2, const Eigen::Matrix4f& matrix1, const Eigen::Matrix4f& matrix2, PQP::PQP_DistanceResult& pqpResult)
+    void
+    CollisionCheckerPQP::GetPQPDistance(const std::shared_ptr<PQP::PQP_Model>& model1,
+                                        const std::shared_ptr<PQP::PQP_Model>& model2,
+                                        const Eigen::Matrix4f& matrix1,
+                                        const Eigen::Matrix4f& matrix2,
+                                        PQP::PQP_DistanceResult& pqpResult)
     {
         VR_ASSERT_MESSAGE(pqpChecker, "NULL data in ColChecker!");
 
@@ -399,9 +449,14 @@ namespace VirtualRobot
         __convEigen2Ar(matrix1, Rotation1, Translation1);
         __convEigen2Ar(matrix2, Rotation2, Translation2);
         pqpChecker->PQP_Distance(&pqpResult,
-                                 Rotation1, Translation1, model1.get(),
-                                 Rotation2, Translation2, model2.get(),
-                                 0, 0); // default: 0 error
+                                 Rotation1,
+                                 Translation1,
+                                 model1.get(),
+                                 Rotation2,
+                                 Translation2,
+                                 model2.get(),
+                                 0,
+                                 0); // default: 0 error
     }
 
-}
+} // namespace VirtualRobot

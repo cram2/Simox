@@ -955,7 +955,7 @@ GL_ShapeDrawer::drawShadow(btScalar* m,
 
     if (shape
             ->isConcave()) //>getShapeType() == TRIANGLE_MESH_SHAPE_PROXYTYPE||shape->getShapeType() == GIMPACT_SHAPE_PROXYTYPE)
-        //      if (shape->getShapeType() == TRIANGLE_MESH_SHAPE_PROXYTYPE)
+    //      if (shape->getShapeType() == TRIANGLE_MESH_SHAPE_PROXYTYPE)
     {
         btConcaveShape* concaveMesh = (btConcaveShape*)shape;
 

@@ -8,7 +8,6 @@
 #include <thread>
 
 #include <VirtualRobot/CollisionDetection/CollisionChecker.h>
-#include "VirtualRobot/Logging.h"
 #include <VirtualRobot/Grasping/Grasp.h>
 #include <VirtualRobot/Grasping/GraspSet.h>
 #include <VirtualRobot/IK/PoseQualityExtendedManipulability.h>
@@ -19,6 +18,7 @@
 #include <VirtualRobot/VirtualRobotException.h>
 #include <VirtualRobot/XML/RobotIO.h>
 
+#include "VirtualRobot/Logging.h"
 #include "WorkspaceData.h"
 #include "XML/FileIO.h"
 

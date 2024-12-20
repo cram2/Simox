@@ -3,6 +3,7 @@
 #include <fstream>
 
 #include <VirtualRobot/VirtualRobotChecks.h>
+
 #include "Logging.h"
 
 namespace fs = std::filesystem;

@@ -1,4 +1,5 @@
 #include <iostream>
+
 #include <boost/foreach.hpp>
 
 #include "../inventor.h"

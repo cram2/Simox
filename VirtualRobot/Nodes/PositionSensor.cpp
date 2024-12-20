@@ -1,5 +1,6 @@
 
 #include "PositionSensor.h"
+
 #include <iostream>
 
 #include <VirtualRobot/Visualization/VisualizationNode.h>

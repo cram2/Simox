@@ -1,4 +1,5 @@
 #include "FeetPosture.h"
+
 #include <iostream>
 
 #include <VirtualRobot/Robot.h>

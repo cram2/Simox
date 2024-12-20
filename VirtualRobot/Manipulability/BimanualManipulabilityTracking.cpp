@@ -22,6 +22,7 @@
 *
 */
 #include "BimanualManipulabilityTracking.h"
+
 #include <iostream>
 
 #include <SimoxUtility/math/convert/pos_quat_to_mat4f.h>

@@ -17,6 +17,7 @@
 */
 
 #include "SoechtingNullspaceGradient.h"
+
 #include <iostream>
 
 #include <VirtualRobot/Nodes/RobotNode.h>

@@ -1,10 +1,11 @@
 ﻿#include "DiffIKWidget.h"
 
+#include <iostream>
+
 #include <QDialog>
 #include <QRegExp>
 #include <QThread>
 #include <QVBoxLayout>
-#include <iostream>
 
 #include <SimoxUtility/algorithm/string/string_conversion.h>
 #include <SimoxUtility/math/convert.h>

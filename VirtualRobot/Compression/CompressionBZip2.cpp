@@ -1,9 +1,8 @@
 #include "Logging.h"
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
-#include "CompressionBZip2.h"
-
 #include "../VirtualRobotException.h"
+#include "CompressionBZip2.h"
 
 #define BZ_RUN 0
 #define BZ_FLUSH 1

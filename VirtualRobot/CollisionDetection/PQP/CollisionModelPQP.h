@@ -23,7 +23,6 @@
 #pragma once
 
 #include "../../VirtualRobot.h"
-
 #include "../CollisionModelImplementation.h"
 
 // #include "PQP++/PQP_Compile.h"
@@ -56,13 +55,15 @@ namespace VirtualRobot
         */
         ~CollisionModelPQP() override;
 
-        const std::shared_ptr<PQP::PQP_Model>& getPQPModel()
+        const std::shared_ptr<PQP::PQP_Model>&
+        getPQPModel()
         {
             return pqpModel;
         }
 
         void print() override;
         std::shared_ptr<CollisionModelImplementation> clone(bool deepCopy = false) const override;
+
     protected:
         CollisionModelPQP(const CollisionModelPQP& orig);
 
@@ -75,4 +76,4 @@ namespace VirtualRobot
         std::shared_ptr<CollisionCheckerPQP> colCheckerPQP;
     };
 
-} // namespace
+} // namespace VirtualRobot

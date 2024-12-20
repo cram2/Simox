@@ -5,6 +5,7 @@
 */
 
 #include "EndEffector.h"
+
 #include <iostream>
 
 #include "../CollisionDetection/CollisionChecker.h"

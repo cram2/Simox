@@ -8,13 +8,13 @@
 
 #include <VirtualRobot/Nodes/RobotNodeFourBar.h>
 #include <VirtualRobot/Nodes/RobotNodeHemisphere.h>
-#include "VirtualRobot/Logging.h"
 
 #include "../CollisionDetection/CollisionChecker.h"
 #include "../Nodes/RobotNodePrismatic.h"
 #include "../Nodes/RobotNodeRevolute.h"
 #include "../Robot.h"
 #include "../VirtualRobotException.h"
+#include "VirtualRobot/Logging.h"
 #include "VirtualRobot/Nodes/RobotNode.h"
 #include "VirtualRobot/RobotNodeSet.h"
 

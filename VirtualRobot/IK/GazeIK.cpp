@@ -7,6 +7,7 @@
 #include <VirtualRobot/Robot.h>
 #include <VirtualRobot/RobotNodeSet.h>
 #include <VirtualRobot/VirtualRobotException.h>
+
 #include "Assert.h"
 #include "Logging.h"
 

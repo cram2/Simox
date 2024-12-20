@@ -1,4 +1,5 @@
 #include "RGBOffscreenRendering.h"
+
 #include <iostream>
 
 #include <Eigen/Core>

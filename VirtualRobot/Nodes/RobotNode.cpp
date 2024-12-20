@@ -17,6 +17,7 @@
 #include <VirtualRobot/Visualization/VisualizationNode.h>
 #include <VirtualRobot/XML/BaseIO.h>
 #include <VirtualRobot/math/Helpers.h>
+
 #include "Logging.h"
 
 namespace VirtualRobot

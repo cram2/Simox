@@ -8,14 +8,13 @@
     disable : 4996) // warning on insecure char* usage, that arises when using boost::split
 #endif
 
-#include "RuntimeEnvironment.h"
-
 #include <filesystem>
 
 #include <boost/program_options.hpp>
 
 #include <SimoxUtility/algorithm/string/string_tools.h>
 
+#include "RuntimeEnvironment.h"
 #include "VirtualRobotException.h"
 #include "Visualization/VisualizationFactory.h"
 

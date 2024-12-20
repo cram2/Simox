@@ -1,4 +1,5 @@
 #include "GraspableSensorizedObject.h"
+
 #include <iostream>
 
 #include "Assert.h"

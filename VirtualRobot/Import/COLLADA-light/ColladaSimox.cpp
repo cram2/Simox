@@ -1,5 +1,6 @@
 
 #include "ColladaSimox.h"
+
 #include <iostream>
 
 #include <Eigen/Dense>

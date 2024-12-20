@@ -9,6 +9,7 @@
 #include <VirtualRobot/SceneObject.h>
 #include <VirtualRobot/VirtualRobotException.h>
 #include <VirtualRobot/Visualization/TriMeshModel.h>
+
 #include "Logging.h"
 
 using namespace std;

@@ -28,8 +28,8 @@
 
 #include <Eigen/Core>
 
-#include "VirtualRobot.h"
 #include "Assert.h"
+#include "VirtualRobot.h"
 
 namespace VirtualRobot
 {
