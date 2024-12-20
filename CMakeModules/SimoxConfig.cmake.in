@@ -26,6 +26,7 @@ if(NOT TARGET Simox AND NOT Simox_BINARY_DIR)
   include("${Simox_CMAKE_DIR}/SimoxTargets.cmake")
   include("${Simox_CMAKE_DIR}/SimoxTargetsLegacy.cmake")
 endif()
+
 # These are IMPORTED targets created by SimoxTargets.cmake
 set(Simox_LIBRARIES "@Simox_LIBRARIES@")
 set(Simox_EXECUTABLE "@Simox_EXECUTABLE@")
@@ -35,6 +36,11 @@ if(EXISTS "${Simox_CMAKE_DIR}/CMakeCache.txt")
     # In build tree
     message(STATUS "Using Simox Source-Build from: ${Simox_CMAKE_DIR}")
     include("${Simox_CMAKE_DIR}/SimoxBuildTreeSettings.cmake")
+
+    # Provide access to CMake helper scripts, e.g., Find... scripts.
+    # They might be needed as they define specific targets.
+    list(APPEND CMAKE_MODULE_PATH "${Simox_MACROS_INCLUDE_DIR}")
+
 else()
     # Installed project
     message(STATUS "Using Simox Binary Package from: ${Simox_CMAKE_DIR}")
@@ -75,6 +81,7 @@ find_package(doctest QUIET)
 find_package(nlohmann_json 3.11.3 REQUIRED)
 find_package(RBDL QUIET)
 find_package(pugixml QUIET)
+find_package(rbdl QUIET)
 
 FIND_PACKAGE(SoQt QUIET)
 
