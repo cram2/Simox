@@ -7,6 +7,7 @@
 #include <Eigen/Core>
 
 #include <VirtualRobot/CollisionDetection/CollisionModel.h>
+#include <VirtualRobot/Nodes/Sensor.h>
 #include <VirtualRobot/Robot.h>
 #include <VirtualRobot/RobotNodeSet.h>
 #include <VirtualRobot/VirtualRobotException.h>
@@ -16,6 +17,8 @@
 #include <VirtualRobot/Visualization/VisualizationNode.h>
 #include <VirtualRobot/XML/BaseIO.h>
 #include <VirtualRobot/math/Helpers.h>
+
+#include "Logging.h"
 
 namespace VirtualRobot
 {
@@ -1249,5 +1252,19 @@ namespace VirtualRobot
         return ss.str();
     }
 
+    SceneObjectPtr
+    RobotNode::clone(const std::string& /*name*/,
+                     CollisionCheckerPtr /*colChecker*/,
+                     float /*scaling*/) const
+    {
+        THROW_VR_EXCEPTION("Cloning not allowed this way...");
+    }
 
+    SceneObject*
+    RobotNode::_clone(const std::string& /*name*/,
+                      CollisionCheckerPtr /*colChecker*/,
+                      float /*scaling*/) const
+    {
+        THROW_VR_EXCEPTION("Cloning not allowed this way...");
+    }
 } // namespace VirtualRobot

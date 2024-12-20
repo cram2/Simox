@@ -22,14 +22,17 @@
 */
 #pragma once
 
-#include "../GraspStudio.h"
-#include "../ConvexHullGenerator.h"
-#include "../ContactConeGenerator.h"
-#include <VirtualRobot/EndEffector/EndEffector.h>
-#include <VirtualRobot/MathTools.h>
-#include <VirtualRobot/Grasping/BasicGraspQualityMeasure.h>
 #include <vector>
+
 #include <Eigen/Core>
+
+#include <VirtualRobot/EndEffector/EndEffector.h>
+#include <VirtualRobot/Grasping/BasicGraspQualityMeasure.h>
+#include <VirtualRobot/MathTools.h>
+
+#include "../ContactConeGenerator.h"
+#include "../ConvexHullGenerator.h"
+#include "../GraspStudio.h"
 
 namespace GraspStudio
 {
@@ -39,14 +42,17 @@ namespace GraspStudio
         @see GraspQualityMeasureWrenchSpace
         @see VirtualRobot::BasicGraspQualityMeasure
     */
-    class GRASPSTUDIO_IMPORT_EXPORT GraspQualityMeasure : public VirtualRobot::BasicGraspQualityMeasure
+    class GRASPSTUDIO_IMPORT_EXPORT GraspQualityMeasure :
+        public VirtualRobot::BasicGraspQualityMeasure
     {
     public:
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
         /// Constructor.
-        GraspQualityMeasure(VirtualRobot::SceneObjectPtr object, float unitForce = 1.0f,
-                            float frictionConeCoeff = 0.35f, int frictionConeSamples = 8);
+        GraspQualityMeasure(VirtualRobot::SceneObjectPtr object,
+                            float unitForce = 1.0f,
+                            float frictionConeCoeff = 0.35f,
+                            int frictionConeSamples = 8);
 
         //! Destructor
         virtual ~GraspQualityMeasure() override;
@@ -68,7 +74,6 @@ namespace GraspStudio
         virtual ContactConeGeneratorPtr getConeGenerator();
 
     protected:
-
         // Methods
         bool sampleObjectPoints(int nMaxFaces = 400);
 
@@ -80,10 +85,8 @@ namespace GraspStudio
         ContactConeGeneratorPtr coneGenerator;
 
         // For Object and Grasp Wrench Space Calculation
-        std::vector<VirtualRobot::MathTools::ContactPoint> sampledObjectPoints;  // in MM
+        std::vector<VirtualRobot::MathTools::ContactPoint> sampledObjectPoints; // in MM
         std::vector<VirtualRobot::MathTools::ContactPoint> sampledObjectPointsM; // converted to M
-
     };
 
-} // namespace
-
+} // namespace GraspStudio

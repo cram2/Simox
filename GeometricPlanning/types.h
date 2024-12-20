@@ -27,7 +27,6 @@
 
 #include <Eigen/Geometry>
 
-
 namespace simox::geometric_planning
 {
     using Pose = Eigen::Isometry3f;
@@ -35,4 +34,4 @@ namespace simox::geometric_planning
 
     using Position = Eigen::Vector3f;
 
-} // namespace armarx::manipulation::core
+} // namespace simox::geometric_planning

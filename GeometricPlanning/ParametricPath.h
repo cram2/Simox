@@ -6,7 +6,7 @@
 
 #include <GeometricPlanning/path_primitives/PathPrimitive.h>
 #include <GeometricPlanning/types.h>
-
+#include <VirtualRobot/VirtualRobot.h>
 
 namespace simox::geometric_planning
 {

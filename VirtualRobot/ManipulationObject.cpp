@@ -1,8 +1,12 @@
 
 #include "ManipulationObject.h"
+
+#include "CollisionDetection/CollisionModel.h"
+#include "GraspableSensorizedObject.h"
+#include "Logging.h"
+#include "MathTools.h"
 #include "VirtualRobotException.h"
 #include "Visualization/VisualizationNode.h"
-#include "GraspableSensorizedObject.h"
 #include "XML/BaseIO.h"
 
 namespace VirtualRobot
@@ -10,21 +14,31 @@ namespace VirtualRobot
     using std::cout;
     using std::endl;
 
-    ManipulationObject::ManipulationObject(const std::string& name, VisualizationNodePtr visualization, CollisionModelPtr collisionModel, const SceneObject::Physics& p, CollisionCheckerPtr colChecker)
-        : Obstacle(name, visualization, collisionModel, p, colChecker)
-    {}
+    ManipulationObject::ManipulationObject(const std::string& name,
+                                           VisualizationNodePtr visualization,
+                                           CollisionModelPtr collisionModel,
+                                           const SceneObject::Physics& p,
+                                           CollisionCheckerPtr colChecker) :
+        Obstacle(name, visualization, collisionModel, p, colChecker)
+    {
+    }
 
-    ManipulationObject::ManipulationObject(const std::string& name, const TriMeshModelPtr& trimesh, const std::string& filename)
-        : Obstacle(name, trimesh, filename)
-    {}
+    ManipulationObject::ManipulationObject(const std::string& name,
+                                           const TriMeshModelPtr& trimesh,
+                                           const std::string& filename) :
+        Obstacle(name, trimesh, filename)
+    {
+    }
 
     ManipulationObject::ManipulationObject(const TriMeshModelPtr& trimesh) :
         ManipulationObject("", trimesh, "")
-    {}
+    {
+    }
 
     ManipulationObject::~ManipulationObject() = default;
 
-    void ManipulationObject::print(bool printChildren, bool printDecoration) const
+    void
+    ManipulationObject::print(bool printChildren, bool printDecoration) const
     {
         if (printDecoration)
         {
@@ -39,8 +53,12 @@ namespace VirtualRobot
         }
     }
 
-
-    std::string ManipulationObject::toXML(const std::string& basePath, int tabs, bool storeLinkToFile, const std::string& modelPathRelative, bool storeSensors)
+    std::string
+    ManipulationObject::toXML(const std::string& basePath,
+                              int tabs,
+                              bool storeLinkToFile,
+                              const std::string& modelPathRelative,
+                              bool storeSensors)
     {
         std::stringstream ss;
         std::string t = "\t";
@@ -68,9 +86,9 @@ namespace VirtualRobot
             if (!gp.isIdentity())
             {
                 ss << pre << t << "<GlobalPose>\n";
-                ss << pre << t  << t  << "<Transform>\n";
+                ss << pre << t << t << "<Transform>\n";
                 ss << MathTools::getTransformXMLString(gp, tabs + 3);
-                ss << pre << t  << t  << "</Transform>\n";
+                ss << pre << t << t << "</Transform>\n";
                 ss << pre << t << "</GlobalPose>\n";
             }
         }
@@ -85,12 +103,16 @@ namespace VirtualRobot
         return ss.str();
     }
 
-    ManipulationObjectPtr ManipulationObject::clone(CollisionCheckerPtr colChecker, bool deepVisuCopy) const
+    ManipulationObjectPtr
+    ManipulationObject::clone(CollisionCheckerPtr colChecker, bool deepVisuCopy) const
     {
         return clone(getName(), colChecker, deepVisuCopy);
     }
 
-    ManipulationObjectPtr ManipulationObject::clone(const std::string& name, CollisionCheckerPtr colChecker, bool deepVisuCopy) const
+    ManipulationObjectPtr
+    ManipulationObject::clone(const std::string& name,
+                              CollisionCheckerPtr colChecker,
+                              bool deepVisuCopy) const
     {
         VisualizationNodePtr clonedVisualizationNode;
 
@@ -106,7 +128,8 @@ namespace VirtualRobot
             clonedCollisionModel = collisionModel->clone(colChecker, 1.0, deepVisuCopy);
         }
 
-        ManipulationObjectPtr result(new ManipulationObject(name, clonedVisualizationNode, clonedCollisionModel, physics, colChecker));
+        ManipulationObjectPtr result(new ManipulationObject(
+            name, clonedVisualizationNode, clonedCollisionModel, physics, colChecker));
 
         result->setGlobalPose(getGlobalPose());
         result->primitiveApproximation = primitiveApproximation;
@@ -117,7 +140,10 @@ namespace VirtualRobot
         return result;
     }
 
-    VirtualRobot::ManipulationObjectPtr ManipulationObject::createFromMesh(TriMeshModelPtr mesh, std::string visualizationType, CollisionCheckerPtr colChecker)
+    VirtualRobot::ManipulationObjectPtr
+    ManipulationObject::createFromMesh(TriMeshModelPtr mesh,
+                                       std::string visualizationType,
+                                       CollisionCheckerPtr colChecker)
     {
         THROW_VR_EXCEPTION_IF(!mesh, "Null data");
 
@@ -145,7 +171,8 @@ namespace VirtualRobot
 
         if (!visu)
         {
-            VR_ERROR << "Could not create sphere visualization with visu type " << visualizationType << std::endl;
+            VR_ERROR << "Could not create sphere visualization with visu type " << visualizationType
+                     << std::endl;
             return result;
         }
 
@@ -158,7 +185,8 @@ namespace VirtualRobot
         std::string name = ss.str();
 
         CollisionModelPtr colModel(new CollisionModel(visu->clone(), name, colChecker, id));
-        result.reset(new ManipulationObject(name, visu, colModel, SceneObject::Physics(), colChecker));
+        result.reset(
+            new ManipulationObject(name, visu, colModel, SceneObject::Physics(), colChecker));
 
         result->initialize();
 
@@ -166,6 +194,4 @@ namespace VirtualRobot
     }
 
 
-} //  namespace
-
-
+} // namespace VirtualRobot

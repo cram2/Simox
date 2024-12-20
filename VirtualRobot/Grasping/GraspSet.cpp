@@ -1,27 +1,33 @@
 
 #include "GraspSet.h"
-#include <VirtualRobot/CollisionDetection/CollisionModel.h>
-#include <VirtualRobot/CollisionDetection/CollisionChecker.h>
-#include <VirtualRobot/Nodes/RobotNode.h>
-#include <VirtualRobot/Visualization/VisualizationFactory.h>
+
+#include <iostream>
 #include <vector>
+
+#include <VirtualRobot/CollisionDetection/CollisionChecker.h>
+#include <VirtualRobot/CollisionDetection/CollisionModel.h>
+#include <VirtualRobot/Grasping/Grasp.h>
+#include <VirtualRobot/Nodes/RobotNode.h>
 #include <VirtualRobot/VirtualRobotException.h>
+#include <VirtualRobot/Visualization/VisualizationFactory.h>
 
 namespace VirtualRobot
 {
     using std::cout;
     using std::endl;
 
-    GraspSet::GraspSet(const std::string& name, const std::string& robotType, const std::string& eef, const std::vector< GraspPtr >& grasps)
-        : grasps(grasps), name(name), robotType(robotType), eef(eef)
+    GraspSet::GraspSet(const std::string& name,
+                       const std::string& robotType,
+                       const std::string& eef,
+                       const std::vector<GraspPtr>& grasps) :
+        grasps(grasps), name(name), robotType(robotType), eef(eef)
     {
-
     }
 
-    GraspSet::~GraspSet()
-    = default;
+    GraspSet::~GraspSet() = default;
 
-    void GraspSet::addGrasp(GraspPtr grasp)
+    void
+    GraspSet::addGrasp(GraspPtr grasp)
     {
         VR_ASSERT_MESSAGE(grasp, "NULL grasp");
         VR_ASSERT_MESSAGE(!hasGrasp(grasp), "Grasp already added!");
@@ -31,11 +37,12 @@ namespace VirtualRobot
         grasps.push_back(grasp);
     }
 
-    bool GraspSet::hasGrasp(GraspPtr grasp) const
+    bool
+    GraspSet::hasGrasp(GraspPtr grasp) const
     {
         VR_ASSERT_MESSAGE(grasp, "NULL grasp");
 
-        for (const auto & i : grasps)
+        for (const auto& i : grasps)
             if (i == grasp)
             {
                 return true;
@@ -44,9 +51,10 @@ namespace VirtualRobot
         return false;
     }
 
-    bool GraspSet::hasGrasp(const std::string& name) const
+    bool
+    GraspSet::hasGrasp(const std::string& name) const
     {
-        for (auto & grasp : grasps)
+        for (auto& grasp : grasps)
         {
             if (grasp->getName() == name)
             {
@@ -57,26 +65,28 @@ namespace VirtualRobot
         return false;
     }
 
-
-    void GraspSet::clear()
+    void
+    GraspSet::clear()
     {
         grasps.clear();
     }
 
-    void GraspSet::includeGraspSet(GraspSetPtr grasps)
+    void
+    GraspSet::includeGraspSet(GraspSetPtr grasps)
     {
-        std::vector<GraspPtr> includedGrasp=grasps->getGrasps();
+        std::vector<GraspPtr> includedGrasp = grasps->getGrasps();
 
-        for(const auto & i : includedGrasp)
+        for (const auto& i : includedGrasp)
         {
-            if(!hasGrasp(i))
+            if (!hasGrasp(i))
             {
                 addGrasp(i);
             }
         }
     }
 
-    void GraspSet::print() const
+    void
+    GraspSet::print() const
     {
         std::cout << "**** Grasp set ****" << std::endl;
         std::cout << "Name: " << name << std::endl;
@@ -93,7 +103,8 @@ namespace VirtualRobot
         std::cout << std::endl;
     }
 
-    bool GraspSet::isCompatibleGrasp(GraspPtr grasp) const
+    bool
+    GraspSet::isCompatibleGrasp(GraspPtr grasp) const
     {
         if (grasp->getRobotType() != robotType)
         {
@@ -108,12 +119,14 @@ namespace VirtualRobot
         return true;
     }
 
-    std::size_t GraspSet::getSize() const
+    std::size_t
+    GraspSet::getSize() const
     {
         return grasps.size();
     }
 
-    VirtualRobot::GraspPtr GraspSet::getGrasp(std::size_t n) const
+    VirtualRobot::GraspPtr
+    GraspSet::getGrasp(std::size_t n) const
     {
         if (n >= grasps.size())
         {
@@ -123,9 +136,10 @@ namespace VirtualRobot
         return grasps[n];
     }
 
-    VirtualRobot::GraspPtr GraspSet::getGrasp(const std::string& name) const
+    VirtualRobot::GraspPtr
+    GraspSet::getGrasp(const std::string& name) const
     {
-        for (auto & grasp : grasps)
+        for (auto& grasp : grasps)
         {
             if (grasp->getName() == name)
             {
@@ -136,23 +150,26 @@ namespace VirtualRobot
         return GraspPtr();
     }
 
-
-    std::string GraspSet::getName() const
+    std::string
+    GraspSet::getName() const
     {
         return name;
     }
 
-    std::string GraspSet::getRobotType() const
+    std::string
+    GraspSet::getRobotType() const
     {
         return robotType;
     }
 
-    std::string GraspSet::getEndEffector() const
+    std::string
+    GraspSet::getEndEffector() const
     {
         return eef;
     }
 
-    std::string GraspSet::getXMLString(int tabs) const
+    std::string
+    GraspSet::getXMLString(int tabs) const
     {
         std::stringstream ss;
         std::string t;
@@ -162,9 +179,10 @@ namespace VirtualRobot
             t += "\t";
         }
 
-        ss << t << "<GraspSet name='" << name << "' RobotType='" << robotType << "' EndEffector='" << eef << "'>\n";
+        ss << t << "<GraspSet name='" << name << "' RobotType='" << robotType << "' EndEffector='"
+           << eef << "'>\n";
 
-        for (auto & grasp : grasps)
+        for (auto& grasp : grasps)
         {
             ss << grasp->toXML(tabs + 1);
         }
@@ -174,13 +192,13 @@ namespace VirtualRobot
         return ss.str();
     }
 
-
-    VirtualRobot::GraspSetPtr GraspSet::clone() const
+    VirtualRobot::GraspSetPtr
+    GraspSet::clone() const
     {
         GraspSetPtr res(new GraspSet(name, robotType, eef));
 
         // clone grasps
-        for (auto & grasp : grasps)
+        for (auto& grasp : grasps)
         {
             res->addGrasp(grasp->clone());
         }
@@ -188,9 +206,10 @@ namespace VirtualRobot
         return res;
     }
 
-    bool GraspSet::removeGrasp(GraspPtr grasp)
+    bool
+    GraspSet::removeGrasp(GraspPtr grasp)
     {
-        for (std::vector< GraspPtr >::iterator i = grasps.begin(); i != grasps.end(); i++)
+        for (std::vector<GraspPtr>::iterator i = grasps.begin(); i != grasps.end(); i++)
         {
             if (*i == grasp)
             {
@@ -202,7 +221,8 @@ namespace VirtualRobot
         return false;
     }
 
-    bool GraspSet::removeGrasp(unsigned int i)
+    bool
+    GraspSet::removeGrasp(unsigned int i)
     {
         GraspPtr g = getGrasp(i);
         if (!g)
@@ -210,16 +230,18 @@ namespace VirtualRobot
         return removeGrasp(g);
     }
 
-    void GraspSet::removeAllGrasps()
+    void
+    GraspSet::removeAllGrasps()
     {
         grasps.clear();
     }
 
-    std::vector< GraspPtr > GraspSet::getGrasps() const
+    std::vector<GraspPtr>
+    GraspSet::getGrasps() const
     {
-        std::vector< GraspPtr > res;
+        std::vector<GraspPtr> res;
 
-        for (const auto & grasp : grasps)
+        for (const auto& grasp : grasps)
         {
             res.push_back(grasp);
         }
@@ -227,16 +249,14 @@ namespace VirtualRobot
         return res;
     }
 
-    void GraspSet::setPreshape(const std::string& preshape)
+    void
+    GraspSet::setPreshape(const std::string& preshape)
     {
-        for (auto & grasp : grasps)
+        for (auto& grasp : grasps)
         {
             grasp->setPreshape(preshape);
         }
     }
 
 
-
-} //  namespace
-
-
+} // namespace VirtualRobot

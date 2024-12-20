@@ -1,15 +1,20 @@
 
 #include "Sensor.h"
-#include "../VirtualRobot.h"
-#include "../VirtualRobotException.h"
-#include "../XML/BaseIO.h"
-#include "../Visualization/TriMeshModel.h"
-#include <VirtualRobot/Visualization/VisualizationNode.h>
-#include "Grasping/GraspSet.h"
+
+#include <iomanip>
 
 #include <Eigen/Core>
 
-#include <iomanip>
+#include <VirtualRobot/Visualization/VisualizationNode.h>
+
+#include "../VirtualRobot.h"
+#include "../VirtualRobotException.h"
+#include "../Visualization/TriMeshModel.h"
+#include "../XML/BaseIO.h"
+#include "GraspableSensorizedObject.h"
+#include "Grasping/GraspSet.h"
+#include "Logging.h"
+#include "Nodes/RobotNode.h"
 
 namespace VirtualRobot
 {
@@ -19,19 +24,17 @@ namespace VirtualRobot
     Sensor::Sensor(GraspableSensorizedObjectWeakPtr parentNode,
                    const std::string& name,
                    VisualizationNodePtr visualization,
-                   const Eigen::Matrix4f& rnTrafo
-                  ) : SceneObject(name, visualization)
+                   const Eigen::Matrix4f& rnTrafo) :
+        SceneObject(name, visualization)
     {
         this->parentNode = parentNode;
         rnTransformation = rnTrafo;
     }
 
+    Sensor::~Sensor() = default;
 
-    Sensor::~Sensor()
-    = default;
-
-
-    bool Sensor::initialize(SceneObjectPtr parent, const std::vector<SceneObjectPtr>& children)
+    bool
+    Sensor::initialize(SceneObjectPtr parent, const std::vector<SceneObjectPtr>& children)
     {
         GraspableSensorizedObjectPtr node = parentNode.lock();
         THROW_VR_EXCEPTION_IF(!node, "Could not init Sensor without parent node");
@@ -44,22 +47,27 @@ namespace VirtualRobot
         return SceneObject::initialize(parent, children);
     }
 
-    RobotNodePtr Sensor::getRobotNode() const {
+    RobotNodePtr
+    Sensor::getRobotNode() const
+    {
         return std::dynamic_pointer_cast<RobotNode>(getParentNode());
     }
 
-    GraspableSensorizedObjectPtr Sensor::getParentNode() const
+    GraspableSensorizedObjectPtr
+    Sensor::getParentNode() const
     {
         GraspableSensorizedObjectPtr result(parentNode);
         return result;
     }
 
-    void Sensor::setGlobalPose(const Eigen::Matrix4f& /*pose*/)
+    void
+    Sensor::setGlobalPose(const Eigen::Matrix4f& /*pose*/)
     {
         THROW_VR_EXCEPTION("Use parent node to control the position of a Sensor");
     }
 
-    void Sensor::print(bool printChildren, bool printDecoration) const
+    void
+    Sensor::print(bool printChildren, bool printDecoration) const
     {
         if (printDecoration)
         {
@@ -103,7 +111,8 @@ namespace VirtualRobot
             // scope1
             std::ostringstream sos;
             sos << std::setiosflags(std::ios::fixed);
-            sos << "* Parent node to sensor transformation:" << endl << rnTransformation << std::endl;
+            sos << "* Parent node to sensor transformation:" << endl
+                << rnTransformation << std::endl;
             sos << "* globalPose:" << endl << getGlobalPose() << std::endl;
             std::cout << sos.str();
         } // scope1
@@ -115,16 +124,17 @@ namespace VirtualRobot
 
         if (printChildren)
         {
-            std::vector< SceneObjectPtr > children = this->getChildren();
+            std::vector<SceneObjectPtr> children = this->getChildren();
 
-            for (auto & i : children)
+            for (auto& i : children)
             {
                 i->print(true, true);
             }
         }
     }
 
-    SensorPtr Sensor::clone(GraspableSensorizedObjectPtr newNode, float scaling)
+    SensorPtr
+    Sensor::clone(GraspableSensorizedObjectPtr newNode, float scaling)
     {
         if (!newNode)
         {
@@ -156,13 +166,15 @@ namespace VirtualRobot
         return result;
     }
 
-    void Sensor::setRobotNodeToSensorTransformation(const Eigen::Matrix4f& t)
+    void
+    Sensor::setRobotNodeToSensorTransformation(const Eigen::Matrix4f& t)
     {
         this->rnTransformation = t;
         updatePose();
     }
 
-    void Sensor::updatePose(bool updateChildren)
+    void
+    Sensor::updatePose(bool updateChildren)
     {
         THROW_VR_EXCEPTION_IF(!initialized, "Not initialized");
 
@@ -171,14 +183,16 @@ namespace VirtualRobot
         if (p)
         {
             this->globalPose = p->getGlobalPose() * rnTransformation;
-        } else
+        }
+        else
             this->globalPose = rnTransformation;
 
         // update collision and visualization model and children
         SceneObject::updatePose(updateChildren);
     }
 
-    void Sensor::updatePose(const Eigen::Matrix4f& globalPose, bool updateChildren)
+    void
+    Sensor::updatePose(const Eigen::Matrix4f& globalPose, bool updateChildren)
     {
         THROW_VR_EXCEPTION_IF(!initialized, "Not initialized");
 
@@ -188,7 +202,8 @@ namespace VirtualRobot
         SceneObject::updatePose(updateChildren);
     }
 
-    std::string Sensor::toXML(const std::string& modelPath, int tabs)
+    std::string
+    Sensor::toXML(const std::string& modelPath, int tabs)
     {
         // this will not work, since no type is available, just a reference implementation of a sensor XML tag
         std::stringstream ss;
@@ -206,7 +221,8 @@ namespace VirtualRobot
         ss << BaseIO::toXML(rnTransformation, pre2);
         ss << pre << "</Transform>" << std::endl;
 
-        if (visualizationModel && visualizationModel->getTriMeshModel() && visualizationModel->getTriMeshModel()->faces.size() > 0)
+        if (visualizationModel && visualizationModel->getTriMeshModel() &&
+            visualizationModel->getTriMeshModel()->faces.size() > 0)
         {
             ss << visualizationModel->toXML(modelPath, tabs + 1);
         }
@@ -215,5 +231,19 @@ namespace VirtualRobot
         return ss.str();
     }
 
+    SceneObjectPtr
+    Sensor::clone(const std::string& /*name*/,
+                  CollisionCheckerPtr /*colChecker*/,
+                  float /*scaling*/) const
+    {
+        THROW_VR_EXCEPTION("Cloning not allowed this way...");
+    }
 
+    SceneObject*
+    Sensor::_clone(const std::string& /*name*/,
+                   CollisionCheckerPtr /*colChecker*/,
+                   float /*scaling*/) const
+    {
+        THROW_VR_EXCEPTION("Cloning not allowed this way...");
+    }
 } // namespace VirtualRobot

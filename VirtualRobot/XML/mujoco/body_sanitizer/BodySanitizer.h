@@ -2,7 +2,6 @@
 
 #include <VirtualRobot/MJCF/Document.h>
 
-
 namespace VirtualRobot::mujoco
 {
 
@@ -18,7 +17,6 @@ namespace VirtualRobot::mujoco
     class BodySanitizer
     {
     public:
-
         /// Constructor.
         BodySanitizer();
 
@@ -35,10 +33,8 @@ namespace VirtualRobot::mujoco
 
 
     protected:
-
         /// "Tab" string for logging.
         static const std::string t;
-
     };
 
-}
+} // namespace VirtualRobot::mujoco

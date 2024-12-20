@@ -1,12 +1,14 @@
 
 #include "RobotNodeFixed.h"
-#include "../Robot.h"
-#include "../Visualization//VisualizationNode.h"
-#include "../CollisionDetection/CollisionModel.h"
-#include <cmath>
-#include <algorithm>
 
+#include <algorithm>
+#include <cmath>
+#include <iostream>
+
+#include "../CollisionDetection/CollisionModel.h"
+#include "../Robot.h"
 #include "../VirtualRobotException.h"
+#include "../Visualization//VisualizationNode.h"
 
 namespace VirtualRobot
 {
@@ -18,8 +20,8 @@ namespace VirtualRobot
                                    CollisionModelPtr collisionModel,
                                    const SceneObject::Physics& p,
                                    CollisionCheckerPtr colChecker,
-                                   RobotNodeType type
-                                  ) : RobotNode(rob, name, 0.0f, 0.0f, visualization, collisionModel, 0.0f, p, colChecker, type)
+                                   RobotNodeType type) :
+        RobotNode(rob, name, 0.0f, 0.0f, visualization, collisionModel, 0.0f, p, colChecker, type)
     {
         optionalDHParameter.isSet = false;
         this->localTransformation = preJointTransform;
@@ -28,13 +30,16 @@ namespace VirtualRobot
 
     RobotNodeFixed::RobotNodeFixed(RobotWeakPtr rob,
                                    const std::string& name,
-                                   float a, float d, float alpha, float theta,
+                                   float a,
+                                   float d,
+                                   float alpha,
+                                   float theta,
                                    VisualizationNodePtr visualization,
                                    CollisionModelPtr collisionModel,
                                    const SceneObject::Physics& p,
                                    CollisionCheckerPtr colChecker,
-                                   RobotNodeType type
-                                  ) : RobotNode(rob, name, 0.0f, 1.0f, visualization, collisionModel, 0.0f, p, colChecker, type)
+                                   RobotNodeType type) :
+        RobotNode(rob, name, 0.0f, 1.0f, visualization, collisionModel, 0.0f, p, colChecker, type)
     {
         initialized = false;
         optionalDHParameter.isSet = true;
@@ -62,20 +67,22 @@ namespace VirtualRobot
         this->localTransformation = RotTheta * TransD * TransA * RotAlpha;
     }
 
-    RobotNodeFixed::~RobotNodeFixed()
-    = default;
+    RobotNodeFixed::~RobotNodeFixed() = default;
 
-    bool RobotNodeFixed::initialize(SceneObjectPtr parent, const std::vector<SceneObjectPtr>& children)
+    bool
+    RobotNodeFixed::initialize(SceneObjectPtr parent, const std::vector<SceneObjectPtr>& children)
     {
         return RobotNode::initialize(parent, children);
     }
 
-    void RobotNodeFixed::updateTransformationMatrices(const Eigen::Matrix4f& parentPose)
+    void
+    RobotNodeFixed::updateTransformationMatrices(const Eigen::Matrix4f& parentPose)
     {
-        this->globalPose = parentPose * localTransformation;//getLocalTransformation();
+        this->globalPose = parentPose * localTransformation; //getLocalTransformation();
     }
 
-    void RobotNodeFixed::print(bool printChildren, bool printDecoration) const
+    void
+    RobotNodeFixed::print(bool printChildren, bool printDecoration) const
     {
         if (printDecoration)
         {
@@ -90,17 +97,22 @@ namespace VirtualRobot
         }
 
 
-        std::vector< SceneObjectPtr > children = this->getChildren();
+        std::vector<SceneObjectPtr> children = this->getChildren();
 
         if (printChildren)
         {
-            std::for_each(children.begin(), children.end(), std::bind(&SceneObject::print,
-                                                                      std::placeholders::_1, true, true));
+            std::for_each(children.begin(),
+                          children.end(),
+                          std::bind(&SceneObject::print, std::placeholders::_1, true, true));
         }
     }
 
-
-    RobotNodePtr RobotNodeFixed::_clone(const RobotPtr newRobot, const VisualizationNodePtr visualizationModel, const CollisionModelPtr collisionModel, CollisionCheckerPtr colChecker, float scaling)
+    RobotNodePtr
+    RobotNodeFixed::_clone(const RobotPtr newRobot,
+                           const VisualizationNodePtr visualizationModel,
+                           const CollisionModelPtr collisionModel,
+                           CollisionCheckerPtr colChecker,
+                           float scaling)
     {
         ReadLockPtr lock = getRobot()->getReadLock();
 
@@ -110,28 +122,41 @@ namespace VirtualRobot
 
         if (optionalDHParameter.isSet)
         {
-            result.reset(new RobotNodeFixed(newRobot, name, optionalDHParameter.aMM()*scaling, optionalDHParameter.dMM()*scaling, optionalDHParameter.alphaRadian(), optionalDHParameter.thetaRadian(), visualizationModel, collisionModel, p, colChecker, nodeType));
+            result.reset(new RobotNodeFixed(newRobot,
+                                            name,
+                                            optionalDHParameter.aMM() * scaling,
+                                            optionalDHParameter.dMM() * scaling,
+                                            optionalDHParameter.alphaRadian(),
+                                            optionalDHParameter.thetaRadian(),
+                                            visualizationModel,
+                                            collisionModel,
+                                            p,
+                                            colChecker,
+                                            nodeType));
         }
         else
         {
             Eigen::Matrix4f lt = getLocalTransformation();
             lt.block(0, 3, 3, 1) *= scaling;
-            result.reset(new RobotNodeFixed(newRobot, name, lt, visualizationModel, collisionModel, p, colChecker, nodeType));
+            result.reset(new RobotNodeFixed(
+                newRobot, name, lt, visualizationModel, collisionModel, p, colChecker, nodeType));
         }
 
         return result;
     }
 
-    void RobotNodeFixed::checkValidRobotNodeType()
+    void
+    RobotNodeFixed::checkValidRobotNodeType()
     {
         RobotNode::checkValidRobotNodeType();
         THROW_VR_EXCEPTION_IF(nodeType == Joint, "RobotNodeFixed not compatible with JointNode");
     }
 
-    std::string RobotNodeFixed::_toXML(const std::string& /*modelPath*/)
+    std::string
+    RobotNodeFixed::_toXML(const std::string& /*modelPath*/)
     {
         return std::string();
     }
 
 
-} // namespace
+} // namespace VirtualRobot

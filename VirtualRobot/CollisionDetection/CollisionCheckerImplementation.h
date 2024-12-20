@@ -22,14 +22,12 @@
 */
 #pragma once
 
-#include "../VirtualRobot.h"
-
-#include <string>
 #include <vector>
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
+#include "../VirtualRobot.h"
 
 namespace VirtualRobot
 {
@@ -57,18 +55,33 @@ namespace VirtualRobot
             automaticSizeCheck = true;
             debugOutput = false;
         }
-        virtual ~CollisionCheckerImplementation() {}
 
-        virtual float calculateDistance(const CollisionModelPtr& model1, const CollisionModelPtr& model2, Eigen::Vector3f& P1, Eigen::Vector3f& P2, int* trID1 = NULL, int* trID2 = NULL) = 0;
-        virtual bool checkCollision(const CollisionModelPtr& model1, const CollisionModelPtr& model2) = 0; //, Eigen::Vector3f *storeContact = NULL) = 0;
-        virtual bool checkCollision(const CollisionModelPtr& model1, const Eigen::Vector3f& point, float tolerance = 0.0f) = 0; //, Eigen::Vector3f *storeContact = NULL) = 0;
+        virtual ~CollisionCheckerImplementation()
+        {
+        }
 
-        virtual void setAutomaticSizeCheck(bool checkSizeOnColModelCreation)
+        virtual float calculateDistance(const CollisionModelPtr& model1,
+                                        const CollisionModelPtr& model2,
+                                        Eigen::Vector3f& P1,
+                                        Eigen::Vector3f& P2,
+                                        int* trID1 = NULL,
+                                        int* trID2 = NULL) = 0;
+        virtual bool checkCollision(
+            const CollisionModelPtr& model1,
+            const CollisionModelPtr& model2) = 0; //, Eigen::Vector3f *storeContact = NULL) = 0;
+        virtual bool
+        checkCollision(const CollisionModelPtr& model1,
+                       const Eigen::Vector3f& point,
+                       float tolerance = 0.0f) = 0; //, Eigen::Vector3f *storeContact = NULL) = 0;
+
+        virtual void
+        setAutomaticSizeCheck(bool checkSizeOnColModelCreation)
         {
             automaticSizeCheck = checkSizeOnColModelCreation;
         }
 
-        virtual void enableDebugOutput(bool e)
+        virtual void
+        enableDebugOutput(bool e)
         {
             debugOutput = e;
         }
@@ -79,5 +92,4 @@ namespace VirtualRobot
         bool automaticSizeCheck;
     };
 
-} // namespace
-
+} // namespace VirtualRobot

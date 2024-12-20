@@ -26,8 +26,7 @@
 namespace math
 {
 
-    class VIRTUAL_ROBOT_IMPORT_EXPORT ContactList :
-        public std::vector<Contact>
+    class VIRTUAL_ROBOT_IMPORT_EXPORT ContactList : public std::vector<Contact>
     {
     public:
         ContactList();
@@ -37,5 +36,4 @@ namespace math
 
     private:
     };
-}
-
+} // namespace math

@@ -6,21 +6,22 @@
 #include <fstream>
 #include <stdexcept>
 
-
-
 #include <VirtualRobot/IK/CompositeDiffIK/Soechting.h>
 #include <VirtualRobot/IK/CompositeDiffIK/SoechtingNullspaceGradient.h>
 
 #include "../Grasping/Grasp.h"
 #include "../Grasping/GraspSet.h"
 #include "../ManipulationObject.h"
+#include "../Nodes/RobotNode.h"
 #include "../Robot.h"
 #include "../RobotNodeSet.h"
 #include "../VirtualRobotException.h"
 #include "IK/CompositeDiffIK/CompositeDiffIK.h"
 #include "IK/CompositeDiffIK/SoechtingNullspaceGradient.h"
 #include "IK/CompositeDiffIK/SoechtingNullspaceGradientWithWrist.h"
+#include "Logging.h"
 #include "VirtualRobot.h"
+#include "WorkspaceData.h"
 
 namespace VirtualRobot
 {
@@ -30,12 +31,14 @@ namespace VirtualRobot
         type = "NaturalPosture";
     }
 
-    void NaturalPosture::customInitialize()
+    void
+    NaturalPosture::customInitialize()
     {
         // auto target1 = ik->addTarget(robot->getRobotNode(tcpNode->getName()), VirtualRobot::IKSolver::All);
     }
 
-    float NaturalPosture::evaluate()
+    float
+    NaturalPosture::evaluate()
     {
         SoechtingNullspaceGradientWithWristPtr soechtingNullspaceGradient;
 
@@ -47,12 +50,12 @@ namespace VirtualRobot
         if (robot->getName() == "Armar6" && nodeSet->getName() == "RightArm")
         {
             VirtualRobot::SoechtingNullspaceGradientWithWrist::ArmJointsWithWrist armjoints;
-            armjoints.clavicula      = robot->getRobotNode("ArmR1_Cla1");
-            armjoints.shoulder1      = robot->getRobotNode("ArmR2_Sho1");
-            armjoints.shoulder2      = robot->getRobotNode("ArmR3_Sho2");
-            armjoints.shoulder3      = robot->getRobotNode("ArmR4_Sho3");
-            armjoints.elbow          = robot->getRobotNode("ArmR5_Elb1");
-            armjoints.forearm        = robot->getRobotNode("ArmR6_Elb2");
+            armjoints.clavicula = robot->getRobotNode("ArmR1_Cla1");
+            armjoints.shoulder1 = robot->getRobotNode("ArmR2_Sho1");
+            armjoints.shoulder2 = robot->getRobotNode("ArmR3_Sho2");
+            armjoints.shoulder3 = robot->getRobotNode("ArmR4_Sho3");
+            armjoints.elbow = robot->getRobotNode("ArmR5_Elb1");
+            armjoints.forearm = robot->getRobotNode("ArmR6_Elb2");
             armjoints.wristAdduction = robot->getRobotNode("ArmR7_Wri1");
             armjoints.wristExtension = robot->getRobotNode("ArmR8_Wri2");
 
@@ -63,12 +66,12 @@ namespace VirtualRobot
         else if (robot->getName() == "Armar6" && nodeSet->getName() == "LeftArm")
         {
             VirtualRobot::SoechtingNullspaceGradientWithWrist::ArmJointsWithWrist armjoints;
-            armjoints.clavicula      = robot->getRobotNode("ArmL1_Cla1");
-            armjoints.shoulder1      = robot->getRobotNode("ArmL2_Sho1");
-            armjoints.shoulder2      = robot->getRobotNode("ArmL3_Sho2");
-            armjoints.shoulder3      = robot->getRobotNode("ArmL4_Sho3");
-            armjoints.elbow          = robot->getRobotNode("ArmL5_Elb1");
-            armjoints.forearm        = robot->getRobotNode("ArmL6_Elb2");
+            armjoints.clavicula = robot->getRobotNode("ArmL1_Cla1");
+            armjoints.shoulder1 = robot->getRobotNode("ArmL2_Sho1");
+            armjoints.shoulder2 = robot->getRobotNode("ArmL3_Sho2");
+            armjoints.shoulder3 = robot->getRobotNode("ArmL4_Sho3");
+            armjoints.elbow = robot->getRobotNode("ArmL5_Elb1");
+            armjoints.forearm = robot->getRobotNode("ArmL6_Elb2");
             armjoints.wristAdduction = robot->getRobotNode("ArmL7_Wri1");
             armjoints.wristExtension = robot->getRobotNode("ArmL8_Wri2");
 
@@ -82,12 +85,13 @@ namespace VirtualRobot
         }
 
         const auto weightedDiff = soechtingNullspaceGradient->getGradient(params, -1);
-        const float e1          = weightedDiff.squaredNorm();
+        const float e1 = weightedDiff.squaredNorm();
 
         return std::sqrt(e1);
     }
 
-    void NaturalPosture::addPose(const Eigen::Matrix4f& pose)
+    void
+    NaturalPosture::addPose(const Eigen::Matrix4f& pose)
     {
         Eigen::Matrix4f p = pose;
         toLocal(p);
@@ -129,7 +133,8 @@ namespace VirtualRobot
             const float objective = 1 - costs; // [0,1]
 
             // convert to fixed size type
-            const auto cellValue = static_cast<unsigned char>(objective * static_cast<float>(UCHAR_MAX) + 0.5F);
+            const auto cellValue =
+                static_cast<unsigned char>(objective * static_cast<float>(UCHAR_MAX) + 0.5F);
 
             // update grid
             const auto oldCellValue = data->get(v.data());

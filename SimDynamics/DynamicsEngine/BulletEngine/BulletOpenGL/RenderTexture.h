@@ -15,8 +15,8 @@ subject to the following restrictions:
 
 #pragma once
 
-#include "LinearMath/btVector3.h"
 #include "GLDebugFont.h"
+#include "LinearMath/btVector3.h"
 
 ///
 ///renderTexture provides a software-render context (setpixel/printf)
@@ -25,34 +25,39 @@ class renderTexture
 {
     int m_height;
     int m_width;
-    unsigned char*  m_buffer;
+    unsigned char* m_buffer;
 
 public:
-
     renderTexture(int width, int height);
     ~renderTexture();
 
     ///rgba input is in range [0..1] for each component
-    inline void setPixel(int x, int y, const btVector4& rgba)
+    inline void
+    setPixel(int x, int y, const btVector4& rgba)
     {
         unsigned char* pixel = &m_buffer[(x + y * m_width) * 4];
 
-        pixel[0] = (unsigned char)(255.*rgba.getX());
-        pixel[1] = (unsigned char)(255.*rgba.getY());
-        pixel[2] = (unsigned char)(255.*rgba.getZ());
-        pixel[3] = (unsigned char)(255.*rgba.getW());
+        pixel[0] = (unsigned char)(255. * rgba.getX());
+        pixel[1] = (unsigned char)(255. * rgba.getY());
+        pixel[2] = (unsigned char)(255. * rgba.getZ());
+        pixel[3] = (unsigned char)(255. * rgba.getW());
     }
 
-    inline void addPixel(int x, int y, const btVector4& rgba)
+    inline void
+    addPixel(int x, int y, const btVector4& rgba)
     {
         unsigned char* pixel = &m_buffer[(x + y * m_width) * 4];
-        pixel[0] = (unsigned char)btMin(btScalar(255.f), ((btScalar)pixel[0] + btScalar(255.f) * rgba.getX()));
-        pixel[1] = (unsigned char)btMin(btScalar(255.f), ((btScalar)pixel[1] + btScalar(255.f) * rgba.getY()));
-        pixel[2] = (unsigned char)btMin(btScalar(255.f), ((btScalar)pixel[2] + btScalar(255.f) * rgba.getZ()));
+        pixel[0] = (unsigned char)btMin(btScalar(255.f),
+                                        ((btScalar)pixel[0] + btScalar(255.f) * rgba.getX()));
+        pixel[1] = (unsigned char)btMin(btScalar(255.f),
+                                        ((btScalar)pixel[1] + btScalar(255.f) * rgba.getY()));
+        pixel[2] = (unsigned char)btMin(btScalar(255.f),
+                                        ((btScalar)pixel[2] + btScalar(255.f) * rgba.getZ()));
         //      pixel[3] = (unsigned char)btMin(btScalar(255.f),((btScalar)pixel[3] + btScalar(255.f)*rgba.getW()));
     }
 
-    inline btVector4 getPixel(int x, int y)
+    inline btVector4
+    getPixel(int x, int y)
     {
         unsigned char* pixel = &m_buffer[(x + y * m_width) * 4];
         return btVector4(pixel[0] * 1.f / 255.f,
@@ -61,20 +66,23 @@ public:
                          pixel[3] * 1.f / 255.f);
     }
 
-    const unsigned char*    getBuffer() const
+    const unsigned char*
+    getBuffer() const
     {
         return m_buffer;
     }
-    int getWidth() const
+
+    int
+    getWidth() const
     {
         return m_width;
     }
-    int getHeight() const
+
+    int
+    getHeight() const
     {
         return m_height;
     }
-    void grapicalPrintf(char* str,  void* fontData, int startx = 0, int starty = 0);
 
+    void grapicalPrintf(char* str, void* fontData, int startx = 0, int starty = 0);
 };
-
-

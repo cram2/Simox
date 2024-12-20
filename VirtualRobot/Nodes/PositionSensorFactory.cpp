@@ -1,37 +1,42 @@
 
 
 #include "PositionSensorFactory.h"
-#include "Sensor.h"
+
 #include "../XML/BaseIO.h"
 #include "../XML/rapidxml.hpp"
 #include "PositionSensor.h"
-
+#include "Sensor.h"
+#include "VirtualRobotException.h"
 
 namespace VirtualRobot
 {
 
-    PositionSensorFactory::PositionSensorFactory()
-    = default;
+    PositionSensorFactory::PositionSensorFactory() = default;
 
 
-    PositionSensorFactory::~PositionSensorFactory()
-    = default;
-
+    PositionSensorFactory::~PositionSensorFactory() = default;
 
     /**
      * This method creates a VirtualRobot::PositionSensor.
      *
      * \return instance of VirtualRobot::PositionSensor.
      */
-    SensorPtr PositionSensorFactory::createSensor(GraspableSensorizedObjectPtr node, const std::string& name, VisualizationNodePtr visualization,
-            const Eigen::Matrix4f& rnTrafo) const
+    SensorPtr
+    PositionSensorFactory::createSensor(GraspableSensorizedObjectPtr node,
+                                        const std::string& name,
+                                        VisualizationNodePtr visualization,
+                                        const Eigen::Matrix4f& rnTrafo) const
     {
         SensorPtr Sensor(new PositionSensor(node, name, visualization, rnTrafo));
 
         return Sensor;
     }
 
-    SensorPtr PositionSensorFactory::createSensor(GraspableSensorizedObjectPtr node, const rapidxml::xml_node<char>* sensorXMLNode, BaseIO::RobotDescription loadMode, const std::string basePath) const
+    SensorPtr
+    PositionSensorFactory::createSensor(GraspableSensorizedObjectPtr node,
+                                        const rapidxml::xml_node<char>* sensorXMLNode,
+                                        BaseIO::RobotDescription loadMode,
+                                        const std::string basePath) const
     {
         THROW_VR_EXCEPTION_IF(!sensorXMLNode, "NULL data");
         THROW_VR_EXCEPTION_IF(!node, "NULL data");
@@ -67,10 +72,13 @@ namespace VirtualRobot
             {
                 if (loadMode == RobotIO::eFull)
                 {
-                    THROW_VR_EXCEPTION_IF(visuProcessed, "Two visualization tags defined in Sensor '" << sensorName << "'." << std::endl);
-                    visualizationNode = BaseIO::processVisualizationTag(nodeXML, sensorName, basePath, useAsColModel);
+                    THROW_VR_EXCEPTION_IF(visuProcessed,
+                                          "Two visualization tags defined in Sensor '"
+                                              << sensorName << "'." << std::endl);
+                    visualizationNode = BaseIO::processVisualizationTag(
+                        nodeXML, sensorName, basePath, useAsColModel);
                     visuProcessed = true;
-                }// else silently ignore tag
+                } // else silently ignore tag
             }
             else if (nodeName == "transform")
             {
@@ -78,12 +86,12 @@ namespace VirtualRobot
             }
             else
             {
-                THROW_VR_EXCEPTION("XML definition <" << nodeName << "> not supported in Sensor <" << sensorName << ">." << std::endl);
+                THROW_VR_EXCEPTION("XML definition <" << nodeName << "> not supported in Sensor <"
+                                                      << sensorName << ">." << std::endl);
             }
 
             nodeXML = nodeXML->next_sibling();
         }
-
 
 
         SensorPtr Sensor(new PositionSensor(node, sensorName, visualizationNode, transformMatrix));
@@ -91,26 +99,27 @@ namespace VirtualRobot
         return Sensor;
     }
 
-
     /**
      * register this class in the super class factory
      */
-    SensorFactory::SubClassRegistry PositionSensorFactory::registry(PositionSensorFactory::getName(), &PositionSensorFactory::createInstance);
-
+    SensorFactory::SubClassRegistry
+        PositionSensorFactory::registry(PositionSensorFactory::getName(),
+                                        &PositionSensorFactory::createInstance);
 
     /**
      * \return "position"
      */
-    std::string PositionSensorFactory::getName()
+    std::string
+    PositionSensorFactory::getName()
     {
         return "position";
     }
 
-
     /**
      * \return new instance of PositionSensorFactory.
      */
-    std::shared_ptr<SensorFactory> PositionSensorFactory::createInstance(void*)
+    std::shared_ptr<SensorFactory>
+    PositionSensorFactory::createInstance(void*)
     {
         std::shared_ptr<PositionSensorFactory> psFactory(new PositionSensorFactory());
         return psFactory;

@@ -1,15 +1,16 @@
 #pragma once
 
-#include <Eigen/Core>
 #include <cmath>
 
+#include <Eigen/Core>
 
 namespace simox::math
 {
     using std::isfinite;
 
     template <class Derived>
-    bool isfinite(const Eigen::MatrixBase<Derived>& mat)
+    bool
+    isfinite(const Eigen::MatrixBase<Derived>& mat)
     {
         for (int x = 0; x < mat.rows(); ++x)
         {
@@ -23,4 +24,4 @@ namespace simox::math
         }
         return true;
     }
-}
+} // namespace simox::math

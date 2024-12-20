@@ -1,18 +1,23 @@
 #include "GraspRrt.h"
 
-#include <VirtualRobot/MathTools.h>
-#include <VirtualRobot/Robot.h>
-#include <VirtualRobot/EndEffector/EndEffector.h>
-#include <VirtualRobot/EndEffector/EndEffectorActor.h>
-#include <VirtualRobot/Grasping/Grasp.h>
-#include <VirtualRobot/Grasping/GraspSet.h>
-#include <VirtualRobot/Grasping/BasicGraspQualityMeasure.h>
-#include <VirtualRobot/Random.h>
 #include <algorithm>
 #include <cfloat>
 #include <ctime>
 
 #include <Eigen/Geometry>
+
+#include <VirtualRobot/EndEffector/EndEffector.h>
+#include <VirtualRobot/EndEffector/EndEffectorActor.h>
+#include <VirtualRobot/Grasping/BasicGraspQualityMeasure.h>
+#include <VirtualRobot/Grasping/Grasp.h>
+#include <VirtualRobot/Grasping/GraspSet.h>
+#include <VirtualRobot/MathTools.h>
+#include <VirtualRobot/Random.h>
+#include <VirtualRobot/Robot.h>
+
+#include "VirtualRobot/CollisionDetection/CollisionChecker.h"
+#include "VirtualRobot/Nodes/RobotNode.h"
+#include "VirtualRobot/RobotNodeSet.h"
 
 using namespace std;
 
@@ -26,14 +31,17 @@ namespace Saba
                        VirtualRobot::BasicGraspQualityMeasurePtr measure,
                        VirtualRobot::SceneObjectSetPtr graspCollisionObjects,
                        float probabGraspHypothesis,
-                       float graspQualityMinScore
-                      )
-        : Rrt(cspace), probabGraspHypothesis(probabGraspHypothesis), graspQualityMinScore(graspQualityMinScore)
+                       float graspQualityMinScore) :
+        Rrt(cspace),
+        probabGraspHypothesis(probabGraspHypothesis),
+        graspQualityMinScore(graspQualityMinScore)
     {
         plannerInitialized = false;
         minGraspContacts = 3;
         name = "GraspRrt";
-        THROW_VR_EXCEPTION_IF(!cspace || !object || !eef || !cspace->getRobotNodeSet() || !cspace->getRobot() || !measure, "NULL data");
+        THROW_VR_EXCEPTION_IF(!cspace || !object || !eef || !cspace->getRobotNodeSet() ||
+                                  !cspace->getRobot() || !measure,
+                              "NULL data");
         rns = cspace->getRobotNodeSet();
         robot = cspace->getRobot();
         targetObject = object;
@@ -46,7 +54,8 @@ namespace Saba
         }
         else
         {
-            this->graspCollisionObjects.reset(new VirtualRobot::SceneObjectSet("GraspRrtSceneObject", object->getCollisionChecker()));
+            this->graspCollisionObjects.reset(new VirtualRobot::SceneObjectSet(
+                "GraspRrtSceneObject", object->getCollisionChecker()));
         }
 
         if (!this->graspCollisionObjects->hasSceneObject(targetObject))
@@ -55,9 +64,8 @@ namespace Saba
         }
 
 
-
         cartSamplingPosStepSize = 10.0f;
-        cartSamplingOriStepSize = (float)M_PI / 18.0f;  // == 10 degree
+        cartSamplingOriStepSize = (float)M_PI / 18.0f; // == 10 degree
 
         THROW_VR_EXCEPTION_IF(dimension <= 0, "Zero dim?");
         THROW_VR_EXCEPTION_IF(!eef->getGCP(), "No gcp..");
@@ -78,14 +86,19 @@ namespace Saba
         // todo: is this value a good guess?
         tryGraspsDistance2 = 600.0f * 600.0f;
 
-        gcpOject = VirtualRobot::Obstacle::createBox(1.0f, 1.0f, 1.0f, VirtualRobot::VisualizationFactory::Color::Red(), "", eef->getCollisionChecker());
+        gcpOject =
+            VirtualRobot::Obstacle::createBox(1.0f,
+                                              1.0f,
+                                              1.0f,
+                                              VirtualRobot::VisualizationFactory::Color::Red(),
+                                              "",
+                                              eef->getCollisionChecker());
     }
 
-    GraspRrt::~GraspRrt()
-    = default;
+    GraspRrt::~GraspRrt() = default;
 
-
-    void GraspRrt::reset()
+    void
+    GraspRrt::reset()
     {
         Rrt::reset();
 
@@ -108,7 +121,8 @@ namespace Saba
         mapConfigTcp.clear();
     }
 
-    bool GraspRrt::init()
+    bool
+    GraspRrt::init()
     {
         performanceMeasure.setupTimeMS = 0.0f;
         performanceMeasure.planningTimeMS = 0.0f;
@@ -149,11 +163,13 @@ namespace Saba
 
         plannerInitialized = true;
         clock_t timeEnd = clock();
-        performanceMeasure.setupTimeMS = ((float)(timeEnd - timeStart) / (float)CLOCKS_PER_SEC) * 1000.0f;
+        performanceMeasure.setupTimeMS =
+            ((float)(timeEnd - timeStart) / (float)CLOCKS_PER_SEC) * 1000.0f;
         return true;
     }
 
-    bool GraspRrt::doPlanningCycle()
+    bool
+    GraspRrt::doPlanningCycle()
     {
 
         if (!plannerInitialized)
@@ -181,11 +197,15 @@ namespace Saba
                     break;
 
                 case eGraspablePoseReached:
-                    std::cout << endl << __FUNCTION__ << " -- FOUND A GRASPABLE POSITION (but score is not high enough) -- " << std::endl;
+                    std::cout << endl
+                              << __FUNCTION__
+                              << " -- FOUND A GRASPABLE POSITION (but score is not high enough) -- "
+                              << std::endl;
 
                     if (grasps.size() <= 0)
                     {
-                        std::cout << __FUNCTION__ << ": Error, no grasp results stored..." << std::endl;
+                        std::cout << __FUNCTION__ << ": Error, no grasp results stored..."
+                                  << std::endl;
                     }
                     else
                     {
@@ -196,13 +216,17 @@ namespace Saba
                     break;
 
                 case eGoalReached:
-                    std::cout << endl << __FUNCTION__ << " -- FOUND GOAL PATH (CONNECTION TO GRASPING POSITION VIA INV JACOBIAN) -- " << std::endl;
+                    std::cout << endl
+                              << __FUNCTION__
+                              << " -- FOUND GOAL PATH (CONNECTION TO GRASPING POSITION VIA INV "
+                                 "JACOBIAN) -- "
+                              << std::endl;
 
                     if (grasps.size() <= 0)
                     {
-                        std::cout << __FUNCTION__ << ": Error, no grasp results stored..." << std::endl;
+                        std::cout << __FUNCTION__ << ": Error, no grasp results stored..."
+                                  << std::endl;
                         stopSearch = true;
-
                     }
                     else
                     {
@@ -238,7 +262,8 @@ namespace Saba
         return true;
     }
 
-    Rrt::ExtensionResult GraspRrt::connectComplete(Eigen::VectorXf& c, CSpaceTreePtr tree, int& storeLastAddedID)
+    Rrt::ExtensionResult
+    GraspRrt::connectComplete(Eigen::VectorXf& c, CSpaceTreePtr tree, int& storeLastAddedID)
     {
         // NEAREST NEIGHBOR OF RANDOM CONFIGURATION
         CSpaceNodePtr nn = tree->getNearestNeighbor(c);
@@ -263,8 +288,8 @@ namespace Saba
         return Rrt::eSuccess; // REACHED
     }
 
-
-    bool GraspRrt::plan(bool bQuiet)
+    bool
+    GraspRrt::plan(bool bQuiet)
     {
         if (!plannerInitialized)
             if (!init())
@@ -301,20 +326,21 @@ namespace Saba
             {
                 bStopLoop = true;
             }
-        }
-        while (!bStopLoop);
+        } while (!bStopLoop);
 
         //time_t endTime = time(NULL);
         clock_t endClock = clock();
 
         //long diffClock = (long)(((float)(endClock - startClock) / (float)CLOCKS_PER_SEC) * 1000.0);
         //long diffTime = (long)((float)(endTime - startTime) * 1000.0);
-        performanceMeasure.planningTimeMS = ((float)(endClock - startClock) / (float)CLOCKS_PER_SEC) * 1000.0f;
+        performanceMeasure.planningTimeMS =
+            ((float)(endClock - startClock) / (float)CLOCKS_PER_SEC) * 1000.0f;
         planningTime = performanceMeasure.planningTimeMS;
 
 
         // calculate the RRT buildup time (the time for moving toward the goals includes the scoring time)
-        performanceMeasure.rrtTimeMS = performanceMeasure.planningTimeMS - performanceMeasure.moveTowardGraspPosesTimeMS;
+        performanceMeasure.rrtTimeMS =
+            performanceMeasure.planningTimeMS - performanceMeasure.moveTowardGraspPosesTimeMS;
         // until now the time for moving toward goal includes the grasp scoring time, so subtract it
         performanceMeasure.moveTowardGraspPosesTimeMS -= performanceMeasure.scoreGraspTimeMS;
 
@@ -355,27 +381,41 @@ namespace Saba
         return false;
     }
 
-    void GraspRrt::printPerformanceResults()
+    void
+    GraspRrt::printPerformanceResults()
     {
         std::cout << endl << "=================== RESULTS ===================" << std::endl;
         std::cout << "Needed " << performanceMeasure.setupTimeMS << " ms for setup." << std::endl;
-        std::cout << "Needed " << performanceMeasure.planningTimeMS << " ms for the complete planning process." << std::endl;
+        std::cout << "Needed " << performanceMeasure.planningTimeMS
+                  << " ms for the complete planning process." << std::endl;
 
-        std::cout << "Needed " << performanceMeasure.rrtTimeMS << " ms for building up the RRT." << std::endl;
-        std::cout << "Needed " << performanceMeasure.moveTowardGraspPosesTimeMS << " ms for moving toward the grasp goals." << std::endl;
-        std::cout << "Needed " << performanceMeasure.scoreGraspTimeMS << " ms for scoring the grasps." << std::endl;
-        std::cout << "  Nr of grasp tries: " << performanceMeasure.numberOfMovementsTowardGraspPose << std::endl;
+        std::cout << "Needed " << performanceMeasure.rrtTimeMS << " ms for building up the RRT."
+                  << std::endl;
+        std::cout << "Needed " << performanceMeasure.moveTowardGraspPosesTimeMS
+                  << " ms for moving toward the grasp goals." << std::endl;
+        std::cout << "Needed " << performanceMeasure.scoreGraspTimeMS
+                  << " ms for scoring the grasps." << std::endl;
+        std::cout << "  Nr of grasp tries: " << performanceMeasure.numberOfMovementsTowardGraspPose
+                  << std::endl;
 
         if (performanceMeasure.numberOfMovementsTowardGraspPose > 0)
         {
-            std::cout << "  Avg Time for moving to grasping test position (without checking the grasp score):" << performanceMeasure.moveTowardGraspPosesTimeMS / (float)performanceMeasure.numberOfMovementsTowardGraspPose << " ms " << std::endl;
+            std::cout << "  Avg Time for moving to grasping test position (without checking the "
+                         "grasp score):"
+                      << performanceMeasure.moveTowardGraspPosesTimeMS /
+                             (float)performanceMeasure.numberOfMovementsTowardGraspPose
+                      << " ms " << std::endl;
         }
 
-        std::cout << "  Nr of grasp scorings: " << performanceMeasure.numberOfGraspScorings << std::endl;
+        std::cout << "  Nr of grasp scorings: " << performanceMeasure.numberOfGraspScorings
+                  << std::endl;
 
         if (performanceMeasure.numberOfGraspScorings > 0)
         {
-            std::cout << "  Avg Time for scoring a grasp:" << performanceMeasure.scoreGraspTimeMS / (float)performanceMeasure.numberOfGraspScorings << " ms " << std::endl;
+            std::cout << "  Avg Time for scoring a grasp:"
+                      << performanceMeasure.scoreGraspTimeMS /
+                             (float)performanceMeasure.numberOfGraspScorings
+                      << " ms " << std::endl;
         }
 
         std::cout << "Created " << tree->getNrOfNodes() << " nodes." << std::endl;
@@ -383,7 +423,8 @@ namespace Saba
         std::cout << "=================== RESULTS ===================" << endl << std::endl;
     }
 
-    bool GraspRrt::setStart(const Eigen::VectorXf& startVec)
+    bool
+    GraspRrt::setStart(const Eigen::VectorXf& startVec)
     {
         if (!tree)
         {
@@ -409,21 +450,21 @@ namespace Saba
                 std::cout << startNode->configuration[i] << ",";
             }
 
-            std::cout <<  std::endl;
+            std::cout << std::endl;
         }
 
         return true;
     }
 
-
-    bool GraspRrt::setGoal(const Eigen::VectorXf& /*c*/)
+    bool
+    GraspRrt::setGoal(const Eigen::VectorXf& /*c*/)
     {
         THROW_VR_EXCEPTION("Not allowed here, goal configurations are sampled during planning..");
         return false;
     }
 
-
-    bool GraspRrt::calculateGlobalGraspPose(const Eigen::VectorXf& c, Eigen::Matrix4f& storeGoal)
+    bool
+    GraspRrt::calculateGlobalGraspPose(const Eigen::VectorXf& c, Eigen::Matrix4f& storeGoal)
     {
         Eigen::Vector3f P1;
         Eigen::Vector3f P2;
@@ -436,7 +477,8 @@ namespace Saba
         gcpOject->setGlobalPose(eef->getGCP()->getGlobalPose());
 
         // get target position (position on grasp object with shortest distance to hand)
-        /*double dist =*/ targetObject->getCollisionChecker()->calculateDistance(targetObject->getCollisionModel(), gcpOject->getCollisionModel(), P1, P2, &nId1, &nId2);
+        /*double dist =*/targetObject->getCollisionChecker()->calculateDistance(
+            targetObject->getCollisionModel(), gcpOject->getCollisionModel(), P1, P2, &nId1, &nId2);
 
         // now target position in global coord system is stored in P1
 
@@ -459,7 +501,8 @@ namespace Saba
 
         if (l < 1e-8)
         {
-            std::cout << __FUNCTION__ << ":WARNING: length to target is small ... aborting " << std::endl;
+            std::cout << __FUNCTION__ << ":WARNING: length to target is small ... aborting "
+                      << std::endl;
             return false;
         }
 
@@ -481,7 +524,8 @@ namespace Saba
         return true;
     }
 
-    GraspRrt::MoveArmResult GraspRrt::connectRandomGraspPositionJacobian()
+    GraspRrt::MoveArmResult
+    GraspRrt::connectRandomGraspPositionJacobian()
     {
         clock_t timeStart = clock();
         // choose one node to extend
@@ -523,11 +567,11 @@ namespace Saba
 
         if (verbose)
         {
-            std::cout << __FUNCTION__ << " - Time for Connect To Grasp Position:" << fMoveTime << std::endl;
+            std::cout << __FUNCTION__ << " - Time for Connect To Grasp Position:" << fMoveTime
+                      << std::endl;
         }
 
         return res;
-
     }
 
     // not needed any more
@@ -568,7 +612,10 @@ namespace Saba
         return bestNode;
     }*/
 
-    GraspRrt::MoveArmResult GraspRrt::moveTowardsGoal(CSpaceNodePtr startNode, const Eigen::Matrix4f& targetPose, int nMaxLoops)
+    GraspRrt::MoveArmResult
+    GraspRrt::moveTowardsGoal(CSpaceNodePtr startNode,
+                              const Eigen::Matrix4f& targetPose,
+                              int nMaxLoops)
     {
         if (!startNode)
         {
@@ -578,7 +625,8 @@ namespace Saba
         CSpaceNodePtr lastExtendNode = startNode;
         float dist;
         bool r;
-        dist = VirtualRobot::MathTools::getCartesianPoseDiff(mapConfigTcp[lastExtendNode], targetPose);
+        dist =
+            VirtualRobot::MathTools::getCartesianPoseDiff(mapConfigTcp[lastExtendNode], targetPose);
         int loopCount = 0;
         float lastDist = 0;
         float fMaxDist_GraspGoalReached = 1.0f; // 1 mm or 3 degrees
@@ -602,23 +650,29 @@ namespace Saba
                 case eCollision_Environment:
                 {
                     // check grasp score of last valid config
-                    float fGraspScore = calculateGraspScore(lastExtendNode->configuration, lastExtendNode->ID, true);
+                    float fGraspScore = calculateGraspScore(
+                        lastExtendNode->configuration, lastExtendNode->ID, true);
 
                     if (fGraspScore >= graspQualityMinScore)
                     {
-                        std::cout << __FUNCTION__ << ": found valid grasp (score:" << fGraspScore << ")" << std::endl;
+                        std::cout << __FUNCTION__ << ": found valid grasp (score:" << fGraspScore
+                                  << ")" << std::endl;
                         return eGoalReached;
                     }
                     else if (fGraspScore > 0.0f)
                     {
-                        std::cout << __FUNCTION__ << ": found valid grasp (score:" << fGraspScore << ")" << std::endl;
+                        std::cout << __FUNCTION__ << ": found valid grasp (score:" << fGraspScore
+                                  << ")" << std::endl;
                         return eGraspablePoseReached;
                     }
                     else
                     {
                         if (verbose)
                         {
-                            std::cout << __FUNCTION__ << ": aborting moveArmToGraspPos, Collision but no graspable config " << std::endl;
+                            std::cout << __FUNCTION__
+                                      << ": aborting moveArmToGraspPos, Collision but no graspable "
+                                         "config "
+                                      << std::endl;
                         }
 
                         return eCollision_Environment;
@@ -635,7 +689,10 @@ namespace Saba
                     {
                         if (verbose)
                         {
-                            std::cout << __FUNCTION__ << ": aborting moveArmToGraspPos, checkPath fails, todo: check GRASP of last valid config.. " << std::endl;
+                            std::cout << __FUNCTION__
+                                      << ": aborting moveArmToGraspPos, checkPath fails, todo: "
+                                         "check GRASP of last valid config.. "
+                                      << std::endl;
                         }
 
                         return eCollision_Environment;
@@ -646,7 +703,9 @@ namespace Saba
 
                     if (!r)
                     {
-                        std::cout << __FUNCTION__ << ": aborting moveArmToGraspPos, appendPath failed?! " << std::endl;
+                        std::cout << __FUNCTION__
+                                  << ": aborting moveArmToGraspPos, appendPath failed?! "
+                                  << std::endl;
                         return eError;
                     }
 
@@ -660,13 +719,16 @@ namespace Saba
                     lastExtendNode->status = 2;
 
                     lastDist = dist;
-                    dist =  VirtualRobot::MathTools::getCartesianPoseDiff(mapConfigTcp[lastExtendNode], targetPose);
+                    dist = VirtualRobot::MathTools::getCartesianPoseDiff(
+                        mapConfigTcp[lastExtendNode], targetPose);
 
                     if ((dist - lastDist) > 2.0f * cartSamplingPosStepSize)
                     {
                         if (verbose)
                         {
-                            std::cout << __FUNCTION__ << ": Stop no dist improvement: last: " << lastDist << ", dist: " << dist << std::endl;
+                            std::cout << __FUNCTION__
+                                      << ": Stop no dist improvement: last: " << lastDist
+                                      << ", dist: " << dist << std::endl;
                         }
 
                         return eTrapped;
@@ -678,7 +740,8 @@ namespace Saba
                 case eJointBoundaryViolation:
                     if (verbose)
                     {
-                        std::cout << __FUNCTION__ << " Stopping: Joint limits reached " << std::endl;
+                        std::cout << __FUNCTION__ << " Stopping: Joint limits reached "
+                                  << std::endl;
                     }
 
                     return eTrapped;
@@ -693,27 +756,34 @@ namespace Saba
             {
                 if (verbose)
                 {
-                    std::cout << __FUNCTION__ << " grasp goal position reached, dist: " << dist << std::endl;
+                    std::cout << __FUNCTION__ << " grasp goal position reached, dist: " << dist
+                              << std::endl;
                 }
 
                 // check grasp score of last valid config
-                float fGraspScore = calculateGraspScore(lastExtendNode->configuration, lastExtendNode->ID, true);
+                float fGraspScore =
+                    calculateGraspScore(lastExtendNode->configuration, lastExtendNode->ID, true);
 
                 if (fGraspScore >= graspQualityMinScore)
                 {
-                    std::cout << __FUNCTION__ << ": found valid grasp (score:" << fGraspScore << ")" << std::endl;
+                    std::cout << __FUNCTION__ << ": found valid grasp (score:" << fGraspScore << ")"
+                              << std::endl;
                     return eGoalReached;
                 }
                 else if (fGraspScore > 0.0f)
                 {
-                    std::cout << __FUNCTION__ << ": found valid grasp (score:" << fGraspScore << ")" << std::endl;
+                    std::cout << __FUNCTION__ << ": found valid grasp (score:" << fGraspScore << ")"
+                              << std::endl;
                     return eGraspablePoseReached;
                 }
                 else
                 {
                     if (verbose)
                     {
-                        std::cout << __FUNCTION__ << ": aborting moveArmToGraspPos, goal pos reached but zero grasp score " << std::endl;
+                        std::cout << __FUNCTION__
+                                  << ": aborting moveArmToGraspPos, goal pos reached but zero "
+                                     "grasp score "
+                                  << std::endl;
                     }
 
                     return eTrapped;
@@ -729,7 +799,8 @@ namespace Saba
         return eTrapped;
     }
 
-    void GraspRrt::limitWorkspaceStep(Eigen::Matrix4f& p)
+    void
+    GraspRrt::limitWorkspaceStep(Eigen::Matrix4f& p)
     {
         float distPos = p.block(0, 3, 3, 1).norm();
         Eigen::Vector3f axis;
@@ -776,8 +847,10 @@ namespace Saba
         p = m;
     }
 
-
-    GraspRrt::MoveArmResult GraspRrt::createWorkSpaceSamplingStep(const Eigen::Matrix4f& currentPose, const Eigen::Matrix4f& goalPose, Eigen::VectorXf& storeCSpaceConf)
+    GraspRrt::MoveArmResult
+    GraspRrt::createWorkSpaceSamplingStep(const Eigen::Matrix4f& currentPose,
+                                          const Eigen::Matrix4f& goalPose,
+                                          Eigen::VectorXf& storeCSpaceConf)
     {
         Eigen::Matrix4f deltaPose = goalPose * currentPose.inverse();
 
@@ -804,7 +877,11 @@ namespace Saba
 
         return moveArmDiffKin(deltaPose, storeCSpaceConf);
     }
-    GraspRrt::MoveArmResult GraspRrt::createWorkSpaceSamplingStep(const Eigen::Matrix4f& goalPose, CSpaceNodePtr extendNode, Eigen::VectorXf& storeCSpaceConf)
+
+    GraspRrt::MoveArmResult
+    GraspRrt::createWorkSpaceSamplingStep(const Eigen::Matrix4f& goalPose,
+                                          CSpaceNodePtr extendNode,
+                                          Eigen::VectorXf& storeCSpaceConf)
     {
         // calculate delta
         /*float pDeltaPosRPY_Global[6];
@@ -820,7 +897,8 @@ namespace Saba
         return createWorkSpaceSamplingStep(currentPose, goalPose, storeCSpaceConf);
     }
 
-    GraspRrt::MoveArmResult GraspRrt::moveArmDiffKin(const Eigen::Matrix4f& deltaPose, Eigen::VectorXf& storeCSpaceConf)
+    GraspRrt::MoveArmResult
+    GraspRrt::moveArmDiffKin(const Eigen::Matrix4f& deltaPose, Eigen::VectorXf& storeCSpaceConf)
     {
         Eigen::VectorXf startConfig(rns->getSize());
         rns->getJointValues(startConfig);
@@ -836,7 +914,6 @@ namespace Saba
 
         // Calculate the IK
         Eigen::VectorXf dTheta = diffIK->getPseudoInverseJacobianMatrix(eef->getGCP()) * e;
-
 
 
         /*std::string sKinChain = m_pCSpace->getNameOfKinematicChain();
@@ -897,22 +974,22 @@ namespace Saba
         delete []pV;*/
 
         return eMovedOneStep;
-
     }
 
-
-    float GraspRrt::calculateGraspScore(const Eigen::VectorXf& c, int nId, bool bStoreGraspInfoOnSuccess)
+    float
+    GraspRrt::calculateGraspScore(const Eigen::VectorXf& c, int nId, bool bStoreGraspInfoOnSuccess)
     {
         SABA_ASSERT(graspQualityMeasure);
         clock_t timeStart = clock();
         performanceMeasure.numberOfGraspScorings++;
 
         robot->setJointValues(rns, c);
-        VirtualRobot::EndEffector::ContactInfoVector contactsAll = eef->closeActors(graspCollisionObjects);
+        VirtualRobot::EndEffector::ContactInfoVector contactsAll =
+            eef->closeActors(graspCollisionObjects);
         VirtualRobot::EndEffector::ContactInfoVector contacts;
 
         // we only need the targetObject contacts
-        for (auto & i : contactsAll)
+        for (auto& i : contactsAll)
         {
             if (i.obstacle == targetObject)
             {
@@ -926,10 +1003,11 @@ namespace Saba
         {
             if (verbose)
             {
-                std::cout << __FUNCTION__ << ": Low number of contacts -> Zero Grasp Score " << std::endl;
-                std::cout << "Fingers: " ;
+                std::cout << __FUNCTION__ << ": Low number of contacts -> Zero Grasp Score "
+                          << std::endl;
+                std::cout << "Fingers: ";
 
-                for (auto & contact : contacts)
+                for (auto& contact : contacts)
                 {
                     std::cout << contact.actor->getName() << ", ";
                 }
@@ -938,7 +1016,8 @@ namespace Saba
             }
 
             clock_t timeEnd = clock();
-            performanceMeasure.scoreGraspTimeMS += ((float)(timeEnd - timeStart) / (float)CLOCKS_PER_SEC) * 1000.0f;
+            performanceMeasure.scoreGraspTimeMS +=
+                ((float)(timeEnd - timeStart) / (float)CLOCKS_PER_SEC) * 1000.0f;
             return 0.0f;
         }
 
@@ -948,7 +1027,8 @@ namespace Saba
         // get distance to target
         Eigen::Vector3f P1, P2;
         int nId1, nId2;
-        float fDistTarget = targetObject->getCollisionChecker()->calculateDistance(targetObject->getCollisionModel(), gcpOject->getCollisionModel(), P1, P2, &nId1, &nId2);
+        float fDistTarget = targetObject->getCollisionChecker()->calculateDistance(
+            targetObject->getCollisionModel(), gcpOject->getCollisionModel(), P1, P2, &nId1, &nId2);
 
 
         graspQualityMeasure->setContactPoints(contacts);
@@ -989,7 +1069,8 @@ namespace Saba
         }
 
         clock_t timeEnd = clock();
-        performanceMeasure.scoreGraspTimeMS += ((float)(timeEnd - timeStart) / (float)CLOCKS_PER_SEC) * 1000.0f;
+        performanceMeasure.scoreGraspTimeMS +=
+            ((float)(timeEnd - timeStart) / (float)CLOCKS_PER_SEC) * 1000.0f;
 
         return fScore;
     }
@@ -1024,7 +1105,8 @@ namespace Saba
         m_pGraspQualityMeasure->CalculateObjectProperties();
     }*/
 
-    void GraspRrt::printGraspInfo(GraspInfo& GrInfo)
+    void
+    GraspRrt::printGraspInfo(GraspInfo& GrInfo)
     {
         std::cout << "Grasp Info:" << std::endl;
         std::cout << "   Distance to object: " << GrInfo.distanceToObject << std::endl;
@@ -1033,8 +1115,8 @@ namespace Saba
         std::cout << "   Contacts stored: " << GrInfo.contacts.size() << std::endl;
     }
 
-
-    void GraspRrt::printConfig(bool printOnlyParams)
+    void
+    GraspRrt::printConfig(bool printOnlyParams)
     {
         if (!printOnlyParams)
         {
@@ -1062,7 +1144,8 @@ namespace Saba
             std::cout << "   RNS: " << rns->getName() << std::endl;
         }
 
-        std::cout << "   Cart Step Size: " << cartSamplingPosStepSize << ", Orientational step size: " << cartSamplingPosStepSize << std::endl;
+        std::cout << "   Cart Step Size: " << cartSamplingPosStepSize
+                  << ", Orientational step size: " << cartSamplingPosStepSize << std::endl;
         Rrt::printConfig(true);
 
         if (!printOnlyParams)
@@ -1071,19 +1154,22 @@ namespace Saba
         }
     }
 
-    ApproachDiscretizationPtr GraspRrt::getPoseRelationSphere()
+    ApproachDiscretizationPtr
+    GraspRrt::getPoseRelationSphere()
     {
         return poseSphere;
     }
 
-    void GraspRrt::getGraspInfoResult(GraspRrt::GraspInfoVector& storeGraspInfo)
+    void
+    GraspRrt::getGraspInfoResult(GraspRrt::GraspInfoVector& storeGraspInfo)
     {
         graspInfoMutex.lock();
         storeGraspInfo = grasps;
         graspInfoMutex.unlock();
     }
 
-    bool GraspRrt::getGraspInfoResult(int nIndex, GraspInfo& storeGraspInfo)
+    bool
+    GraspRrt::getGraspInfoResult(int nIndex, GraspInfo& storeGraspInfo)
     {
         graspInfoMutex.lock();
 
@@ -1099,7 +1185,8 @@ namespace Saba
         return true;
     }
 
-    int GraspRrt::getNrOfGraspInfoResults()
+    int
+    GraspRrt::getNrOfGraspInfoResults()
     {
         int nRes;
         graspInfoMutex.lock();
@@ -1108,13 +1195,14 @@ namespace Saba
         return nRes;
     }
 
-    GraspRrt::PlanningPerformance GraspRrt::getPerformanceMeasurement()
+    GraspRrt::PlanningPerformance
+    GraspRrt::getPerformanceMeasurement()
     {
         return performanceMeasure;
     }
 
-
-    bool GraspRrt::processNodes(unsigned int startId, unsigned int endId)
+    bool
+    GraspRrt::processNodes(unsigned int startId, unsigned int endId)
     {
         if (!tree)
         {
@@ -1135,7 +1223,8 @@ namespace Saba
         return true;
     }
 
-    bool GraspRrt::processNode(CSpaceNodePtr n)
+    bool
+    GraspRrt::processNode(CSpaceNodePtr n)
     {
         if (!n)
         {
@@ -1156,11 +1245,11 @@ namespace Saba
         }
 
         return true;
-
     }
 
-    void GraspRrt::setMinGraspContacts(int nr)
+    void
+    GraspRrt::setMinGraspContacts(int nr)
     {
         minGraspContacts = nr;
     }
-}
+} // namespace Saba

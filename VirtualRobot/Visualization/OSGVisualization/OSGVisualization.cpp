@@ -6,9 +6,11 @@
 
 
 #include "OSGVisualization.h"
-#include "OSGVisualizationNode.h"
 
 #include <algorithm>
+
+#include "Logging.h"
+#include "OSGVisualizationNode.h"
 
 namespace VirtualRobot
 {
@@ -19,7 +21,8 @@ namespace VirtualRobot
         visu = NULL;
     }
 
-    OSGVisualization::OSGVisualization(const std::vector<VisualizationNodePtr>& visualizationNodes) :
+    OSGVisualization::OSGVisualization(
+        const std::vector<VisualizationNodePtr>& visualizationNodes) :
         Visualization(visualizationNodes)
     {
         visu = NULL;
@@ -33,7 +36,8 @@ namespace VirtualRobot
         }
     }
 
-    bool OSGVisualization::buildVisualization()
+    bool
+    OSGVisualization::buildVisualization()
     {
         if (visu)
         {
@@ -43,9 +47,10 @@ namespace VirtualRobot
         visu = new osg::Group;
         visu->ref();
 
-        BOOST_FOREACH(VisualizationNodePtr visualizationNode, visualizationNodes)
+        BOOST_FOREACH (VisualizationNodePtr visualizationNode, visualizationNodes)
         {
-            boost::shared_ptr<OSGVisualizationNode> osgNode = boost::dynamic_pointer_cast<OSGVisualizationNode>(visualizationNode);
+            boost::shared_ptr<OSGVisualizationNode> osgNode =
+                boost::dynamic_pointer_cast<OSGVisualizationNode>(visualizationNode);
 
             if (osgNode && osgNode->getOSGVisualization())
             {
@@ -55,7 +60,8 @@ namespace VirtualRobot
         return true;
     }
 
-    bool OSGVisualization::highlight(unsigned int which, bool enable)
+    bool
+    OSGVisualization::highlight(unsigned int which, bool enable)
     {
         if (which >= visualizationNodes.size())
         {
@@ -66,8 +72,8 @@ namespace VirtualRobot
         return highlight(visualizationNodes[which], enable);
     }
 
-
-    bool OSGVisualization::highlight(osg::Node* visu, bool enable)
+    bool
+    OSGVisualization::highlight(osg::Node* visu, bool enable)
     {
         if (!visu)
         {
@@ -84,7 +90,8 @@ namespace VirtualRobot
         return true;
     }
 
-    bool OSGVisualization::highlight(VisualizationNodePtr visualizationNode, bool enable)
+    bool
+    OSGVisualization::highlight(VisualizationNodePtr visualizationNode, bool enable)
     {
         if (!isVisualizationNodeRegistered(visualizationNode))
         {
@@ -92,7 +99,8 @@ namespace VirtualRobot
             return false;
         }
 
-        boost::shared_ptr<OSGVisualizationNode> osgNode = boost::dynamic_pointer_cast<OSGVisualizationNode>(visualizationNode);
+        boost::shared_ptr<OSGVisualizationNode> osgNode =
+            boost::dynamic_pointer_cast<OSGVisualizationNode>(visualizationNode);
 
         if (osgNode)
         {
@@ -102,7 +110,8 @@ namespace VirtualRobot
         return false;
     }
 
-    bool OSGVisualization::highlight(bool enable)
+    bool
+    OSGVisualization::highlight(bool enable)
     {
         for (size_t i = 0; i < visualizationNodes.size(); i++)
         {
@@ -119,7 +128,8 @@ namespace VirtualRobot
      * processed node is of type OSGVisualizationNode.
      * Afterwards the SoSeparator is returned.
      */
-    osg::Node* OSGVisualization::getOSGVisualization()
+    osg::Node*
+    OSGVisualization::getOSGVisualization()
     {
         buildVisualization();
         return visu;
@@ -128,7 +138,8 @@ namespace VirtualRobot
     /**
      * \return new instance of VirtualRobot::OSGVisualization with the same set of robot nodes.
      */
-    VirtualRobot::VisualizationPtr OSGVisualization::clone()
+    VirtualRobot::VisualizationPtr
+    OSGVisualization::clone()
     {
         return VisualizationPtr(new OSGVisualization(visualizationNodes));
     }

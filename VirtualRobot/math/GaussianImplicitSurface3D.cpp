@@ -20,6 +20,7 @@
  */
 
 #include "GaussianImplicitSurface3D.h"
+
 #include <cmath>
 #include <iostream>
 
@@ -27,11 +28,14 @@
 
 namespace math
 {
-    GaussianImplicitSurface3D::GaussianImplicitSurface3D(std::unique_ptr<KernelWithDerivatives> kernel)
-        : kernel(std::move(kernel)) {}
+    GaussianImplicitSurface3D::GaussianImplicitSurface3D(
+        std::unique_ptr<KernelWithDerivatives> kernel) :
+        kernel(std::move(kernel))
+    {
+    }
 
-
-    void GaussianImplicitSurface3D::Calculate(const std::vector<DataR3R1>& samples, float noise)
+    void
+    GaussianImplicitSurface3D::Calculate(const std::vector<DataR3R1>& samples, float noise)
     {
         std::vector<DataR3R2> samples2;
         for (const DataR3R1& d : samples)
@@ -41,7 +45,8 @@ namespace math
         Calculate(samples2);
     }
 
-    void GaussianImplicitSurface3D::Calculate(const std::vector<DataR3R2>& samples)
+    void
+    GaussianImplicitSurface3D::Calculate(const std::vector<DataR3R2>& samples)
     {
         this->samples = samples;
         std::vector<Eigen::Vector3f> points;
@@ -71,12 +76,14 @@ namespace math
         MatrixInvert(values);
     }
 
-    float GaussianImplicitSurface3D::Get(Eigen::Vector3f pos)
+    float
+    GaussianImplicitSurface3D::Get(Eigen::Vector3f pos)
     {
         return Predict(pos);
     }
 
-    float GaussianImplicitSurface3D::GetVariance(const Eigen::Vector3f& pos)
+    float
+    GaussianImplicitSurface3D::GetVariance(const Eigen::Vector3f& pos)
     {
         Eigen::VectorXd Cux(samples.size());
         int i = 0;
@@ -88,7 +95,8 @@ namespace math
         return kernel->Kernel(pos, pos, R) - Cux.dot(covariance_inv * Cux);
     }
 
-    float GaussianImplicitSurface3D::Predict(const Eigen::Vector3f& pos) const
+    float
+    GaussianImplicitSurface3D::Predict(const Eigen::Vector3f& pos) const
     {
         Eigen::VectorXd Cux(samples.size());
         int i = 0;
@@ -99,7 +107,10 @@ namespace math
         return Cux.dot(alpha);
     }
 
-    void GaussianImplicitSurface3D::CalculateCovariance(const std::vector<Eigen::Vector3f>& points, float R, const std::vector<float>& noise)
+    void
+    GaussianImplicitSurface3D::CalculateCovariance(const std::vector<Eigen::Vector3f>& points,
+                                                   float R,
+                                                   const std::vector<float>& noise)
     {
         covariance = Eigen::MatrixXd(points.size(), points.size());
 
@@ -118,10 +129,11 @@ namespace math
         }
     }
 
-    void GaussianImplicitSurface3D::MatrixInvert(const Eigen::VectorXd& b)
+    void
+    GaussianImplicitSurface3D::MatrixInvert(const Eigen::VectorXd& b)
     {
         Eigen::ColPivHouseholderQR<Eigen::MatrixXd> qr = covariance.colPivHouseholderQr();
         covariance_inv = qr.inverse();
         alpha = covariance_inv * b;
     }
-}
+} // namespace math

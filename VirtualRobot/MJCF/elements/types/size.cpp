@@ -5,4 +5,4 @@
 
 using namespace mjcf;
 
-const std::string SizeSection::tag      = "size";
+const std::string SizeSection::tag = "size";

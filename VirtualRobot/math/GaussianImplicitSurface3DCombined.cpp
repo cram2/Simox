@@ -19,16 +19,24 @@
 */
 
 #include "GaussianImplicitSurface3DCombined.h"
-#include <cmath>
 
+#include <cmath>
 
 namespace math
 {
 
-    GaussianImplicitSurface3DCombined::GaussianImplicitSurface3DCombined(std::unique_ptr<KernelWithDerivatives> kernel)
-        : kernel(std::move(kernel)) {}
+    GaussianImplicitSurface3DCombined::GaussianImplicitSurface3DCombined(
+        std::unique_ptr<KernelWithDerivatives> kernel) :
+        kernel(std::move(kernel))
+    {
+    }
 
-    void GaussianImplicitSurface3DCombined::Calculate(const ContactList& normalSamples, const std::vector<DataR3R1>& samples, float noise, float normalNoise, float normalScale)
+    void
+    GaussianImplicitSurface3DCombined::Calculate(const ContactList& normalSamples,
+                                                 const std::vector<DataR3R1>& samples,
+                                                 float noise,
+                                                 float normalNoise,
+                                                 float normalScale)
     {
         std::vector<DataR3R2> samples2;
         for (const auto& d : samples)
@@ -38,7 +46,11 @@ namespace math
         Calculate(normalSamples, samples2, normalNoise, normalScale);
     }
 
-    void GaussianImplicitSurface3DCombined::Calculate(const ContactList& normalSamples, const std::vector<DataR3R2>& samples, float normalNoise, float normalScale)
+    void
+    GaussianImplicitSurface3DCombined::Calculate(const ContactList& normalSamples,
+                                                 const std::vector<DataR3R2>& samples,
+                                                 float normalNoise,
+                                                 float normalScale)
     {
         ContactList shiftedNormalSamples;
         std::vector<DataR3R2> shiftedSamples;
@@ -95,13 +107,14 @@ namespace math
         this->normalSamples = shiftedNormalSamples;
     }
 
-
-    float GaussianImplicitSurface3DCombined::Get(Eigen::Vector3f pos)
+    float
+    GaussianImplicitSurface3DCombined::Get(Eigen::Vector3f pos)
     {
         return Predict(pos);
     }
 
-    Eigen::VectorXd GaussianImplicitSurface3DCombined::getCux(const Eigen::Vector3f& pos)
+    Eigen::VectorXd
+    GaussianImplicitSurface3DCombined::getCux(const Eigen::Vector3f& pos)
     {
         Eigen::VectorXd Cux(samples.size() + normalSamples.size() * 4);
         for (std::size_t i = 0; i < samples.size(); i++)
@@ -112,23 +125,34 @@ namespace math
         for (std::size_t i = 0; i < normalSamples.size(); i++)
         {
             Cux(samples.size() + i * 4) = kernel->Kernel(pos, normalSamples[i].Position(), R);
-            Cux(samples.size() + i * 4 + 1) = kernel->Kernel_dj(pos, normalSamples[i].Position(), R, 0);
-            Cux(samples.size() + i * 4 + 2) = kernel->Kernel_dj(pos, normalSamples[i].Position(), R, 1);
-            Cux(samples.size() + i * 4 + 3) = kernel->Kernel_dj(pos, normalSamples[i].Position(), R, 2);
+            Cux(samples.size() + i * 4 + 1) =
+                kernel->Kernel_dj(pos, normalSamples[i].Position(), R, 0);
+            Cux(samples.size() + i * 4 + 2) =
+                kernel->Kernel_dj(pos, normalSamples[i].Position(), R, 1);
+            Cux(samples.size() + i * 4 + 3) =
+                kernel->Kernel_dj(pos, normalSamples[i].Position(), R, 2);
         }
         return Cux;
     }
 
-    float GaussianImplicitSurface3DCombined::Predict(const Eigen::Vector3f& pos)
+    float
+    GaussianImplicitSurface3DCombined::Predict(const Eigen::Vector3f& pos)
     {
         Eigen::VectorXd Cux(samples.size() + normalSamples.size() * 4);
         Cux = getCux(pos);
         return Cux.dot(alpha);
     }
 
-    void GaussianImplicitSurface3DCombined::CalculateCovariance(const std::vector<Eigen::Vector3f>& points, const std::vector<Eigen::Vector3f>& normalPoints, float R, const std::vector<float>& noise, float normalNoise)
+    void
+    GaussianImplicitSurface3DCombined::CalculateCovariance(
+        const std::vector<Eigen::Vector3f>& points,
+        const std::vector<Eigen::Vector3f>& normalPoints,
+        float R,
+        const std::vector<float>& noise,
+        float normalNoise)
     {
-        covariance = Eigen::MatrixXd(points.size() + normalPoints.size() * 4, points.size() + normalPoints.size() * 4);
+        covariance = Eigen::MatrixXd(points.size() + normalPoints.size() * 4,
+                                     points.size() + normalPoints.size() * 4);
 
         // Just points
         for (size_t i = 0; i < points.size(); i++)
@@ -146,7 +170,8 @@ namespace math
         {
             for (size_t j = i; j < normalPoints.size() * 4; j++)
             {
-                const float cov = kernel->Kernel(normalPoints[i / 4], normalPoints[j / 4], R, i % 4, j % 4);
+                const float cov =
+                    kernel->Kernel(normalPoints[i / 4], normalPoints[j / 4], R, i % 4, j % 4);
                 covariance(points.size() + i, points.size() + j) = cov;
                 covariance(points.size() + j, points.size() + i) = cov;
             }
@@ -173,11 +198,13 @@ namespace math
         for (size_t i = 0; i < normalPoints.size(); i++)
         {
             // TODO: fix normalNoise
-            covariance(points.size() + i, points.size() + i) += (i % 4 == 0 ? normalNoise* normalNoise : normalNoise * normalNoise);
+            covariance(points.size() + i, points.size() + i) +=
+                (i % 4 == 0 ? normalNoise * normalNoise : normalNoise * normalNoise);
         }
     }
 
-    float GaussianImplicitSurface3DCombined::GetVariance(const Eigen::Vector3f& pos)
+    float
+    GaussianImplicitSurface3DCombined::GetVariance(const Eigen::Vector3f& pos)
     {
         Eigen::VectorXd Cux(4 * samples.size());
         Cux = getCux(pos);
@@ -185,10 +212,11 @@ namespace math
         return kernel->Kernel(pos, pos, R) - Cux.dot(covariance_inv * Cux);
     }
 
-    void GaussianImplicitSurface3DCombined::MatrixInvert(const Eigen::VectorXd& b)
+    void
+    GaussianImplicitSurface3DCombined::MatrixInvert(const Eigen::VectorXd& b)
     {
         Eigen::ColPivHouseholderQR<Eigen::MatrixXd> qr = covariance.colPivHouseholderQr();
         covariance_inv = qr.inverse();
         alpha = covariance_inv * b;
     }
-}
+} // namespace math

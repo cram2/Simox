@@ -1,46 +1,46 @@
 
 #include "CoinConvexHullVisualization.h"
+
 #include "../../ConvexHullGenerator.h"
-
-#include <Inventor/SoPrimitiveVertex.h>
 #include <Inventor/SbLinear.h>
-#include <Inventor/nodes/SoShape.h>
+#include <Inventor/SoPrimitiveVertex.h>
 #include <Inventor/actions/SoCallbackAction.h>
-#include <Inventor/nodes/SoSeparator.h>
-#include <Inventor/nodes/SoMatrixTransform.h>
-#include <Inventor/nodes/SoScale.h>
-#include <Inventor/nodes/SoNormal.h>
-
-
-#include <Inventor/nodes/SoComplexity.h>
-#include <Inventor/nodes/SoMaterial.h>
-#include <Inventor/nodes/SoDrawStyle.h>
-#include <Inventor/nodes/SoLineSet.h>
-#include <Inventor/nodes/SoFaceSet.h>
-
-#include <Inventor/nodes/SoCoordinate3.h>
-#include <Inventor/nodes/SoSphere.h>
 #include <Inventor/nodes/SoBaseColor.h>
+#include <Inventor/nodes/SoComplexity.h>
+#include <Inventor/nodes/SoCoordinate3.h>
+#include <Inventor/nodes/SoDrawStyle.h>
+#include <Inventor/nodes/SoFaceSet.h>
+#include <Inventor/nodes/SoLineSet.h>
+#include <Inventor/nodes/SoMaterial.h>
+#include <Inventor/nodes/SoMatrixTransform.h>
+#include <Inventor/nodes/SoNormal.h>
+#include <Inventor/nodes/SoScale.h>
+#include <Inventor/nodes/SoSeparator.h>
+#include <Inventor/nodes/SoShape.h>
+#include <Inventor/nodes/SoSphere.h>
 #include <Inventor/nodes/SoTranslation.h>
 #include <Inventor/nodes/SoUnits.h>
-
 
 namespace GraspStudio
 {
 
-    CoinConvexHullVisualization::CoinConvexHullVisualization(VirtualRobot::MathTools::ConvexHull6DPtr convHull, bool useFirst3Coords) :
+    CoinConvexHullVisualization::CoinConvexHullVisualization(
+        VirtualRobot::MathTools::ConvexHull6DPtr convHull,
+        bool useFirst3Coords) :
         ConvexHullVisualization(convHull, useFirst3Coords)
     {
         buildVisu();
     }
 
-    CoinConvexHullVisualization::CoinConvexHullVisualization(VirtualRobot::MathTools::ConvexHull3DPtr convHull) :
+    CoinConvexHullVisualization::CoinConvexHullVisualization(
+        VirtualRobot::MathTools::ConvexHull3DPtr convHull) :
         ConvexHullVisualization(convHull)
     {
         buildVisu();
     }
 
-    void CoinConvexHullVisualization::buildVisu()
+    void
+    CoinConvexHullVisualization::buildVisu()
     {
         visualization = new SoSeparator();
         visualization->ref();
@@ -53,7 +53,6 @@ namespace GraspStudio
             {
                 visualization->addChild(vi);
             }
-
         }
 
         if (convHull6D)
@@ -77,21 +76,20 @@ namespace GraspStudio
         {
             visualization->unref();
         }
-
     }
-
-
 
     /**
      * This mehtod returns the internal CoinConvexHullVisualization::visualization.
      */
-    SoSeparator* CoinConvexHullVisualization::getCoinVisualization()
+    SoSeparator*
+    CoinConvexHullVisualization::getCoinVisualization()
     {
         return visualization;
     }
 
-
-    SoSeparator* CoinConvexHullVisualization::createConvexHullVisualization(VirtualRobot::MathTools::ConvexHull3DPtr& convHull)
+    SoSeparator*
+    CoinConvexHullVisualization::createConvexHullVisualization(
+        VirtualRobot::MathTools::ConvexHull3DPtr& convHull)
     {
         SoSeparator* result = new SoSeparator;
 
@@ -184,8 +182,10 @@ namespace GraspStudio
         return result;
     }
 
-
-    SoSeparator* CoinConvexHullVisualization::createConvexHullVisualization(VirtualRobot::MathTools::ConvexHull6DPtr& convHull, bool buseFirst3Coords)
+    SoSeparator*
+    CoinConvexHullVisualization::createConvexHullVisualization(
+        VirtualRobot::MathTools::ConvexHull6DPtr& convHull,
+        bool buseFirst3Coords)
     {
         SoSeparator* result = new SoSeparator;
 
@@ -220,22 +220,23 @@ namespace GraspStudio
                 if (buseFirst3Coords)
                 {
                     //v[j] = convHull->vertices.at(convHull->faces[i].id[j]).p;
-                    vProjectedPoints.push_back(convHull->vertices[ j ].p);
+                    vProjectedPoints.push_back(convHull->vertices[j].p);
                 }
                 else
                 {
                     //v[j] = convHull->vertices.at(convHull->faces[i].id[j]).n;
-                    vProjectedPoints.push_back(convHull->vertices[ j ].n);
+                    vProjectedPoints.push_back(convHull->vertices[j].n);
                 }
-
             }
         }
 
-        VirtualRobot::MathTools::ConvexHull3DPtr projectedHull = ConvexHullGenerator::CreateConvexHull(vProjectedPoints);
+        VirtualRobot::MathTools::ConvexHull3DPtr projectedHull =
+            ConvexHullGenerator::CreateConvexHull(vProjectedPoints);
 
         if (!projectedHull)
         {
-            GRASPSTUDIO_ERROR << " Could not create hull of projected points, aborting..." << std::endl;
+            GRASPSTUDIO_ERROR << " Could not create hull of projected points, aborting..."
+                              << std::endl;
             return result;
         }
 
@@ -243,7 +244,8 @@ namespace GraspStudio
 
         if (!hullV)
         {
-            GRASPSTUDIO_ERROR << " Could not create visualization of projected points, aborting..." << std::endl;
+            GRASPSTUDIO_ERROR << " Could not create visualization of projected points, aborting..."
+                              << std::endl;
             return result;
         }
 
@@ -253,4 +255,4 @@ namespace GraspStudio
     }
 
 
-}
+} // namespace GraspStudio

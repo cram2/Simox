@@ -22,19 +22,11 @@
 */
 #pragma once
 
-#include "WorkspaceData.h"
-#include "../VirtualRobot.h"
-#include "../Compression/CompressionBZip2.h"
-
-
-
-
-
-#include <vector>
-
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
+#include "../VirtualRobot.h"
+#include "WorkspaceData.h"
 
 namespace VirtualRobot
 {
@@ -42,14 +34,21 @@ namespace VirtualRobot
         Stores a 6-dimensional array for the vertex data of a workspace representation.
         Internally unsigned char data types are used (0...255)
     */
-    class VIRTUAL_ROBOT_IMPORT_EXPORT WorkspaceDataArray : public WorkspaceData, public std::enable_shared_from_this<WorkspaceDataArray>
+    class VIRTUAL_ROBOT_IMPORT_EXPORT WorkspaceDataArray :
+        public WorkspaceData,
+        public std::enable_shared_from_this<WorkspaceDataArray>
     {
     public:
         /*!
             Constructor, fills the data with 0
         */
-        WorkspaceDataArray(unsigned int size1, unsigned int size2, unsigned int size3,
-                           unsigned int size4, unsigned int size5, unsigned int size6, bool adjustOnOverflow);
+        WorkspaceDataArray(unsigned int size1,
+                           unsigned int size2,
+                           unsigned int size3,
+                           unsigned int size4,
+                           unsigned int size5,
+                           unsigned int size6,
+                           bool adjustOnOverflow);
 
         //! Clone other data structure
         WorkspaceDataArray(WorkspaceDataArray* other);
@@ -63,25 +62,38 @@ namespace VirtualRobot
         unsigned int getSizeTr() const override;
         unsigned int getSizeRot() const override;
 
-        void setDatum(float x[], unsigned char value, const WorkspaceRepresentation* workspace) override;
+        void
+        setDatum(float x[], unsigned char value, const WorkspaceRepresentation* workspace) override;
 
-        void setDatum(unsigned int x0, unsigned int x1, unsigned int x2,
-                             unsigned int x3, unsigned int x4, unsigned int x5, unsigned char value) override;
+        void setDatum(unsigned int x0,
+                      unsigned int x1,
+                      unsigned int x2,
+                      unsigned int x3,
+                      unsigned int x4,
+                      unsigned int x5,
+                      unsigned char value) override;
 
         inline void setDatum(unsigned int x[6], unsigned char value) override;
 
-        void setDatumCheckNeighbors(unsigned int x[6], unsigned char value, unsigned int neighborVoxels) override;
+        void setDatumCheckNeighbors(unsigned int x[6],
+                                    unsigned char value,
+                                    unsigned int neighborVoxels) override;
 
         void increaseDatum(float x[], const WorkspaceRepresentation* workspace) override;
 
-        inline void increaseDatum(unsigned int x0, unsigned int x1, unsigned int x2,
-                                  unsigned int x3, unsigned int x4, unsigned int x5);
+        inline void increaseDatum(unsigned int x0,
+                                  unsigned int x1,
+                                  unsigned int x2,
+                                  unsigned int x3,
+                                  unsigned int x4,
+                                  unsigned int x5);
 
         inline void increaseDatum(unsigned int x[6]);
         /*!
             Set rotation data for given x,y,z position.
         */
-        void setDataRot(unsigned char* data, unsigned int x, unsigned int y, unsigned int z) override;
+        void
+        setDataRot(unsigned char* data, unsigned int x, unsigned int y, unsigned int z) override;
         /*!
             Get rotation data for given x,y,z position.
         */
@@ -92,8 +104,12 @@ namespace VirtualRobot
         int getMaxSummedAngleReachablity();
 
         //! Simulates a multi-dimensional array access
-        inline unsigned char get(unsigned int x0, unsigned int x1, unsigned int x2,
-                                 unsigned int x3, unsigned int x4, unsigned int x5) override;
+        inline unsigned char get(unsigned int x0,
+                                 unsigned int x1,
+                                 unsigned int x2,
+                                 unsigned int x3,
+                                 unsigned int x4,
+                                 unsigned int x5) override;
 
         //! Simulates a multi-dimensional array access
         inline unsigned char get(unsigned int x[6]) override;
@@ -106,12 +122,14 @@ namespace VirtualRobot
 
         void bisectData() override;
 
-        unsigned int getSize(int dim) override
+        unsigned int
+        getSize(int dim) override
         {
             return sizes[dim];
         }
 
-        unsigned char** getRawData() override
+        unsigned char**
+        getRawData() override
         {
             return data;
         }
@@ -121,22 +139,29 @@ namespace VirtualRobot
         bool save(std::ofstream& file) override;
 
         void reset(int x, int y, int z) override;
-    protected:
 
+    protected:
         void ensureData(unsigned int x, unsigned int y, unsigned int z);
         int sumAngleReachabilities(int x0, int x1, int x2);
 
-        inline void getPos(unsigned int x0, unsigned int x1, unsigned int x2,
-                           unsigned int x3, unsigned int x4, unsigned int x5 ,
-                           unsigned int& storePosTr, unsigned int& storePosRot) const
+        inline void
+        getPos(unsigned int x0,
+               unsigned int x1,
+               unsigned int x2,
+               unsigned int x3,
+               unsigned int x4,
+               unsigned int x5,
+               unsigned int& storePosTr,
+               unsigned int& storePosRot) const
         {
-            storePosTr  = x0 * sizeTr0  + x1 * sizeTr1  + x2;
+            storePosTr = x0 * sizeTr0 + x1 * sizeTr1 + x2;
             storePosRot = x3 * sizeRot0 + x4 * sizeRot1 + x5;
         }
 
-        inline void getPos(unsigned int x[6], unsigned int& storePosTr, unsigned int& storePosRot) const
+        inline void
+        getPos(unsigned int x[6], unsigned int& storePosTr, unsigned int& storePosRot) const
         {
-            storePosTr  = x[0] * sizeTr0  + x[1] * sizeTr1  + x[2];
+            storePosTr = x[0] * sizeTr0 + x[1] * sizeTr1 + x[2];
             storePosRot = x[3] * sizeRot0 + x[4] * sizeRot1 + x[5];
         }
 
@@ -148,6 +173,4 @@ namespace VirtualRobot
     };
 
 
-
 } // namespace VirtualRobot
-

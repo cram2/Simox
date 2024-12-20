@@ -1,43 +1,44 @@
 
 #include "stabilityWindow.h"
+
+#include "VirtualRobot/BoundingBox.h"
+#include "VirtualRobot/CollisionDetection/CollisionChecker.h"
 #include "VirtualRobot/EndEffector/EndEffector.h"
-#include "VirtualRobot/Workspace/Reachability.h"
-#include "VirtualRobot/XML/RobotIO.h"
+#include "VirtualRobot/IK/CoMIK.h"
+#include "VirtualRobot/Logging.h"
 #include "VirtualRobot/Visualization/CoinVisualization/CoinVisualizationFactory.h"
 #include "VirtualRobot/Visualization/CoinVisualization/CoinVisualizationNode.h"
-#include "VirtualRobot/CollisionDetection/CollisionChecker.h"
-#include "VirtualRobot/BoundingBox.h"
-#include "VirtualRobot/IK/CoMIK.h"
+#include "VirtualRobot/Workspace/Reachability.h"
+#include "VirtualRobot/XML/RobotIO.h"
 
 #ifdef USE_NLOPT
 #include "VirtualRobot/IK/ConstrainedOptimizationIK.h"
 #include "VirtualRobot/IK/constraints/CoMConstraint.h"
 #endif
 
+#include <cmath>
+#include <ctime>
+#include <iostream>
+#include <sstream>
+#include <vector>
+
 #include <QFileDialog>
+
 #include <Eigen/Geometry>
 
-#include <ctime>
-#include <vector>
-#include <iostream>
-#include <cmath>
-
 #include "Inventor/actions/SoLineHighlightRenderAction.h"
-#include <Inventor/nodes/SoShapeHints.h>
-#include <Inventor/nodes/SoLightModel.h>
 #include <Inventor/nodes/SoCube.h>
-#include <Inventor/nodes/SoMatrixTransform.h>
+#include <Inventor/nodes/SoLightModel.h>
 #include <Inventor/nodes/SoMaterial.h>
+#include <Inventor/nodes/SoMatrixTransform.h>
+#include <Inventor/nodes/SoShapeHints.h>
 #include <Inventor/nodes/SoSphere.h>
-
-#include <sstream>
 using namespace std;
 using namespace VirtualRobot;
 
 float TIMER_MS = 30.0f;
 
-stabilityWindow::stabilityWindow(std::string& sRobotFile)
-    : QMainWindow(nullptr)
+stabilityWindow::stabilityWindow(std::string& sRobotFile) : QMainWindow(nullptr)
 {
     VR_INFO << " start " << std::endl;
 
@@ -57,8 +58,9 @@ stabilityWindow::stabilityWindow(std::string& sRobotFile)
     supportVisu = new SoSeparator;
     sceneSep->addChild(supportVisu);
 
-    MathTools::Plane p =  MathTools::getFloorPlane();
-    sceneSep->addChild(CoinVisualizationFactory::CreatePlaneVisualization(p.p, p.n, 10000.0f, 0.0f));
+    MathTools::Plane p = MathTools::getFloorPlane();
+    sceneSep->addChild(
+        CoinVisualizationFactory::CreatePlaneVisualization(p.p, p.n, 10000.0f, 0.0f));
 
     m_CoMTarget = Eigen::Vector2f::Zero();
 
@@ -69,14 +71,13 @@ stabilityWindow::stabilityWindow(std::string& sRobotFile)
     m_pExViewer->viewAll();
 }
 
-
 stabilityWindow::~stabilityWindow()
 {
     sceneSep->unref();
 }
 
-
-void stabilityWindow::setupUI()
+void
+stabilityWindow::setupUI()
 {
     UI.setupUi(this);
     m_pExViewer = new SoQtExaminerViewer(UI.frameViewer, "", TRUE, SoQtExaminerViewer::BUILD_POPUP);
@@ -109,7 +110,8 @@ void stabilityWindow::setupUI()
     connect(UI.sliderY, SIGNAL(valueChanged(int)), this, SLOT(comTargetMovedY(int)));
 }
 
-QString stabilityWindow::formatString(const char* s, float f)
+QString
+stabilityWindow::formatString(const char* s, float f)
 {
     QString str1(s);
 
@@ -139,23 +141,22 @@ QString stabilityWindow::formatString(const char* s, float f)
     return str1;
 }
 
-
-void stabilityWindow::resetSceneryAll()
+void
+stabilityWindow::resetSceneryAll()
 {
     if (!robot)
     {
         return;
     }
 
-    std::vector< RobotNodePtr > nodes;
+    std::vector<RobotNodePtr> nodes;
     robot->getRobotNodes(nodes);
     std::vector<float> jv(nodes.size(), 0.0f);
     robot->setJointValues(nodes, jv);
 }
 
-
-
-void stabilityWindow::collisionModel()
+void
+stabilityWindow::collisionModel()
 {
     if (!robot)
     {
@@ -165,7 +166,8 @@ void stabilityWindow::collisionModel()
     buildVisu();
 }
 
-void stabilityWindow::showSupportPolygon()
+void
+stabilityWindow::showSupportPolygon()
 {
     if (!robot)
     {
@@ -175,7 +177,8 @@ void stabilityWindow::showSupportPolygon()
     updateSupportVisu();
 }
 
-void stabilityWindow::showCoM()
+void
+stabilityWindow::showCoM()
 {
     if (!robot)
     {
@@ -184,14 +187,16 @@ void stabilityWindow::showCoM()
 
     buildVisu();
 }
-void stabilityWindow::closeEvent(QCloseEvent* event)
+
+void
+stabilityWindow::closeEvent(QCloseEvent* event)
 {
     quit();
     QMainWindow::closeEvent(event);
 }
 
-
-void stabilityWindow::buildVisu()
+void
+stabilityWindow::buildVisu()
 {
     if (!robot)
     {
@@ -200,8 +205,9 @@ void stabilityWindow::buildVisu()
 
     robotVisuSep->removeAllChildren();
     useColModel = UI.checkBoxColModel->checkState() == Qt::Checked;
-    SceneObject::VisualizationType colModel = (UI.checkBoxColModel->isChecked()) ? SceneObject::Collision : SceneObject::Full;
-    visualization = robot->getVisualization<CoinVisualization>(colModel);
+    SceneObject::VisualizationType colModel =
+        (UI.checkBoxColModel->isChecked()) ? SceneObject::Collision : SceneObject::Full;
+    visualization = robot->getVisualization(colModel);
     SoNode* visualisationNode = nullptr;
 
     if (visualization)
@@ -266,10 +272,10 @@ void stabilityWindow::buildVisu()
     updateSupportVisu();
 
     m_pExViewer->scheduleRedraw();
-
 }
 
-void stabilityWindow::updateCoM()
+void
+stabilityWindow::updateCoM()
 {
     if (!comVisu || comVisu->getNumChildren() == 0)
     {
@@ -319,8 +325,8 @@ void stabilityWindow::updateCoM()
     }
 }
 
-
-void stabilityWindow::updateSupportVisu()
+void
+stabilityWindow::updateSupportVisu()
 {
     supportVisu->removeAllChildren();
 
@@ -330,15 +336,15 @@ void stabilityWindow::updateSupportVisu()
         material->diffuseColor.setValue(1.0f,0.2f,0.2f);
         supportVisu->addChild(material);*/
 
-        MathTools::Plane p =  MathTools::getFloorPlane();
+        MathTools::Plane p = MathTools::getFloorPlane();
 
         //supportVisu->addChild(CoinVisualizationFactory::CreatePlaneVisualization(p.p,p.n,100000.0f,0.5f));
 
-        std::vector< CollisionModelPtr > colModels =  robot->getCollisionModels();
+        std::vector<CollisionModelPtr> colModels = robot->getCollisionModels();
         CollisionCheckerPtr colChecker = CollisionChecker::getGlobalCollisionChecker();
-        std::vector< CollisionModelPtr >::iterator i = colModels.begin();
+        std::vector<CollisionModelPtr>::iterator i = colModels.begin();
 
-        std::vector< MathTools::ContactPoint > points;
+        std::vector<MathTools::ContactPoint> points;
 
         while (i != colModels.end())
         {
@@ -346,10 +352,10 @@ void stabilityWindow::updateSupportVisu()
             i++;
         }
 
-        std::vector< Eigen::Vector2f > points2D;
+        std::vector<Eigen::Vector2f> points2D;
 
         //MathTools::Plane plane2(Eigen::Vector3f(0,0,0),Eigen::Vector3f(0,1.0f,0));
-        for (auto & point : points)
+        for (auto& point : points)
         {
 
             Eigen::Vector2f pt2d = MathTools::projectPointToPlane2D(point.p, p);
@@ -357,21 +363,28 @@ void stabilityWindow::updateSupportVisu()
         }
 
         MathTools::ConvexHull2DPtr cv = MathTools::createConvexHull2D(points2D);
-        SoSeparator* visu = CoinVisualizationFactory::CreateConvexHull2DVisualization(cv, p, VisualizationFactory::Color::Blue(), VisualizationFactory::Color::Black(), 6.0f, Eigen::Vector3f(0, 0, 2.0f));
+        SoSeparator* visu = CoinVisualizationFactory::CreateConvexHull2DVisualization(
+            cv,
+            p,
+            VisualizationFactory::Color::Blue(),
+            VisualizationFactory::Color::Black(),
+            6.0f,
+            Eigen::Vector3f(0, 0, 2.0f));
         supportVisu->addChild(visu);
     }
 }
 
-void stabilityWindow::updateRNSBox()
+void
+stabilityWindow::updateRNSBox()
 {
     UI.comboBoxRNS->clear();
     UI.comboBoxRNS->addItem(QString("<All>"));
 
-    std::vector < VirtualRobot::RobotNodeSetPtr > allRNS;
+    std::vector<VirtualRobot::RobotNodeSetPtr> allRNS;
     robot->getRobotNodeSets(allRNS);
     robotNodeSets.clear();
 
-    for (auto & i : allRNS)
+    for (auto& i : allRNS)
     {
         //if (allRNS[i]->isKinematicChain())
         //{
@@ -385,7 +398,7 @@ void stabilityWindow::updateRNSBox()
     }
 
 
-    for (auto & allRobotNode : allRobotNodes)
+    for (auto& allRobotNode : allRobotNodes)
     {
         allRobotNode->showBoundingBox(false);
     }
@@ -394,7 +407,8 @@ void stabilityWindow::updateRNSBox()
     updateJointBox();
 }
 
-void stabilityWindow::selectRNS(int nr)
+void
+stabilityWindow::selectRNS(int nr)
 {
     currentRobotNodeSet.reset();
     std::cout << "Selecting RNS nr " << nr << std::endl;
@@ -427,27 +441,28 @@ void stabilityWindow::selectRNS(int nr)
     updateCoM();
 }
 
-int stabilityWindow::main()
+int
+stabilityWindow::main()
 {
     SoQt::show(this);
     SoQt::mainLoop();
     return 0;
 }
 
-
-void stabilityWindow::quit()
+void
+stabilityWindow::quit()
 {
     std::cout << "stabilityWindow: Closing" << std::endl;
     this->close();
     SoQt::exitMainLoop();
 }
 
-
-void stabilityWindow::updateJointBox()
+void
+stabilityWindow::updateJointBox()
 {
     UI.comboBoxJoint->clear();
 
-    for (auto & currentRobotNode : currentRobotNodes)
+    for (auto& currentRobotNode : currentRobotNodes)
     {
         UI.comboBoxJoint->addItem(QString(currentRobotNode->getName().c_str()));
     }
@@ -455,7 +470,8 @@ void stabilityWindow::updateJointBox()
     selectJoint(0);
 }
 
-void stabilityWindow::jointValueChanged(int pos)
+void
+stabilityWindow::jointValueChanged(int pos)
 {
     int nr = UI.comboBoxJoint->currentIndex();
 
@@ -464,7 +480,10 @@ void stabilityWindow::jointValueChanged(int pos)
         return;
     }
 
-    float fPos = currentRobotNodes[nr]->getJointLimitLo() + (float)pos / 1000.0f * (currentRobotNodes[nr]->getJointLimitHi() - currentRobotNodes[nr]->getJointLimitLo());
+    float fPos =
+        currentRobotNodes[nr]->getJointLimitLo() +
+        (float)pos / 1000.0f *
+            (currentRobotNodes[nr]->getJointLimitHi() - currentRobotNodes[nr]->getJointLimitLo());
     robot->setJointValue(currentRobotNodes[nr], fPos);
     UI.lcdNumberJointValue->display((double)fPos);
 
@@ -486,9 +505,8 @@ void stabilityWindow::jointValueChanged(int pos)
     }
 }
 
-
-
-void stabilityWindow::selectJoint(int nr)
+void
+stabilityWindow::selectJoint(int nr)
 {
     currentRobotNode.reset();
     std::cout << "Selecting Joint nr " << nr << std::endl;
@@ -509,7 +527,8 @@ void stabilityWindow::selectJoint(int nr)
     float j = currentRobotNode->getJointValue();
     UI.lcdNumberJointValue->display((double)j);
 
-    if (fabs(ma - mi) > 0 && (currentRobotNode->isTranslationalJoint() || currentRobotNode->isRotationalJoint()))
+    if (fabs(ma - mi) > 0 &&
+        (currentRobotNode->isTranslationalJoint() || currentRobotNode->isRotationalJoint()))
     {
         UI.horizontalSliderPos->setEnabled(true);
         int pos = (int)((j - mi) / (ma - mi) * 1000.0f);
@@ -522,14 +541,17 @@ void stabilityWindow::selectJoint(int nr)
     }
 }
 
-void stabilityWindow::selectRobot()
+void
+stabilityWindow::selectRobot()
 {
-    QString fi = QFileDialog::getOpenFileName(this, tr("Open Robot File"), QString(), tr("XML Files (*.xml)"));
+    QString fi = QFileDialog::getOpenFileName(
+        this, tr("Open Robot File"), QString(), tr("XML Files (*.xml)"));
     robotFile = std::string(fi.toLatin1());
     loadRobot();
 }
 
-void stabilityWindow::loadRobot()
+void
+stabilityWindow::loadRobot()
 {
     robotVisuSep->removeAllChildren();
     std::cout << "Loading Scene from " << robotFile << std::endl;
@@ -571,7 +593,8 @@ void stabilityWindow::loadRobot()
     m_pExViewer->viewAll();
 }
 
-void stabilityWindow::performCoMIK()
+void
+stabilityWindow::performCoMIK()
 {
     if (!currentRobotNodeSet)
     {
@@ -579,12 +602,14 @@ void stabilityWindow::performCoMIK()
     }
 
 #ifdef USE_NLOPT
-    ConstrainedOptimizationIKPtr ik(new ConstrainedOptimizationIK(robot, currentRobotNodeSet, 0.01));
-    CoMConstraintPtr comConstraint(new CoMConstraint(robot, currentRobotNodeSet, currentRobotNodeSet, m_CoMTarget, 5.0f));
+    ConstrainedOptimizationIKPtr ik(
+        new ConstrainedOptimizationIK(robot, currentRobotNodeSet, 0.01));
+    CoMConstraintPtr comConstraint(
+        new CoMConstraint(robot, currentRobotNodeSet, currentRobotNodeSet, m_CoMTarget, 5.0f));
     ik->addConstraint(comConstraint);
     ik->initialize();
 
-    if(!ik->solve())
+    if (!ik->solve())
     {
         std::cout << "IK solver did not succeed" << std::endl;
     }
@@ -602,7 +627,8 @@ void stabilityWindow::performCoMIK()
     updateCoM();
 }
 
-void stabilityWindow::comTargetMovedX(int value)
+void
+stabilityWindow::comTargetMovedX(int value)
 {
     if (!currentRobotNodeSet)
     {
@@ -633,7 +659,8 @@ void stabilityWindow::comTargetMovedX(int value)
     performCoMIK();
 }
 
-void stabilityWindow::comTargetMovedY(int value)
+void
+stabilityWindow::comTargetMovedY(int value)
 {
     Eigen::Matrix4f T;
     T.setIdentity();

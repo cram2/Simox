@@ -22,44 +22,49 @@
 */
 #pragma once
 
-#include "../VirtualRobot.h"
-#include "WorkspaceRepresentation.h"
-
-
-
-
-
-#include <vector>
-
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
+#include "../VirtualRobot.h"
+#include "WorkspaceRepresentation.h"
 
 namespace VirtualRobot
 {
     class WorkspaceRepresentation;
+
     /*!
         Stores a 6-dimensional array for the vertex data of a workspace representation.
         Internally unsigned char data types are used (0...255)
     */
 
-    class VIRTUAL_ROBOT_IMPORT_EXPORT WorkspaceData : public std::enable_shared_from_this<WorkspaceData>
+    class VIRTUAL_ROBOT_IMPORT_EXPORT WorkspaceData :
+        public std::enable_shared_from_this<WorkspaceData>
     {
     public:
-        virtual ~WorkspaceData() {}
+        virtual ~WorkspaceData()
+        {
+        }
 
         //! Return the amount of data in bytes
         virtual unsigned int getSizeTr() const = 0;
         virtual unsigned int getSizeRot() const = 0;
 
-        virtual void setDatum(float x[], unsigned char value, const WorkspaceRepresentation* workspace) = 0;
+        virtual void
+        setDatum(float x[], unsigned char value, const WorkspaceRepresentation* workspace) = 0;
 
-        virtual void setDatum(unsigned int x0, unsigned int x1, unsigned int x2,
-                              unsigned int x3, unsigned int x4, unsigned int x5, unsigned char value) = 0;
+        virtual void setDatum(unsigned int x0,
+                              unsigned int x1,
+                              unsigned int x2,
+                              unsigned int x3,
+                              unsigned int x4,
+                              unsigned int x5,
+                              unsigned char value) = 0;
 
         virtual void setDatum(unsigned int x[6], unsigned char value) = 0;
 
-        virtual void setDatumCheckNeighbors(unsigned int x[6], unsigned char value, unsigned int neighborVoxels) = 0;
+        virtual void setDatumCheckNeighbors(unsigned int x[6],
+                                            unsigned char value,
+                                            unsigned int neighborVoxels) = 0;
 
         virtual void increaseDatum(float x[], const WorkspaceRepresentation* workspace) = 0;
 
@@ -72,7 +77,8 @@ namespace VirtualRobot
         /*!
             Set rotation data for given x,y,z position.
         */
-        virtual void setDataRot(unsigned char* data, unsigned int x, unsigned int y, unsigned int z) = 0;
+        virtual void
+        setDataRot(unsigned char* data, unsigned int x, unsigned int y, unsigned int z) = 0;
         /*!
             Get rotation data for given x,y,z position.
         */
@@ -83,8 +89,12 @@ namespace VirtualRobot
         virtual unsigned char get(float x[], const WorkspaceRepresentation* workspace) = 0;
 
         //! Simulates a multi-dimensional array access
-        virtual unsigned char get(unsigned int x0, unsigned int x1, unsigned int x2,
-                                  unsigned int x3, unsigned int x4, unsigned int x5) = 0;
+        virtual unsigned char get(unsigned int x0,
+                                  unsigned int x1,
+                                  unsigned int x2,
+                                  unsigned int x3,
+                                  unsigned int x4,
+                                  unsigned int x5) = 0;
 
         //! Simulates a multi-dimensional array access
         virtual unsigned char get(unsigned int x[6]) = 0;
@@ -104,28 +114,33 @@ namespace VirtualRobot
 
         virtual bool save(std::ofstream& file) = 0;
 
-        virtual void setVoxelFilledCount(int c)
+        virtual void
+        setVoxelFilledCount(int c)
         {
             voxelFilledCount = c;
         }
 
-        virtual unsigned char getMaxEntry()
+        virtual unsigned char
+        getMaxEntry()
         {
             return maxEntry;
         }
 
-        virtual void setMaxEntry(unsigned char m)
+        virtual void
+        setMaxEntry(unsigned char m)
         {
             maxEntry = m;
         }
 
-        virtual unsigned int getVoxelFilledCount() const
+        virtual unsigned int
+        getVoxelFilledCount() const
         {
             return voxelFilledCount;
         }
 
         //! Min valid value is 1 by default. In cases some values are needed to indicate special flags (e.g. stability) the minimum valid number can be set here
-        virtual void setMinValidValue(unsigned char v)
+        virtual void
+        setMinValidValue(unsigned char v)
         {
             minValidValue = v;
         }
@@ -134,14 +149,11 @@ namespace VirtualRobot
 
 
     protected:
-
         unsigned char minValidValue;
 
         unsigned char maxEntry;
         unsigned int voxelFilledCount;
         bool adjustOnOverflow;
-
     };
 
 } // namespace VirtualRobot
-

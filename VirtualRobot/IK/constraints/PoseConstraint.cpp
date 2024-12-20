@@ -23,19 +23,28 @@
 
 #include "PoseConstraint.h"
 
-#include <VirtualRobot/Robot.h>
+#include <iostream>
 
 #include <Eigen/Dense>
 
-#include <iostream>
+#include <VirtualRobot/Robot.h>
+
+#include "Logging.h"
+#include "Nodes/RobotNode.h"
+#include "RobotNodeSet.h"
 
 using namespace VirtualRobot;
 
-#define POSITION_COMPONENT      0
-#define ORIENTATION_COMPONENT   1
+#define POSITION_COMPONENT 0
+#define ORIENTATION_COMPONENT 1
 
-PoseConstraint::PoseConstraint(const RobotPtr& robot, const RobotNodeSetPtr& nodeSet, const SceneObjectPtr& eef, const Eigen::Matrix4f& target, IKSolver::CartesianSelection cartesianSelection,
-                               float tolerancePosition, float toleranceRotation) :
+PoseConstraint::PoseConstraint(const RobotPtr& robot,
+                               const RobotNodeSetPtr& nodeSet,
+                               const SceneObjectPtr& eef,
+                               const Eigen::Matrix4f& target,
+                               IKSolver::CartesianSelection cartesianSelection,
+                               float tolerancePosition,
+                               float toleranceRotation) :
     Constraint(nodeSet),
     robot(robot),
     nodeSet(nodeSet),
@@ -57,37 +66,44 @@ PoseConstraint::PoseConstraint(const RobotPtr& robot, const RobotNodeSetPtr& nod
     name = "PoseConstraint";
 }
 
-void PoseConstraint::setVisualization(const SceneObjectSetPtr& visualizationNodeSet)
+void
+PoseConstraint::setVisualization(const SceneObjectSetPtr& visualizationNodeSet)
 {
     this->visualizationNodeSet = visualizationNodeSet;
 }
 
-Eigen::MatrixXf PoseConstraint::getJacobianMatrix()
+Eigen::MatrixXf
+PoseConstraint::getJacobianMatrix()
 {
     return ik->getJacobianMatrix(eef, cartesianSelection);
 }
 
-Eigen::MatrixXf PoseConstraint::getJacobianMatrix(SceneObjectPtr tcp)
+Eigen::MatrixXf
+PoseConstraint::getJacobianMatrix(SceneObjectPtr tcp)
 {
     if (tcp->getName() != eef->getName())
     {
-        VR_WARNING << "EndEffectorPoseConstraing Jacobina calculation for differing EEF ('" << tcp->getName() << "' instead of '" << eef->getName() << "')" << std::endl;
+        VR_WARNING << "EndEffectorPoseConstraing Jacobina calculation for differing EEF ('"
+                   << tcp->getName() << "' instead of '" << eef->getName() << "')" << std::endl;
     }
 
     return ik->getJacobianMatrix(tcp);
 }
 
-Eigen::VectorXf PoseConstraint::getError(float stepSize)
+Eigen::VectorXf
+PoseConstraint::getError(float stepSize)
 {
     return ik->getError(stepSize);
 }
 
-bool PoseConstraint::checkTolerances()
+bool
+PoseConstraint::checkTolerances()
 {
     return ik->checkTolerances();
 }
 
-bool PoseConstraint::getRobotPoseForConstraint(Eigen::Matrix4f& pose)
+bool
+PoseConstraint::getRobotPoseForConstraint(Eigen::Matrix4f& pose)
 {
     if (robot->getRootNode()->getName() == eef->getName())
     {
@@ -100,20 +116,23 @@ bool PoseConstraint::getRobotPoseForConstraint(Eigen::Matrix4f& pose)
     return false;
 }
 
-const Eigen::Matrix4f& PoseConstraint::getTarget()
+const Eigen::Matrix4f&
+PoseConstraint::getTarget()
 {
     return target;
 }
 
-void PoseConstraint::updateTarget(const Eigen::Matrix4f& newTarget)
+void
+PoseConstraint::updateTarget(const Eigen::Matrix4f& newTarget)
 {
     target = newTarget;
     ik->setGoal(target, eef, cartesianSelection, tolerancePosition, toleranceRotation);
 }
 
-double PoseConstraint::optimizationFunction(unsigned int id)
+double
+PoseConstraint::optimizationFunction(unsigned int id)
 {
-    switch(id)
+    switch (id)
     {
         case POSITION_COMPONENT:
             return optimizationFunctionFactor * positionOptimizationFunction();
@@ -126,9 +145,10 @@ double PoseConstraint::optimizationFunction(unsigned int id)
     }
 }
 
-Eigen::VectorXf PoseConstraint::optimizationGradient(unsigned int id)
+Eigen::VectorXf
+PoseConstraint::optimizationGradient(unsigned int id)
 {
-    switch(id)
+    switch (id)
     {
         case POSITION_COMPONENT:
             return optimizationFunctionFactor * positionOptimizationGradient();
@@ -141,11 +161,13 @@ Eigen::VectorXf PoseConstraint::optimizationGradient(unsigned int id)
     }
 }
 
-double PoseConstraint::positionOptimizationFunction()
+double
+PoseConstraint::positionOptimizationFunction()
 {
-    Eigen::Vector3f d = posRotTradeoff * (eef->getGlobalPose().block<3,1>(0,3) - target.block<3,1>(0,3));
+    Eigen::Vector3f d =
+        posRotTradeoff * (eef->getGlobalPose().block<3, 1>(0, 3) - target.block<3, 1>(0, 3));
 
-    switch(cartesianSelection)
+    switch (cartesianSelection)
     {
         case IKSolver::CartesianSelection::X:
             return d.x() * d.x();
@@ -166,14 +188,16 @@ double PoseConstraint::positionOptimizationFunction()
     return 0;
 }
 
-Eigen::VectorXf PoseConstraint::positionOptimizationGradient()
+Eigen::VectorXf
+PoseConstraint::positionOptimizationGradient()
 {
     int size = nodeSet->getSize();
 
     Eigen::MatrixXf J = ik->getJacobianMatrix(eef).block(0, 0, 3, size);
-    Eigen::Vector3f d = posRotTradeoff * (eef->getGlobalPose().block<3,1>(0,3) - target.block<3,1>(0,3));
+    Eigen::Vector3f d =
+        posRotTradeoff * (eef->getGlobalPose().block<3, 1>(0, 3) - target.block<3, 1>(0, 3));
 
-    switch(cartesianSelection)
+    switch (cartesianSelection)
     {
         case IKSolver::CartesianSelection::X:
             return 2 * Eigen::Vector3f(d.x(), 0, 0).transpose() * J;
@@ -194,11 +218,12 @@ Eigen::VectorXf PoseConstraint::positionOptimizationGradient()
     return Eigen::VectorXf::Zero(size);
 }
 
-double PoseConstraint::orientationOptimizationFunction()
+double
+PoseConstraint::orientationOptimizationFunction()
 {
 
     float value = 0;
-    switch(cartesianSelection)
+    switch (cartesianSelection)
     {
         case IKSolver::CartesianSelection::X:
         case IKSolver::CartesianSelection::Y:
@@ -209,23 +234,25 @@ double PoseConstraint::orientationOptimizationFunction()
         case IKSolver::CartesianSelection::Orientation:
         case IKSolver::CartesianSelection::All:
         {
-            Eigen::Matrix3f diff = target.block<3,3>(0,0) * eef->getGlobalPose().block<3,3>(0,0).inverse();
+            Eigen::Matrix3f diff =
+                target.block<3, 3>(0, 0) * eef->getGlobalPose().block<3, 3>(0, 0).inverse();
             Eigen::AngleAxisf aa(diff);
 
             value = aa.angle() * aa.angle();
         }
-            break;
+        break;
     }
 
     return value;
 }
 
-Eigen::VectorXf PoseConstraint::orientationOptimizationGradient()
+Eigen::VectorXf
+PoseConstraint::orientationOptimizationGradient()
 {
     int size = nodeSet->getSize();
 
 
-    switch(cartesianSelection)
+    switch (cartesianSelection)
     {
         case IKSolver::CartesianSelection::X:
         case IKSolver::CartesianSelection::Y:
@@ -242,7 +269,7 @@ Eigen::VectorXf PoseConstraint::orientationOptimizationGradient()
 
             Eigen::Vector3f rpy;
             Eigen::AngleAxisf aa;
-            aa = diff.block<3,3>(0,0);
+            aa = diff.block<3, 3>(0, 0);
             rpy = aa.angle() * aa.axis();
             return 2 * rpy.transpose() * J.block(3, 0, 3, size);
         }

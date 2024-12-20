@@ -1,6 +1,7 @@
 #pragma once
 
-#include "orthogonal_vector.h"
+
+#include <Eigen/Core>
 
 namespace simox::math
 {
@@ -11,11 +12,10 @@ namespace simox::math
         Z = 2
     };
 
-    template<class Scalar>
+    template <class Scalar>
     Eigen::Matrix<Scalar, 3, 3>
-    normal_to_mat3(
-        Eigen::Matrix<Scalar, 3, 1> vector,
-        CoordinateSystemAxis axis = CoordinateSystemAxis::Z)
+    normal_to_mat3(Eigen::Matrix<Scalar, 3, 1> vector,
+                   CoordinateSystemAxis axis = CoordinateSystemAxis::Z)
     {
         const Scalar len = vector.norm();
         if (len <= 1e-9)
@@ -24,10 +24,9 @@ namespace simox::math
         }
         vector /= len;
 
-        const Eigen::Matrix<Scalar, 3, 1> vhelp =
-            (vector(0) < 0.5f) ?
-            Eigen::Matrix<Scalar, 3, 1>::UnitX() :
-            Eigen::Matrix<Scalar, 3, 1>::UnitY();
+        const Eigen::Matrix<Scalar, 3, 1> vhelp = (vector(0) < 0.5f)
+                                                      ? Eigen::Matrix<Scalar, 3, 1>::UnitX()
+                                                      : Eigen::Matrix<Scalar, 3, 1>::UnitY();
 
         const Eigen::Matrix<Scalar, 3, 1> v2 = vector.cross(vhelp).normalized();
         const Eigen::Matrix<Scalar, 3, 1> v3 = vector.cross(v2).normalized();
@@ -39,4 +38,4 @@ namespace simox::math
 
         return m;
     }
-}
+} // namespace simox::math

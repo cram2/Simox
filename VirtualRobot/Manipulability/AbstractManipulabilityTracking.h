@@ -23,79 +23,102 @@
 */
 #pragma once
 
-#include <unsupported/Eigen/CXX11/Tensor>
+#include <map>
 #include <memory>
+
 #include "AbstractManipulability.h"
+#include <unsupported/Eigen/CXX11/Tensor>
 
-namespace VirtualRobot {
-
-template<typename T>
-using  MatrixType = Eigen::Matrix<T,Eigen::Dynamic, Eigen::Dynamic>;
-
-template<typename Scalar,int rank, typename sizeType>
-auto Tensor_to_Matrix(const Eigen::Tensor<Scalar,rank> &tensor,const sizeType rows,const sizeType cols)
+namespace VirtualRobot
 {
-    return Eigen::Map<const MatrixType<Scalar>> (tensor.data(), rows,cols);
-}
 
-template<typename Scalar, typename... Dims>
-auto Matrix_to_Tensor(const MatrixType<Scalar> &matrix, Dims... dims)
-{
-    constexpr int rank = sizeof... (Dims);
-    return Eigen::TensorMap<Eigen::Tensor<const Scalar, rank>>(matrix.data(), {dims...});
-}
+    template <typename T>
+    using MatrixType = Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>;
 
-/**
+    template <typename Scalar, int rank, typename sizeType>
+    auto
+    Tensor_to_Matrix(const Eigen::Tensor<Scalar, rank>& tensor,
+                     const sizeType rows,
+                     const sizeType cols)
+    {
+        return Eigen::Map<const MatrixType<Scalar>>(tensor.data(), rows, cols);
+    }
+
+    template <typename Scalar, typename... Dims>
+    auto
+    Matrix_to_Tensor(const MatrixType<Scalar>& matrix, Dims... dims)
+    {
+        constexpr int rank = sizeof...(Dims);
+        return Eigen::TensorMap<Eigen::Tensor<const Scalar, rank>>(matrix.data(), {dims...});
+    }
+
+    /**
  * Implementation of manipulability tracking, see
  * N. Jaquier, L. Rozo, D. G. Caldwell and S. Calinon. Geometry-aware Tracking of Manipulability Ellipsoids, in Robotics: Science and Systems (R:SS), 2018. (http://www.roboticsproceedings.org/rss14/p27.pdf)
  * N. Jaquier, L. Rozo, D. G. Caldwell and S. Calinon. Geometry-aware Manipulability Learning, Tracking and Transfer, International Journal of Robotics Research (IJRR), 2020.
  * @brief The ManipulabilityTracking class
  */
-class AbstractManipulabilityTracking
-{
-public:
-    virtual Eigen::VectorXf calculateVelocity(const Eigen::MatrixXd &manipulabilityDesired, const Eigen::MatrixXd &gainMatrix = Eigen::MatrixXd(), bool jointLimitAvoidance = false) = 0;
+    class AbstractManipulabilityTracking
+    {
+    public:
+        virtual Eigen::VectorXf
+        calculateVelocity(const Eigen::MatrixXd& manipulabilityDesired,
+                          const Eigen::MatrixXd& gainMatrix = Eigen::MatrixXd(),
+                          bool jointLimitAvoidance = false) = 0;
 
-    std::map<std::string, float> calculateVelocityMap(const Eigen::MatrixXd &manipulabilityDesired, const std::vector<std::string> &jointNames, const Eigen::MatrixXd &gainMatrix = Eigen::MatrixXd(), bool jointLimitAvoidance = false);
+        std::map<std::string, float>
+        calculateVelocityMap(const Eigen::MatrixXd& manipulabilityDesired,
+                             const std::vector<std::string>& jointNames,
+                             const Eigen::MatrixXd& gainMatrix = Eigen::MatrixXd(),
+                             bool jointLimitAvoidance = false);
 
-    Eigen::Tensor<double, 3> computeJacobianDerivative(const Eigen::MatrixXd &jacobian);
+        Eigen::Tensor<double, 3> computeJacobianDerivative(const Eigen::MatrixXd& jacobian);
 
-    Eigen::Tensor<double, 3> tensorMatrixProduct(const Eigen::Tensor<double, 3> &tensor, const Eigen::MatrixXd &matrix);
+        Eigen::Tensor<double, 3> tensorMatrixProduct(const Eigen::Tensor<double, 3>& tensor,
+                                                     const Eigen::MatrixXd& matrix);
 
-    Eigen::Tensor<double, 3> tensorMatrixProductPermutate(const Eigen::Tensor<double, 3> &tensor, const Eigen::MatrixXd &matrix);
+        Eigen::Tensor<double, 3>
+        tensorMatrixProductPermutate(const Eigen::Tensor<double, 3>& tensor,
+                                     const Eigen::MatrixXd& matrix);
 
-    Eigen::Tensor<double, 3> subCube(Eigen::Tensor<double, 3> &manipulationJacobian);
+        Eigen::Tensor<double, 3> subCube(Eigen::Tensor<double, 3>& manipulationJacobian);
 
-    Eigen::MatrixXd getDefaultGainMatrix();
+        Eigen::MatrixXd getDefaultGainMatrix();
 
-    Eigen::MatrixXd logMap(const Eigen::MatrixXd &manipulabilityDesired, const Eigen::MatrixXd &manipulabilityCurrent);
+        Eigen::MatrixXd logMap(const Eigen::MatrixXd& manipulabilityDesired,
+                               const Eigen::MatrixXd& manipulabilityCurrent);
 
-    double computeDistance(const Eigen::MatrixXd &manipulabilityDesired);   
+        double computeDistance(const Eigen::MatrixXd& manipulabilityDesired);
 
-    /* Calculate weight matrix for joint limits avoidance */
-    Eigen::MatrixXd getJointsLimitsWeightMatrix(const Eigen::VectorXd &jointAngles, const Eigen::VectorXd &jointLimitsLow, const Eigen::VectorXd &jointLimitsHigh);
+        /* Calculate weight matrix for joint limits avoidance */
+        Eigen::MatrixXd getJointsLimitsWeightMatrix(const Eigen::VectorXd& jointAngles,
+                                                    const Eigen::VectorXd& jointLimitsLow,
+                                                    const Eigen::VectorXd& jointLimitsHigh);
 
-    Eigen::MatrixXd computeManipulabilityJacobianMandelNotation(const Eigen::Tensor<double, 3> &manipulabilityJacobian);
+        Eigen::MatrixXd computeManipulabilityJacobianMandelNotation(
+            const Eigen::Tensor<double, 3>& manipulabilityJacobian);
 
-    Eigen::VectorXd symMatrixToVector(const Eigen::MatrixXd &sym_matrix);
+        Eigen::VectorXd symMatrixToVector(const Eigen::MatrixXd& sym_matrix);
 
-    virtual int getTaskVars() = 0;
+        virtual int getTaskVars() = 0;
 
-    virtual AbstractManipulability::Mode getMode() = 0;
+        virtual AbstractManipulability::Mode getMode() = 0;
 
-    virtual Eigen::MatrixXd computeCurrentManipulability() = 0;
+        virtual Eigen::MatrixXd computeCurrentManipulability() = 0;
 
-    virtual std::vector<std::string> getJointNames() = 0;
+        virtual std::vector<std::string> getJointNames() = 0;
 
-    virtual VisualizationNodePtr getManipulabilityVis(const Eigen::MatrixXd &manipulability, const std::string &visualizationType = "", double scaling = 1000.0) = 0;
+        virtual VisualizationNodePtr getManipulabilityVis(const Eigen::MatrixXd& manipulability,
+                                                          const std::string& visualizationType = "",
+                                                          double scaling = 1000.0) = 0;
 
-    virtual void setConvertMMtoM(bool value) = 0;
+        virtual void setConvertMMtoM(bool value) = 0;
 
-    void setjointAngleLimitGradient(const Eigen::VectorXd &gradient);
+        void setjointAngleLimitGradient(const Eigen::VectorXd& gradient);
 
-    Eigen::Matrix<double, Eigen::Dynamic, 1> jointAngleLimitGradient;  // TODO initialize
-};
+        Eigen::Matrix<double, Eigen::Dynamic, 1> jointAngleLimitGradient; // TODO initialize
+    };
 
-typedef std::shared_ptr<AbstractManipulabilityTracking> AbstractManipulabilityTrackingPtr;
+    typedef std::shared_ptr<AbstractManipulabilityTracking> AbstractManipulabilityTrackingPtr;
 
-}
+} // namespace VirtualRobot

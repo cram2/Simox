@@ -1,25 +1,28 @@
 
 #include "SceneIO.h"
-#include "../VirtualRobotException.h"
-#include "rapidxml.hpp"
 
-
-#include "RobotIO.h"
-#include "ObjectIO.h"
-#include "../Trajectory.h"
+#include "../ManipulationObject.h"
+#include "../Obstacle.h"
+#include "../Scene.h"
+#include "../SceneObject.h"
 #include "../SceneObjectSet.h"
+#include "../Trajectory.h"
+#include "../VirtualRobotException.h"
+#include "Logging.h"
+#include "ObjectIO.h"
+#include "RobotIO.h"
+#include "rapidxml.hpp"
 
 namespace VirtualRobot
 {
     using std::endl;
 
-    SceneIO::SceneIO()
-        = default;
+    SceneIO::SceneIO() = default;
 
-    SceneIO::~SceneIO()
-        = default;
+    SceneIO::~SceneIO() = default;
 
-    VirtualRobot::ScenePtr SceneIO::loadScene(const std::string& xmlFile)
+    VirtualRobot::ScenePtr
+    SceneIO::loadScene(const std::string& xmlFile)
     {
         // load file
         std::ifstream in(xmlFile.c_str());
@@ -41,7 +44,8 @@ namespace VirtualRobot
         return res;
     }
 
-    ScenePtr SceneIO::processSceneAttributes(rapidxml::xml_node<char>* sceneXMLNode)
+    ScenePtr
+    SceneIO::processSceneAttributes(rapidxml::xml_node<char>* sceneXMLNode)
     {
         // process attributes of scene
 
@@ -54,8 +58,10 @@ namespace VirtualRobot
         return scene;
     }
 
-
-    bool SceneIO::processSceneRobot(rapidxml::xml_node<char>* sceneXMLNode, ScenePtr scene, const std::string& basePath)
+    bool
+    SceneIO::processSceneRobot(rapidxml::xml_node<char>* sceneXMLNode,
+                               ScenePtr scene,
+                               const std::string& basePath)
     {
         THROW_VR_EXCEPTION_IF(!sceneXMLNode, "NULL data in processSceneRobot");
 
@@ -71,15 +77,15 @@ namespace VirtualRobot
         std::string initStr("initconfig");
         std::string initConfigName = processStringAttribute(initStr, sceneXMLNode, true);
 
-        std::vector< RobotConfigPtr > configs;
-        std::vector< std::vector< RobotConfig::Configuration > > configDefinitions;
-        std::vector< std::string > configNames;
-        std::vector< std::string > tcpNames;
+        std::vector<RobotConfigPtr> configs;
+        std::vector<std::vector<RobotConfig::Configuration>> configDefinitions;
+        std::vector<std::string> configNames;
+        std::vector<std::string> tcpNames;
         Eigen::Matrix4f globalPose = Eigen::Matrix4f::Identity();
         std::string fileName;
         rapidxml::xml_node<>* node = sceneXMLNode->first_node();
 
-        std::vector< rapidxml::xml_node<>* > rnsNodes;
+        std::vector<rapidxml::xml_node<>*> rnsNodes;
 
         while (node)
         {
@@ -87,13 +93,18 @@ namespace VirtualRobot
 
             if (nodeName == "file")
             {
-                THROW_VR_EXCEPTION_IF(!fileName.empty(), "Multiple files defined in scene's robot tag '" << robotName << "'." << endl);
+                THROW_VR_EXCEPTION_IF(!fileName.empty(),
+                                      "Multiple files defined in scene's robot tag '"
+                                          << robotName << "'." << endl);
                 fileName = processFileNode(node, basePath);
             }
             else if (nodeName == "configuration")
             {
-                bool cOK = processConfigurationNodeList(node, configDefinitions, configNames, tcpNames);
-                THROW_VR_EXCEPTION_IF(!cOK, "Invalid configuration defined in scene's robot tag '" << robotName << "'." << endl);
+                bool cOK =
+                    processConfigurationNodeList(node, configDefinitions, configNames, tcpNames);
+                THROW_VR_EXCEPTION_IF(!cOK,
+                                      "Invalid configuration defined in scene's robot tag '"
+                                          << robotName << "'." << endl);
             }
             else if (nodeName == "globalpose")
             {
@@ -105,16 +116,21 @@ namespace VirtualRobot
             }
             else
             {
-                THROW_VR_EXCEPTION("XML definition <" << nodeName << "> not supported in scene's Robot definition <" << robotName << ">." << endl);
+                THROW_VR_EXCEPTION("XML definition <"
+                                   << nodeName << "> not supported in scene's Robot definition <"
+                                   << robotName << ">." << endl);
             }
 
             node = node->next_sibling();
         }
 
         // create & register robot
-        THROW_VR_EXCEPTION_IF(fileName.empty(), "Missing file definition in scene's robot tag '" << robotName << "'." << endl);
+        THROW_VR_EXCEPTION_IF(fileName.empty(),
+                              "Missing file definition in scene's robot tag '" << robotName << "'."
+                                                                               << endl);
         RobotPtr robot = RobotIO::loadRobot(fileName);
-        THROW_VR_EXCEPTION_IF(!robot, "Invalid robot file in scene's robot tag '" << robotName << "'." << endl);
+        THROW_VR_EXCEPTION_IF(
+            !robot, "Invalid robot file in scene's robot tag '" << robotName << "'." << endl);
         robot->setGlobalPose(globalPose);
         scene->registerRobot(robot);
 
@@ -124,12 +140,14 @@ namespace VirtualRobot
         for (auto& rnsNode : rnsNodes)
         {
             // registers rns to robot
-            RobotNodeSetPtr r = processRobotNodeSet(rnsNode, robot, robot->getRootNode()->getName(), rnsNr);
+            RobotNodeSetPtr r =
+                processRobotNodeSet(rnsNode, robot, robot->getRootNode()->getName(), rnsNr);
             THROW_VR_EXCEPTION_IF(!r, "Invalid RobotNodeSet definition " << endl);
         }
 
         // create & register configs
-        THROW_VR_EXCEPTION_IF(configDefinitions.size() != configNames.size(), "Invalid RobotConfig definitions " << endl);
+        THROW_VR_EXCEPTION_IF(configDefinitions.size() != configNames.size(),
+                              "Invalid RobotConfig definitions " << endl);
 
         for (size_t i = 0; i < configDefinitions.size(); i++)
         {
@@ -140,16 +158,18 @@ namespace VirtualRobot
         // process init config
         if (!initConfigName.empty())
         {
-            THROW_VR_EXCEPTION_IF(!scene->hasRobotConfig(robot, initConfigName), "Scene's robot tag '" << robotName << "' does not have the initConfig '" << initConfigName << "'." << endl);
+            THROW_VR_EXCEPTION_IF(!scene->hasRobotConfig(robot, initConfigName),
+                                  "Scene's robot tag '" << robotName
+                                                        << "' does not have the initConfig '"
+                                                        << initConfigName << "'." << endl);
             robot->setJointValues(scene->getRobotConfig(robot, initConfigName));
         }
 
         return true;
     }
 
-
-
-    bool SceneIO::processSceneObjectSet(rapidxml::xml_node<char>* sceneXMLNode, ScenePtr scene)
+    bool
+    SceneIO::processSceneObjectSet(rapidxml::xml_node<char>* sceneXMLNode, ScenePtr scene)
     {
         THROW_VR_EXCEPTION_IF(!sceneXMLNode, "NULL data in processSceneObjectSet");
 
@@ -174,7 +194,10 @@ namespace VirtualRobot
             {
                 std::string oname = processNameAttribute(node);
 
-                THROW_VR_EXCEPTION_IF(!(scene->hasObstacle(oname) || scene->hasManipulationObject(oname)), " Object with name '" << oname << "' not known in scene '" << scene->getName() << "'." << endl);
+                THROW_VR_EXCEPTION_IF(
+                    !(scene->hasObstacle(oname) || scene->hasManipulationObject(oname)),
+                    " Object with name '" << oname << "' not known in scene '" << scene->getName()
+                                          << "'." << endl);
 
                 if (scene->hasObstacle(oname))
                 {
@@ -187,7 +210,10 @@ namespace VirtualRobot
             }
             else
             {
-                THROW_VR_EXCEPTION("XML definition <" << nodeName << "> not supported in scene's SceneObjectSet definition <" << sosName << ">." << endl);
+                THROW_VR_EXCEPTION("XML definition <"
+                                   << nodeName
+                                   << "> not supported in scene's SceneObjectSet definition <"
+                                   << sosName << ">." << endl);
             }
 
             node = node->next_sibling();
@@ -197,8 +223,10 @@ namespace VirtualRobot
         return true;
     }
 
-
-    bool SceneIO::processSceneManipulationObject(rapidxml::xml_node<char>* sceneXMLNode, ScenePtr scene, const std::string& basePath)
+    bool
+    SceneIO::processSceneManipulationObject(rapidxml::xml_node<char>* sceneXMLNode,
+                                            ScenePtr scene,
+                                            const std::string& basePath)
     {
         THROW_VR_EXCEPTION_IF(!sceneXMLNode, "NULL data in processSceneManipulationObject");
 
@@ -213,8 +241,10 @@ namespace VirtualRobot
         return true;
     }
 
-
-    bool SceneIO::processSceneObstacle(rapidxml::xml_node<char>* sceneXMLNode, ScenePtr scene, const std::string& basePath)
+    bool
+    SceneIO::processSceneObstacle(rapidxml::xml_node<char>* sceneXMLNode,
+                                  ScenePtr scene,
+                                  const std::string& basePath)
     {
         THROW_VR_EXCEPTION_IF(!sceneXMLNode, "NULL data in processSceneObstacle");
 
@@ -229,7 +259,8 @@ namespace VirtualRobot
         return true;
     }
 
-    bool SceneIO::processSceneTrajectory(rapidxml::xml_node<char>* sceneXMLNode, ScenePtr scene)
+    bool
+    SceneIO::processSceneTrajectory(rapidxml::xml_node<char>* sceneXMLNode, ScenePtr scene)
     {
         THROW_VR_EXCEPTION_IF(!sceneXMLNode || !scene, "NULL data in processSceneTrajectory");
 
@@ -245,7 +276,8 @@ namespace VirtualRobot
         return true;
     }
 
-    ScenePtr SceneIO::processScene(rapidxml::xml_node<char>* sceneXMLNode, const std::string& basePath)
+    ScenePtr
+    SceneIO::processScene(rapidxml::xml_node<char>* sceneXMLNode, const std::string& basePath)
     {
         THROW_VR_EXCEPTION_IF(!sceneXMLNode, "No <Scene> tag in XML definition");
 
@@ -254,8 +286,8 @@ namespace VirtualRobot
         scene = processSceneAttributes(sceneXMLNode);
 
         // process xml nodes
-        std::vector<rapidxml::xml_node<char>* > sceneSetNodes;
-        std::vector<rapidxml::xml_node<char>* > trajectoryNodes;
+        std::vector<rapidxml::xml_node<char>*> sceneSetNodes;
+        std::vector<rapidxml::xml_node<char>*> trajectoryNodes;
 
 
         rapidxml::xml_node<>* XMLNode = sceneXMLNode->first_node(nullptr, 0, false);
@@ -272,9 +304,9 @@ namespace VirtualRobot
                 if (!r)
                 {
                     std::string failedNodeName = processNameAttribute(XMLNode);
-                    THROW_VR_EXCEPTION("Failed to create robot " << failedNodeName << " in scene " << scene->getName() << endl);
+                    THROW_VR_EXCEPTION("Failed to create robot " << failedNodeName << " in scene "
+                                                                 << scene->getName() << endl);
                 }
-
             }
             else if (nodeName == "obstacle")
             {
@@ -283,7 +315,9 @@ namespace VirtualRobot
                 if (!r)
                 {
                     std::string failedNodeName = processNameAttribute(XMLNode);
-                    THROW_VR_EXCEPTION("Failed to create obstacle " << failedNodeName << " in scene " << scene->getName() << endl);
+                    THROW_VR_EXCEPTION("Failed to create obstacle "
+                                       << failedNodeName << " in scene " << scene->getName()
+                                       << endl);
                 }
             }
             else if (nodeName == "manipulationobject")
@@ -293,7 +327,9 @@ namespace VirtualRobot
                 if (!r)
                 {
                     std::string failedNodeName = processNameAttribute(XMLNode);
-                    THROW_VR_EXCEPTION("Failed to create ManipulationObject " << failedNodeName << " in scene " << scene->getName() << endl);
+                    THROW_VR_EXCEPTION("Failed to create ManipulationObject "
+                                       << failedNodeName << " in scene " << scene->getName()
+                                       << endl);
                 }
             }
             else if (nodeName == "trajectory")
@@ -303,11 +339,12 @@ namespace VirtualRobot
             else if (nodeName == "sceneobjectset")
             {
                 sceneSetNodes.push_back(XMLNode);
-
             }
             else
             {
-                THROW_VR_EXCEPTION("XML node of type <" << nodeName_ << "> is not supported. Ignoring contents..." << endl);
+                THROW_VR_EXCEPTION("XML node of type <"
+                                   << nodeName_ << "> is not supported. Ignoring contents..."
+                                   << endl);
             }
 
             XMLNode = XMLNode->next_sibling(nullptr, 0, false);
@@ -321,7 +358,8 @@ namespace VirtualRobot
             if (!r)
             {
                 std::string failedNodeName = processNameAttribute(XMLNode);
-                THROW_VR_EXCEPTION("Failed to create SceneObjectSet " << failedNodeName << " in scene " << scene->getName() << endl);
+                THROW_VR_EXCEPTION("Failed to create SceneObjectSet "
+                                   << failedNodeName << " in scene " << scene->getName() << endl);
             }
         }
 
@@ -334,16 +372,17 @@ namespace VirtualRobot
             if (!r)
             {
                 std::string failedNodeName = processNameAttribute(XMLNode);
-                THROW_VR_EXCEPTION("Failed to create trajectory " << failedNodeName << " in scene " << scene->getName() << endl);
+                THROW_VR_EXCEPTION("Failed to create trajectory " << failedNodeName << " in scene "
+                                                                  << scene->getName() << endl);
             }
         }
 
         return scene;
     }
 
-
-
-    VirtualRobot::ScenePtr SceneIO::createSceneFromString(const std::string& xmlString, const std::string& basePath /*= ""*/)
+    VirtualRobot::ScenePtr
+    SceneIO::createSceneFromString(const std::string& xmlString,
+                                   const std::string& basePath /*= ""*/)
     {
         // copy string content to char array
         char* y = new char[xmlString.size() + 1];
@@ -353,17 +392,19 @@ namespace VirtualRobot
 
         try
         {
-            rapidxml::xml_document<char> doc;    // character type defaults to char
-            doc.parse<0>(y);    // 0 means default parse flags
+            rapidxml::xml_document<char> doc; // character type defaults to char
+            doc.parse<0>(y); // 0 means default parse flags
             rapidxml::xml_node<char>* sceneXMLNode = doc.first_node("Scene");
             scene = processScene(sceneXMLNode, basePath);
         }
         catch (rapidxml::parse_error& e)
         {
             delete[] y;
-            THROW_VR_EXCEPTION("Could not parse data in xml definition" << endl
+            THROW_VR_EXCEPTION("Could not parse data in xml definition"
+                               << endl
                                << "Error message:" << e.what() << endl
-                               << "Position: " << endl << e.where<char>() << endl);
+                               << "Position: " << endl
+                               << e.where<char>() << endl);
             return ScenePtr();
         }
         catch (VirtualRobot::VirtualRobotException&)
@@ -376,7 +417,8 @@ namespace VirtualRobot
         {
             delete[] y;
             THROW_VR_EXCEPTION("Error while parsing xml definition" << endl
-                               << "Error code:" << e.what() << endl);
+                                                                    << "Error code:" << e.what()
+                                                                    << endl);
             return ScenePtr();
         }
         catch (...)
@@ -390,7 +432,8 @@ namespace VirtualRobot
         return scene;
     }
 
-    bool SceneIO::saveScene(ScenePtr s, const std::string& xmlFile)
+    bool
+    SceneIO::saveScene(ScenePtr s, const std::string& xmlFile)
     {
         if (!s)
         {

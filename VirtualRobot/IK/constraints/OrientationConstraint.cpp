@@ -21,19 +21,27 @@
 *
 */
 
-#include <stdexcept>
+#include "OrientationConstraint.h"
+
 #include <sstream>
+#include <stdexcept>
 
 #include <Eigen/Dense>
 
-#include "OrientationConstraint.h"
-
 #include <VirtualRobot/Robot.h>
+
+#include "RobotNodeSet.h"
 
 using namespace VirtualRobot;
 
-OrientationConstraint::OrientationConstraint(const VirtualRobot::RobotPtr &robot, const VirtualRobot::RobotNodeSetPtr &nodeSet, const VirtualRobot::SceneObjectPtr &eef,
-                                                           const Eigen::Matrix3f &target, VirtualRobot::IKSolver::CartesianSelection cartesianSelection, float tolerance, bool soft) :
+OrientationConstraint::OrientationConstraint(
+    const VirtualRobot::RobotPtr& robot,
+    const VirtualRobot::RobotNodeSetPtr& nodeSet,
+    const VirtualRobot::SceneObjectPtr& eef,
+    const Eigen::Matrix3f& target,
+    VirtualRobot::IKSolver::CartesianSelection cartesianSelection,
+    float tolerance,
+    bool soft) :
     Constraint(nodeSet),
     robot(robot),
     nodeSet(nodeSet),
@@ -44,18 +52,19 @@ OrientationConstraint::OrientationConstraint(const VirtualRobot::RobotPtr &robot
 {
     ik.reset(new DifferentialIK(nodeSet));
     Eigen::Matrix4f target4x4 = Eigen::Matrix4f::Identity();
-    target4x4.block<3,3>(0,0) = target;
+    target4x4.block<3, 3>(0, 0) = target;
     ik->setGoal(target4x4, eef, cartesianSelection);
     addOptimizationFunction(0, soft);
 }
 
-double OrientationConstraint::optimizationFunction(unsigned int /*id*/)
+double
+OrientationConstraint::optimizationFunction(unsigned int /*id*/)
 {
-    Eigen::Matrix3f diff = target * eef->getGlobalPose().block<3,3>(0,0).inverse();
+    Eigen::Matrix3f diff = target * eef->getGlobalPose().block<3, 3>(0, 0).inverse();
     Eigen::AngleAxisf aa(diff);
 
     float value = 0;
-    switch(cartesianSelection)
+    switch (cartesianSelection)
     {
         case IKSolver::CartesianSelection::X:
         case IKSolver::CartesianSelection::Y:
@@ -72,19 +81,20 @@ double OrientationConstraint::optimizationFunction(unsigned int /*id*/)
     return value;
 }
 
-Eigen::VectorXf OrientationConstraint::optimizationGradient(unsigned int /*id*/)
+Eigen::VectorXf
+OrientationConstraint::optimizationGradient(unsigned int /*id*/)
 {
     int size = nodeSet->getSize();
 
     Eigen::MatrixXf J = ik->getJacobianMatrix(eef);
-    Eigen::Matrix3f diff = eef->getGlobalPose().block<3,3>(0,0) * target.inverse();
+    Eigen::Matrix3f diff = eef->getGlobalPose().block<3, 3>(0, 0) * target.inverse();
 
     Eigen::Vector3f rpy;
     Eigen::AngleAxisf aa;
     aa = diff;
     rpy = aa.angle() * aa.axis();
 
-    switch(cartesianSelection)
+    switch (cartesianSelection)
     {
         case IKSolver::CartesianSelection::X:
         case IKSolver::CartesianSelection::Y:
@@ -100,9 +110,10 @@ Eigen::VectorXf OrientationConstraint::optimizationGradient(unsigned int /*id*/)
     return Eigen::VectorXf::Zero(size);
 }
 
-bool OrientationConstraint::checkTolerances()
+bool
+OrientationConstraint::checkTolerances()
 {
-    switch(cartesianSelection)
+    switch (cartesianSelection)
     {
         case IKSolver::CartesianSelection::X:
         case IKSolver::CartesianSelection::Y:
@@ -114,14 +125,15 @@ bool OrientationConstraint::checkTolerances()
         case IKSolver::CartesianSelection::Orientation:
         case IKSolver::CartesianSelection::All:
         {
-            Eigen::Matrix3f diff = target * eef->getGlobalPose().block<3,3>(0,0).inverse();
+            Eigen::Matrix3f diff = target * eef->getGlobalPose().block<3, 3>(0, 0).inverse();
             Eigen::AngleAxisf aa(diff);
 
             return fabs(aa.angle()) <= tolerance;
         }
-            break;
+        break;
     }
     std::stringstream ss;
-    ss << "OrientationConstraint::checkTolerances(): unknown value for cartesianSelection = " << cartesianSelection;
+    ss << "OrientationConstraint::checkTolerances(): unknown value for cartesianSelection = "
+       << cartesianSelection;
     throw std::logic_error{ss.str()};
 }

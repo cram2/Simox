@@ -22,13 +22,14 @@
 */
 #pragma once
 
-#include "VirtualRobot.h"
+#include <cfloat>
+#include <string>
+#include <vector>
 
 #include <Eigen/Core>
 
-#include <string>
-#include <vector>
-#include <cfloat>
+#include "Assert.h"
+#include "VirtualRobot.h"
 
 namespace VirtualRobot
 {
@@ -46,14 +47,15 @@ namespace VirtualRobot
                 x = y = z = 0.0f;
                 w = 1.0f;
             }
+
             float x, y, z, w;
         };
-
 
         /*!
             Return rotation that converts vector from to vector to.
         */
-        Quaternion VIRTUAL_ROBOT_IMPORT_EXPORT getRotation(const Eigen::Vector3f& from, const Eigen::Vector3f& to);
+        Quaternion VIRTUAL_ROBOT_IMPORT_EXPORT getRotation(const Eigen::Vector3f& from,
+                                                           const Eigen::Vector3f& to);
 
         //! get the corresponding angle of rotation that is defined by the quaternion (radian)
         float VIRTUAL_ROBOT_IMPORT_EXPORT getAngle(const Quaternion& q);
@@ -68,13 +70,15 @@ namespace VirtualRobot
         Quaternion VIRTUAL_ROBOT_IMPORT_EXPORT getConjugated(const Quaternion& q);
 
         //! Returns q1*q2
-        Quaternion VIRTUAL_ROBOT_IMPORT_EXPORT multiplyQuaternions(const Quaternion& q1, const Quaternion& q2);
+        Quaternion VIRTUAL_ROBOT_IMPORT_EXPORT multiplyQuaternions(const Quaternion& q1,
+                                                                   const Quaternion& q2);
 
         //! returns q1 dot q2
         float VIRTUAL_ROBOT_IMPORT_EXPORT getDot(const Quaternion& q1, const Quaternion& q2);
 
         //! Computes mean orientation of quaternions
-        MathTools::Quaternion VIRTUAL_ROBOT_IMPORT_EXPORT getMean(std::vector<MathTools::Quaternion> quaternions);
+        MathTools::Quaternion VIRTUAL_ROBOT_IMPORT_EXPORT
+        getMean(std::vector<MathTools::Quaternion> quaternions);
 
         /*!
         Apply the slerp interpolation
@@ -83,7 +87,9 @@ namespace VirtualRobot
         \param alpha A value between 0 and 1
         \return The intermediate quaternion
         */
-        MathTools::Quaternion VIRTUAL_ROBOT_IMPORT_EXPORT slerp(const MathTools::Quaternion& q1, const MathTools::Quaternion& q2, float alpha);
+        MathTools::Quaternion VIRTUAL_ROBOT_IMPORT_EXPORT slerp(const MathTools::Quaternion& q1,
+                                                                const MathTools::Quaternion& q2,
+                                                                float alpha);
 
         float VIRTUAL_ROBOT_IMPORT_EXPORT fmod(float value, float boundLow, float boundHigh);
 
@@ -129,12 +135,26 @@ namespace VirtualRobot
         Eigen::Matrix3f VIRTUAL_ROBOT_IMPORT_EXPORT rpy2eigen3f(const Eigen::Vector3f& rpy);
 
         void VIRTUAL_ROBOT_IMPORT_EXPORT posrpy2eigen4f(const float x[6], Eigen::Matrix4f& m);
-        void VIRTUAL_ROBOT_IMPORT_EXPORT posrpy2eigen4f(const Eigen::Vector3f& pos, const Eigen::Vector3f& rpy, Eigen::Matrix4f& m);
-        void VIRTUAL_ROBOT_IMPORT_EXPORT posrpy2eigen4f(float x, float y, float z, float roll, float pitch, float yaw, Eigen::Matrix4f& m);
-        Eigen::Matrix4f VIRTUAL_ROBOT_IMPORT_EXPORT posrpy2eigen4f(const Eigen::Vector3f& pos, const Eigen::Vector3f& rpy);
-        Eigen::Matrix4f VIRTUAL_ROBOT_IMPORT_EXPORT posrpy2eigen4f(float x, float y, float z, float roll, float pitch, float yaw);
-        Eigen::Matrix4f VIRTUAL_ROBOT_IMPORT_EXPORT posquat2eigen4f(float x, float y, float z, float qx, float qy, float qz, float qw);
-        Eigen::Matrix3f VIRTUAL_ROBOT_IMPORT_EXPORT quat2eigen3f(float qx, float qy, float qz, float qw);
+        void VIRTUAL_ROBOT_IMPORT_EXPORT posrpy2eigen4f(const Eigen::Vector3f& pos,
+                                                        const Eigen::Vector3f& rpy,
+                                                        Eigen::Matrix4f& m);
+        void VIRTUAL_ROBOT_IMPORT_EXPORT posrpy2eigen4f(float x,
+                                                        float y,
+                                                        float z,
+                                                        float roll,
+                                                        float pitch,
+                                                        float yaw,
+                                                        Eigen::Matrix4f& m);
+        Eigen::Matrix4f VIRTUAL_ROBOT_IMPORT_EXPORT posrpy2eigen4f(const Eigen::Vector3f& pos,
+                                                                   const Eigen::Vector3f& rpy);
+        Eigen::Matrix4f VIRTUAL_ROBOT_IMPORT_EXPORT
+        posrpy2eigen4f(float x, float y, float z, float roll, float pitch, float yaw);
+        Eigen::Matrix4f VIRTUAL_ROBOT_IMPORT_EXPORT
+        posquat2eigen4f(float x, float y, float z, float qx, float qy, float qz, float qw);
+        Eigen::Matrix3f VIRTUAL_ROBOT_IMPORT_EXPORT quat2eigen3f(float qx,
+                                                                 float qy,
+                                                                 float qz,
+                                                                 float qw);
 
         /*!
             Convert homogeneous matrix to translation and rpy rotation.
@@ -142,32 +162,46 @@ namespace VirtualRobot
             \param x The result is stored in this float array (x,y,z,roll,pitch,yaw)
         */
         void VIRTUAL_ROBOT_IMPORT_EXPORT eigen4f2rpy(const Eigen::Matrix4f& m, float x[6]);
-        void VIRTUAL_ROBOT_IMPORT_EXPORT eigen4f2rpy(const Eigen::Matrix4f& m, Eigen::Vector3f& storeRPY);
+        void VIRTUAL_ROBOT_IMPORT_EXPORT eigen4f2rpy(const Eigen::Matrix4f& m,
+                                                     Eigen::Vector3f& storeRPY);
         Eigen::Vector3f VIRTUAL_ROBOT_IMPORT_EXPORT eigen4f2rpy(const Eigen::Matrix4f& m);
         Eigen::Vector3f VIRTUAL_ROBOT_IMPORT_EXPORT eigen3f2rpy(const Eigen::Matrix3f& m);
-        Eigen::Matrix<float, 6, 1> VIRTUAL_ROBOT_IMPORT_EXPORT eigen4f2posrpy(const Eigen::Matrix4f& m);
+        Eigen::Matrix<float, 6, 1>
+            VIRTUAL_ROBOT_IMPORT_EXPORT eigen4f2posrpy(const Eigen::Matrix4f& m);
 
         /*!
             Convert quaternion values to a 3x3 rotation matrix and store it to the rotational component of the result.
             The translational part of m is zero
             \return Homogeneous matrix representing the rotation of q.
         */
-        Eigen::Matrix4f VIRTUAL_ROBOT_IMPORT_EXPORT quat2eigen4f(float x, float y, float z, float w);
+        Eigen::Matrix4f VIRTUAL_ROBOT_IMPORT_EXPORT quat2eigen4f(float x,
+                                                                 float y,
+                                                                 float z,
+                                                                 float w);
         Eigen::Matrix4f VIRTUAL_ROBOT_IMPORT_EXPORT quat2eigen4f(const Quaternion q);
-        void VIRTUAL_ROBOT_IMPORT_EXPORT quat2eigen4f(float x, float y, float z, float w, Eigen::Matrix4f& m);
+        void VIRTUAL_ROBOT_IMPORT_EXPORT
+        quat2eigen4f(float x, float y, float z, float w, Eigen::Matrix4f& m);
         void VIRTUAL_ROBOT_IMPORT_EXPORT quat2eigen4f(const Quaternion q, Eigen::Matrix4f& m);
 
         Quaternion VIRTUAL_ROBOT_IMPORT_EXPORT eigen4f2quat(const Eigen::Matrix4f& m);
         void VIRTUAL_ROBOT_IMPORT_EXPORT eigen4f2quat(const Eigen::Matrix4f& m, Quaternion& q);
 
         Eigen::Vector3f VIRTUAL_ROBOT_IMPORT_EXPORT getTranslation(const Eigen::Matrix4f& m);
-        void VIRTUAL_ROBOT_IMPORT_EXPORT getTranslation(const Eigen::Matrix4f& m, Eigen::Vector3f& v);
+        void VIRTUAL_ROBOT_IMPORT_EXPORT getTranslation(const Eigen::Matrix4f& m,
+                                                        Eigen::Vector3f& v);
 
-        void VIRTUAL_ROBOT_IMPORT_EXPORT eigen4f2axisangle(const Eigen::Matrix4f& m, Eigen::Vector3f& storeAxis, float& storeAngle);
-        Eigen::Matrix4f VIRTUAL_ROBOT_IMPORT_EXPORT axisangle2eigen4f(const Eigen::Vector3f& axis, float angle);
-        void VIRTUAL_ROBOT_IMPORT_EXPORT axisangle2eigen4f(const Eigen::Vector3f& axis, float angle, Eigen::Matrix4f& storeResult);
-        Eigen::Matrix3f VIRTUAL_ROBOT_IMPORT_EXPORT axisangle2eigen3f(const Eigen::Vector3f& axis, float angle);
-        Quaternion VIRTUAL_ROBOT_IMPORT_EXPORT axisangle2quat(const Eigen::Vector3f& axis, float angle);
+        void VIRTUAL_ROBOT_IMPORT_EXPORT eigen4f2axisangle(const Eigen::Matrix4f& m,
+                                                           Eigen::Vector3f& storeAxis,
+                                                           float& storeAngle);
+        Eigen::Matrix4f VIRTUAL_ROBOT_IMPORT_EXPORT axisangle2eigen4f(const Eigen::Vector3f& axis,
+                                                                      float angle);
+        void VIRTUAL_ROBOT_IMPORT_EXPORT axisangle2eigen4f(const Eigen::Vector3f& axis,
+                                                           float angle,
+                                                           Eigen::Matrix4f& storeResult);
+        Eigen::Matrix3f VIRTUAL_ROBOT_IMPORT_EXPORT axisangle2eigen3f(const Eigen::Vector3f& axis,
+                                                                      float angle);
+        Quaternion VIRTUAL_ROBOT_IMPORT_EXPORT axisangle2quat(const Eigen::Vector3f& axis,
+                                                              float angle);
 
         /*!
             Compute the delta of two poses.
@@ -176,7 +210,10 @@ namespace VirtualRobot
             \param storeDetalPos The position delta is stored here.
             \param storeDeltaRot The orientation delta is stored here [radian]
         */
-        void VIRTUAL_ROBOT_IMPORT_EXPORT getDelta(const Eigen::Matrix4f& m1, const Eigen::Matrix4f& m2, float& storeDetalPos, float& storeDeltaRot);
+        void VIRTUAL_ROBOT_IMPORT_EXPORT getDelta(const Eigen::Matrix4f& m1,
+                                                  const Eigen::Matrix4f& m2,
+                                                  float& storeDetalPos,
+                                                  float& storeDeltaRot);
 
 
         float VIRTUAL_ROBOT_IMPORT_EXPORT rad2deg(float rad);
@@ -210,17 +247,19 @@ namespace VirtualRobot
                 this->n = plane.n;
             }
 
-            Eigen::Vector3f p;  // point
-            Eigen::Vector3f n;  // normal (unit length)
+            Eigen::Vector3f p; // point
+            Eigen::Vector3f n; // normal (unit length)
         };
 
         //! Create a floor plane
         Plane VIRTUAL_ROBOT_IMPORT_EXPORT getFloorPlane();
 
-        template<typename VectorT>
+        template <typename VectorT>
         struct BaseLine
         {
-            BaseLine() {}
+            BaseLine()
+            {
+            }
 
             BaseLine(const VectorT& point, const VectorT& dir) : p(point), d(dir)
             {
@@ -230,19 +269,18 @@ namespace VirtualRobot
                 }
             }
 
-            BaseLine(const BaseLine<VectorT>& line)
-                : p(line.p)
-                , d(line.d)
+            BaseLine(const BaseLine<VectorT>& line) : p(line.p), d(line.d)
             {
             }
 
-            bool isValid() const
+            bool
+            isValid() const
             {
                 return d.norm() > 1e-9;
             }
 
-            VectorT p;  // point
-            VectorT d;  // direction (unit length)
+            VectorT p; // point
+            VectorT d; // direction (unit length)
         };
 
         typedef BaseLine<Eigen::Vector3f> Line;
@@ -255,11 +293,13 @@ namespace VirtualRobot
                 p0.setZero();
                 p1.setZero();
             }
+
             Segment(const Eigen::Vector3f& point0, const Eigen::Vector3f& point1)
             {
                 p0 = point0;
                 p1 = point1;
             }
+
             Eigen::Vector3f p0;
             Eigen::Vector3f p1;
         };
@@ -268,7 +308,9 @@ namespace VirtualRobot
         {
             OOBB();
 
-            OOBB(const Eigen::Vector3f& minLocal, const Eigen::Vector3f& maxLocal, const Eigen::Matrix4f& globalPose);
+            OOBB(const Eigen::Vector3f& minLocal,
+                 const Eigen::Vector3f& maxLocal,
+                 const Eigen::Matrix4f& globalPose);
 
             //! Returns the 8 bounding box points transformed to global frame
             std::vector<Eigen::Vector3f> getOOBBPoints() const;
@@ -289,8 +331,8 @@ namespace VirtualRobot
         */
         struct ContactPoint
         {
-            Eigen::Vector3f p = Eigen::Vector3f::Zero();  // point
-            Eigen::Vector3f n = Eigen::Vector3f::Zero();  // normal
+            Eigen::Vector3f p = Eigen::Vector3f::Zero(); // point
+            Eigen::Vector3f n = Eigen::Vector3f::Zero(); // normal
             float force = 0;
         };
 
@@ -301,30 +343,39 @@ namespace VirtualRobot
             /**
              * Flips the orientation of the contained vertex and the normal.
              */
-            void flipOrientation()
+            void
+            flipOrientation()
             {
                 std::swap(id3, id1);
                 normal *= -1.0f;
             }
-            void set(unsigned int id1, unsigned int id2, unsigned int id3)
+
+            void
+            set(unsigned int id1, unsigned int id2, unsigned int id3)
             {
                 this->id1 = id1;
                 this->id2 = id2;
                 this->id3 = id3;
             }
-            void setColor(unsigned int idColor1, unsigned int idColor2, unsigned int idColor3)
+
+            void
+            setColor(unsigned int idColor1, unsigned int idColor2, unsigned int idColor3)
             {
                 this->idColor1 = idColor1;
                 this->idColor2 = idColor2;
                 this->idColor3 = idColor3;
             }
-            void setNormal(unsigned int idNormal1, unsigned int idNormal2, unsigned int idNormal3)
+
+            void
+            setNormal(unsigned int idNormal1, unsigned int idNormal2, unsigned int idNormal3)
             {
                 this->idNormal1 = idNormal1;
                 this->idNormal2 = idNormal2;
                 this->idNormal3 = idNormal3;
             }
-            void setMaterial(unsigned int idMaterial)
+
+            void
+            setMaterial(unsigned int idMaterial)
             {
                 this->idMaterial = idMaterial;
             }
@@ -350,17 +401,18 @@ namespace VirtualRobot
             // per face normal (used when no idNormals are given)
             Eigen::Vector3f normal{0, 0, 0};
         };
+
         struct TriangleFace6D
         {
-            int id[6];// position in vertice vector (x,y,z,nx,ny,nz)
+            int id[6]; // position in vertice vector (x,y,z,nx,ny,nz)
             ContactPoint normal;
 
             // these values are set by the ConvexHull algorithm (see GraspStudio)
-            float distNormZero;     // distance of facet to origin
-            float distNormCenter;   // distance of facet to center of convex hull
-            float distPlaneZero;    // distance of plane defined by facet to origin
-            float distPlaneCenter;  // distance of plane defined by facet to center of convex hull
-            float offset;           // offset value of facet, determined by qhull
+            float distNormZero; // distance of facet to origin
+            float distNormCenter; // distance of facet to center of convex hull
+            float distPlaneZero; // distance of plane defined by facet to origin
+            float distPlaneCenter; // distance of plane defined by facet to center of convex hull
+            float offset; // offset value of facet, determined by qhull
         };
 
         enum IntersectionResult
@@ -370,9 +422,9 @@ namespace VirtualRobot
             eIntersection
         };
 
-
         //! Get the projected point in 3D
-        Eigen::Vector3f VIRTUAL_ROBOT_IMPORT_EXPORT projectPointToPlane(const Eigen::Vector3f& point, const Plane& plane);
+        Eigen::Vector3f VIRTUAL_ROBOT_IMPORT_EXPORT
+        projectPointToPlane(const Eigen::Vector3f& point, const Plane& plane);
 
         //! Get the intersection line of two planes. If planes are parallel, the resulting line is invalid, i.e. has a zero direction vector!
         Line VIRTUAL_ROBOT_IMPORT_EXPORT intersectPlanes(const Plane& p1, const Plane& p2);
@@ -384,7 +436,10 @@ namespace VirtualRobot
             \param storeResult In case the intersection exists, the result is stored here
             \result If there is no intersection the result is eNoIntersection. In case the result is eIntersection, the resulting intersection point is stored in storeResult.
         */
-        IntersectionResult VIRTUAL_ROBOT_IMPORT_EXPORT intersectSegmentPlane(const Segment& segment, const Plane& plane, Eigen::Vector3f& storeResult);
+        IntersectionResult VIRTUAL_ROBOT_IMPORT_EXPORT
+        intersectSegmentPlane(const Segment& segment,
+                              const Plane& plane,
+                              Eigen::Vector3f& storeResult);
 
         /*!
         Intersect an object oriented bounding box (oobb) with a plane.
@@ -393,11 +448,15 @@ namespace VirtualRobot
         \param storeResult In case an intersection exists, the intersection area is defined by these points
         \result If the oobb does not intersect eNoIntersection is returned, otherwise eIntersection.
         */
-        IntersectionResult VIRTUAL_ROBOT_IMPORT_EXPORT intersectOOBBPlane(const OOBB& oobb, const Plane& plane, std::vector<Eigen::Vector3f>& storeResult);
+        IntersectionResult VIRTUAL_ROBOT_IMPORT_EXPORT
+        intersectOOBBPlane(const OOBB& oobb,
+                           const Plane& plane,
+                           std::vector<Eigen::Vector3f>& storeResult);
 
         //! Returns nearest point to p on line l
-        template<typename VectorT>
-        inline VectorT nearestPointOnLine(const BaseLine<VectorT>& l, const VectorT& p)
+        template <typename VectorT>
+        inline VectorT
+        nearestPointOnLine(const BaseLine<VectorT>& l, const VectorT& p)
         {
             if (!l.isValid())
             {
@@ -413,8 +472,11 @@ namespace VirtualRobot
         }
 
         //! Returns nearest point to p on segment given by the two end points
-        template<typename VectorT>
-        inline VectorT nearestPointOnSegment(const VectorT& firstEndPoint, const VectorT& secondEndPoint, const VectorT& p)
+        template <typename VectorT>
+        inline VectorT
+        nearestPointOnSegment(const VectorT& firstEndPoint,
+                              const VectorT& secondEndPoint,
+                              const VectorT& p)
         {
             VectorT direction = secondEndPoint - firstEndPoint;
             direction /= direction.norm();
@@ -440,8 +502,9 @@ namespace VirtualRobot
         }
 
         //! Returns the distance of vector p to line l
-        template<typename VectorT>
-        inline float distPointLine(const BaseLine<VectorT>& l, const VectorT& p)
+        template <typename VectorT>
+        inline float
+        distPointLine(const BaseLine<VectorT>& l, const VectorT& p)
         {
             if (!l.isValid())
             {
@@ -453,52 +516,68 @@ namespace VirtualRobot
         }
 
         //! Returns the distance of vector p to segment given by the two end points
-        template<typename VectorT>
-        inline float distPointSegment(const VectorT& firstEndPoint, const VectorT& secondEndPoint, const VectorT& p)
+        template <typename VectorT>
+        inline float
+        distPointSegment(const VectorT& firstEndPoint,
+                         const VectorT& secondEndPoint,
+                         const VectorT& p)
         {
             return (p - nearestPointOnSegment(firstEndPoint, secondEndPoint, p)).norm();
         }
 
         //! Check if three points are collinear
-        bool VIRTUAL_ROBOT_IMPORT_EXPORT collinear(const Eigen::Vector3f& p1, const Eigen::Vector3f& p2, const Eigen::Vector3f& p3);
+        bool VIRTUAL_ROBOT_IMPORT_EXPORT collinear(const Eigen::Vector3f& p1,
+                                                   const Eigen::Vector3f& p2,
+                                                   const Eigen::Vector3f& p3);
 
         /*!
             assuming all points to be in a plane. Returns normal of this plane.
         */
-        Eigen::Vector3f VIRTUAL_ROBOT_IMPORT_EXPORT findNormal(const std::vector<Eigen::Vector3f>& points);
+        Eigen::Vector3f VIRTUAL_ROBOT_IMPORT_EXPORT
+        findNormal(const std::vector<Eigen::Vector3f>& points);
 
         //! Get the projected point in 2D (local coordinate system of the plane)
-        Eigen::Vector2f VIRTUAL_ROBOT_IMPORT_EXPORT projectPointToPlane2D(const Eigen::Vector3f& point, const Plane& plane);
+        Eigen::Vector2f VIRTUAL_ROBOT_IMPORT_EXPORT
+        projectPointToPlane2D(const Eigen::Vector3f& point, const Plane& plane);
 
         //! Get the corresponding point in 3D
-        Eigen::Vector3f VIRTUAL_ROBOT_IMPORT_EXPORT planePoint3D(const Eigen::Vector2f& pointLocal, const Plane& plane);
+        Eigen::Vector3f VIRTUAL_ROBOT_IMPORT_EXPORT planePoint3D(const Eigen::Vector2f& pointLocal,
+                                                                 const Plane& plane);
 
-        float VIRTUAL_ROBOT_IMPORT_EXPORT getDistancePointPlane(const Eigen::Vector3f& point, const Plane& plane);
+        float VIRTUAL_ROBOT_IMPORT_EXPORT getDistancePointPlane(const Eigen::Vector3f& point,
+                                                                const Plane& plane);
 
         /*!
             This method can be used to multiply a 3d position with a matrix
             result = m * pos
         */
-        Eigen::Vector3f VIRTUAL_ROBOT_IMPORT_EXPORT transformPosition(const Eigen::Vector3f& pos, const Eigen::Matrix4f& m);
+        Eigen::Vector3f VIRTUAL_ROBOT_IMPORT_EXPORT transformPosition(const Eigen::Vector3f& pos,
+                                                                      const Eigen::Matrix4f& m);
 
         /*!
             This method can be used to multiply a 2d position with a matrix
             result = m * pos
         */
-        Eigen::Vector2f VIRTUAL_ROBOT_IMPORT_EXPORT transformPosition(const Eigen::Vector2f& pos, const Eigen::Matrix4f& m);
+        Eigen::Vector2f VIRTUAL_ROBOT_IMPORT_EXPORT transformPosition(const Eigen::Vector2f& pos,
+                                                                      const Eigen::Matrix4f& m);
 
         //! Get a random point inside the triangle that is spanned by v1, v2 and v3
-        Eigen::Vector3f VIRTUAL_ROBOT_IMPORT_EXPORT randomPointInTriangle(const Eigen::Vector3f& v1, const Eigen::Vector3f& v2, const Eigen::Vector3f& v3);
+        Eigen::Vector3f VIRTUAL_ROBOT_IMPORT_EXPORT
+        randomPointInTriangle(const Eigen::Vector3f& v1,
+                              const Eigen::Vector3f& v2,
+                              const Eigen::Vector3f& v3);
 
         /*!
             Returns true, if point is on the side of plane in which the normal vector is pointing.
         */
-        bool VIRTUAL_ROBOT_IMPORT_EXPORT onNormalPointingSide(const Eigen::Vector3f& point, const Plane& p);
+        bool VIRTUAL_ROBOT_IMPORT_EXPORT onNormalPointingSide(const Eigen::Vector3f& point,
+                                                              const Plane& p);
 
         /*!
             Returns angle between v1 and v2 [rad].
         */
-        float VIRTUAL_ROBOT_IMPORT_EXPORT getAngle(const Eigen::Vector3f& v1, const Eigen::Vector3f& v2);
+        float VIRTUAL_ROBOT_IMPORT_EXPORT getAngle(const Eigen::Vector3f& v1,
+                                                   const Eigen::Vector3f& v2);
 
         /*!
             This method unites the translational and rotational difference of two Cartesian poses to one metric value.
@@ -507,7 +586,9 @@ namespace VirtualRobot
             In the standard setting -> 3mm equals 1 degree in this metric
             The angle is approximated by replacing the costly eq alpha=2*acos(q0) with a linear term: alpha = 180-(q0+1)*90
         */
-        float VIRTUAL_ROBOT_IMPORT_EXPORT getCartesianPoseDiff(const Eigen::Matrix4f& p1, const Eigen::Matrix4f& p2, float rotInfluence = 3.0f);
+        float VIRTUAL_ROBOT_IMPORT_EXPORT getCartesianPoseDiff(const Eigen::Matrix4f& p1,
+                                                               const Eigen::Matrix4f& p2,
+                                                               float rotInfluence = 3.0f);
 
         /*!
          * \brief getPoseDiff Computes the translational and rotational difference between two poses.
@@ -517,9 +598,14 @@ namespace VirtualRobot
          * \param storeRotDiffRad The rotational absolute distance between p1 and p2 is stored here (radian)
          * \return
          */
-        void VIRTUAL_ROBOT_IMPORT_EXPORT getPoseDiff(const Eigen::Matrix4f& p1, const Eigen::Matrix4f& p2, float& storePosDiff, float& storeRotDiffRad);
+        void VIRTUAL_ROBOT_IMPORT_EXPORT getPoseDiff(const Eigen::Matrix4f& p1,
+                                                     const Eigen::Matrix4f& p2,
+                                                     float& storePosDiff,
+                                                     float& storeRotDiffRad);
 
-        float VIRTUAL_ROBOT_IMPORT_EXPORT getTriangleArea(const Eigen::Vector3f& a, const Eigen::Vector3f& b, const Eigen::Vector3f& c);
+        float VIRTUAL_ROBOT_IMPORT_EXPORT getTriangleArea(const Eigen::Vector3f& a,
+                                                          const Eigen::Vector3f& b,
+                                                          const Eigen::Vector3f& c);
 
         /************************************************************************/
         /* CONVEX HULLS                                                         */
@@ -537,6 +623,7 @@ namespace VirtualRobot
             std::vector<Eigen::Vector2f> vertices;
             std::vector<Segment2D> segments;
         };
+
         typedef std::shared_ptr<ConvexHull2D> ConvexHull2DPtr;
 
         struct ConvexHull3D
@@ -548,17 +635,18 @@ namespace VirtualRobot
             Eigen::Vector3f center;
             float maxDistFacetCenter; // maximum distance of faces to center
         };
+
         typedef std::shared_ptr<ConvexHull3D> ConvexHull3DPtr;
 
         struct ConvexHull6D
         {
-            std::vector<ContactPoint>   vertices;
+            std::vector<ContactPoint> vertices;
             std::vector<TriangleFace6D> faces;
             float volume;
             ContactPoint center;
         };
-        typedef std::shared_ptr<ConvexHull6D> ConvexHull6DPtr;
 
+        typedef std::shared_ptr<ConvexHull6D> ConvexHull6DPtr;
 
         // Copyright 2001, softSurfer (www.softsurfer.com)
         // This code may be freely used and modified for any purpose
@@ -572,36 +660,42 @@ namespace VirtualRobot
         //            =0 for P2 on the line
         //            <0 for P2 right of the line
         //    See: the January 2001 Algorithm on Area of Triangles
-        inline float isLeft(Eigen::Vector2f P0, Eigen::Vector2f P1, Eigen::Vector2f P2)
+        inline float
+        isLeft(Eigen::Vector2f P0, Eigen::Vector2f P1, Eigen::Vector2f P2)
         {
             return (P1(0) - P0(0)) * (P2(1) - P0(1)) - (P2(0) - P0(0)) * (P1(1) - P0(1));
         }
 
-        ConvexHull2DPtr VIRTUAL_ROBOT_IMPORT_EXPORT createConvexHull2D(const std::vector< Eigen::Vector2f >& points);
+        ConvexHull2DPtr VIRTUAL_ROBOT_IMPORT_EXPORT
+        createConvexHull2D(const std::vector<Eigen::Vector2f>& points);
         Eigen::Vector2f VIRTUAL_ROBOT_IMPORT_EXPORT getConvexHullCenter(ConvexHull2DPtr ch);
         bool VIRTUAL_ROBOT_IMPORT_EXPORT isInside(const Eigen::Vector2f& p, ConvexHull2DPtr hull);
 
         /*!
             Sort points according to their first coordinate. If two points share the first coord, the second one is used to decide which is "smaller".
         */
-        std::vector< Eigen::Vector2f > sortPoints(const std::vector< Eigen::Vector2f >& points);
-
+        std::vector<Eigen::Vector2f> sortPoints(const std::vector<Eigen::Vector2f>& points);
 
 
         /************************************************************************/
         /* BASIS HELPERS                                                        */
         /************************************************************************/
-        bool VIRTUAL_ROBOT_IMPORT_EXPORT ensureOrthonormalBasis(Eigen::Vector3f& x, Eigen::Vector3f& y, Eigen::Vector3f& z);
+        bool VIRTUAL_ROBOT_IMPORT_EXPORT ensureOrthonormalBasis(Eigen::Vector3f& x,
+                                                                Eigen::Vector3f& y,
+                                                                Eigen::Vector3f& z);
 
 
         //! perform the Gram-Schmidt method for building an orthonormal basis
-        bool VIRTUAL_ROBOT_IMPORT_EXPORT GramSchmidt(std::vector< Eigen::VectorXf >& basis);
+        bool VIRTUAL_ROBOT_IMPORT_EXPORT GramSchmidt(std::vector<Eigen::VectorXf>& basis);
 
         //! Searches a vector that is linearly independent of the given basis.
-        bool VIRTUAL_ROBOT_IMPORT_EXPORT randomLinearlyIndependentVector(const std::vector< Eigen::VectorXf > basis, Eigen::VectorXf& storeResult);
+        bool VIRTUAL_ROBOT_IMPORT_EXPORT
+        randomLinearlyIndependentVector(const std::vector<Eigen::VectorXf> basis,
+                                        Eigen::VectorXf& storeResult);
 
         //! Checks if m contains a col vector equal to v (distance up to 1e-8 are considered as equal)
-        bool VIRTUAL_ROBOT_IMPORT_EXPORT containsVector(const Eigen::MatrixXf& m, const Eigen::VectorXf& v);
+        bool VIRTUAL_ROBOT_IMPORT_EXPORT containsVector(const Eigen::MatrixXf& m,
+                                                        const Eigen::VectorXf& v);
 
 
         /*!
@@ -612,7 +706,9 @@ namespace VirtualRobot
             \param basisDst The final basis vectors.
             \return The transformation matrix T.
         */
-        Eigen::MatrixXf VIRTUAL_ROBOT_IMPORT_EXPORT getBasisTransformation(const std::vector< Eigen::VectorXf >& basisSrc, const std::vector< Eigen::VectorXf >& basisDst);
+        Eigen::MatrixXf VIRTUAL_ROBOT_IMPORT_EXPORT
+        getBasisTransformation(const std::vector<Eigen::VectorXf>& basisSrc,
+                               const std::vector<Eigen::VectorXf>& basisDst);
 
         /*!
             Computes the matrix describing the basis transformation from basis formed by vectors in basisSrc to basisDst.
@@ -622,9 +718,12 @@ namespace VirtualRobot
             \param basisDst The column vectors are the final basis vectors.
             \return The transformation matrix T.
         */
-        Eigen::MatrixXf VIRTUAL_ROBOT_IMPORT_EXPORT getBasisTransformation(const Eigen::MatrixXf& basisSrc, const Eigen::MatrixXf& basisDst);
+        Eigen::MatrixXf VIRTUAL_ROBOT_IMPORT_EXPORT
+        getBasisTransformation(const Eigen::MatrixXf& basisSrc, const Eigen::MatrixXf& basisDst);
 
-        Eigen::VectorXf VIRTUAL_ROBOT_IMPORT_EXPORT getPermutation(const Eigen::VectorXf& inputA, const Eigen::VectorXf& inputB, unsigned int i);
+        Eigen::VectorXf VIRTUAL_ROBOT_IMPORT_EXPORT getPermutation(const Eigen::VectorXf& inputA,
+                                                                   const Eigen::VectorXf& inputB,
+                                                                   unsigned int i);
         /************************************************************************/
         /* HELPERS and IO                                                       */
         /************************************************************************/
@@ -634,28 +733,39 @@ namespace VirtualRobot
         /*!
             Returns the Pseudo inverse matrix.
         */
-        Eigen::MatrixXf VIRTUAL_ROBOT_IMPORT_EXPORT getPseudoInverse(const Eigen::MatrixXf& m, float tol = 1e-5f);
-        Eigen::MatrixXd VIRTUAL_ROBOT_IMPORT_EXPORT getPseudoInverseD(const Eigen::MatrixXd& m, double tol = 1e-5);
+        Eigen::MatrixXf VIRTUAL_ROBOT_IMPORT_EXPORT getPseudoInverse(const Eigen::MatrixXf& m,
+                                                                     float tol = 1e-5f);
+        Eigen::MatrixXd VIRTUAL_ROBOT_IMPORT_EXPORT getPseudoInverseD(const Eigen::MatrixXd& m,
+                                                                      double tol = 1e-5);
         /*!
             Returns the damped Pseudo inverse matrix.
         */
-        Eigen::MatrixXf VIRTUAL_ROBOT_IMPORT_EXPORT getPseudoInverseDamped(const Eigen::MatrixXf& m, float lambda = 1.0f);
-        Eigen::MatrixXd VIRTUAL_ROBOT_IMPORT_EXPORT getPseudoInverseDampedD(const Eigen::MatrixXd& m, double lambda = 1.0);
+        Eigen::MatrixXf VIRTUAL_ROBOT_IMPORT_EXPORT getPseudoInverseDamped(const Eigen::MatrixXf& m,
+                                                                           float lambda = 1.0f);
+        Eigen::MatrixXd VIRTUAL_ROBOT_IMPORT_EXPORT
+        getPseudoInverseDampedD(const Eigen::MatrixXd& m, double lambda = 1.0);
 
         /*! Calculates damping factor for singularity avoidance */
-        double VIRTUAL_ROBOT_IMPORT_EXPORT getDamping(const Eigen::MatrixXd &matrix);
-        double VIRTUAL_ROBOT_IMPORT_EXPORT getDamping(const Eigen::MatrixXf &matrix);
+        double VIRTUAL_ROBOT_IMPORT_EXPORT getDamping(const Eigen::MatrixXd& matrix);
+        double VIRTUAL_ROBOT_IMPORT_EXPORT getDamping(const Eigen::MatrixXf& matrix);
 
         /*! @brief Calculates the damped least square inverse by J^T * (JJ^T + k^2 I)^{-1}
          * @param jacobian Jacobian J
          * @param squaredDampingFactor Damping factor k^2
          */
         template <typename T>
-        Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> VIRTUAL_ROBOT_IMPORT_EXPORT getDampedLeastSquareInverse(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> &jacobian, double squaredDampingFactor = 0.01f) {
-            Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> k2I = squaredDampingFactor * Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>::Identity(jacobian.rows(), jacobian.rows());
+        Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> VIRTUAL_ROBOT_IMPORT_EXPORT
+        getDampedLeastSquareInverse(
+            const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& jacobian,
+            double squaredDampingFactor = 0.01f)
+        {
+            Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> k2I =
+                squaredDampingFactor * Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>::Identity(
+                                           jacobian.rows(), jacobian.rows());
             Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> JJT = jacobian * jacobian.transpose();
             Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> JJT_k2I = JJT + k2I;
-            Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> dampedLeastSquaresInverse =  jacobian.transpose() * JJT_k2I.inverse();
+            Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> dampedLeastSquaresInverse =
+                jacobian.transpose() * JJT_k2I.inverse();
             return dampedLeastSquaresInverse;
         }
 
@@ -668,12 +778,21 @@ namespace VirtualRobot
         void VIRTUAL_ROBOT_IMPORT_EXPORT print(const Eigen::VectorXf& v, bool endline = true);
         void VIRTUAL_ROBOT_IMPORT_EXPORT printMat(const Eigen::MatrixXf& m, bool endline = true);
         void VIRTUAL_ROBOT_IMPORT_EXPORT print(const std::vector<float>& v, bool endline = true);
-        std::string VIRTUAL_ROBOT_IMPORT_EXPORT getTransformXMLString(const Eigen::Matrix4f& m, int tabs, bool skipMatrixTag = false);
-        std::string VIRTUAL_ROBOT_IMPORT_EXPORT getTransformXMLString(const Eigen::Matrix4f& m, const std::string& tabs, bool skipMatrixTag = false);
-        std::string VIRTUAL_ROBOT_IMPORT_EXPORT getTransformXMLString(const Eigen::Matrix3f& m, int tabs, bool skipMatrixTag = false);
-        std::string VIRTUAL_ROBOT_IMPORT_EXPORT getTransformXMLString(const Eigen::Matrix3f& m, const std::string& tabs, bool skipMatrixTag = false);
-        void VIRTUAL_ROBOT_IMPORT_EXPORT convertMM2M(const std::vector<ContactPoint> points, std::vector<ContactPoint>& storeResult);
+        std::string VIRTUAL_ROBOT_IMPORT_EXPORT getTransformXMLString(const Eigen::Matrix4f& m,
+                                                                      int tabs,
+                                                                      bool skipMatrixTag = false);
+        std::string VIRTUAL_ROBOT_IMPORT_EXPORT getTransformXMLString(const Eigen::Matrix4f& m,
+                                                                      const std::string& tabs,
+                                                                      bool skipMatrixTag = false);
+        std::string VIRTUAL_ROBOT_IMPORT_EXPORT getTransformXMLString(const Eigen::Matrix3f& m,
+                                                                      int tabs,
+                                                                      bool skipMatrixTag = false);
+        std::string VIRTUAL_ROBOT_IMPORT_EXPORT getTransformXMLString(const Eigen::Matrix3f& m,
+                                                                      const std::string& tabs,
+                                                                      bool skipMatrixTag = false);
+        void VIRTUAL_ROBOT_IMPORT_EXPORT convertMM2M(const std::vector<ContactPoint> points,
+                                                     std::vector<ContactPoint>& storeResult);
 
 
-    }
+    } // namespace MathTools
 } // namespace VirtualRobot

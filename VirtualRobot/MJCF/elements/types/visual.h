@@ -5,10 +5,10 @@
 namespace mjcf
 {
 
-struct VisualSection : public Element<VisualSection>
-{
-    static const std::string tag;
-    mjcf_ElementDerivedConstructors(VisualSection)
-};
+    struct VisualSection : public Element<VisualSection>
+    {
+        static const std::string tag;
+        mjcf_ElementDerivedConstructors(VisualSection)
+    };
 
-}
+} // namespace mjcf

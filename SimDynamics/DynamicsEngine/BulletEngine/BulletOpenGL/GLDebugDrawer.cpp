@@ -1,21 +1,22 @@
 
 #include "GLDebugDrawer.h"
+
+#include <cstdio> //printf debugging
+
 #include "GLDebugFont.h"
 #include "GlutStuff.h"
 
-
-
-#include <cstdio> //printf debugging
-GLDebugDrawer::GLDebugDrawer()
-    : m_debugMode(0)
+GLDebugDrawer::GLDebugDrawer() : m_debugMode(0)
 {
-
 }
 
-GLDebugDrawer::~GLDebugDrawer()
-= default;
+GLDebugDrawer::~GLDebugDrawer() = default;
 
-void    GLDebugDrawer::drawLine(const btVector3& from, const btVector3& to, const btVector3& fromColor, const btVector3& toColor)
+void
+GLDebugDrawer::drawLine(const btVector3& from,
+                        const btVector3& to,
+                        const btVector3& fromColor,
+                        const btVector3& toColor)
 {
     glBegin(GL_LINES);
     glColor3f(fromColor.getX(), fromColor.getY(), fromColor.getZ());
@@ -25,12 +26,14 @@ void    GLDebugDrawer::drawLine(const btVector3& from, const btVector3& to, cons
     glEnd();
 }
 
-void    GLDebugDrawer::drawLine(const btVector3& from, const btVector3& to, const btVector3& color)
+void
+GLDebugDrawer::drawLine(const btVector3& from, const btVector3& to, const btVector3& color)
 {
     drawLine(from, to, color, color);
 }
 
-void GLDebugDrawer::drawSphere(const btVector3& p, btScalar radius, const btVector3& color)
+void
+GLDebugDrawer::drawSphere(const btVector3& p, btScalar radius, const btVector3& color)
 {
     glColor4f(color.getX(), color.getY(), color.getZ(), btScalar(1.0f));
     glPushMatrix();
@@ -44,10 +47,10 @@ void GLDebugDrawer::drawSphere(const btVector3& p, btScalar radius, const btVect
     for (i = 0; i <= lats; i++)
     {
         btScalar lat0 = SIMD_PI * (-btScalar(0.5) + (btScalar)(i - 1) / lats);
-        btScalar z0  = radius * sin(lat0);
-        btScalar zr0 =  radius * cos(lat0);
+        btScalar z0 = radius * sin(lat0);
+        btScalar zr0 = radius * cos(lat0);
 
-        btScalar lat1 = SIMD_PI * (-btScalar(0.5) + (btScalar) i / lats);
+        btScalar lat1 = SIMD_PI * (-btScalar(0.5) + (btScalar)i / lats);
         btScalar z1 = radius * sin(lat1);
         btScalar zr1 = radius * cos(lat1);
 
@@ -71,9 +74,12 @@ void GLDebugDrawer::drawSphere(const btVector3& p, btScalar radius, const btVect
     glPopMatrix();
 }
 
-
-
-void    GLDebugDrawer::drawTriangle(const btVector3& a, const btVector3& b, const btVector3& c, const btVector3& color, btScalar alpha)
+void
+GLDebugDrawer::drawTriangle(const btVector3& a,
+                            const btVector3& b,
+                            const btVector3& c,
+                            const btVector3& color,
+                            btScalar alpha)
 {
     //  if (m_debugMode > 0)
     {
@@ -88,24 +94,31 @@ void    GLDebugDrawer::drawTriangle(const btVector3& a, const btVector3& b, cons
     }
 }
 
-void    GLDebugDrawer::setDebugMode(int debugMode)
+void
+GLDebugDrawer::setDebugMode(int debugMode)
 {
     m_debugMode = debugMode;
-
 }
 
-void    GLDebugDrawer::draw3dText(const btVector3& location, const char* /*textString*/)
+void
+GLDebugDrawer::draw3dText(const btVector3& location, const char* /*textString*/)
 {
-    glRasterPos3f(location.x(),  location.y(),  location.z());
+    glRasterPos3f(location.x(), location.y(), location.z());
     //BMF_DrawString(BMF_GetFont(BMF_kHelvetica10),textString);
 }
 
-void    GLDebugDrawer::reportErrorWarning(const char* warningString)
+void
+GLDebugDrawer::reportErrorWarning(const char* warningString)
 {
     printf("%s\n", warningString);
 }
 
-void    GLDebugDrawer::drawContactPoint(const btVector3& pointOnB, const btVector3& normalOnB, btScalar /*distance*/, int /*lifeTime*/, const btVector3& color)
+void
+GLDebugDrawer::drawContactPoint(const btVector3& pointOnB,
+                                const btVector3& normalOnB,
+                                btScalar /*distance*/,
+                                int /*lifeTime*/,
+                                const btVector3& color)
 {
 
     {
@@ -123,12 +136,5 @@ void    GLDebugDrawer::drawContactPoint(const btVector3& pointOnB, const btVecto
         //      char buf[12];
         //      sprintf(buf," %d",lifeTime);
         //BMF_DrawString(BMF_GetFont(BMF_kHelvetica10),buf);
-
-
     }
 }
-
-
-
-
-

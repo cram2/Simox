@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <iostream>
 
 #include <Eigen/Geometry>
 
@@ -9,6 +10,7 @@
 #include <SimoxUtility/math/pose/pose.h>
 #include <SimoxUtility/meta/enum/EnumNames.hpp>
 
+#include "Assert.h"
 #include "Nodes/Sensor.h"
 #include "Robot.h"
 #include "VirtualRobotException.h"
@@ -377,7 +379,7 @@ namespace VirtualRobot
         {
             throw VirtualRobotException("No second data");
         }
-        
+
         return secondData.value();
     }
 

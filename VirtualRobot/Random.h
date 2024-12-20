@@ -22,25 +22,30 @@
 */
 #pragma once
 
-#include "VirtualRobot.h"
 #include <random>
+
+#include "VirtualRobotImportExport.h"
 
 namespace VirtualRobot
 {
-    std::mt19937_64 VIRTUAL_ROBOT_IMPORT_EXPORT & PRNG64Bit();
+    std::mt19937_64 VIRTUAL_ROBOT_IMPORT_EXPORT& PRNG64Bit();
 
-    inline typename std::mt19937_64::result_type RandomNumber()
+    inline typename std::mt19937_64::result_type
+    RandomNumber()
     {
         return PRNG64Bit()();
     }
-    inline float RandomFloat()
+
+    inline float
+    RandomFloat()
     {
         static thread_local std::uniform_real_distribution<float> d{0.f, std::nextafter(1.f, 2.f)};
         return d(PRNG64Bit());
     }
-    inline float RandomFloat(float min, float max)
+
+    inline float
+    RandomFloat(float min, float max)
     {
         return std::uniform_real_distribution<float>{min, max}(PRNG64Bit());
     }
-}
-
+} // namespace VirtualRobot

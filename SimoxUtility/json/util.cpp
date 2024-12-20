@@ -2,7 +2,6 @@
 
 #include <sstream>
 
-
 namespace simox
 {
     json::json::const_reference
@@ -24,5 +23,4 @@ namespace simox
         }
         throw std::out_of_range(ss.str());
     }
-}
-
+} // namespace simox

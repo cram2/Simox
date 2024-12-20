@@ -1,20 +1,29 @@
 #include "ConstrainedHierarchicalIK.h"
 
+#include "Logging.h"
+#include "VirtualRobotException.h"
+
 using namespace VirtualRobot;
 
-ConstrainedHierarchicalIK::ConstrainedHierarchicalIK(RobotPtr& robot, const RobotNodeSetPtr& nodeSet, float stepSize, int maxIterations, float stall_epsilon, float raise_epsilon) :
+ConstrainedHierarchicalIK::ConstrainedHierarchicalIK(RobotPtr& robot,
+                                                     const RobotNodeSetPtr& nodeSet,
+                                                     float stepSize,
+                                                     int maxIterations,
+                                                     float stall_epsilon,
+                                                     float raise_epsilon) :
     ConstrainedIK(robot, nodeSet, maxIterations, stall_epsilon, raise_epsilon),
     nodeSet(nodeSet),
     stepSize(stepSize)
 {
 }
 
-bool ConstrainedHierarchicalIK::initialize()
+bool
+ConstrainedHierarchicalIK::initialize()
 {
     ik.reset(new HierarchicalIK(nodeSet));
     jacobians.clear();
 
-    for (auto & constraint : constraints)
+    for (auto& constraint : constraints)
     {
         jacobians.push_back(constraint);
     }
@@ -22,7 +31,8 @@ bool ConstrainedHierarchicalIK::initialize()
     return ConstrainedIK::initialize();
 }
 
-bool ConstrainedHierarchicalIK::solveStep()
+bool
+ConstrainedHierarchicalIK::solveStep()
 {
     THROW_VR_EXCEPTION_IF(!ik, "IK not initialized, did you forget to call initialize()?");
 
@@ -39,7 +49,7 @@ bool ConstrainedHierarchicalIK::solveStep()
     lastDelta = delta;
 
     // Check if any of the hard constraints has increased error
-    for (auto & constraint : constraints)
+    for (auto& constraint : constraints)
     {
         if (hardConstraints[constraint])
         {
@@ -48,8 +58,8 @@ bool ConstrainedHierarchicalIK::solveStep()
             {
                 VR_INFO << "Constrained IK failed due to error raise for hard constraint. "
                         << "hardConstraints[constraint]" << hardConstraints[constraint]
-                        << " getErrorDifference()=" << diff
-                        << " raiseEpsilon=" << raiseEpsilon << std::endl;
+                        << " getErrorDifference()=" << diff << " raiseEpsilon=" << raiseEpsilon
+                        << std::endl;
                 return false;
             }
         }

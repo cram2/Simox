@@ -22,14 +22,11 @@
 */
 #pragma once
 
-#include "VirtualRobot.h"
-#include "CollisionDetection/CollisionModel.h"
-#include "Visualization/VisualizationFactory.h"
-#include "GraspableSensorizedObject.h"
-
 #include <string>
-#include <vector>
 
+#include "GraspableSensorizedObject.h"
+#include "VirtualRobot.h"
+#include "Visualization/VisualizationFactory.h"
 
 namespace VirtualRobot
 {
@@ -40,18 +37,25 @@ namespace VirtualRobot
     class VIRTUAL_ROBOT_IMPORT_EXPORT Obstacle : public GraspableSensorizedObject
     {
     public:
-
         /*!
         */
-        Obstacle(const std::string& name, VisualizationNodePtr visualization = {},
-                 CollisionModelPtr collisionModel = {}, const SceneObject::Physics& p = {},
+        Obstacle(const std::string& name,
+                 VisualizationNodePtr visualization = {},
+                 CollisionModelPtr collisionModel = {},
+                 const SceneObject::Physics& p = {},
                  CollisionCheckerPtr colChecker = {});
 
     private:
-        struct TagTrimeshCtor {};
+        struct TagTrimeshCtor
+        {
+        };
+
         Obstacle(TagTrimeshCtor, const std::string& name, const VisualizationNodePtr& vis);
+
     public:
-        Obstacle(const std::string& name, const TriMeshModelPtr& trimesh, const std::string& filename = "");
+        Obstacle(const std::string& name,
+                 const TriMeshModelPtr& trimesh,
+                 const std::string& filename = "");
         /*!
         */
         ~Obstacle() override;
@@ -61,7 +65,9 @@ namespace VirtualRobot
         /*!
             Clones this object. If no col checker is given, the one of the original object is used.
         */
-        ObstaclePtr clone(const std::string& name, CollisionCheckerPtr colChecker = {}, float scaling = 1.0) const;
+        ObstaclePtr clone(const std::string& name,
+                          CollisionCheckerPtr colChecker = {},
+                          float scaling = 1.0) const;
 
         int getID();
 
@@ -74,9 +80,13 @@ namespace VirtualRobot
             \param visualizationType Here the type of visualization can be specified (e.g. "Inventor"). If empty, the first registered visualization type (which is usually the only one) is used.
             \param colChecker Only needed if you plan to use the collision checker in parallel. If not given, the object is registered with the global singleton collision checker.
         */
-        static ObstaclePtr createBox(float width, float height, float depth,
-                                     VisualizationFactory::Color color = VisualizationFactory::Color::Red(),
-                                     std::string visualizationType = "", CollisionCheckerPtr colChecker = {});
+        static ObstaclePtr
+        createBox(float width,
+                  float height,
+                  float depth,
+                  VisualizationFactory::Color color = VisualizationFactory::Color::Red(),
+                  std::string visualizationType = "",
+                  CollisionCheckerPtr colChecker = {});
         /*!
             Create a standard obstacle.
             \param radius The radius of the sphere.
@@ -84,9 +94,11 @@ namespace VirtualRobot
             \param visualizationType Here the type of visualization can be specified (e.g. "Inventor"). If empty, the first registered visualization type (which is usually the only one) is used.
             \param colChecker Only needed if you plan to use the collision checker in parallel. If not given, the object is registered with the global singleton collision checker.
         */
-        static ObstaclePtr createSphere(float radius,
-                                        VisualizationFactory::Color color = VisualizationFactory::Color::Red(),
-                                        std::string visualizationType = "", CollisionCheckerPtr colChecker = {});
+        static ObstaclePtr
+        createSphere(float radius,
+                     VisualizationFactory::Color color = VisualizationFactory::Color::Red(),
+                     std::string visualizationType = "",
+                     CollisionCheckerPtr colChecker = {});
         /*!
             Create a standard obstacle.
             \param radius The radius of the cylinder.
@@ -95,9 +107,12 @@ namespace VirtualRobot
             \param visualizationType Here the type of visualization can be specified (e.g. "Inventor"). If empty, the first registered visualization type (which is usually the only one) is used.
             \param colChecker Only needed if you plan to use the collision checker in parallel. If not given, the object is registered with the global singleton collision checker.
         */
-        static ObstaclePtr createCylinder(float radius, float height,
-                                          VisualizationFactory::Color color = VisualizationFactory::Color::Red(),
-                                          std::string visualizationType = "", CollisionCheckerPtr colChecker = {});
+        static ObstaclePtr
+        createCylinder(float radius,
+                       float height,
+                       VisualizationFactory::Color color = VisualizationFactory::Color::Red(),
+                       std::string visualizationType = "",
+                       CollisionCheckerPtr colChecker = {});
 
         /*!
         Create a standard obstacle from a mesh.
@@ -106,15 +121,18 @@ namespace VirtualRobot
         \param colChecker Only needed if you plan to use the collision checker in parallel. If not given, the object is registered with the global singleton collision checker.
         */
         static ObstaclePtr createFromMesh(TriMeshModelPtr mesh,
-                                          std::string visualizationType = "", CollisionCheckerPtr colChecker = {});
+                                          std::string visualizationType = "",
+                                          CollisionCheckerPtr colChecker = {});
 
-        virtual std::string toXML(const std::string& basePath, int tabs = 0, const std::string& modelPathRelative = "", bool storeSensors = true);
+        virtual std::string toXML(const std::string& basePath,
+                                  int tabs = 0,
+                                  const std::string& modelPathRelative = "",
+                                  bool storeSensors = true);
 
         void setFilename(const std::string& filename);
         std::string getFilename() const;
 
     protected:
-
         std::string filename;
 
         // a counter for internal ids
@@ -123,5 +141,4 @@ namespace VirtualRobot
         int id;
     };
 
-} // namespace
-
+} // namespace VirtualRobot

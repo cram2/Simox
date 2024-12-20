@@ -30,6 +30,9 @@
 #include <VirtualRobot/Grasping/GraspSet.h>
 #include <VirtualRobot/Robot.h>
 
+#include "VirtualRobot/Grasping/Grasp.h"
+#include "VirtualRobot/Nodes/RobotNode.h"
+
 namespace simox::geometric_planning
 {
 

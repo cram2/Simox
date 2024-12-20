@@ -1,20 +1,24 @@
 #include "CSpace.h"
-#include "CSpaceNode.h"
-#include <VirtualRobot/Robot.h>
-#include <VirtualRobot/Nodes/RobotNode.h>
-#include "Sampler.h"
-#include "CSpaceTree.h"
-#include "CSpacePath.h"
-#include "ConfigurationConstraint.h"
-#include <VirtualRobot/CollisionDetection/CDManager.h>
-#include <VirtualRobot/CollisionDetection/CollisionChecker.h>
+
 #include <cfloat>
 #include <cmath>
+#include <ctime>
 #include <fstream>
 #include <iomanip>
-#include <ctime>
+
+#include <VirtualRobot/CollisionDetection/CDManager.h>
+#include <VirtualRobot/CollisionDetection/CollisionChecker.h>
 #include <VirtualRobot/MathTools.h>
+#include <VirtualRobot/Nodes/RobotNode.h>
 #include <VirtualRobot/Random.h>
+#include <VirtualRobot/Robot.h>
+
+#include "CSpaceNode.h"
+#include "CSpacePath.h"
+#include "CSpaceTree.h"
+#include "ConfigurationConstraint.h"
+#include "Sampler.h"
+#include "VirtualRobot/RobotNodeSet.h"
 #define GET_RANDOM_DATA_FROM_64BIT_ADDRESS(a) (int)(0xFF & (long)a) | (0xFF00 & ((long)a >> 16))
 
 using namespace std;
@@ -26,7 +30,11 @@ namespace Saba
     SABA_IMPORT_EXPORT int CSpace::cloneCounter = 0;
 
     //#define DO_THE_TESTS
-    CSpace::CSpace(VirtualRobot::RobotPtr robot, VirtualRobot::CDManagerPtr collisionManager, VirtualRobot::RobotNodeSetPtr robotNodes, unsigned int maxConfigs, unsigned int randomSeed)
+    CSpace::CSpace(VirtualRobot::RobotPtr robot,
+                   VirtualRobot::CDManagerPtr collisionManager,
+                   VirtualRobot::RobotNodeSetPtr robotNodes,
+                   unsigned int maxConfigs,
+                   unsigned int randomSeed)
     {
         if (maxConfigs <= 0)
         {
@@ -85,7 +93,9 @@ namespace Saba
 
             if (boundaryDist[i] == 0)
             {
-                SABA_WARNING << "Limits for joint " << robotJoints[i]->getName() << " not set correctly. Degenerated dimension (" << i << ") in C-Space." << std::endl;
+                SABA_WARNING << "Limits for joint " << robotJoints[i]->getName()
+                             << " not set correctly. Degenerated dimension (" << i
+                             << ") in C-Space." << std::endl;
             }
         }
 
@@ -98,7 +108,7 @@ namespace Saba
 
         checkForBorderlessDimensions(checkForBorderlessDims);
 
-//        SABA_INFO << " dimension: " << dimension << ", random Seed: " << randomSeed << std::endl;
+        //        SABA_INFO << " dimension: " << dimension << ", random Seed: " << randomSeed << std::endl;
 
         // allocate configs
         maxNodes = maxConfigs;
@@ -116,25 +126,26 @@ namespace Saba
         }
     }
 
-
     CSpace::~CSpace()
     {
         freeNodes.clear();
         nodes.clear();
     }
 
-
-    void CSpace::requestStop()
+    void
+    CSpace::requestStop()
     {
         stopPathCheck = true;
     }
 
-    void CSpace::setRandomSeed(unsigned int random_seed)
+    void
+    CSpace::setRandomSeed(unsigned int random_seed)
     {
         VirtualRobot::PRNG64Bit().seed(random_seed);
     }
 
-    void CSpace::reset()
+    void
+    CSpace::reset()
     {
         resetPerformanceVars();
         unsigned int i;
@@ -147,7 +158,8 @@ namespace Saba
         freeNodes = nodes;
     }
 
-    CSpaceNodePtr CSpace::getNode(unsigned int id)
+    CSpaceNodePtr
+    CSpace::getNode(unsigned int id)
     {
         if (id >= nodes.size())
         {
@@ -163,7 +175,8 @@ namespace Saba
         return nodes[id];
     }
 
-    bool CSpace::checkSolution(CSpacePathPtr solution, bool bVerbose)
+    bool
+    CSpace::checkSolution(CSpacePathPtr solution, bool bVerbose)
     {
         if (!solution)
         {
@@ -203,7 +216,8 @@ namespace Saba
         return true;
     }
 
-    bool CSpace::checkTree(CSpaceTreePtr tree)
+    bool
+    CSpace::checkTree(CSpaceTreePtr tree)
     {
         if (!tree)
         {
@@ -233,7 +247,8 @@ namespace Saba
         return true;
     }
 
-    void CSpace::setBoundaries(const Eigen::VectorXf& min, const Eigen::VectorXf& max)
+    void
+    CSpace::setBoundaries(const Eigen::VectorXf& min, const Eigen::VectorXf& max)
     {
         SABA_ASSERT(min.rows() == dimension)
 
@@ -243,8 +258,8 @@ namespace Saba
         }
     }
 
-
-    void CSpace::setBoundary(unsigned int dim, float min, float max)
+    void
+    CSpace::setBoundary(unsigned int dim, float min, float max)
     {
         SABA_ASSERT(dim < dimension)
 
@@ -261,7 +276,8 @@ namespace Saba
         checkForBorderlessDimensions(checkForBorderlessDims);
     }
 
-    void CSpace::setMetricWeights(const Eigen::VectorXf& weights)
+    void
+    CSpace::setMetricWeights(const Eigen::VectorXf& weights)
     {
         SABA_ASSERT(weights.rows() == dimension)
 
@@ -279,7 +295,8 @@ namespace Saba
         enableWeights(true);
     }
 
-    void CSpace::checkForBorderlessDimensions(bool enable)
+    void
+    CSpace::checkForBorderlessDimensions(bool enable)
     {
         checkForBorderlessDims = enable;
         borderLessDimension.resize(dimension);
@@ -290,12 +307,18 @@ namespace Saba
         }
     }
 
-    float CSpace::calcDist(const Eigen::VectorXf& c1, const Eigen::VectorXf& c2, bool forceDisablingMetricWeights)
+    float
+    CSpace::calcDist(const Eigen::VectorXf& c1,
+                     const Eigen::VectorXf& c2,
+                     bool forceDisablingMetricWeights)
     {
         return sqrtf(calcDist2(c1, c2, forceDisablingMetricWeights));
     }
 
-    float CSpace::calcDist2(const Eigen::VectorXf& c1, const Eigen::VectorXf& c2, bool forceDisablingMetricWeights)
+    float
+    CSpace::calcDist2(const Eigen::VectorXf& c1,
+                      const Eigen::VectorXf& c2,
+                      bool forceDisablingMetricWeights)
     {
         SABA_ASSERT(c1.rows() == dimension)
         SABA_ASSERT(c2.rows() == dimension)
@@ -303,7 +326,7 @@ namespace Saba
         float res = 0.0f;
         float dist;
 
-        for (unsigned int i = 0 ; i < dimension; i++)
+        for (unsigned int i = 0; i < dimension; i++)
         {
             dist = c1[i] - c2[i];
 
@@ -327,8 +350,12 @@ namespace Saba
         return res;
     }
 
-
-    void CSpace::generateNewConfig(const Eigen::VectorXf& randomConfig, const Eigen::VectorXf& nearestConfig, Eigen::VectorXf& storeNewConfig, float stepSize, float preCalculatedDist /*=-1.0*/)
+    void
+    CSpace::generateNewConfig(const Eigen::VectorXf& randomConfig,
+                              const Eigen::VectorXf& nearestConfig,
+                              Eigen::VectorXf& storeNewConfig,
+                              float stepSize,
+                              float preCalculatedDist /*=-1.0*/)
     {
         SABA_ASSERT(randomConfig.rows() == dimension)
         SABA_ASSERT(nearestConfig.rows() == dimension)
@@ -355,7 +382,11 @@ namespace Saba
         }
     }
 
-    void CSpace::getDirectionVector(const Eigen::VectorXf& c1, const Eigen::VectorXf& c2, Eigen::VectorXf& storeDir, float length)
+    void
+    CSpace::getDirectionVector(const Eigen::VectorXf& c1,
+                               const Eigen::VectorXf& c2,
+                               Eigen::VectorXf& storeDir,
+                               float length)
     {
         SABA_ASSERT(c1.rows() == dimension)
         SABA_ASSERT(c2.rows() == dimension)
@@ -382,8 +413,8 @@ namespace Saba
         }
     }
 
-
-    float CSpace::calculateObstacleDistance(const Eigen::VectorXf& config)
+    float
+    CSpace::calculateObstacleDistance(const Eigen::VectorXf& config)
     {
         SABA_ASSERT(config.rows() == dimension)
 
@@ -406,9 +437,11 @@ namespace Saba
         return d;
     }
 
-    float CSpace::getDirectedMaxMovement(const Eigen::VectorXf& /*config*/, const Eigen::VectorXf& nextConfig)
+    float
+    CSpace::getDirectedMaxMovement(const Eigen::VectorXf& /*config*/,
+                                   const Eigen::VectorXf& nextConfig)
     {
-        (void) nextConfig;
+        (void)nextConfig;
 
         // SABA_ASSERT(config.rows() == dimension)
         SABA_ASSERT(nextConfig.rows() == dimension)
@@ -437,8 +470,8 @@ namespace Saba
         return directedFreeSpaceStep;*/
     }
 
-
-    bool CSpace::isCollisionFree(const Eigen::VectorXf& config)
+    bool
+    CSpace::isCollisionFree(const Eigen::VectorXf& config)
     {
         SABA_ASSERT(config.rows() == dimension)
 
@@ -460,19 +493,22 @@ namespace Saba
         return !res;
     }
 
-    void CSpace::lock()
+    void
+    CSpace::lock()
     {
         //if (multiThreaded)
         colCheckMutex.lock();
     }
 
-    void CSpace::unlock()
+    void
+    CSpace::unlock()
     {
         //if (multiThreaded)
         colCheckMutex.unlock();
     }
 
-    bool CSpace::isInBoundary(const Eigen::VectorXf& config)
+    bool
+    CSpace::isInBoundary(const Eigen::VectorXf& config)
     {
         SABA_ASSERT(config.rows() == dimension)
 
@@ -488,7 +524,11 @@ namespace Saba
         return true;
     }
 
-    bool CSpace::isConfigValid(const Eigen::VectorXf& config, bool checkBorders, bool checkCollisions, bool checkConstraints)
+    bool
+    CSpace::isConfigValid(const Eigen::VectorXf& config,
+                          bool checkBorders,
+                          bool checkCollisions,
+                          bool checkConstraints)
     {
         SABA_ASSERT(config.rows() == dimension)
 
@@ -513,8 +553,8 @@ namespace Saba
         return true;
     }
 
-
-    float CSpace::getBoundaryMin(unsigned int d)
+    float
+    CSpace::getBoundaryMin(unsigned int d)
     {
         if (d >= dimension)
         {
@@ -525,8 +565,8 @@ namespace Saba
         return boundaryMin[d];
     }
 
-
-    float CSpace::getBoundaryMax(unsigned int d)
+    float
+    CSpace::getBoundaryMax(unsigned int d)
     {
         if (d >= dimension)
         {
@@ -537,8 +577,8 @@ namespace Saba
         return boundaryMax[d];
     }
 
-
-    float CSpace::getBoundaryDist(unsigned int d)
+    float
+    CSpace::getBoundaryDist(unsigned int d)
     {
         if (d >= dimension)
         {
@@ -549,9 +589,8 @@ namespace Saba
         return boundaryDist[d];
     }
 
-
-
-    void CSpace::respectBoundaries(Eigen::VectorXf& config)
+    void
+    CSpace::respectBoundaries(Eigen::VectorXf& config)
     {
         SABA_ASSERT(config.rows() == dimension)
 
@@ -569,13 +608,14 @@ namespace Saba
         }
     }
 
-
     // config values are not set! (except id)
-    CSpaceNodePtr CSpace::createNewNode()
+    CSpaceNodePtr
+    CSpace::createNewNode()
     {
         if (freeNodes.size() == 0)
         {
-            THROW_SABA_EXCEPTION(" Could not create new nodes... (maxNodes exceeded:" << maxNodes << ")");
+            THROW_SABA_EXCEPTION(" Could not create new nodes... (maxNodes exceeded:" << maxNodes
+                                                                                      << ")");
         }
 
         // get free node
@@ -588,7 +628,8 @@ namespace Saba
         return result;
     }
 
-    Eigen::VectorXf CSpace::interpolate(const Eigen::VectorXf& q1, const Eigen::VectorXf& q2, float step)
+    Eigen::VectorXf
+    CSpace::interpolate(const Eigen::VectorXf& q1, const Eigen::VectorXf& q2, float step)
     {
         SABA_ASSERT(q1.rows() == dimension)
         SABA_ASSERT(q2.rows() == dimension)
@@ -602,11 +643,13 @@ namespace Saba
         return res;
     }
 
-    float CSpace::interpolate(const Eigen::VectorXf& q1, const Eigen::VectorXf& q2, int dim, float step)
+    float
+    CSpace::interpolate(const Eigen::VectorXf& q1, const Eigen::VectorXf& q2, int dim, float step)
     {
         SABA_ASSERT(q1.rows() == dimension)
         SABA_ASSERT(q2.rows() == dimension)
-        SABA_ASSERT_MESSAGE((dim >= 0 && dim < (int)robotJoints.size()),  "Dim " << dim << " out of bounds..." << endl)
+        SABA_ASSERT_MESSAGE((dim >= 0 && dim < (int)robotJoints.size()),
+                            "Dim " << dim << " out of bounds..." << endl)
 
         // translational joint
         if (robotJoints[dim]->isTranslationalJoint())
@@ -625,20 +668,22 @@ namespace Saba
             // we map 'start' and 'end' to [0,2pi] (temporarily)
             float start = q1[dim];
             float end = q2[dim];
-            float res = interpolateRotational(start, end , step);
+            float res = interpolateRotational(start, end, step);
             // change to actual defined borders
-            res = VirtualRobot::MathTools::angleModX(res, 0.5f*(boundaryMax[dim]+boundaryMin[dim]));
+            res = VirtualRobot::MathTools::angleModX(res,
+                                                     0.5f * (boundaryMax[dim] + boundaryMin[dim]));
             return res;
         }
-
     }
 
-    float CSpace::interpolateLinear(float a, float b, float step)
+    float
+    CSpace::interpolateLinear(float a, float b, float step)
     {
         return (a + step * (b - a));
     }
 
-    float CSpace::interpolateRotational(float a, float b, float step)
+    float
+    CSpace::interpolateRotational(float a, float b, float step)
     {
         auto fmod = [](float value, float boundLow, float boundHigh)
         {
@@ -650,10 +695,7 @@ namespace Saba
             return value;
         };
 
-        auto lerp = [](float a, float b, float f)
-        {
-            return a * (1 - f) + b * f;
-        };
+        auto lerp = [](float a, float b, float f) { return a * (1 - f) + b * f; };
 
         auto angleLerp = [&](float a, float b, float f)
         {
@@ -663,8 +705,8 @@ namespace Saba
         return angleLerp(a, b, step);
     }
 
-
-    float CSpace::getRandomConfig_UniformSampling(unsigned int dim)
+    float
+    CSpace::getRandomConfig_UniformSampling(unsigned int dim)
     {
         SABA_ASSERT(dim <= dimension)
 
@@ -673,7 +715,8 @@ namespace Saba
         return res;
     }
 
-    void CSpace::getRandomConfig(Eigen::VectorXf& config, bool checkValid)
+    void
+    CSpace::getRandomConfig(Eigen::VectorXf& config, bool checkValid)
     {
         SABA_ASSERT(config.rows() == dimension)
 
@@ -693,12 +736,11 @@ namespace Saba
                     config[i] = boundaryMin[i] + (boundaryDist[i] * t);
                 }
             }
-        }
-        while (checkValid && !isConfigValid(config, false, true, true));
+        } while (checkValid && !isConfigValid(config, false, true, true));
     }
 
-
-    void CSpace::printConfig(const Eigen::VectorXf& config) const
+    void
+    CSpace::printConfig(const Eigen::VectorXf& config) const
     {
         if (config.rows() != dimension)
         {
@@ -722,12 +764,14 @@ namespace Saba
         cout.precision(pr);
     }
 
-    void CSpace::exclusiveRobotAccess(bool bGranted)
+    void
+    CSpace::exclusiveRobotAccess(bool bGranted)
     {
         multiThreaded = bGranted;
     }
 
-    bool CSpace::hasExclusiveRobotAccess()
+    bool
+    CSpace::hasExclusiveRobotAccess()
     {
         return multiThreaded;
     }
@@ -737,13 +781,15 @@ namespace Saba
         return maxConfigs;
     }*/
 
-    void CSpace::setRandomSampler(SamplerPtr sampler)
+    void
+    CSpace::setRandomSampler(SamplerPtr sampler)
     {
         sampleAlgorithm = sampler;
         enableWeights(useMetricWeights); // update sample class
     }
 
-    void CSpace::enableWeights(bool enable)
+    void
+    CSpace::enableWeights(bool enable)
     {
         useMetricWeights = enable;
 
@@ -760,17 +806,20 @@ namespace Saba
         }
     }
 
-    VirtualRobot::RobotNodeSetPtr CSpace::getRobotNodeSet() const
+    VirtualRobot::RobotNodeSetPtr
+    CSpace::getRobotNodeSet() const
     {
         return robotNodes;
     }
 
-    VirtualRobot::CDManagerPtr CSpace::getCDManager() const
+    VirtualRobot::CDManagerPtr
+    CSpace::getCDManager() const
     {
         return cdm;
     }
 
-    void CSpace::removeNode(CSpaceNodePtr node)
+    void
+    CSpace::removeNode(CSpaceNodePtr node)
     {
         SABA_ASSERT(node)
 
@@ -784,7 +833,8 @@ namespace Saba
         freeNodes.push_back(node);
     }
 
-    CSpacePathPtr CSpace::createPath(const Eigen::VectorXf& start, const Eigen::VectorXf& goal)
+    CSpacePathPtr
+    CSpace::createPath(const Eigen::VectorXf& start, const Eigen::VectorXf& goal)
     {
         SABA_ASSERT(start.rows() == dimension)
         SABA_ASSERT(goal.rows() == dimension)
@@ -794,7 +844,10 @@ namespace Saba
         return p;
     }
 
-    Saba::CSpacePathPtr CSpace::createPathUntilInvalid(const Eigen::VectorXf& start, const Eigen::VectorXf& goal, float& storeAddedLength)
+    Saba::CSpacePathPtr
+    CSpace::createPathUntilInvalid(const Eigen::VectorXf& start,
+                                   const Eigen::VectorXf& goal,
+                                   float& storeAddedLength)
     {
         SABA_ASSERT(start.rows() == dimension);
         SABA_ASSERT(goal.rows() == dimension);
@@ -811,45 +864,50 @@ namespace Saba
         return p;
     }
 
-    bool CSpace::isPathValid(const Eigen::VectorXf& /*q1*/, const Eigen::VectorXf& q2)
+    bool
+    CSpace::isPathValid(const Eigen::VectorXf& /*q1*/, const Eigen::VectorXf& q2)
     {
         return isConfigValid(q2);
     }
 
-
-    bool CSpace::isBorderlessDimension(unsigned int dim) const
+    bool
+    CSpace::isBorderlessDimension(unsigned int dim) const
     {
         SABA_ASSERT(dim < dimension)
 
-//        if (!(robotJoints[dim]->isTranslationalJoint()))
-//        {
-//            // rotational joint
-//            if (abs((double)(robotJoints[dim]->getJointLimitHi() - robotJoints[dim]->getJointLimitLo())) > (1.9999999999999 * M_PI))
-//            {
-//                return true;
-//            }
-//        }
+        //        if (!(robotJoints[dim]->isTranslationalJoint()))
+        //        {
+        //            // rotational joint
+        //            if (abs((double)(robotJoints[dim]->getJointLimitHi() - robotJoints[dim]->getJointLimitLo())) > (1.9999999999999 * M_PI))
+        //            {
+        //                return true;
+        //            }
+        //        }
         return robotJoints[dim]->isLimitless();
     }
 
-    unsigned int CSpace::getDimension() const
+    unsigned int
+    CSpace::getDimension() const
     {
         return dimension;
     }
 
-    VirtualRobot::RobotPtr CSpace::getRobot() const
+    VirtualRobot::RobotPtr
+    CSpace::getRobot() const
     {
         return robo;
     }
 
-    void CSpace::addConstraintCheck(ConfigurationConstraintPtr constraint)
+    void
+    CSpace::addConstraintCheck(ConfigurationConstraintPtr constraint)
     {
         constraints.push_back(constraint);
     }
 
-    bool CSpace::isSatisfyingConstraints(const Eigen::VectorXf& config)
+    bool
+    CSpace::isSatisfyingConstraints(const Eigen::VectorXf& config)
     {
-        for (auto & constraint : constraints)
+        for (auto& constraint : constraints)
         {
             if (!constraint->isValid(config))
             {
@@ -860,4 +918,4 @@ namespace Saba
         return true;
     }
 
-}
+} // namespace Saba

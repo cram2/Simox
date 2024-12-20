@@ -44,21 +44,22 @@ mobile manipulators or service and humanoid robots.
 
 #endif
 
+#include "VirtualRobot/Logging.h"
 #include "VirtualRobot/VirtualRobot.h"
 #include "VirtualRobot/VirtualRobotException.h"
 
 
 #ifdef WIN32
-#  include <winsock2.h>
-#  include <windows.h>
-#  pragma warning ( disable : 4251 )
-#  if defined(Saba_EXPORTS)
-#    define SABA_IMPORT_EXPORT __declspec(dllexport)
-#  else
-#    define SABA_IMPORT_EXPORT __declspec(dllimport)
-#  endif
+#include <windows.h>
+#include <winsock2.h>
+#pragma warning(disable : 4251)
+#if defined(Saba_EXPORTS)
+#define SABA_IMPORT_EXPORT __declspec(dllexport)
 #else
-#  define SABA_IMPORT_EXPORT
+#define SABA_IMPORT_EXPORT __declspec(dllimport)
+#endif
+#else
+#define SABA_IMPORT_EXPORT
 #endif
 
 
@@ -114,11 +115,20 @@ namespace Saba
 
 #ifdef NDEBUG
 #define SABA_ASSERT(a)
-#define SABA_ASSERT_MESSAGE(a,b)
+#define SABA_ASSERT_MESSAGE(a, b)
 #else
-#define SABA_ASSERT(a) if (!(a)) {cout << "ASSERT failed (" << #a <<")"<<endl; THROW_SABA_EXCEPTION( "ASSERT failed (" << #a << ")" )};
-#define SABA_ASSERT_MESSAGE(a,b) if (!(a)) {cout << "ASSERT failed (" << #a <<"): "<<b<<endl; THROW_SABA_EXCEPTION( "ASSERT failed (" << #a << "): " << b )};
+#define SABA_ASSERT(a)                                                                             \
+    if (!(a))                                                                                      \
+    {                                                                                              \
+        cout << "ASSERT failed (" << #a << ")" << endl;                                            \
+        THROW_SABA_EXCEPTION("ASSERT failed (" << #a << ")")                                       \
+    };
+#define SABA_ASSERT_MESSAGE(a, b)                                                                  \
+    if (!(a))                                                                                      \
+    {                                                                                              \
+        cout << "ASSERT failed (" << #a << "): " << b << endl;                                     \
+        THROW_SABA_EXCEPTION("ASSERT failed (" << #a << "): " << b)                                \
+    };
 #endif
 
-}
-
+} // namespace Saba

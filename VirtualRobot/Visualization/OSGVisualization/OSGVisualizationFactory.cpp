@@ -5,25 +5,28 @@
 */
 
 #include "OSGVisualizationFactory.h"
-#include "../VisualizationNode.h"
-#include "OSGVisualizationNode.h"
-#include "../../VirtualRobotException.h"
-#include "OSGVisualization.h"
-#include "../../Robot.h"
+
+#include <algorithm>
+#include <iostream>
+
 #include "../../Grasping/Grasp.h"
 #include "../../Grasping/GraspSet.h"
+#include "../../Robot.h"
 #include "../../SceneObject.h"
-#include "../TriMeshModel.h"
+#include "../../VirtualRobotException.h"
 #include "../../Workspace/Reachability.h"
-#include <iostream>
-#include <algorithm>
-
-#include <osgDB/ReadFile>
-#include <osg/ShapeDrawable>
+#include "../TriMeshModel.h"
+#include "../VisualizationNode.h"
+#include "Logging.h"
+#include "OSGVisualization.h"
+#include "OSGVisualizationNode.h"
 #include <osg/BoundingBox>
-#include <osg/PolygonMode>
 #include <osg/ComputeBoundsVisitor>
 #include <osg/LineWidth>
+#include <osg/PolygonMode>
+#include <osg/ShapeDrawable>
+#include <osgDB/ReadFile>
+
 namespace VirtualRobot
 {
 
@@ -31,11 +34,9 @@ namespace VirtualRobot
     {
     }
 
-
     OSGVisualizationFactory::~OSGVisualizationFactory()
     {
     }
-
 
     /**
      * This method creates a VirtualRobot::OSGVisualizationNode from a given \p filename.
@@ -45,7 +46,8 @@ namespace VirtualRobot
      * \param boundingBox Use bounding box instead of full model.
      * \return instance of VirtualRobot::OSGVisualizationNode upon success and VirtualRobot::VisualizationNode on error.
      */
-    VisualizationNodePtr OSGVisualizationFactory::getVisualizationFromFile(const std::string& filename, bool boundingBox)
+    VisualizationNodePtr
+    OSGVisualizationFactory::getVisualizationFromFile(const std::string& filename, bool boundingBox)
     {
         VisualizationNodePtr visualizationNode(new VisualizationNode);
 
@@ -77,32 +79,39 @@ namespace VirtualRobot
         return visualizationNode;
     }
 
-
     /**
      * register this class in the super class factory
      */
-    VisualizationFactory::SubClassRegistry OSGVisualizationFactory::registry(OSGVisualizationFactory::getName(), &OSGVisualizationFactory::createInstance);
-
+    VisualizationFactory::SubClassRegistry
+        OSGVisualizationFactory::registry(OSGVisualizationFactory::getName(),
+                                          &OSGVisualizationFactory::createInstance);
 
     /**
      * \return "osg"
      */
-    std::string OSGVisualizationFactory::getName()
+    std::string
+    OSGVisualizationFactory::getName()
     {
         return "osg";
     }
 
-
     /**
      * \return new instance of OSGVisualizationFactory
      */
-    boost::shared_ptr<VisualizationFactory> OSGVisualizationFactory::createInstance(void*)
+    boost::shared_ptr<VisualizationFactory>
+    OSGVisualizationFactory::createInstance(void*)
     {
         boost::shared_ptr<OSGVisualizationFactory> OSGFactory(new OSGVisualizationFactory());
         return OSGFactory;
     }
 
-    VirtualRobot::VisualizationNodePtr OSGVisualizationFactory::createBox(float width, float height, float depth, float colorR, float colorG, float colorB)
+    VirtualRobot::VisualizationNodePtr
+    OSGVisualizationFactory::createBox(float width,
+                                       float height,
+                                       float depth,
+                                       float colorR,
+                                       float colorG,
+                                       float colorB)
     {
         osg::Box* b = new osg::Box(osg::Vec3(0, 0, 0), width, height, depth);
         osg::ShapeDrawable* bd = new osg::ShapeDrawable(b);
@@ -117,9 +126,13 @@ namespace VirtualRobot
         return visualizationNode;
     }
 
-
-
-    VisualizationNodePtr OSGVisualizationFactory::createLine(const Eigen::Matrix4f& from, const Eigen::Matrix4f& to, float width, float colorR, float colorG, float colorB)
+    VisualizationNodePtr
+    OSGVisualizationFactory::createLine(const Eigen::Matrix4f& from,
+                                        const Eigen::Matrix4f& to,
+                                        float width,
+                                        float colorR,
+                                        float colorG,
+                                        float colorB)
     {
         osg::Vec3 sp(from(0, 3), from(1, 3), from(2, 3));
         osg::Vec3 ep(to(0, 3), to(1, 3), to(2, 3));
@@ -145,7 +158,8 @@ namespace VirtualRobot
         return visualizationNode;
     }
 
-    VisualizationNodePtr OSGVisualizationFactory::createSphere(float radius, float colorR, float colorG, float colorB)
+    VisualizationNodePtr
+    OSGVisualizationFactory::createSphere(float radius, float colorR, float colorG, float colorB)
     {
         osg::Sphere* b = new osg::Sphere(osg::Vec3(0, 0, 0), radius);
         osg::ShapeDrawable* bd = new osg::ShapeDrawable(b);
@@ -159,21 +173,33 @@ namespace VirtualRobot
         return visualizationNode;
     }
 
-    VisualizationNodePtr OSGVisualizationFactory::createCoordSystem(float scaling, std::string* text, float axisLength, float axisSize, int nrOfBlocks)
+    VisualizationNodePtr
+    OSGVisualizationFactory::createCoordSystem(float scaling,
+                                               std::string* text,
+                                               float axisLength,
+                                               float axisSize,
+                                               int nrOfBlocks)
     {
-        osg::Node* s = OSGVisualizationFactory::CreateCoordSystemVisualization(scaling, text, axisLength, axisSize, nrOfBlocks);
+        osg::Node* s = OSGVisualizationFactory::CreateCoordSystemVisualization(
+            scaling, text, axisLength, axisSize, nrOfBlocks);
         VisualizationNodePtr visualizationNode(new OSGVisualizationNode(s));
         return visualizationNode;
     }
 
-
-
-    osg::Node* OSGVisualizationFactory::CreateCoordSystemVisualization(float scaling, std::string* text, float axisLength, float axisSize, int nrOfBlocks)
+    osg::Node*
+    OSGVisualizationFactory::CreateCoordSystemVisualization(float scaling,
+                                                            std::string* text,
+                                                            float axisLength,
+                                                            float axisSize,
+                                                            int nrOfBlocks)
     {
 
-        osg::Node* xAxis = CreateArrow(Eigen::Vector3f(1, 0, 0), axisLength, axisSize, Color::Red());
-        osg::Node* yAxis = CreateArrow(Eigen::Vector3f(0, 1, 0), axisLength, axisSize, Color::Green());
-        osg::Node* zAxis = CreateArrow(Eigen::Vector3f(0, 0, 1), axisLength, axisSize, Color::Blue());
+        osg::Node* xAxis =
+            CreateArrow(Eigen::Vector3f(1, 0, 0), axisLength, axisSize, Color::Red());
+        osg::Node* yAxis =
+            CreateArrow(Eigen::Vector3f(0, 1, 0), axisLength, axisSize, Color::Green());
+        osg::Node* zAxis =
+            CreateArrow(Eigen::Vector3f(0, 0, 1), axisLength, axisSize, Color::Blue());
 
         osg::Group* g = new osg::Group;
         g->addChild(xAxis);
@@ -293,6 +319,7 @@ namespace VirtualRobot
         }
         return result;*/
     }
+
     /*VisualizationNodePtr OSGVisualizationFactory::createVisualization(CollisionCheckerPtr colChecker)
     {
         VR_INFO << "init nyi..." << endl;
@@ -300,26 +327,44 @@ namespace VirtualRobot
     }*/
 
 
-
-    VirtualRobot::VisualizationNodePtr OSGVisualizationFactory::createVertexVisualization(const Eigen::Vector3f& position, float radius, float transparency, float colorR /*= 0.5f*/, float colorG /*= 0.5f*/, float colorB /*= 0.5f*/)
+    VirtualRobot::VisualizationNodePtr
+    OSGVisualizationFactory::createVertexVisualization(const Eigen::Vector3f& position,
+                                                       float radius,
+                                                       float transparency,
+                                                       float colorR /*= 0.5f*/,
+                                                       float colorG /*= 0.5f*/,
+                                                       float colorB /*= 0.5f*/)
     {
         VR_INFO << "init nyi..." << endl;
         return VisualizationNodePtr();
     }
 
-    VirtualRobot::VisualizationNodePtr OSGVisualizationFactory::createPlane(const Eigen::Vector3f& position, const Eigen::Vector3f& normal, float extend, float transparency, float colorR /*= 0.5f*/, float colorG /*= 0.5f*/, float colorB /*= 0.5f*/)
+    VirtualRobot::VisualizationNodePtr
+    OSGVisualizationFactory::createPlane(const Eigen::Vector3f& position,
+                                         const Eigen::Vector3f& normal,
+                                         float extend,
+                                         float transparency,
+                                         float colorR /*= 0.5f*/,
+                                         float colorG /*= 0.5f*/,
+                                         float colorB /*= 0.5f*/)
     {
         VR_INFO << "init nyi..." << endl;
         return VisualizationNodePtr();
     }
 
-    VirtualRobot::VisualizationNodePtr OSGVisualizationFactory::createTrajectory(TrajectoryPtr t, Color colorNode, Color colorLine, float nodeSize, float lineSize)
+    VirtualRobot::VisualizationNodePtr
+    OSGVisualizationFactory::createTrajectory(TrajectoryPtr t,
+                                              Color colorNode,
+                                              Color colorLine,
+                                              float nodeSize,
+                                              float lineSize)
     {
         VR_INFO << "init nyi..." << endl;
         return VisualizationNodePtr();
     }
 
-    void OSGVisualizationFactory::switchToWireframe(osg::Node* srcNode)
+    void
+    OSGVisualizationFactory::switchToWireframe(osg::Node* srcNode)
     {
         if (!srcNode)
         {
@@ -329,8 +374,8 @@ namespace VirtualRobot
         osg::StateSet* state = srcNode->getOrCreateStateSet();
         osg::PolygonMode* polyModeObj;
 
-        polyModeObj = dynamic_cast< osg::PolygonMode* >
-                      (state->getAttribute(osg::StateAttribute::POLYGONMODE));
+        polyModeObj =
+            dynamic_cast<osg::PolygonMode*>(state->getAttribute(osg::StateAttribute::POLYGONMODE));
 
         if (!polyModeObj)
         {
@@ -341,7 +386,8 @@ namespace VirtualRobot
         polyModeObj->setMode(osg::PolygonMode::FRONT_AND_BACK, osg::PolygonMode::LINE);
     }
 
-    osg::Node* OSGVisualizationFactory::CreateBoundingBox(osg::Node* model, bool wireFrame)
+    osg::Node*
+    OSGVisualizationFactory::CreateBoundingBox(osg::Node* model, bool wireFrame)
     {
         if (!model)
         {
@@ -363,7 +409,8 @@ namespace VirtualRobot
         return CreateBoundingBoxVisualization(bbox, wireFrame);
     }
 
-    osg::Node* OSGVisualizationFactory::CreateBoundingBoxVisualization(const BoundingBox& bbox, bool wireFrame)
+    osg::Node*
+    OSGVisualizationFactory::CreateBoundingBoxVisualization(const BoundingBox& bbox, bool wireFrame)
     {
         osg::BoundingBox bboxOSG;
 
@@ -384,7 +431,8 @@ namespace VirtualRobot
         return boundingBoxGeode;
     }
 
-    VirtualRobot::VisualizationNodePtr OSGVisualizationFactory::createBoundingBox(const BoundingBox& bbox, bool wireFrame)
+    VirtualRobot::VisualizationNodePtr
+    OSGVisualizationFactory::createBoundingBox(const BoundingBox& bbox, bool wireFrame)
     {
         osg::Node* res = CreateBoundingBoxVisualization(bbox, wireFrame);
 
@@ -392,7 +440,8 @@ namespace VirtualRobot
         return node;
     }
 
-    osg::MatrixTransform* OSGVisualizationFactory::getMatrixTransform(const Eigen::Matrix4f& pose)
+    osg::MatrixTransform*
+    OSGVisualizationFactory::getMatrixTransform(const Eigen::Matrix4f& pose)
     {
         osg::MatrixTransform* mt = new osg::MatrixTransform;
         osg::Matrix mat(pose.data());
@@ -400,7 +449,10 @@ namespace VirtualRobot
         return mt;
     }
 
-    VirtualRobot::VisualizationNodePtr OSGVisualizationFactory::createTriMeshModelVisualization(TriMeshModelPtr model, bool showNormals, Eigen::Matrix4f& pose)
+    VirtualRobot::VisualizationNodePtr
+    OSGVisualizationFactory::createTriMeshModelVisualization(TriMeshModelPtr model,
+                                                             bool showNormals,
+                                                             Eigen::Matrix4f& pose)
     {
         osg::Group* res = new osg::Group;
 
@@ -414,7 +466,10 @@ namespace VirtualRobot
         return node;
     }
 
-    osg::Node* OSGVisualizationFactory::getOSGVisualization(TriMeshModelPtr model, bool showNormals, VisualizationFactory::Color color)
+    osg::Node*
+    OSGVisualizationFactory::getOSGVisualization(TriMeshModelPtr model,
+                                                 bool showNormals,
+                                                 VisualizationFactory::Color color)
     {
         osg::Group* res = new osg::Group;
         res->ref();
@@ -454,7 +509,12 @@ namespace VirtualRobot
         return res;
     }
 
-    osg::Node* OSGVisualizationFactory::CreatePolygonVisualization(const std::vector<Eigen::Vector3f>& points, VisualizationFactory::Color colorInner /*= VisualizationFactory::Color::Blue()*/, VisualizationFactory::Color colorLine /*= VisualizationFactory::Color::Black()*/, float lineSize /*= 5.0f*/)
+    osg::Node*
+    OSGVisualizationFactory::CreatePolygonVisualization(
+        const std::vector<Eigen::Vector3f>& points,
+        VisualizationFactory::Color colorInner /*= VisualizationFactory::Color::Blue()*/,
+        VisualizationFactory::Color colorLine /*= VisualizationFactory::Color::Black()*/,
+        float lineSize /*= 5.0f*/)
     {
         osg::Geode* geode = new osg::Geode();
         // create Geometry object to store all the vertices and lines primitive.
@@ -465,7 +525,6 @@ namespace VirtualRobot
         for (unsigned int i = 0; i < points.size(); i++)
         {
             vertices->push_back(osg::Vec3(points[i](0), points[i](1), points[i](2)));
-
         }
 
         int numCoords = int(points.size());
@@ -474,7 +533,8 @@ namespace VirtualRobot
         polyGeom->setVertexArray(vertices);
 
         osg::Vec4Array* colors = new osg::Vec4Array;
-        colors->push_back(osg::Vec4(colorInner.r, colorInner.g, colorInner.b, 1.0f - colorInner.transparency));
+        colors->push_back(
+            osg::Vec4(colorInner.r, colorInner.g, colorInner.b, 1.0f - colorInner.transparency));
         polyGeom->setColorArray(colors);
         polyGeom->setColorBinding(osg::Geometry::BIND_OVERALL);
 
@@ -491,7 +551,8 @@ namespace VirtualRobot
         osg::Geometry* linesGeom = new osg::Geometry();
         linesGeom->setVertexArray(vertices);
         osg::Vec4Array* colorsL = new osg::Vec4Array;
-        colorsL->push_back(osg::Vec4(colorLine.r, colorLine.g, colorLine.b, 1.0f - colorLine.transparency));
+        colorsL->push_back(
+            osg::Vec4(colorLine.r, colorLine.g, colorLine.b, 1.0f - colorLine.transparency));
         linesGeom->setColorArray(colorsL);
         linesGeom->setColorBinding(osg::Geometry::BIND_OVERALL);
         linesGeom->setNormalArray(normals);
@@ -504,7 +565,12 @@ namespace VirtualRobot
 
         return geode;
     }
-    VirtualRobot::VisualizationNodePtr OSGVisualizationFactory::createArrow(const Eigen::Vector3f& n, float length /*= 50.0f*/, float width /*= 2.0f*/, const Color& color /*= Color::Gray()*/)
+
+    VirtualRobot::VisualizationNodePtr
+    OSGVisualizationFactory::createArrow(const Eigen::Vector3f& n,
+                                         float length /*= 50.0f*/,
+                                         float width /*= 2.0f*/,
+                                         const Color& color /*= Color::Gray()*/)
     {
         osg::Node* res = CreateArrow(n, length, width, color);
 
@@ -512,7 +578,11 @@ namespace VirtualRobot
         return node;
     }
 
-    osg::Node* OSGVisualizationFactory::CreateArrow(const Eigen::Vector3f& n, float length /*= 50.0f*/, float width /*= 2.0f*/, const Color& color /*= Color::Gray()*/)
+    osg::Node*
+    OSGVisualizationFactory::CreateArrow(const Eigen::Vector3f& n,
+                                         float length /*= 50.0f*/,
+                                         float width /*= 2.0f*/,
+                                         const Color& color /*= Color::Gray()*/)
     {
         float coneHeight = width * 6.0f;
         float coneBotomRadius = width * 2.5f;
@@ -558,14 +628,16 @@ namespace VirtualRobot
         return res;
     }
 
-    VirtualRobot::VisualizationNodePtr OSGVisualizationFactory::createVisualization()
+    VirtualRobot::VisualizationNodePtr
+    OSGVisualizationFactory::createVisualization()
     {
         osg::Group* s = new osg::Group;
         VisualizationNodePtr visualizationNode(new OSGVisualizationNode(s));
         return visualizationNode;
     }
 
-    osg::Matrix* OSGVisualizationFactory::getRelativePose(osg::Node* n, osg::Node* rootNode)
+    osg::Matrix*
+    OSGVisualizationFactory::getRelativePose(osg::Node* n, osg::Node* rootNode)
     {
         globalPoseNodeVisitor* ncv = new globalPoseNodeVisitor(rootNode);
 

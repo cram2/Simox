@@ -1,14 +1,18 @@
 
 #include "CSpacePath.h"
+
 #include <algorithm>
-#include <iostream>
 #include <fstream>
+#include <iostream>
+
+#include "VirtualRobot/Assert.h"
 using namespace std;
 
 namespace Saba
 {
 
-    CSpacePath::CSpacePath(CSpacePtr cspace, const std::string& name): Trajectory(cspace ? cspace->getRobotNodeSet() : VirtualRobot::RobotNodeSetPtr(), name)
+    CSpacePath::CSpacePath(CSpacePtr cspace, const std::string& name) :
+        Trajectory(cspace ? cspace->getRobotNodeSet() : VirtualRobot::RobotNodeSetPtr(), name)
     {
         this->cspace = cspace;
 
@@ -25,10 +29,8 @@ namespace Saba
         reset();
     }
 
-
-
-
-    CSpacePathPtr CSpacePath::clone() const
+    CSpacePathPtr
+    CSpacePath::clone() const
     {
         CSpacePathPtr res(new CSpacePath(cspace, name));
 
@@ -39,7 +41,6 @@ namespace Saba
 
         return res;
     }
-
 
     /*
     bool CSpacePath::movePosition(unsigned int pos, const Eigen::VectorXf &moveVector, int sideSteps)
@@ -107,18 +108,23 @@ namespace Saba
     */
 
 
-
-    float CSpacePath::getLength() const
+    float
+    CSpacePath::getLength() const
     {
         return getLength(true);
     }
-    float CSpacePath::getLength(bool useCSpaceWeights) const
+
+    float
+    CSpacePath::getLength(bool useCSpaceWeights) const
     {
         return getLength(0, (int)path.size() - 1, useCSpaceWeights);
     }
 
     // be careful, this method calculates the c-space length of the path, not the workspace length!
-    float CSpacePath::getLength(unsigned int startIndex, unsigned int endIndex, bool useCSpaceWeights) const
+    float
+    CSpacePath::getLength(unsigned int startIndex,
+                          unsigned int endIndex,
+                          bool useCSpaceWeights) const
     {
         if (endIndex < startIndex || endIndex >= path.size())
         {
@@ -141,6 +147,7 @@ namespace Saba
 
         return pathLength;
     }
+
     /*
     int CSpacePath::checkIntermediatePositions(unsigned int startPos, const float *samplingDist)
     {
@@ -246,7 +253,8 @@ namespace Saba
     }
     */
 
-    float CSpacePath::getTime(unsigned int nr)
+    float
+    CSpacePath::getTime(unsigned int nr)
     {
         if (getNrOfPoints() == 0)
         {
@@ -286,7 +294,10 @@ namespace Saba
     }
 
     // returns position on path for time t (0<=t<=1)
-    void CSpacePath::interpolate(float t, Eigen::VectorXf& storePathPos, int* storeIndex /*= NULL*/) const
+    void
+    CSpacePath::interpolate(float t,
+                            Eigen::VectorXf& storePathPos,
+                            int* storeIndex /*= NULL*/) const
     {
         storePathPos.resize(dimension);
 
@@ -295,7 +306,8 @@ namespace Saba
             // check for rounding errors
             if (t < -0.000000001 || t > 1.000001f)
             {
-                std::cout << "CSpacePath::interpolatePath: need t value between 0 and 1... (" << t << ")" << std::endl;
+                std::cout << "CSpacePath::interpolatePath: need t value between 0 and 1... (" << t
+                          << ")" << std::endl;
             }
 
             if (t < 0)
@@ -392,11 +404,12 @@ namespace Saba
                     diff += (float)M_PI * 2.0f;
                 }
 
-                storePathPos[j] = c1[j] +  diff * factor; // storePos = startPos + factor*segment
+                storePathPos[j] = c1[j] + diff * factor; // storePos = startPos + factor*segment
             }
             else
             {
-                storePathPos[j] = c1[j] + (c2[j] - c1[j]) * factor; // storePos = startPos + factor*segment
+                storePathPos[j] =
+                    c1[j] + (c2[j] - c1[j]) * factor; // storePos = startPos + factor*segment
             }
         }
 
@@ -404,8 +417,8 @@ namespace Saba
         {
             *storeIndex = startIndex;
         }
-
     }
+
     /*
     void CSpacePath::print() const
     {
@@ -424,16 +437,18 @@ namespace Saba
         std::cout << "</CSpacePath>" << std::endl;
     }*/
 
-    Saba::CSpacePtr CSpacePath::getCSpace()
+    Saba::CSpacePtr
+    CSpacePath::getCSpace()
     {
         return cspace;
     }
 
-    std::vector<Eigen::Matrix4f > CSpacePath::createWorkspacePath(VirtualRobot::RobotNodePtr r)
+    std::vector<Eigen::Matrix4f>
+    CSpacePath::createWorkspacePath(VirtualRobot::RobotNodePtr r)
     {
         VR_ASSERT(cspace);
 
-        std::vector<Eigen::Matrix4f > result;
+        std::vector<Eigen::Matrix4f> result;
 
         if (cspace->hasExclusiveRobotAccess())
         {

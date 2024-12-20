@@ -1,9 +1,11 @@
-#include "stabilityWindow.h"
 #include <VirtualRobot/RuntimeEnvironment.h>
+
+#include "stabilityWindow.h"
 
 using namespace VirtualRobot;
 
-int main(int argc, char* argv[])
+int
+main(int argc, char* argv[])
 {
 
     VirtualRobot::init(argc, argv, "Stability Demo");
@@ -35,5 +37,4 @@ int main(int argc, char* argv[])
     rw.main();
 
     return 0;
-
 }

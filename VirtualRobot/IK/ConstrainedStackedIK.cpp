@@ -1,8 +1,14 @@
 #include "ConstrainedStackedIK.h"
 
+#include "VirtualRobotException.h"
+
 using namespace VirtualRobot;
 
-ConstrainedStackedIK::ConstrainedStackedIK(RobotPtr& robot, const RobotNodeSetPtr& nodeSet, float stepSize, int maxIterations, JacobiProvider::InverseJacobiMethod method) :
+ConstrainedStackedIK::ConstrainedStackedIK(RobotPtr& robot,
+                                           const RobotNodeSetPtr& nodeSet,
+                                           float stepSize,
+                                           int maxIterations,
+                                           JacobiProvider::InverseJacobiMethod method) :
     ConstrainedIK(robot, nodeSet, maxIterations),
     nodeSet(nodeSet),
     method(method),
@@ -10,12 +16,13 @@ ConstrainedStackedIK::ConstrainedStackedIK(RobotPtr& robot, const RobotNodeSetPt
 {
 }
 
-bool ConstrainedStackedIK::initialize()
+bool
+ConstrainedStackedIK::initialize()
 {
     ik.reset(new StackedIK(nodeSet, method));
     jacobians.clear();
 
-    for (auto & constraint : constraints)
+    for (auto& constraint : constraints)
     {
         jacobians.push_back(constraint);
     }
@@ -23,7 +30,8 @@ bool ConstrainedStackedIK::initialize()
     return ConstrainedIK::initialize();
 }
 
-bool ConstrainedStackedIK::solveStep()
+bool
+ConstrainedStackedIK::solveStep()
 {
     THROW_VR_EXCEPTION_IF(!ik, "IK not initialized, did you forget to call initialize()?");
 

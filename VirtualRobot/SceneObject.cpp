@@ -6,6 +6,7 @@
 #include <filesystem>
 #include <functional>
 #include <iomanip>
+#include <iostream>
 #include <iterator>
 
 #include <Eigen/Dense>
@@ -16,7 +17,9 @@
 #include "Affordances.h"
 #include "CollisionDetection/CollisionChecker.h"
 #include "CollisionDetection/CollisionModel.h"
+#include "Logging.h"
 #include "Robot.h"
+#include "VirtualRobotException.h"
 #include "Visualization/TriMeshModel.h"
 #include "Visualization/Visualization.h"
 #include "Visualization/VisualizationFactory.h"
@@ -1864,7 +1867,7 @@ namespace VirtualRobot
                          std::back_inserter(matchingAffordances),
                          isMatchingType);
         }
-        
+
         // refine selection by removing all non-matching affordances
         for (auto& affordanceLocation : matchingAffordances)
         {

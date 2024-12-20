@@ -20,14 +20,22 @@
  */
 
 #include "GaussianImplicitSurface3DNormals.h"
+
 #include <cmath>
 
 namespace math
 {
-    GaussianImplicitSurface3DNormals::GaussianImplicitSurface3DNormals(std::unique_ptr<KernelWithDerivatives> kernel)
-        : kernel(std::move(kernel)) {}
+    GaussianImplicitSurface3DNormals::GaussianImplicitSurface3DNormals(
+        std::unique_ptr<KernelWithDerivatives> kernel) :
+        kernel(std::move(kernel))
+    {
+    }
 
-    void GaussianImplicitSurface3DNormals::Calculate(const ContactList& samples, float noise, float normalNoise, float normalScale)
+    void
+    GaussianImplicitSurface3DNormals::Calculate(const ContactList& samples,
+                                                float noise,
+                                                float normalNoise,
+                                                float normalScale)
     {
         ContactList shiftedSamples;
         std::vector<Eigen::Vector3f> points;
@@ -64,13 +72,14 @@ namespace math
         this->samples = shiftedSamples;
     }
 
-
-    float GaussianImplicitSurface3DNormals::Get(Eigen::Vector3f pos)
+    float
+    GaussianImplicitSurface3DNormals::Get(Eigen::Vector3f pos)
     {
         return Predict(pos);
     }
 
-    Eigen::VectorXd GaussianImplicitSurface3DNormals::getCux(const Eigen::Vector3f& pos)
+    Eigen::VectorXd
+    GaussianImplicitSurface3DNormals::getCux(const Eigen::Vector3f& pos)
     {
         Eigen::VectorXd Cux(samples.size() * 4);
         for (std::size_t i = 0; i < samples.size(); i++)
@@ -80,16 +89,19 @@ namespace math
             Cux(i * 4 + 2) = kernel->Kernel_dj(pos, samples.at(i).Position(), R, 1);
             Cux(i * 4 + 3) = kernel->Kernel_dj(pos, samples.at(i).Position(), R, 2);
         }
-        return Cux;//Eigen::VectorXf;
+        return Cux; //Eigen::VectorXf;
     }
-    float GaussianImplicitSurface3DNormals::Predict(const Eigen::Vector3f& pos)
+
+    float
+    GaussianImplicitSurface3DNormals::Predict(const Eigen::Vector3f& pos)
     {
         Eigen::VectorXd Cux(4 * samples.size());
         Cux = getCux(pos);
         return Cux.dot(alpha);
     }
 
-    float GaussianImplicitSurface3DNormals::GetVariance(const Eigen::Vector3f& pos)
+    float
+    GaussianImplicitSurface3DNormals::GetVariance(const Eigen::Vector3f& pos)
     {
         Eigen::VectorXd Cux(4 * samples.size());
         Cux = getCux(pos);
@@ -97,8 +109,12 @@ namespace math
         return kernel->Kernel(pos, pos, R) - Cux.dot(covariance_inv * Cux);
     }
 
-
-    void GaussianImplicitSurface3DNormals::CalculateCovariance(const std::vector<Eigen::Vector3f>& points, float R, float noise, float normalNoise)
+    void
+    GaussianImplicitSurface3DNormals::CalculateCovariance(
+        const std::vector<Eigen::Vector3f>& points,
+        float R,
+        float noise,
+        float normalNoise)
     {
         covariance = Eigen::MatrixXd(points.size() * 4, points.size() * 4);
 
@@ -118,10 +134,11 @@ namespace math
         }
     }
 
-    void GaussianImplicitSurface3DNormals::MatrixInvert(const Eigen::VectorXd& b)
+    void
+    GaussianImplicitSurface3DNormals::MatrixInvert(const Eigen::VectorXd& b)
     {
         Eigen::ColPivHouseholderQR<Eigen::MatrixXd> qr = covariance.colPivHouseholderQr();
         covariance_inv = qr.inverse();
         alpha = covariance_inv * b;
     }
-}
+} // namespace math

@@ -22,12 +22,13 @@
 */
 #pragma once
 
-#include "VirtualRobot.h"
-#include <Eigen/Core>
-
+#include <map>
 #include <string>
 #include <vector>
-#include <map>
+
+#include <Eigen/Core>
+
+#include "VirtualRobot.h"
 
 namespace VirtualRobot
 {
@@ -46,7 +47,8 @@ namespace VirtualRobot
             \param colChecker Can be used to link this object to different instances of the collision checker.
             If NULL, the global collision checker singleton is used.
         */
-        SceneObjectSet(const std::string& name = "", CollisionCheckerPtr colChecker = CollisionCheckerPtr());
+        SceneObjectSet(const std::string& name = "",
+                       CollisionCheckerPtr colChecker = CollisionCheckerPtr());
 
         /*!Standard Destructor.
         */
@@ -84,7 +86,8 @@ namespace VirtualRobot
         //! remove a single col model from this Set
         virtual bool removeSceneObject(SceneObjectPtr sceneObject);
 
-        CollisionCheckerPtr getCollisionChecker()
+        CollisionCheckerPtr
+        getCollisionChecker()
         {
             return colChecker;
         }
@@ -92,8 +95,8 @@ namespace VirtualRobot
         /*!
             Returns all covered collision models.
         */
-        std::vector< CollisionModelPtr > getCollisionModels();
-        const std::vector< SceneObjectPtr >& getSceneObjects();
+        std::vector<CollisionModelPtr> getCollisionModels();
+        const std::vector<SceneObjectPtr>& getSceneObjects();
 
         virtual unsigned int getSize() const;
         virtual SceneObjectPtr getSceneObject(unsigned int nr);
@@ -102,7 +105,8 @@ namespace VirtualRobot
         virtual bool hasSceneObject(SceneObjectPtr sceneObject);
 
         //! fills the current globalPose of all associated sceneobjects to map.
-        virtual bool getCurrentSceneObjectConfig(std::map< SceneObjectPtr, Eigen::Matrix4f >& storeConfig);
+        virtual bool
+        getCurrentSceneObjectConfig(std::map<SceneObjectPtr, Eigen::Matrix4f>& storeConfig);
 
         virtual std::string toXML(int tabs);
 
@@ -128,12 +132,11 @@ namespace VirtualRobot
         ObstaclePtr createStaticObstacle(const std::string& name);
 
     protected:
-
         //! delete all data
         void destroyData();
 
         std::string name;
-        std::vector< SceneObjectPtr > sceneObjects;
+        std::vector<SceneObjectPtr> sceneObjects;
         CollisionCheckerPtr colChecker;
     };
 

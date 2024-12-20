@@ -22,12 +22,12 @@
 */
 #pragma once
 
-#include "../VirtualRobot.h"
-#include "VirtualRobot/EndEffector/EndEffector.h"
-
+#include <map>
 #include <string>
-#include <vector>
+
 #include <Eigen/Core>
+
+#include "../VirtualRobot.h"
 
 namespace VirtualRobot
 {
@@ -49,9 +49,13 @@ namespace VirtualRobot
             \param quality A custom quality index.
             \param eefPreshape An optional preshape.
         */
-        Grasp(const std::string& name, const std::string& robotType, const std::string& eef,
-              const Eigen::Matrix4f& poseInTCPCoordSystem, const std::string& creation = "",
-              float quality = 0.0f, const std::string& eefPreshape = "");
+        Grasp(const std::string& name,
+              const std::string& robotType,
+              const std::string& eef,
+              const Eigen::Matrix4f& poseInTCPCoordSystem,
+              const std::string& creation = "",
+              float quality = 0.0f,
+              const std::string& eefPreshape = "");
 
         /*!
         */
@@ -77,7 +81,8 @@ namespace VirtualRobot
         /*!
             Get the pose (relative to the robot root) that has to be achieved by the tcp in order to apply the grasp on the object at position objectPose.
         */
-        Eigen::Matrix4f getTcpPoseRobotRoot(const Eigen::Matrix4f& objectPose, const RobotPtr& robot) const;
+        Eigen::Matrix4f getTcpPoseRobotRoot(const Eigen::Matrix4f& objectPose,
+                                            const RobotPtr& robot) const;
 
         /*!
             The returned pose is the object pose that have to be set in order to apply a grasp at pose graspingPose.
@@ -119,19 +124,19 @@ namespace VirtualRobot
 
 
     protected:
-        virtual std::string getTransformationXML(const std::string &tabs) const;
+        virtual std::string getTransformationXML(const std::string& tabs) const;
 
-        std::map< std::string, float > eefConfiguration; //!< Optional: the configuration of the actors.
+        std::map<std::string, float>
+            eefConfiguration; //!< Optional: the configuration of the actors.
 
-        Eigen::Matrix4f poseTcp;    //!< The pose in TCP's coordinate system
+        Eigen::Matrix4f poseTcp; //!< The pose in TCP's coordinate system
         std::string robotType;
-        std::string eef;            //!< The eef specifies which TCP node should be used
+        std::string eef; //!< The eef specifies which TCP node should be used
         std::string name;
         std::string creation;
         float quality;
 
-        std::string preshape;       //!< Optionally an eef-preshape can be defined.
+        std::string preshape; //!< Optionally an eef-preshape can be defined.
     };
 
-} // namespace
-
+} // namespace VirtualRobot

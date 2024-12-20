@@ -6,15 +6,14 @@
 
 #define BOOST_TEST_MODULE SimDynamics_BulletFactoryTest
 
-#include <VirtualRobot/VirtualRobotTest.h>
-#include <VirtualRobot/RuntimeEnvironment.h>
-#include <SimDynamics/DynamicsWorld.h>
-#include <SimDynamics/DynamicsEngine/BulletEngine/BulletEngineFactory.h>
-
-#include <VirtualRobot/Obstacle.h>
-
 #include <string>
 
+#include <VirtualRobot/Obstacle.h>
+#include <VirtualRobot/RuntimeEnvironment.h>
+#include <VirtualRobot/VirtualRobotTest.h>
+
+#include <SimDynamics/DynamicsEngine/BulletEngine/BulletEngineFactory.h>
+#include <SimDynamics/DynamicsWorld.h>
 
 BOOST_AUTO_TEST_CASE(testSimDynamicsBulletFactoryCreateWorld)
 {

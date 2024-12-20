@@ -1,39 +1,42 @@
 
 #include "PlatformWindow.h"
-#include "VirtualRobot/EndEffector/EndEffector.h"
-#include "VirtualRobot/Workspace/Reachability.h"
-#include "VirtualRobot/ManipulationObject.h"
-#include "VirtualRobot/Grasping/Grasp.h"
-#include "VirtualRobot/IK/GenericIKSolver.h"
-#include "VirtualRobot/Grasping/GraspSet.h"
-#include "VirtualRobot/Obstacle.h"
-#include "VirtualRobot/CollisionDetection/CDManager.h"
-#include "VirtualRobot/XML/ObjectIO.h"
-#include "VirtualRobot/XML/RobotIO.h"
-#include "VirtualRobot/Visualization/CoinVisualization/CoinVisualizationFactory.h"
-#include "MotionPlanning/CSpace/CSpaceSampled.h"
-#include "MotionPlanning/Planner/Rrt.h"
-#include "MotionPlanning/Planner/BiRrt.h"
-#include "MotionPlanning/PostProcessing/ShortcutProcessor.h"
-#include "MotionPlanning/PostProcessing/ElasticBandProcessor.h"
-#include <MotionPlanning/Visualization/CoinVisualization/CoinRrtWorkspaceVisualization.h>
-#include <QFileDialog>
-#include <Eigen/Geometry>
-#include <ctime>
-#include <vector>
-#include <iostream>
-#include <iomanip>
+
 #include <cmath>
+#include <ctime>
+#include <iomanip>
+#include <iostream>
+#include <sstream>
+#include <vector>
+
+#include <QFileDialog>
+
+#include <Eigen/Geometry>
 
 #include "Inventor/actions/SoLineHighlightRenderAction.h"
-#include <Inventor/nodes/SoShapeHints.h>
-#include <Inventor/nodes/SoLightModel.h>
-#include <Inventor/sensors/SoTimerSensor.h>
+#include "MotionPlanning/CSpace/CSpaceSampled.h"
+#include "MotionPlanning/Planner/BiRrt.h"
+#include "MotionPlanning/Planner/Rrt.h"
+#include "MotionPlanning/PostProcessing/ElasticBandProcessor.h"
+#include "MotionPlanning/PostProcessing/ShortcutProcessor.h"
+#include "VirtualRobot/CollisionDetection/CDManager.h"
+#include "VirtualRobot/EndEffector/EndEffector.h"
+#include "VirtualRobot/Grasping/Grasp.h"
+#include "VirtualRobot/Grasping/GraspSet.h"
+#include "VirtualRobot/IK/GenericIKSolver.h"
+#include "VirtualRobot/ManipulationObject.h"
+#include "VirtualRobot/Obstacle.h"
+#include "VirtualRobot/Scene.h"
+#include "VirtualRobot/Visualization/CoinVisualization/CoinVisualizationFactory.h"
+#include "VirtualRobot/Workspace/Reachability.h"
+#include "VirtualRobot/XML/ObjectIO.h"
+#include "VirtualRobot/XML/RobotIO.h"
 #include <Inventor/nodes/SoEventCallback.h>
+#include <Inventor/nodes/SoLightModel.h>
 #include <Inventor/nodes/SoMatrixTransform.h>
+#include <Inventor/nodes/SoShapeHints.h>
 #include <Inventor/nodes/SoUnits.h>
-
-#include <sstream>
+#include <Inventor/sensors/SoTimerSensor.h>
+#include <MotionPlanning/Visualization/CoinVisualization/CoinRrtWorkspaceVisualization.h>
 using namespace std;
 using namespace VirtualRobot;
 
@@ -42,8 +45,8 @@ float TIMER_MS = 200.0f;
 PlatformWindow::PlatformWindow(const std::string& sceneFile,
                                const std::string& rns,
                                const std::string& colModelRob,
-                               const std::string& colModelEnv)
-    : QMainWindow(nullptr)
+                               const std::string& colModelEnv) :
+    QMainWindow(nullptr)
 {
     VR_INFO << " start " << std::endl;
 
@@ -77,21 +80,20 @@ PlatformWindow::PlatformWindow(const std::string& sceneFile,
     sensor_mgr->insertTimerSensor(timer);
 }
 
-
 PlatformWindow::~PlatformWindow()
 {
     allSep->unref();
 }
 
-
-void PlatformWindow::timerCB(void* data, SoSensor* /*sensor*/)
+void
+PlatformWindow::timerCB(void* data, SoSensor* /*sensor*/)
 {
     PlatformWindow* ikWindow = static_cast<PlatformWindow*>(data);
     ikWindow->redraw();
 }
 
-
-void PlatformWindow::setupUI()
+void
+PlatformWindow::setupUI()
 {
     UI.setupUi(this);
     viewer = new SoQtExaminerViewer(UI.frameViewer, "", TRUE, SoQtExaminerViewer::BUILD_POPUP);
@@ -128,25 +130,24 @@ void PlatformWindow::setupUI()
     connect(UI.radioButtonSolutionOpti, SIGNAL(clicked()), this, SLOT(solutionSelected()));
 }
 
-
-
-
-void PlatformWindow::closeEvent(QCloseEvent* event)
+void
+PlatformWindow::closeEvent(QCloseEvent* event)
 {
     quit();
     QMainWindow::closeEvent(event);
 }
 
-
-void PlatformWindow::buildVisu()
+void
+PlatformWindow::buildVisu()
 {
     sceneFileSep->removeAllChildren();
 
-    SceneObject::VisualizationType colModel = (UI.checkBoxColModel->isChecked()) ? SceneObject::Collision : SceneObject::Full;
+    SceneObject::VisualizationType colModel =
+        (UI.checkBoxColModel->isChecked()) ? SceneObject::Collision : SceneObject::Full;
 
     if (scene)
     {
-        visualization = scene->getVisualization<CoinVisualization>(colModel);
+        visualization = scene->getVisualization(colModel);
         SoNode* visualisationNode = nullptr;
 
         if (visualization)
@@ -167,24 +168,27 @@ void PlatformWindow::buildVisu()
     redraw();
 }
 
-int PlatformWindow::main()
+int
+PlatformWindow::main()
 {
     SoQt::show(this);
     SoQt::mainLoop();
     return 0;
 }
 
-
-void PlatformWindow::quit()
+void
+PlatformWindow::quit()
 {
     std::cout << "PlatformWindow: Closing" << std::endl;
     this->close();
     SoQt::exitMainLoop();
 }
 
-void PlatformWindow::loadSceneWindow()
+void
+PlatformWindow::loadSceneWindow()
 {
-    QString fi = QFileDialog::getOpenFileName(this, tr("Open Scene File"), QString(), tr("XML Files (*.xml)"));
+    QString fi = QFileDialog::getOpenFileName(
+        this, tr("Open Scene File"), QString(), tr("XML Files (*.xml)"));
 
     if (fi == "")
     {
@@ -195,7 +199,8 @@ void PlatformWindow::loadSceneWindow()
     loadScene();
 }
 
-void PlatformWindow::loadScene()
+void
+PlatformWindow::loadScene()
 {
     robot.reset();
     solution.reset();
@@ -212,7 +217,7 @@ void PlatformWindow::loadScene()
         return;
     }
 
-    std::vector< RobotPtr > robots = scene->getRobots();
+    std::vector<RobotPtr> robots = scene->getRobots();
 
     if (robots.size() != 1)
     {
@@ -247,7 +252,7 @@ void PlatformWindow::loadScene()
     // setup start Config combo box
     configs = scene->getRobotConfigs(robot);
 
-    for (auto c:configs)
+    for (auto c : configs)
     {
         if (c->getName() == "start")
         {
@@ -279,8 +284,8 @@ void PlatformWindow::loadScene()
     buildVisu();
 }
 
-
-void PlatformWindow::setStart(Eigen::VectorXf &startConf)
+void
+PlatformWindow::setStart(Eigen::VectorXf& startConf)
 {
     if (rns)
         rns->setJointValues(startConf);
@@ -288,14 +293,15 @@ void PlatformWindow::setStart(Eigen::VectorXf &startConf)
     startConfig = startConf;
 }
 
-void PlatformWindow::setGoal(Eigen::VectorXf &goalConf)
+void
+PlatformWindow::setGoal(Eigen::VectorXf& goalConf)
 {
 
     goalConfig = goalConf;
 }
 
-
-void PlatformWindow::selectColModelRob(const std::string &name)
+void
+PlatformWindow::selectColModelRob(const std::string& name)
 {
     colModelRob.reset();
 
@@ -307,9 +313,8 @@ void PlatformWindow::selectColModelRob(const std::string &name)
     this->colModelRob = robot->getRobotNodeSet(name);
 }
 
-
-
-void PlatformWindow::selectColModelEnv(const std::string &name)
+void
+PlatformWindow::selectColModelEnv(const std::string& name)
 {
     colModelEnv.reset();
 
@@ -321,17 +326,20 @@ void PlatformWindow::selectColModelEnv(const std::string &name)
     this->colModelEnv = scene->getSceneObjectSet(name);
 }
 
-void PlatformWindow::updateDistVisu(const Eigen::Vector3f &from, const Eigen::Vector3f &to)
+void
+PlatformWindow::updateDistVisu(const Eigen::Vector3f& from, const Eigen::Vector3f& to)
 {
     distSep->removeAllChildren();
     if (UI.checkBoxShowDistance->isChecked())
     {
-        SoNode * c = CoinVisualizationFactory::createCoinLine(from, to, 5.0f, VirtualRobot::CoinVisualizationFactory::Color(1.0f, 0.2f, 0.2f));
+        SoNode* c = CoinVisualizationFactory::createCoinLine(
+            from, to, 5.0f, VirtualRobot::CoinVisualizationFactory::Color(1.0f, 0.2f, 0.2f));
         distSep->addChild(c);
     }
 }
 
-void PlatformWindow::buildRRTVisu()
+void
+PlatformWindow::buildRRTVisu()
 {
     rrtSep->removeAllChildren();
 
@@ -340,7 +348,8 @@ void PlatformWindow::buildRRTVisu()
         return;
     }
 
-    std::shared_ptr<Saba::CoinRrtWorkspaceVisualization> w(new Saba::CoinRrtWorkspaceVisualization(robot, cspace, rns->getTCP()->getName()));
+    std::shared_ptr<Saba::CoinRrtWorkspaceVisualization> w(
+        new Saba::CoinRrtWorkspaceVisualization(robot, cspace, rns->getTCP()->getName()));
 
     if (UI.checkBoxShowRRT->isChecked())
     {
@@ -373,11 +382,12 @@ void PlatformWindow::buildRRTVisu()
     rrtSep->addChild(sol);
 }
 
-void PlatformWindow::optimizeSolutionPressed()
+void
+PlatformWindow::optimizeSolutionPressed()
 {
     int nrSteps = UI.spinBox_smoothing->value();
     postProcessingMethod postProcessing = eElasticBands;
-    if (UI.comboBoxSmoothing->currentIndex()==1)
+    if (UI.comboBoxSmoothing->currentIndex() == 1)
     {
         postProcessing = eShortcuts;
     }
@@ -388,22 +398,23 @@ void PlatformWindow::optimizeSolutionPressed()
     buildVisu();
 }
 
-
-void PlatformWindow::showOptizerForces(Saba::ElasticBandProcessorPtr postProcessing, Saba::CSpacePathPtr s)
+void
+PlatformWindow::showOptizerForces(Saba::ElasticBandProcessorPtr postProcessing,
+                                  Saba::CSpacePathPtr s)
 {
-	if (!postProcessing)
-		return;
-		
-	forcesSep->removeAllChildren();
+    if (!postProcessing)
+        return;
+
+    forcesSep->removeAllChildren();
 
     SoUnits* u = new SoUnits();
     u->units = SoUnits::MILLIMETERS;
     forcesSep->addChild(u);
 
-		
-    for (unsigned int i=0; i<s->getNrOfPoints(); i++)
-	{
-		Eigen::Vector3f internalForce;
+
+    for (unsigned int i = 0; i < s->getNrOfPoints(); i++)
+    {
+        Eigen::Vector3f internalForce;
         Eigen::Vector3f externalForce;
         Eigen::Vector3f resultingForce;
         postProcessing->getForces(i, internalForce, externalForce);
@@ -411,31 +422,34 @@ void PlatformWindow::showOptizerForces(Saba::ElasticBandProcessorPtr postProcess
         Eigen::Vector3f p = postProcessing->getWSpacePoint(s->getPoint(i));
         Eigen::Matrix4f m;
         m.setIdentity();
-        m.block(0,3,3,1) = p;
+        m.block(0, 3, 3, 1) = p;
 
-        SoSeparator *sa = new SoSeparator;
-        SoSeparator *sb = new SoSeparator;
-        SoSeparator *sc = new SoSeparator;
+        SoSeparator* sa = new SoSeparator;
+        SoSeparator* sb = new SoSeparator;
+        SoSeparator* sc = new SoSeparator;
         SoMatrixTransform* t = CoinVisualizationFactory::getMatrixTransform(m);
         sa->addChild(t);
         sb->addChild(t);
         sc->addChild(t);
         float l1 = internalForce.norm() * 5.0f;
         float l2 = externalForce.norm() * 100.0f;
-        if (l1<30.0f)
+        if (l1 < 30.0f)
             l1 = 30.0f;
-        if (l1>60.0f)
+        if (l1 > 60.0f)
             l1 = 60.0f;
-        if (l2<30.0f)
+        if (l2 < 30.0f)
             l2 = 30.0f;
-        if (l2>60.0f)
+        if (l2 > 60.0f)
             l2 = 60.0f;
         internalForce.normalize();
         externalForce.normalize();
         resultingForce.normalize();
-        SoNode* v1 = CoinVisualizationFactory::CreateArrow(internalForce, l1, 2.0f, VisualizationFactory::Color::Blue());
-        SoNode* v2 = CoinVisualizationFactory::CreateArrow(externalForce, l2, 2.0f, VisualizationFactory::Color::Green());
-        SoNode* v3 = CoinVisualizationFactory::CreateArrow(resultingForce, l1+l2, 2.0f, VisualizationFactory::Color::Red());
+        SoNode* v1 = CoinVisualizationFactory::CreateArrow(
+            internalForce, l1, 2.0f, VisualizationFactory::Color::Blue());
+        SoNode* v2 = CoinVisualizationFactory::CreateArrow(
+            externalForce, l2, 2.0f, VisualizationFactory::Color::Green());
+        SoNode* v3 = CoinVisualizationFactory::CreateArrow(
+            resultingForce, l1 + l2, 2.0f, VisualizationFactory::Color::Red());
         sa->addChild(v1);
         sb->addChild(v2);
         sc->addChild(v3);
@@ -445,17 +459,19 @@ void PlatformWindow::showOptizerForces(Saba::ElasticBandProcessorPtr postProcess
     }
 }
 
-void PlatformWindow::optimizeSolution(postProcessingMethod postProcessing, int nrSteps)
+void
+PlatformWindow::optimizeSolution(postProcessingMethod postProcessing, int nrSteps)
 {
     VR_INFO << " Smoothing solution with " << nrSteps << " steps " << std::endl;
     forcesSep->removeAllChildren();
-    if (nrSteps<=0)
+    if (nrSteps <= 0)
         return;
     switch (postProcessing)
     {
         case eShortcuts:
         {
-            Saba::ShortcutProcessorPtr postProcessing(new Saba::ShortcutProcessor(solutionOptimized, cspace, false));
+            Saba::ShortcutProcessorPtr postProcessing(
+                new Saba::ShortcutProcessor(solutionOptimized, cspace, false));
             solutionOptimized = postProcessing->optimize(nrSteps);
             break;
         }
@@ -463,10 +479,11 @@ void PlatformWindow::optimizeSolution(postProcessingMethod postProcessing, int n
         {
             RobotNodePtr n = colModelRob->getNode(0);
             VR_INFO << "using elsatic band processor with node " << n->getName() << std::endl;
-            Saba::ElasticBandProcessorPtr postProcessing(new Saba::ElasticBandProcessor(solutionOptimized, cspace, n, colModelEnv, false));
+            Saba::ElasticBandProcessorPtr postProcessing(
+                new Saba::ElasticBandProcessor(solutionOptimized, cspace, n, colModelEnv, false));
             // specific to armar3:
             Eigen::VectorXf w(3);
-            w << 1,1,0;
+            w << 1, 1, 0;
             postProcessing->setWeights(w);
             solutionOptimized = postProcessing->optimize(nrSteps);
 
@@ -479,7 +496,8 @@ void PlatformWindow::optimizeSolution(postProcessingMethod postProcessing, int n
     VR_INFO << " Smoothing done" << std::endl;
 }
 
-void PlatformWindow::plan()
+void
+PlatformWindow::plan()
 {
     if (!robot || !rns)
     {
@@ -508,7 +526,7 @@ void PlatformWindow::plan()
     cspace->setSamplingSize(sampl);
     cspace->setSamplingSizeDCD(samplDCD);
     Eigen::VectorXf w(3);
-    w << 1,1,0.001f;
+    w << 1, 1, 0.001f;
     cspace->setMetricWeights(w);
 
     Saba::BiRrtPtr rrt(new Saba::BiRrt(cspace));
@@ -527,7 +545,7 @@ void PlatformWindow::plan()
 
         int nrSteps = UI.spinBox_smoothing->value();
         postProcessingMethod postProcessing = eElasticBands;
-        if (UI.comboBoxSmoothing->currentIndex()==1)
+        if (UI.comboBoxSmoothing->currentIndex() == 1)
         {
             postProcessing = eShortcuts;
         }
@@ -545,15 +563,20 @@ void PlatformWindow::plan()
     buildVisu();
 }
 
-void PlatformWindow::colModel()
+void
+PlatformWindow::colModel()
 {
     buildVisu();
 }
-void PlatformWindow::solutionSelected()
+
+void
+PlatformWindow::solutionSelected()
 {
     sliderSolution(UI.horizontalSliderPos->sliderPosition());
 }
-void PlatformWindow::sliderSolution(int pos)
+
+void
+PlatformWindow::sliderSolution(int pos)
 {
     if (!solution)
     {
@@ -574,7 +597,7 @@ void PlatformWindow::sliderSolution(int pos)
 
     std::stringstream d2;
     d2 << setprecision(2) << fixed << "Pos: ";
-    for (unsigned int i=0;i<rns->getSize();i++)
+    for (unsigned int i = 0; i < rns->getSize(); i++)
         d2 << rns->getNode(i)->getJointValue() << ", ";
     QString t2(d2.str().c_str());
     UI.labelPos->setText(t2);
@@ -592,12 +615,13 @@ void PlatformWindow::sliderSolution(int pos)
         QString t(d.str().c_str());
         UI.labelDist->setText(t);
 
-        updateDistVisu(P1,P2);
+        updateDistVisu(P1, P2);
     }
     redraw();
 }
 
-void PlatformWindow::redraw()
+void
+PlatformWindow::redraw()
 {
     viewer->scheduleRedraw();
     UI.frameViewer->update();

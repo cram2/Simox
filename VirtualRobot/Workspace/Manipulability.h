@@ -24,9 +24,6 @@
 
 #include <VirtualRobot/VirtualRobot.h>
 #include <VirtualRobot/Workspace/WorkspaceRepresentation.h>
-#include <VirtualRobot/IK/PoseQualityMeasurement.h>
-#include <VirtualRobot/Grasping/GraspSet.h>
-
 
 namespace VirtualRobot
 {
@@ -47,19 +44,22 @@ namespace VirtualRobot
             \see PoseQualityManipulability
             \see PoseQualityExtendedManipulability
     */
-    class VIRTUAL_ROBOT_IMPORT_EXPORT Manipulability : public WorkspaceRepresentation, public std::enable_shared_from_this<Manipulability>
+    class VIRTUAL_ROBOT_IMPORT_EXPORT Manipulability :
+        public WorkspaceRepresentation,
+        public std::enable_shared_from_this<Manipulability>
     {
     public:
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
         Manipulability(RobotPtr robot);
 
-
         struct ManipulabiliyGrasp
         {
             GraspPtr grasp;
             float manipulability;
-            bool operator<(const ManipulabiliyGrasp& rhs) const
+
+            bool
+            operator<(const ManipulabiliyGrasp& rhs) const
             {
                 return manipulability < rhs.manipulability;
             }
@@ -71,7 +71,8 @@ namespace VirtualRobot
             \param object The grasps are supposed to to be applied to the object at its current global pose.
             \return A vector of all grasps with manipulability>0 in sorted order (starting with the grasp with highest manipulability)
         */
-        std::vector< ManipulabiliyGrasp > analyseGrasps(GraspSetPtr grasps, ManipulationObjectPtr object);
+        std::vector<ManipulabiliyGrasp> analyseGrasps(GraspSetPtr grasps,
+                                                      ManipulationObjectPtr object);
         ManipulabiliyGrasp analyseGrasp(GraspPtr grasp, ManipulationObjectPtr object);
 
         /*!
@@ -157,7 +158,9 @@ namespace VirtualRobot
         /*!
             Access self distance configuration.
         */
-        void getSelfDistConfig(bool& storeConsiderSelfDist, RobotNodeSetPtr& storeStatic, RobotNodeSetPtr& storeDynamic);
+        void getSelfDistConfig(bool& storeConsiderSelfDist,
+                               RobotNodeSetPtr& storeStatic,
+                               RobotNodeSetPtr& storeDynamic);
 
         /*!
             Creates a deep copy of this data structure. A ManipulabilityPtr is returned.
@@ -171,10 +174,11 @@ namespace VirtualRobot
             \param numThreads number of worker threads used behind the scenes to append random TCP poses to workspace data.
             \param checkForSelfCollisions Build a collision-free configuration. If true, random configs are generated until one is collision-free.
         */
-        void addRandomTCPPoses(unsigned int loops, unsigned int numThreads, bool checkForSelfCollisions = true) override;
+        void addRandomTCPPoses(unsigned int loops,
+                               unsigned int numThreads,
+                               bool checkForSelfCollisions = true) override;
 
     protected:
-
         bool customLoad(std::ifstream& file) override;
         bool customSave(std::ofstream& file) override;
         void customPrint() override;
@@ -183,15 +187,21 @@ namespace VirtualRobot
 
         bool customStringRead(std::ifstream& file, std::string& res);
 
-        float getCurrentManipulability(PoseQualityMeasurementPtr qualMeasure, RobotNodeSetPtr selfDistSt = RobotNodeSetPtr(), RobotNodeSetPtr selfDistDyn = RobotNodeSetPtr());
+        float getCurrentManipulability(PoseQualityMeasurementPtr qualMeasure,
+                                       RobotNodeSetPtr selfDistSt = RobotNodeSetPtr(),
+                                       RobotNodeSetPtr selfDistDyn = RobotNodeSetPtr());
         void addPose(const Eigen::Matrix4f& p) override;
         void addPose(const Eigen::Matrix4f& p, PoseQualityMeasurementPtr qualMeasure) override;
-        void addPose(const Eigen::Matrix4f& p, PoseQualityMeasurementPtr qualMeasure, RobotNodeSetPtr selfDistSt, RobotNodeSetPtr selfDistDyn);
+        void addPose(const Eigen::Matrix4f& p,
+                     PoseQualityMeasurementPtr qualMeasure,
+                     RobotNodeSetPtr selfDistSt,
+                     RobotNodeSetPtr selfDistDyn);
         PoseQualityMeasurementPtr measure;
 
         float maxManip;
 
-        std::string measureName; // if file was loaded we store the name of the manipulability measure here
+        std::string
+            measureName; // if file was loaded we store the name of the manipulability measure here
         bool considerJL;
 
         bool considerSelfDist;
@@ -201,11 +211,8 @@ namespace VirtualRobot
 
         float selfDistAlpha;
         float selfDistBeta;
-
     };
 
     typedef std::shared_ptr<Manipulability> ManipulabilityPtr;
 
 } // namespace VirtualRobot
-
-

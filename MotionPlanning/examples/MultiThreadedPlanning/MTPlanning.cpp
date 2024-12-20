@@ -1,21 +1,22 @@
 
-#include "MTPlanningWindow.h"
-
-
 #include <cstring>
 #include <iostream>
+
+#include "MTPlanningWindow.h"
+#include "VirtualRobot/CollisionDetection/CollisionChecker.h"
 using namespace std;
 using namespace VirtualRobot;
 
-
-void startMTPlanning()
+void
+startMTPlanning()
 {
     MTPlanningWindow* agfw = new MTPlanningWindow();
     agfw->main();
     delete agfw;
 }
 
-int main(int argc, char** argv)
+int
+main(int argc, char** argv)
 {
     SoDB::init();
     SoQt::init(argc, argv, "MT");
@@ -23,21 +24,25 @@ int main(int argc, char** argv)
 
     if (!CollisionChecker::IsSupported_Multithreading_MultipleColCheckers())
     {
-        std::cout << " The collision detection library that is linked to simox does not support multi threading. Aborting...." << std::endl;
+        std::cout << " The collision detection library that is linked to simox does not support "
+                     "multi threading. Aborting...."
+                  << std::endl;
         return -1;
     }
 
 #ifdef WIN32
-    std::cout << "Visual Studio users: Be sure to start this example with <ctrl>+F5 (RELEASE mode) for full performance (otherwise only 1 thread will be used)" << std::endl;
+    std::cout << "Visual Studio users: Be sure to start this example with <ctrl>+F5 (RELEASE mode) "
+                 "for full performance (otherwise only 1 thread will be used)"
+              << std::endl;
 #endif
 
     try
     {
         startMTPlanning();
     }
-    catch(const std::exception &e)
+    catch (const std::exception& e)
     {
-        std::cout << "Exception: " << e.what() << std::endl ;
+        std::cout << "Exception: " << e.what() << std::endl;
     }
     catch (...)
     {

@@ -22,12 +22,11 @@
 */
 #pragma once
 
-#include <boost/test/unit_test.hpp>
-
-#include "VirtualRobot.h"
-#include <string>
 #include <fstream>
 #include <iostream>
+#include <string>
+
+#include <boost/test/unit_test.hpp>
 
 #ifndef WIN32
 struct OutputConfiguration
@@ -43,22 +42,23 @@ struct OutputConfiguration
         logFile.open(logFileName.c_str());
         boost::unit_test::unit_test_log.set_stream(logFile);
     }
+
     ~OutputConfiguration()
     {
 
-#if  BOOST_VERSION  < 106200
+#if BOOST_VERSION < 106200
         logFile << "</TestLog>" << std::flush;
 #endif
         logFile.close();
         boost::unit_test::unit_test_log.set_stream(std::cout);
     }
+
     std::ofstream logFile;
 };
 
-#if  BOOST_VERSION  < 106200
-    BOOST_GLOBAL_FIXTURE(OutputConfiguration)
+#if BOOST_VERSION < 106200
+BOOST_GLOBAL_FIXTURE(OutputConfiguration)
 #else
-    BOOST_GLOBAL_FIXTURE(OutputConfiguration);
+BOOST_GLOBAL_FIXTURE(OutputConfiguration);
 #endif
 #endif
-

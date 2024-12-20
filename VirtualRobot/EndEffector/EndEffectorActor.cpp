@@ -6,25 +6,26 @@
 */
 
 #include "EndEffectorActor.h"
-#include "../VirtualRobotException.h"
+
+#include "../CollisionDetection/CollisionChecker.h"
+#include "../CollisionDetection/CollisionModel.h"
 #include "../Nodes/RobotNode.h"
 #include "../Robot.h"
 #include "../RobotConfig.h"
 #include "../SceneObjectSet.h"
-#include "../CollisionDetection/CollisionChecker.h"
-#include "../CollisionDetection/CollisionModel.h"
+#include "../VirtualRobotException.h"
 #include "EndEffector.h"
-#include "../SceneObjectSet.h"
-
+#include "Logging.h"
 
 namespace VirtualRobot
 {
     using std::cout;
     using std::endl;
 
-    EndEffectorActor::EndEffectorActor(const std::string& name, const std::vector< ActorDefinition >& a, CollisionCheckerPtr colChecker) :
-        name(name),
-        actors(a)
+    EndEffectorActor::EndEffectorActor(const std::string& name,
+                                       const std::vector<ActorDefinition>& a,
+                                       CollisionCheckerPtr colChecker) :
+        name(name), actors(a)
     {
         this->colChecker = colChecker;
 
@@ -34,12 +35,14 @@ namespace VirtualRobot
         }
     }
 
-    std::vector<EndEffectorActor::ActorDefinition> EndEffectorActor::getDefinition()
+    std::vector<EndEffectorActor::ActorDefinition>
+    EndEffectorActor::getDefinition()
     {
         return actors;
     }
 
-    EndEffectorActorPtr EndEffectorActor::clone(RobotPtr newRobot)
+    EndEffectorActorPtr
+    EndEffectorActor::clone(RobotPtr newRobot)
     {
         if (!newRobot)
         {
@@ -58,15 +61,18 @@ namespace VirtualRobot
             newDef.push_back(a);
         }
 
-        return EndEffectorActorPtr(new EndEffectorActor(name, newDef, newRobot->getCollisionChecker()));
+        return EndEffectorActorPtr(
+            new EndEffectorActor(name, newDef, newRobot->getCollisionChecker()));
     }
 
-    std::string EndEffectorActor::getName()
+    std::string
+    EndEffectorActor::getName()
     {
         return name;
     }
 
-    bool EndEffectorActor::moveActor(float angle)
+    bool
+    EndEffectorActor::moveActor(float angle)
     {
         if (actors.size() == 0)
         {
@@ -92,7 +98,11 @@ namespace VirtualRobot
         return res;
     }
 
-    bool EndEffectorActor::moveActorCheckCollision(EndEffectorPtr eef, EndEffector::ContactInfoVector& storeContacts, SceneObjectSetPtr obstacles /*= SceneObjectSetPtr()*/, float angle /*= 0.02*/)
+    bool
+    EndEffectorActor::moveActorCheckCollision(EndEffectorPtr eef,
+                                              EndEffector::ContactInfoVector& storeContacts,
+                                              SceneObjectSetPtr obstacles /*= SceneObjectSetPtr()*/,
+                                              float angle /*= 0.02*/)
     {
         VR_ASSERT(eef);
         const RobotPtr& robot = eef->getRobot();
@@ -104,7 +114,7 @@ namespace VirtualRobot
 
         for (auto& actor : actors)
         {
-            float oldV =  actor.robotNode->getJointValue();
+            float oldV = actor.robotNode->getJointValue();
             float v = oldV + angle * actor.directionAndSpeed;
 
             bool isMoving = true;
@@ -118,7 +128,8 @@ namespace VirtualRobot
                 bool collision = false;
 
                 // obstacles (store contacts)
-                if ((/*n->colMode!=eNone &&*/ obstacles && isColliding(eef, obstacles, newContacts)))
+                if ((/*n->colMode!=eNone &&*/ obstacles &&
+                     isColliding(eef, obstacles, newContacts)))
                 {
                     collision = true;
                 }
@@ -129,7 +140,8 @@ namespace VirtualRobot
                     for (auto& eefActor : eef->getActors())
                     {
                         // Don't check for collisions with the actor itself (don't store contacts)
-                        if ((eefActor->getName() != name) && isColliding(eefActor))   //isColliding(eef,*a,newContacts) )
+                        if ((eefActor->getName() != name) &&
+                            isColliding(eefActor)) //isColliding(eef,*a,newContacts) )
                         {
                             collision = true;
                         }
@@ -179,7 +191,8 @@ namespace VirtualRobot
 
             for (auto& storeContact : storeContacts)
             {
-                if (storeContact.robotNode == newContact.robotNode && storeContact.obstacle == newContact.obstacle)
+                if (storeContact.robotNode == newContact.robotNode &&
+                    storeContact.obstacle == newContact.obstacle)
                 {
                     doubleEntry = true;
                     break;
@@ -189,17 +202,29 @@ namespace VirtualRobot
             if (!doubleEntry)
             {
                 int id1, id2;
-                newContact.distance = colChecker->calculateDistance(newContact.robotNode->getCollisionModel(), newContact.obstacle->getCollisionModel(), newContact.contactPointFingerGlobal, newContact.contactPointObstacleGlobal, &id1, &id2);
-                newContact.contactPointFingerLocal = newContact.obstacle->toLocalCoordinateSystemVec(newContact.contactPointFingerGlobal);
-                newContact.contactPointObstacleLocal = newContact.obstacle->toLocalCoordinateSystemVec(newContact.contactPointObstacleGlobal);
+                newContact.distance =
+                    colChecker->calculateDistance(newContact.robotNode->getCollisionModel(),
+                                                  newContact.obstacle->getCollisionModel(),
+                                                  newContact.contactPointFingerGlobal,
+                                                  newContact.contactPointObstacleGlobal,
+                                                  &id1,
+                                                  &id2);
+                newContact.contactPointFingerLocal =
+                    newContact.obstacle->toLocalCoordinateSystemVec(
+                        newContact.contactPointFingerGlobal);
+                newContact.contactPointObstacleLocal =
+                    newContact.obstacle->toLocalCoordinateSystemVec(
+                        newContact.contactPointObstacleGlobal);
 
                 // compute approach direction
                 // todo: this could be done more elegantly (Jacobian)
                 RobotConfigPtr config = getConfiguration();
                 Eigen::Vector3f contGlobal1 = newContact.contactPointFingerGlobal;
-                Eigen::Vector3f contFinger = newContact.robotNode->toLocalCoordinateSystemVec(contGlobal1);
+                Eigen::Vector3f contFinger =
+                    newContact.robotNode->toLocalCoordinateSystemVec(contGlobal1);
                 this->moveActor(angle);
-                Eigen::Vector3f contGlobal2 = newContact.robotNode->toGlobalCoordinateSystemVec(contFinger);
+                Eigen::Vector3f contGlobal2 =
+                    newContact.robotNode->toGlobalCoordinateSystemVec(contFinger);
                 newContact.approachDirectionGlobal = contGlobal2 - contGlobal1;
                 newContact.approachDirectionGlobal.normalize();
                 robot->setJointValues(config);
@@ -211,8 +236,11 @@ namespace VirtualRobot
         return allActorsHaveStopped;
     }
 
-
-    bool EndEffectorActor::isColliding(EndEffectorPtr eef, SceneObjectSetPtr obstacles, EndEffector::ContactInfoVector& storeContacts, CollisionMode checkColMode)
+    bool
+    EndEffectorActor::isColliding(EndEffectorPtr eef,
+                                  SceneObjectSetPtr obstacles,
+                                  EndEffector::ContactInfoVector& storeContacts,
+                                  CollisionMode checkColMode)
     {
         std::vector<SceneObjectPtr> colModels = obstacles->getSceneObjects();
         //Eigen::Vector3f contact;
@@ -223,10 +251,10 @@ namespace VirtualRobot
             for (auto& colModel : colModels)
             {
 
-                if ((actor.colMode & checkColMode) &&
-                    (colModel->getCollisionModel()) &&
+                if ((actor.colMode & checkColMode) && (colModel->getCollisionModel()) &&
                     actor.robotNode->getCollisionModel() &&
-                    colChecker->checkCollision(actor.robotNode->getCollisionModel(), colModel->getCollisionModel()))
+                    colChecker->checkCollision(actor.robotNode->getCollisionModel(),
+                                               colModel->getCollisionModel()))
                 {
 
                     col = true;
@@ -240,9 +268,16 @@ namespace VirtualRobot
                     // todo: maybe not needed here: we are in collision, distance makes no sense...
                     // later the distance is calculated anyway (with slightly opened actors)
                     int id1, id2;
-                    ci.distance = colChecker->calculateDistance(ci.robotNode->getCollisionModel(), ci.obstacle->getCollisionModel(), ci.contactPointFingerGlobal, ci.contactPointObstacleGlobal, &id1, &id2);
-                    ci.contactPointFingerLocal = ci.obstacle->toLocalCoordinateSystemVec(ci.contactPointFingerGlobal);
-                    ci.contactPointObstacleLocal = ci.obstacle->toLocalCoordinateSystemVec(ci.contactPointObstacleGlobal);
+                    ci.distance = colChecker->calculateDistance(ci.robotNode->getCollisionModel(),
+                                                                ci.obstacle->getCollisionModel(),
+                                                                ci.contactPointFingerGlobal,
+                                                                ci.contactPointObstacleGlobal,
+                                                                &id1,
+                                                                &id2);
+                    ci.contactPointFingerLocal =
+                        ci.obstacle->toLocalCoordinateSystemVec(ci.contactPointFingerGlobal);
+                    ci.contactPointObstacleLocal =
+                        ci.obstacle->toLocalCoordinateSystemVec(ci.contactPointObstacleGlobal);
 
                     storeContacts.push_back(ci);
                 }
@@ -252,11 +287,13 @@ namespace VirtualRobot
         return col;
     }
 
-    bool EndEffectorActor::isColliding(SceneObjectSetPtr obstacles,  CollisionMode checkColMode)
+    bool
+    EndEffectorActor::isColliding(SceneObjectSetPtr obstacles, CollisionMode checkColMode)
     {
         for (auto& actor : actors)
         {
-            if ((actor.colMode & checkColMode) && actor.robotNode->getCollisionModel() && colChecker->checkCollision(actor.robotNode->getCollisionModel(), obstacles))
+            if ((actor.colMode & checkColMode) && actor.robotNode->getCollisionModel() &&
+                colChecker->checkCollision(actor.robotNode->getCollisionModel(), obstacles))
             {
                 return true;
             }
@@ -265,7 +302,8 @@ namespace VirtualRobot
         return false;
     }
 
-    bool EndEffectorActor::isColliding(SceneObjectPtr obstacle, CollisionMode checkColMode)
+    bool
+    EndEffectorActor::isColliding(SceneObjectPtr obstacle, CollisionMode checkColMode)
     {
         if (!obstacle || !obstacle->getCollisionModel())
         {
@@ -274,7 +312,9 @@ namespace VirtualRobot
 
         for (auto& actor : actors)
         {
-            if ((actor.colMode & checkColMode) && actor.robotNode->getCollisionModel() && colChecker->checkCollision(actor.robotNode->getCollisionModel(), obstacle->getCollisionModel()))
+            if ((actor.colMode & checkColMode) && actor.robotNode->getCollisionModel() &&
+                colChecker->checkCollision(actor.robotNode->getCollisionModel(),
+                                           obstacle->getCollisionModel()))
             {
                 return true;
             }
@@ -283,7 +323,8 @@ namespace VirtualRobot
         return false;
     }
 
-    bool EndEffectorActor::isColliding(EndEffectorActorPtr obstacle)
+    bool
+    EndEffectorActor::isColliding(EndEffectorActorPtr obstacle)
     {
         for (auto& actor : actors)
         {
@@ -298,7 +339,8 @@ namespace VirtualRobot
         return false;
     }
 
-    bool EndEffectorActor::isColliding(EndEffectorPtr obstacle)
+    bool
+    EndEffectorActor::isColliding(EndEffectorPtr obstacle)
     {
         std::vector<EndEffectorActorPtr> obstacleActors;
         obstacle->getActors(obstacleActors);
@@ -328,7 +370,10 @@ namespace VirtualRobot
         return false;
     }
 
-    bool EndEffectorActor::isColliding(EndEffectorPtr eef, EndEffectorPtr obstacle, EndEffector::ContactInfoVector& storeContacts)
+    bool
+    EndEffectorActor::isColliding(EndEffectorPtr eef,
+                                  EndEffectorPtr obstacle,
+                                  EndEffector::ContactInfoVector& storeContacts)
     {
         std::vector<EndEffectorActorPtr> obstacleActors;
         obstacle->getActors(obstacleActors);
@@ -339,7 +384,8 @@ namespace VirtualRobot
         for (auto& obstacleActor : obstacleActors)
         {
             // Don't check for collisions with the actor itself
-            if ((obstacleActor->getName() != name) && isColliding(eef, obstacleActor, storeContacts))
+            if ((obstacleActor->getName() != name) &&
+                isColliding(eef, obstacleActor, storeContacts))
             {
                 return true;
             }
@@ -358,7 +404,10 @@ namespace VirtualRobot
         return false;
     }
 
-    bool EndEffectorActor::isColliding(EndEffectorPtr eef, EndEffectorActorPtr obstacle, EndEffector::ContactInfoVector& storeContacts)
+    bool
+    EndEffectorActor::isColliding(EndEffectorPtr eef,
+                                  EndEffectorActorPtr obstacle,
+                                  EndEffector::ContactInfoVector& storeContacts)
     {
         for (auto& actor : actors)
         {
@@ -371,10 +420,13 @@ namespace VirtualRobot
         }
 
         return false;
-
     }
 
-    bool EndEffectorActor::isColliding(EndEffectorPtr eef, SceneObjectPtr obstacle, EndEffector::ContactInfoVector& storeContacts, CollisionMode checkColMode /*= EndEffectorActor::eAll*/)
+    bool
+    EndEffectorActor::isColliding(EndEffectorPtr eef,
+                                  SceneObjectPtr obstacle,
+                                  EndEffector::ContactInfoVector& storeContacts,
+                                  CollisionMode checkColMode /*= EndEffectorActor::eAll*/)
     {
         if (!obstacle || !obstacle->getCollisionModel())
         {
@@ -387,9 +439,9 @@ namespace VirtualRobot
         for (auto& actor : actors)
         {
 
-            if ((actor.colMode & checkColMode) &&
-                actor.robotNode->getCollisionModel() &&
-                colChecker->checkCollision(actor.robotNode->getCollisionModel(), obstacle->getCollisionModel()))
+            if ((actor.colMode & checkColMode) && actor.robotNode->getCollisionModel() &&
+                colChecker->checkCollision(actor.robotNode->getCollisionModel(),
+                                           obstacle->getCollisionModel()))
             {
                 col = true;
                 // create contact info
@@ -401,9 +453,16 @@ namespace VirtualRobot
 
                 // todo: not needed here, later we calculate the distance with opened actors...
                 int id1, id2;
-                ci.distance = colChecker->calculateDistance(ci.robotNode->getCollisionModel(), ci.obstacle->getCollisionModel(), ci.contactPointFingerGlobal, ci.contactPointObstacleGlobal, &id1, &id2);
-                ci.contactPointFingerLocal = ci.obstacle->toLocalCoordinateSystemVec(ci.contactPointFingerGlobal);
-                ci.contactPointObstacleLocal = ci.obstacle->toLocalCoordinateSystemVec(ci.contactPointObstacleGlobal);
+                ci.distance = colChecker->calculateDistance(ci.robotNode->getCollisionModel(),
+                                                            ci.obstacle->getCollisionModel(),
+                                                            ci.contactPointFingerGlobal,
+                                                            ci.contactPointObstacleGlobal,
+                                                            &id1,
+                                                            &id2);
+                ci.contactPointFingerLocal =
+                    ci.obstacle->toLocalCoordinateSystemVec(ci.contactPointFingerGlobal);
+                ci.contactPointObstacleLocal =
+                    ci.obstacle->toLocalCoordinateSystemVec(ci.contactPointObstacleGlobal);
 
 
                 storeContacts.push_back(ci);
@@ -413,13 +472,10 @@ namespace VirtualRobot
         return col;
     }
 
-
-
-
-
-    std::vector< RobotNodePtr > EndEffectorActor::getRobotNodes()
+    std::vector<RobotNodePtr>
+    EndEffectorActor::getRobotNodes()
     {
-        std::vector< RobotNodePtr > res;
+        std::vector<RobotNodePtr> res;
 
         for (auto& actor : actors)
         {
@@ -429,21 +485,24 @@ namespace VirtualRobot
         return res;
     }
 
-    void EndEffectorActor::print()
+    void
+    EndEffectorActor::print()
     {
         std::cout << " ****" << std::endl;
         std::cout << " ** Name:" << name << std::endl;
 
         for (auto& actor : actors)
         {
-            std::cout << " *** RobotNode: " << actor.robotNode->getName() << ", Direction/Speed:" << actor.directionAndSpeed << std::endl;
+            std::cout << " *** RobotNode: " << actor.robotNode->getName()
+                      << ", Direction/Speed:" << actor.directionAndSpeed << std::endl;
             //actors[i].robotNode->print();
         }
 
         std::cout << " ****" << std::endl;
     }
 
-    bool EndEffectorActor::hasNode(RobotNodePtr node)
+    bool
+    EndEffectorActor::hasNode(RobotNodePtr node)
     {
         std::vector<ActorDefinition>::iterator iS = actors.begin();
 
@@ -460,7 +519,8 @@ namespace VirtualRobot
         return false;
     }
 
-    bool EndEffectorActor::nodesSufficient(std::vector<RobotNodePtr> nodes) const
+    bool
+    EndEffectorActor::nodesSufficient(std::vector<RobotNodePtr> nodes) const
     {
         std::vector<ActorDefinition>::const_iterator i = actors.begin();
 
@@ -491,7 +551,8 @@ namespace VirtualRobot
         return true;
     }
 
-    float EndEffectorActor::getApproximatedLength()
+    float
+    EndEffectorActor::getApproximatedLength()
     {
         BoundingBox bb_all;
 
@@ -509,14 +570,15 @@ namespace VirtualRobot
         return d.norm();
     }
 
-    VirtualRobot::RobotConfigPtr EndEffectorActor::getConfiguration()
+    VirtualRobot::RobotConfigPtr
+    EndEffectorActor::getConfiguration()
     {
         if (actors.size() == 0 || !actors[0].robotNode)
         {
             return VirtualRobot::RobotConfigPtr();
         }
 
-        std::vector< RobotConfig::Configuration > c;
+        std::vector<RobotConfig::Configuration> c;
 
         for (auto& actor : actors)
         {
@@ -530,7 +592,8 @@ namespace VirtualRobot
         return res;
     }
 
-    std::string EndEffectorActor::toXML(int ident /*= 1*/)
+    std::string
+    EndEffectorActor::toXML(int ident /*= 1*/)
     {
         std::stringstream ss;
         std::string t = "\t";
@@ -578,18 +641,15 @@ namespace VirtualRobot
         return ss.str();
     }
 
-    bool EndEffectorActor::isAtHiLimit() const
+    bool
+    EndEffectorActor::isAtHiLimit() const
     {
         for (const auto& actor : actors)
         {
             const float v = actor.robotNode->getJointValue();
             const float jointLimitHigh = actor.robotNode->getJointLimitHi();
             const float jointLimitLow = actor.robotNode->getJointLimitLo();
-            const auto [min, max] =
-                std::minmax(
-                    jointLimitHigh,
-                    jointLimitLow
-                );
+            const auto [min, max] = std::minmax(jointLimitHigh, jointLimitLow);
             if (actor.directionAndSpeed > 0)
             {
                 if (v < max)
@@ -608,18 +668,15 @@ namespace VirtualRobot
         return true;
     }
 
-    bool EndEffectorActor::isAtLoLimit() const
+    bool
+    EndEffectorActor::isAtLoLimit() const
     {
         for (const auto& actor : actors)
         {
             const float v = actor.robotNode->getJointValue();
             const float jointLimitHigh = actor.robotNode->getJointLimitHi();
             const float jointLimitLow = actor.robotNode->getJointLimitLo();
-            const auto [min, max] =
-                std::minmax(
-                    jointLimitHigh,
-                    jointLimitLow
-                );
+            const auto [min, max] = std::minmax(jointLimitHigh, jointLimitLow);
             if (actor.directionAndSpeed > 0)
             {
                 if (v > min)

@@ -22,16 +22,18 @@
 */
 #pragma once
 
-#include "../VirtualRobot.h"
-#include "../VirtualRobotException.h"
-#include "../MathTools.h"
-#include "../XML/FileIO.h"
-#include "../Compression/CompressionBZip2.h"
-#include "VoxelTreeNDElement.hpp"
-
+#include <iomanip>
 #include <string>
 #include <vector>
-#include <iomanip>
+
+#include "../Compression/CompressionBZip2.h"
+#include "../MathTools.h"
+#include "../VirtualRobot.h"
+#include "../VirtualRobotException.h"
+#include "../XML/FileIO.h"
+#include "../Logging.h"
+#include "../Assert.h"
+#include "VoxelTreeNDElement.hpp"
 
 //#define VoxelTreeND_DEBUG_OUTPUT
 
@@ -65,22 +67,24 @@ namespace VirtualRobot
     class VoxelTreeND
     {
         friend class VoxelTreeNDElement<T, N>;
+
     public:
-
-
-        VoxelTreeND(float minExtend[N], float maxExtend[N], float discretization[N], bool verbose = false):
-            verbose(verbose),
-            currentElementID(0)
+        VoxelTreeND(float minExtend[N],
+                    float maxExtend[N],
+                    float discretization[N],
+                    bool verbose = false) :
+            verbose(verbose), currentElementID(0)
         {
-            memcpy(this->minExtend, minExtend, sizeof(float)*N);
-            memcpy(this->maxExtend, maxExtend, sizeof(float)*N);
-            memcpy(this->discretization, discretization, sizeof(float)*N);
+            memcpy(this->minExtend, minExtend, sizeof(float) * N);
+            memcpy(this->maxExtend, maxExtend, sizeof(float) * N);
+            memcpy(this->discretization, discretization, sizeof(float) * N);
 
             for (unsigned int i = 0; i < N; i++)
             {
                 size[i] = maxExtend[i] - minExtend[i];
                 THROW_VR_EXCEPTION_IF(size[i] <= 0.0f, "Invalid extend parameters?!");
-                THROW_VR_EXCEPTION_IF(discretization[i] <= 0.0f, "Invalid discretization parameters?!");
+                THROW_VR_EXCEPTION_IF(discretization[i] <= 0.0f,
+                                      "Invalid discretization parameters?!");
             }
 
             int maxSteps = 0;
@@ -103,7 +107,7 @@ namespace VirtualRobot
             // precompute extends for all sub elements
             elementExtends.resize(maxLevels, N);
             float newExtend[N];
-            memcpy(newExtend, size, sizeof(float)*N);
+            memcpy(newExtend, size, sizeof(float) * N);
 
             for (unsigned int a = 0; a < static_cast<unsigned>(maxLevels); a++)
             {
@@ -125,8 +129,11 @@ namespace VirtualRobot
 
                 for (unsigned int i = 0; i < N; i++)
                 {
-                    std::cout << std::fixed << minExtend[i] << "," << maxExtend[i] << " -> " << size[i] << std::endl;
-                    std::cout << std::fixed << "\tdiscretization:" << discretization[i] << ". Max leafs:" << (int)(size[i] / discretization[i] + 0.5f) << std::endl;
+                    std::cout << std::fixed << minExtend[i] << "," << maxExtend[i] << " -> "
+                              << size[i] << std::endl;
+                    std::cout << std::fixed << "\tdiscretization:" << discretization[i]
+                              << ". Max leafs:" << (int)(size[i] / discretization[i] + 0.5f)
+                              << std::endl;
                 }
 
                 std::cout << std::resetiosflags(std::ios::fixed);
@@ -136,8 +143,7 @@ namespace VirtualRobot
 
             THROW_VR_EXCEPTION_IF(maxLevels <= 0, "Invalid parameters...");
             num_children = VirtualRobot::MathTools::pow_int(2, N);
-            root = new VoxelTreeNDElement<T, N>(minExtend,/*size,*/0,/*maxLevels,*/this);
-
+            root = new VoxelTreeNDElement<T, N>(minExtend, /*size,*/ 0, /*maxLevels,*/ this);
         }
 
         virtual ~VoxelTreeND()
@@ -150,7 +156,8 @@ namespace VirtualRobot
             Creates a leaf if necessary. Existing entries are silently overwritten.
             A copy of e is created.
         */
-        bool setEntry(float pos[N], const T& e)
+        bool
+        setEntry(float pos[N], const T& e)
         {
             return root->setEntry(pos, e);
         }
@@ -158,7 +165,8 @@ namespace VirtualRobot
         /*!
             Returns entry at pos. If pos is outside the space representation or no data stored at pos, NULL is returned.
         */
-        T* getEntry(float pos[N])
+        T*
+        getEntry(float pos[N])
         {
             return root->getEntry(pos);
         }
@@ -166,7 +174,8 @@ namespace VirtualRobot
         /*!
             Returns size of voxelized data structure (in local coordinate system)
         */
-        void getSize(float storeSize[N])
+        void
+        getSize(float storeSize[N])
         {
             memcpy(storeSize, size, N * sizeof(float));
         }
@@ -174,7 +183,8 @@ namespace VirtualRobot
         /*!
             Returns min position of voxelized data structure (in local coordinate system)
         */
-        void getMinExtend(float storeMin[N])
+        void
+        getMinExtend(float storeMin[N])
         {
             memcpy(storeMin, minExtend, N * sizeof(float));
         }
@@ -182,7 +192,8 @@ namespace VirtualRobot
         /*!
             Returns max position of voxelized data structure (in local coordinate system)
         */
-        void getMaxExtend(float storeMin[N])
+        void
+        getMaxExtend(float storeMin[N])
         {
             memcpy(storeMin, maxExtend, N * sizeof(float));
         }
@@ -190,7 +201,8 @@ namespace VirtualRobot
         /*!
             Returns discretization vector as defined on construction. (The actual discretization may differ, depending on max tree depth)
         */
-        void getDiscretization(float storeDiscretization[N])
+        void
+        getDiscretization(float storeDiscretization[N])
         {
             memcpy(storeDiscretization, discretization, N * sizeof(float));
         }
@@ -198,7 +210,8 @@ namespace VirtualRobot
         /*!
             Get real min element sizes.
         */
-        void getRealDiscretization(float storeDiscretization[N])
+        void
+        getRealDiscretization(float storeDiscretization[N])
         {
             for (int i = 0; i < N; i++)
             {
@@ -209,7 +222,8 @@ namespace VirtualRobot
         /*!
             Returns leaf at position pos. NULL if no data stored.
         */
-        VoxelTreeNDElement<T, N>* getLeafElement(float pos[N])
+        VoxelTreeNDElement<T, N>*
+        getLeafElement(float pos[N])
         {
             return root->getLeaf(pos);
         }
@@ -218,7 +232,8 @@ namespace VirtualRobot
             Gets leaf element with max entry T of all sub-tree elements at position p (size of Vector p defines which level of the tree is considered).
             If no entry is stored below p NULL is returned
         */
-        VoxelTreeNDElement<T, N>* getMaxEntry(const Eigen::VectorXf& p)
+        VoxelTreeNDElement<T, N>*
+        getMaxEntry(const Eigen::VectorXf& p)
         {
             VR_ASSERT(p.rows() > 0 && p.rows() <= N);
             return root->maxLeaf(p);
@@ -227,13 +242,15 @@ namespace VirtualRobot
         /*!
             Gets all leaf elements of all sub-tree elements at position p (size of Vector p defines which level of the tree is considered).
         */
-        std::vector< VoxelTreeNDElement<T, N>* > getAllLeafs(const Eigen::VectorXf& p)
+        std::vector<VoxelTreeNDElement<T, N>*>
+        getAllLeafs(const Eigen::VectorXf& p)
         {
             VR_ASSERT(p.rows() > 0 && p.rows() <= N);
             return root->getAllLeafs(p);
         }
 
-        static VoxelTreeND<T, N>* load(std::ifstream& file)
+        static VoxelTreeND<T, N>*
+        load(std::ifstream& file)
         {
             THROW_VR_EXCEPTION_IF(!file, "File could not be read.");
 
@@ -256,7 +273,7 @@ namespace VirtualRobot
 
                 // Check version
                 int64_t version[2];
-                FileIO::readArray<int64_t>(version , 2 , file);
+                FileIO::readArray<int64_t>(version, 2, file);
 
                 if (version[0] != 1 || version[1] != 1)
                 {
@@ -266,7 +283,8 @@ namespace VirtualRobot
                 // check sizeof type T
                 int64_t expectedSize = int64_t(sizeof(T));
                 int64_t storedSize = FileIO::read<int64_t>(file);
-                THROW_VR_EXCEPTION_IF(storedSize != expectedSize, "Wrong type information in file...");
+                THROW_VR_EXCEPTION_IF(storedSize != expectedSize,
+                                      "Wrong type information in file...");
 
                 // check N
                 int64_t storedN;
@@ -275,7 +293,7 @@ namespace VirtualRobot
                 THROW_VR_EXCEPTION_IF(storedN != int64_t(N), "Wrong N information in file...");
 
                 // get maxLevels
-                /*int maxLevels = int(*/FileIO::read<int64_t>(file)/*)*/;
+                /*int maxLevels = int(*/ FileIO::read<int64_t>(file) /*)*/;
 
                 // get extends
                 float minExtend[N];
@@ -289,18 +307,19 @@ namespace VirtualRobot
                 {
                     float s = maxExtend[i] - minExtend[i];
                     THROW_VR_EXCEPTION_IF(s <= 0.0f, "Invalid extend parameters?!");
-                    THROW_VR_EXCEPTION_IF(discretization[i] <= 0.0f, "Invalid discretization parameters?!");
+                    THROW_VR_EXCEPTION_IF(discretization[i] <= 0.0f,
+                                          "Invalid discretization parameters?!");
                 }
 
                 tree = new VoxelTreeND<T, N>(minExtend, maxExtend, discretization);
-                std::map< unsigned int, VoxelTreeNDElement<T, N>* > idElementMapping;
+                std::map<unsigned int, VoxelTreeNDElement<T, N>*> idElementMapping;
                 idElementMapping[1] = tree->root;
 
                 // get nr of entries
                 int64_t nrElements = FileIO::read<int64_t>(file);
 
                 // id
-                /*int64_t expectedID = */FileIO::read<int64_t>(file);
+                /*int64_t expectedID = */ FileIO::read<int64_t>(file);
 
                 // create dummy elements to be filled afterwards
                 float p[N];
@@ -308,13 +327,16 @@ namespace VirtualRobot
                 //float ex[N];
                 for (int64_t i = 1; i < nrElements; i++)
                 {
-                    VoxelTreeNDElement<T, N>* e = new VoxelTreeNDElement<T, N>(p,/*ex,*/0,/*10,*/tree);
-                    idElementMapping[(unsigned int)(i + 1)] = e; // we start with 1, but root is already created!
+                    VoxelTreeNDElement<T, N>* e =
+                        new VoxelTreeNDElement<T, N>(p, /*ex,*/ 0, /*10,*/ tree);
+                    idElementMapping[(unsigned int)(i + 1)] =
+                        e; // we start with 1, but root is already created!
                 }
 
 
                 FileIO::readString(tmpString, file);
-                THROW_VR_EXCEPTION_IF(tmpString != "DATA_START", "Bad file format, expecting DATA_START");
+                THROW_VR_EXCEPTION_IF(tmpString != "DATA_START",
+                                      "Bad file format, expecting DATA_START");
 
 
                 // fill element data
@@ -437,15 +459,15 @@ namespace VirtualRobot
                         delete tree;
                         return NULL;
                     }
-
                 }
 
                 bzip2->close();
                 FileIO::readString(tmpString, file);
-                THROW_VR_EXCEPTION_IF(tmpString != "DATA_END", "Bad file format, expecting DATA_END");
+                THROW_VR_EXCEPTION_IF(tmpString != "DATA_END",
+                                      "Bad file format, expecting DATA_END");
                 // set root and update extend / pos information
                 tree->setRoot(idElementMapping[1]);
-                delete []childIDs;
+                delete[] childIDs;
             }
             catch (VirtualRobotException& e)
             {
@@ -456,7 +478,9 @@ namespace VirtualRobot
 
             return tree;
         }
-        static VoxelTreeND<T, N>* load(const std::string& filename)
+
+        static VoxelTreeND<T, N>*
+        load(const std::string& filename)
         {
             std::ifstream file(filename.c_str(), std::ios::in | std::ios::binary);
             THROW_VR_EXCEPTION_IF(!file, "File could not be read.");
@@ -464,7 +488,9 @@ namespace VirtualRobot
             file.close();
             return tree;
         }
-        bool save(std::ofstream& file)
+
+        bool
+        save(std::ofstream& file)
         {
             THROW_VR_EXCEPTION_IF(!file.is_open(), "File is not open...");
 
@@ -496,7 +522,7 @@ namespace VirtualRobot
                 FileIO::writeArray<float>(file, discretization, N);
 
                 // nr of entries
-                std::vector< VoxelTreeNDElement<T, N>* > elements;
+                std::vector<VoxelTreeNDElement<T, N>*> elements;
                 root->collectElements(elements);
                 FileIO::write<int64_t>(file, int64_t(elements.size()));
 
@@ -556,7 +582,8 @@ namespace VirtualRobot
                     {
                         // write children ids
                         dataSize = sizeof(unsigned int) * numChildren;
-                        THROW_VR_EXCEPTION_IF(static_cast<size_t>(numChildren) != d.children.size(), "Internal error, numChildren wrong...");
+                        THROW_VR_EXCEPTION_IF(static_cast<size_t>(numChildren) != d.children.size(),
+                                              "Internal error, numChildren wrong...");
 
                         for (int j = 0; j < numChildren; j++)
                         {
@@ -583,7 +610,8 @@ namespace VirtualRobot
             return true;
         }
 
-        bool save(const std::string& filename)
+        bool
+        save(const std::string& filename)
         {
             std::ofstream file;
             file.open(filename.c_str(), std::ios::out | std::ios::binary);
@@ -593,13 +621,14 @@ namespace VirtualRobot
             return res;
         }
 
-        bool isCovered(float p[N])
+        bool
+        isCovered(float p[N])
         {
             return root->covers(p);
         }
 
-
-        void print()
+        void
+        print()
         {
             std::cout << " **** VoxelTreeND ****" << std::endl;
             std::cout << "N=" << N << std::endl;
@@ -640,7 +669,8 @@ namespace VirtualRobot
             std::cout << " *********************" << std::endl;
         }
 
-        int getMaxLevels()
+        int
+        getMaxLevels()
         {
             return maxLevels;
         }
@@ -650,7 +680,8 @@ namespace VirtualRobot
             /*!
                 Initialize iterator and return first element (NULL if no elements are present)
             */
-            VoxelTreeNDElement<T, N>* init(VoxelTreeND<T, N>* tree)
+            VoxelTreeNDElement<T, N>*
+            init(VoxelTreeND<T, N>* tree)
             {
                 this->tree = tree;
                 elementStack.clear();
@@ -684,7 +715,8 @@ namespace VirtualRobot
             /*!
                 Iterate through tree and return next element (NULL when no more elements are present)
             */
-            VoxelTreeNDElement<T, N>* getNextElement()
+            VoxelTreeNDElement<T, N>*
+            getNextElement()
             {
 #ifdef VoxelTreeND_DEBUG_OUTPUT
                 std::cout << "current stack:" << std::endl;
@@ -710,18 +742,18 @@ namespace VirtualRobot
                     currentElement = elementStack.back();
                     currentElementNr = idStack.back();
                     idStack.pop_back();
-                    currentElement = currentElement->getNextChild(currentElementNr + 1, currentElementNr);
+                    currentElement =
+                        currentElement->getNextChild(currentElementNr + 1, currentElementNr);
 
                     if (!currentElement)
                     {
                         elementStack.pop_back();
                     }
-                }
-                while (!currentElement && elementStack.size() > 0 && idStack.size() > 0);
+                } while (!currentElement && elementStack.size() > 0 && idStack.size() > 0);
 
                 if (!currentElement)
                 {
-                    return NULL;    // no more elements
+                    return NULL; // no more elements
                 }
 
                 // go down
@@ -755,13 +787,15 @@ namespace VirtualRobot
             }
 
         protected:
-            void printStack()
+            void
+            printStack()
             {
                 std::cout << "Stack: [" << elementStack[0]->getLevel() << "]";
 
                 for (size_t i = 0; i < idStack.size(); i++)
                 {
-                    std::cout << "->" << idStack[i] << " ->" << "[" << elementStack[i + 1]->getLevel() << "]";
+                    std::cout << "->" << idStack[i] << " ->"
+                              << "[" << elementStack[i + 1]->getLevel() << "]";
                 }
 
                 std::cout << std::endl;
@@ -774,12 +808,14 @@ namespace VirtualRobot
             VoxelTreeND<T, N>* tree;
         };
 
-        VoxelTreeNDElement<T, N>* getRoot()
+        VoxelTreeNDElement<T, N>*
+        getRoot()
         {
             return root;
         }
 
-        void getMemoryConsumtion(long& storeMemStructure, long& storeMemData)
+        void
+        getMemoryConsumtion(long& storeMemStructure, long& storeMemData)
         {
             storeMemStructure = 0;
             storeMemData = 0;
@@ -794,7 +830,8 @@ namespace VirtualRobot
         /*!
          *  Retruns number of all Nodes, including inner and leaf nodes.
          */
-        long getNumNodes()
+        long
+        getNumNodes()
         {
             return root->countNodesRecursive();
         }
@@ -803,17 +840,21 @@ namespace VirtualRobot
         /*!
             Returns voxel extends of element in given level (0<=level<maxLevels) and dimension dim (0<=dim<N)
         */
-        float getExtends(int level, int dim)
+        float
+        getExtends(int level, int dim)
         {
             THROW_VR_EXCEPTION_IF(static_cast<size_t>(dim) >= N || dim < 0, "Index out of bounds");
             return elementExtends(level, dim);
         }
-        int getNumChildren()
+
+        int
+        getNumChildren()
         {
             return num_children;
         }
 
-        void setRoot(VoxelTreeNDElement<T, N>* e)
+        void
+        setRoot(VoxelTreeNDElement<T, N>* e)
         {
             if (e != root)
             {
@@ -823,10 +864,12 @@ namespace VirtualRobot
 
             if (root)
             {
-                root->propagateData(minExtend,/*size,*/0,/*maxLevels,*/this);
+                root->propagateData(minExtend, /*size,*/ 0, /*maxLevels,*/ this);
             }
         }
-        unsigned int getNextID()
+
+        unsigned int
+        getNextID()
         {
             currentElementID++;
             return currentElementID;
@@ -844,9 +887,7 @@ namespace VirtualRobot
         Eigen::MatrixXf elementExtends;
 
         VoxelTreeNDElement<T, N>* root;
-
     };
 
 
-
-}
+} // namespace VirtualRobot

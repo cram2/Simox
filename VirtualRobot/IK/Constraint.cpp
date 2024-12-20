@@ -1,5 +1,7 @@
 #include "Constraint.h"
 
+#include "VirtualRobotException.h"
+
 using namespace VirtualRobot;
 
 Constraint::Constraint(const RobotNodeSetPtr& nodeSet) :
@@ -8,24 +10,27 @@ Constraint::Constraint(const RobotNodeSetPtr& nodeSet) :
     lastLastError(-1),
     optimizationFunctionFactor(1)
 {
-    name ="Constraint";
+    name = "Constraint";
     initialized = true;
 }
 
-void Constraint::initialize()
+void
+Constraint::initialize()
 {
     lastError = -1;
     lastLastError = -1;
     optimizationFunctionFactor = 1;
 }
 
-bool Constraint::getRobotPoseForConstraint(Eigen::Matrix4f& /*pose*/)
+bool
+Constraint::getRobotPoseForConstraint(Eigen::Matrix4f& /*pose*/)
 {
     // No change in global pose required
     return false;
 }
 
-float Constraint::getErrorDifference()
+float
+Constraint::getErrorDifference()
 {
     Eigen::VectorXf e = getError(1);
     lastLastError = lastError;
@@ -39,67 +44,80 @@ float Constraint::getErrorDifference()
     return lastLastError - lastError;
 }
 
-const std::vector<OptimizationFunctionSetup> &Constraint::getEqualityConstraints()
+const std::vector<OptimizationFunctionSetup>&
+Constraint::getEqualityConstraints()
 {
     return equalityConstraints;
 }
 
-const std::vector<OptimizationFunctionSetup> &Constraint::getInequalityConstraints()
+const std::vector<OptimizationFunctionSetup>&
+Constraint::getInequalityConstraints()
 {
     return inequalityConstraints;
 }
 
-const std::vector<OptimizationFunctionSetup> &Constraint::getOptimizationFunctions()
+const std::vector<OptimizationFunctionSetup>&
+Constraint::getOptimizationFunctions()
 {
     return optimizationFunctions;
 }
 
-void Constraint::setOptimizationFunctionFactor(float factor)
+void
+Constraint::setOptimizationFunctionFactor(float factor)
 {
     optimizationFunctionFactor = factor;
 }
 
-float Constraint::getOptimizationFunctionFactor()
+float
+Constraint::getOptimizationFunctionFactor()
 {
     return optimizationFunctionFactor;
 }
 
-double Constraint::optimizationFunction(unsigned int /*id*/)
+double
+Constraint::optimizationFunction(unsigned int /*id*/)
 {
     THROW_VR_EXCEPTION("Constraint does not support NLopt-based solvers.");
 }
 
-Eigen::VectorXf Constraint::optimizationGradient(unsigned int /*id*/)
+Eigen::VectorXf
+Constraint::optimizationGradient(unsigned int /*id*/)
 {
     THROW_VR_EXCEPTION("Constraint does not support NLopt-based solvers.");
 }
 
-Eigen::MatrixXf Constraint::getJacobianMatrix()
+Eigen::MatrixXf
+Constraint::getJacobianMatrix()
 {
     THROW_VR_EXCEPTION("Constraint does not support Jacobian-based solvers.");
 }
 
-Eigen::MatrixXf Constraint::getJacobianMatrix(SceneObjectPtr /*tcp*/)
+Eigen::MatrixXf
+Constraint::getJacobianMatrix(SceneObjectPtr /*tcp*/)
 {
     THROW_VR_EXCEPTION("Constraint does not support Jacobian-based solvers.");
 }
 
-Eigen::VectorXf Constraint::getError(float /*stepSize*/)
+Eigen::VectorXf
+Constraint::getError(float /*stepSize*/)
 {
     THROW_VR_EXCEPTION("Constraint does not support Jacobian-based solvers.");
 }
 
-bool Constraint::checkTolerances()
+bool
+Constraint::checkTolerances()
 {
     THROW_VR_EXCEPTION("Constraint does not support Jacobian-based solvers.");
 }
 
-bool Constraint::usingCollisionModel()
+bool
+Constraint::usingCollisionModel()
 {
     return false;
 }
 
-void Constraint::addEqualityConstraint(unsigned int id, bool soft)
+void
+Constraint::addEqualityConstraint(unsigned int id, bool soft)
 {
     OptimizationFunctionSetup setup;
     setup.id = id;
@@ -108,7 +126,8 @@ void Constraint::addEqualityConstraint(unsigned int id, bool soft)
     equalityConstraints.push_back(setup);
 }
 
-void Constraint::addInequalityConstraint(unsigned int id, bool soft)
+void
+Constraint::addInequalityConstraint(unsigned int id, bool soft)
 {
     OptimizationFunctionSetup setup;
     setup.id = id;
@@ -117,7 +136,8 @@ void Constraint::addInequalityConstraint(unsigned int id, bool soft)
     inequalityConstraints.push_back(setup);
 }
 
-void Constraint::addOptimizationFunction(unsigned int id, bool soft)
+void
+Constraint::addOptimizationFunction(unsigned int id, bool soft)
 {
     OptimizationFunctionSetup setup;
     setup.id = id;

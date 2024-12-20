@@ -52,6 +52,7 @@ printMat(const Eigen::MatrixXf& mat)
         std::cout << "\n";
     }
 }
+
 BOOST_AUTO_TEST_CASE(AOGPHelper_circle_first_path_element)
 {
     const std::string articulatedObjectName = "mobile-fridge";
@@ -77,7 +78,6 @@ BOOST_AUTO_TEST_CASE(AOGPHelper_circle_first_path_element)
     }
     BOOST_REQUIRE(sse < precision);
 }
-
 
 BOOST_AUTO_TEST_CASE(AOGPHelper_circle_path_whole_around_z)
 {

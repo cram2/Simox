@@ -1,21 +1,25 @@
 
 #include "JacobiWindow.h"
-#include "VirtualRobot/Visualization/CoinVisualization/CoinVisualizationNode.h"
-#include "VirtualRobot/EndEffector/EndEffector.h"
-#include "VirtualRobot/IK/DifferentialIK.h"
 
 #include <ctime>
-#include <vector>
 #include <iostream>
 #include <sstream>
+#include <vector>
+
+#include "VirtualRobot/EndEffector/EndEffector.h"
+#include "VirtualRobot/IK/DifferentialIK.h"
+#include "VirtualRobot/Logging.h"
+#include "VirtualRobot/MathTools.h"
+#include "VirtualRobot/Nodes/RobotNode.h"
+#include "VirtualRobot/RobotNodeSet.h"
+#include "VirtualRobot/Visualization/CoinVisualization/CoinVisualizationNode.h"
 
 using namespace std;
 using namespace VirtualRobot;
 
 float TIMER_MS = 30.0f;
 
-JacobiWindow::JacobiWindow(std::string& sRobotFilename)
-    : QMainWindow(nullptr)
+JacobiWindow::JacobiWindow(std::string& sRobotFilename) : QMainWindow(nullptr)
 {
     VR_INFO << " start " << std::endl;
     //this->setCaption(QString("ShowRobot - KIT - Humanoids Group"));
@@ -52,13 +56,13 @@ JacobiWindow::JacobiWindow(std::string& sRobotFilename)
     exViewer->viewAll();
 }
 
-
 JacobiWindow::~JacobiWindow()
 {
     sceneSep->unref();
 }
 
-void JacobiWindow::setupUI()
+void
+JacobiWindow::setupUI()
 {
     UI.setupUi(this);
     exViewer = new SoQtExaminerViewer(UI.frameViewer, "", TRUE, SoQtExaminerViewer::BUILD_POPUP);
@@ -114,7 +118,8 @@ void JacobiWindow::setupUI()
     timer->schedule();
 }
 
-void JacobiWindow::updateCB(void* data, SoSensor* /*sensor*/)
+void
+JacobiWindow::updateCB(void* data, SoSensor* /*sensor*/)
 {
     if (!data)
     {
@@ -165,7 +170,8 @@ void JacobiWindow::updateCB(void* data, SoSensor* /*sensor*/)
     }
 }
 
-void JacobiWindow::updatBoxPos(float x, float y, float z, float a, float b, float g)
+void
+JacobiWindow::updatBoxPos(float x, float y, float z, float a, float b, float g)
 {
     if (!box)
     {
@@ -183,7 +189,8 @@ void JacobiWindow::updatBoxPos(float x, float y, float z, float a, float b, floa
     exViewer->render();
 }
 
-void JacobiWindow::updatBoxBiPos(float x, float y, float z, float a, float b, float g)
+void
+JacobiWindow::updatBoxBiPos(float x, float y, float z, float a, float b, float g)
 {
     if (!box3)
     {
@@ -201,7 +208,8 @@ void JacobiWindow::updatBoxBiPos(float x, float y, float z, float a, float b, fl
     exViewer->render();
 }
 
-void JacobiWindow::updatBox2Pos(float x, float y, float z, float a, float b, float g)
+void
+JacobiWindow::updatBox2Pos(float x, float y, float z, float a, float b, float g)
 {
     if (!box2)
     {
@@ -219,7 +227,8 @@ void JacobiWindow::updatBox2Pos(float x, float y, float z, float a, float b, flo
     exViewer->render();
 }
 
-QString JacobiWindow::formatString(const char* s, float f)
+QString
+JacobiWindow::formatString(const char* s, float f)
 {
     QString str1(s);
 
@@ -249,8 +258,8 @@ QString JacobiWindow::formatString(const char* s, float f)
     return str1;
 }
 
-
-void JacobiWindow::resetSceneryAll()
+void
+JacobiWindow::resetSceneryAll()
 {
     if (!robot)
     {
@@ -265,9 +274,8 @@ void JacobiWindow::resetSceneryAll()
     exViewer->render();
 }
 
-
-
-void JacobiWindow::collisionModel()
+void
+JacobiWindow::collisionModel()
 {
     if (!robot)
     {
@@ -276,9 +284,10 @@ void JacobiWindow::collisionModel()
 
     robotSep->removeAllChildren();
     useColModel = UI.checkBoxColModel->checkState() == Qt::Checked;
-    SceneObject::VisualizationType colModel = useColModel ? SceneObject::Collision : SceneObject::Full;
+    SceneObject::VisualizationType colModel =
+        useColModel ? SceneObject::Collision : SceneObject::Full;
 
-    std::shared_ptr<CoinVisualization> visualization = robot->getVisualization<CoinVisualization>(colModel);
+    std::shared_ptr<CoinVisualization> visualization = robot->getVisualization(colModel);
     SoNode* visualisationNode = nullptr;
 
     if (visualization)
@@ -294,30 +303,31 @@ void JacobiWindow::collisionModel()
     exViewer->render();
 }
 
-
-void JacobiWindow::closeEvent(QCloseEvent* event)
+void
+JacobiWindow::closeEvent(QCloseEvent* event)
 {
     quit();
     QMainWindow::closeEvent(event);
 }
 
-
-int JacobiWindow::main()
+int
+JacobiWindow::main()
 {
     SoQt::show(this);
     SoQt::mainLoop();
     return 0;
 }
 
-
-void JacobiWindow::quit()
+void
+JacobiWindow::quit()
 {
     std::cout << "JacobiWindow: Closing" << std::endl;
     this->close();
     SoQt::exitMainLoop();
 }
 
-void JacobiWindow::updateKCBox()
+void
+JacobiWindow::updateKCBox()
 {
     UI.comboBoxKC->clear();
 
@@ -330,7 +340,7 @@ void JacobiWindow::updateKCBox()
     robot->getRobotNodeSets(rns);
     kinChains.clear();
 
-    for (auto & rn : rns)
+    for (auto& rn : rns)
     {
         if (rn->isKinematicChain())
         {
@@ -340,7 +350,8 @@ void JacobiWindow::updateKCBox()
     }
 }
 
-void JacobiWindow::selectKC(int nr)
+void
+JacobiWindow::selectKC(int nr)
 {
     std::cout << "Selecting kinematic chain nr " << nr << std::endl;
 
@@ -369,7 +380,7 @@ void JacobiWindow::selectKC(int nr)
     std::vector<RobotNodePtr> nodes = kc->getAllRobotNodes();
     elbow.reset();
 
-    for (auto & node : nodes)
+    for (auto& node : nodes)
     {
         if (node->getName() == std::string("Elbow L"))
         {
@@ -407,7 +418,8 @@ void JacobiWindow::selectKC(int nr)
     box2TCP();
 }
 
-void JacobiWindow::sliderReleased()
+void
+JacobiWindow::sliderReleased()
 {
     UI.horizontalSliderX->setSliderPosition(0);
     UI.horizontalSliderY->setSliderPosition(0);
@@ -430,8 +442,8 @@ void JacobiWindow::sliderReleased()
     exViewer->render();
 }
 
-
-void JacobiWindow::jacobiTest()
+void
+JacobiWindow::jacobiTest()
 {
     if (!kc)
     {
@@ -450,7 +462,8 @@ void JacobiWindow::jacobiTest()
     std::cout << "---- END TEST JACOBI ----" << std::endl;
 }
 
-void JacobiWindow::jacobiTest2()
+void
+JacobiWindow::jacobiTest2()
 {
     if (!kc || !elbow)
     {
@@ -462,7 +475,7 @@ void JacobiWindow::jacobiTest2()
     //n.push_back(tcp);
     //n.push_back(elbow);
     //RobotNodeSetPtr rns = RobotNodeSet::createRobotNodeSet(robot,std::string("jacobiTest"),n);
-    DifferentialIKPtr j(new DifferentialIK(kc, RobotNodePtr()/*,rns*/));
+    DifferentialIKPtr j(new DifferentialIK(kc, RobotNodePtr() /*,rns*/));
 
     Eigen::Matrix4f targetPose = box->getGlobalPose();
     Eigen::Matrix4f targetPose2 = box2->getGlobalPose();
@@ -475,7 +488,8 @@ void JacobiWindow::jacobiTest2()
     std::cout << "---- END TEST JACOBI ----" << std::endl;
 }
 
-void JacobiWindow::jacobiTestBi()
+void
+JacobiWindow::jacobiTestBi()
 {
     if (!kc || !tcp || !tcp2)
     {
@@ -505,9 +519,10 @@ void JacobiWindow::jacobiTestBi()
     nBi.push_back(robot->getRobotNode(std::string("Hip Roll")));
     nBi.push_back(robot->getRobotNode(std::string("Hip Pitch")));
     nBi.push_back(robot->getRobotNode(std::string("Hip Yaw")));
-    RobotNodeSetPtr kcBi = RobotNodeSet::createRobotNodeSet(robot, std::string("jacobiTestBi"), nBi);
+    RobotNodeSetPtr kcBi =
+        RobotNodeSet::createRobotNodeSet(robot, std::string("jacobiTestBi"), nBi);
 
-    DifferentialIKPtr j(new DifferentialIK(kcBi, RobotNodePtr()/*,rns*/));
+    DifferentialIKPtr j(new DifferentialIK(kcBi, RobotNodePtr() /*,rns*/));
 
     Eigen::Matrix4f targetPose = box->getGlobalPose();
     Eigen::Matrix4f targetPose2 = box3->getGlobalPose();
@@ -520,7 +535,8 @@ void JacobiWindow::jacobiTestBi()
     std::cout << "---- END TEST JACOBI ----" << std::endl;
 }
 
-void JacobiWindow::box2TCP()
+void
+JacobiWindow::box2TCP()
 {
     if (!tcp || !box || !box2)
     {
@@ -546,12 +562,14 @@ void JacobiWindow::box2TCP()
     exViewer->render();
 }
 
-void JacobiWindow::sliderPressed()
+void
+JacobiWindow::sliderPressed()
 {
     std::cout << "GG ";
 }
 
-void JacobiWindow::loadRobot()
+void
+JacobiWindow::loadRobot()
 {
     std::cout << "JacobiWindow: Loading robot" << std::endl;
     robotSep->removeAllChildren();
@@ -590,4 +608,3 @@ void JacobiWindow::loadRobot()
     exViewer->viewAll();
     exViewer->render();
 }
-

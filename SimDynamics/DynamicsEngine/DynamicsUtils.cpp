@@ -1,21 +1,18 @@
 
 #include "DynamicsUtils.h"
 
-#include <iostream>
 #include <cmath>
+#include <iostream>
 
 namespace SimDynamics
 {
-    PIDController::PIDController(double gainP, double gainI, double gainD)
-        : gainP(gainP)
-        , gainI(gainI)
-        , gainD(gainD)
-        , errorSum(0)
-        , lastError(0)
+    PIDController::PIDController(double gainP, double gainI, double gainD) :
+        gainP(gainP), gainI(gainI), gainD(gainD), errorSum(0), lastError(0)
     {
     }
 
-    double PIDController::update(double error, double dt)
+    double
+    PIDController::update(double error, double dt)
     {
         double p = error * gainP;
         errorSum += error * dt;
@@ -28,12 +25,14 @@ namespace SimDynamics
         return output;
     }
 
-    void PIDController::reset()
+    void
+    PIDController::reset()
     {
         reset(gainP, gainI, gainD);
     }
 
-    void PIDController::reset(double gainP, double gainI, double gainD)
+    void
+    PIDController::reset(double gainP, double gainI, double gainD)
     {
         errorSum = 0.0;
         lastError = 0.0;
@@ -42,41 +41,43 @@ namespace SimDynamics
         this->gainD = gainD;
     }
 
-
-    void PIDController::debug()
+    void
+    PIDController::debug()
     {
-        std::cout << "error sum: " << errorSum
-                  << " last error: " << lastError
-                  << " last output: " << lastOutput
-                  << std::endl;
+        std::cout << "error sum: " << errorSum << " last error: " << lastError
+                  << " last output: " << lastOutput << std::endl;
     }
 
-    void PIDController::getPID(double& storeP, double& storeI, double& storeD)
+    void
+    PIDController::getPID(double& storeP, double& storeI, double& storeD)
     {
         storeP = gainP;
         storeI = gainI;
         storeD = gainD;
     }
 
-
-    TorqueMotorController::TorqueMotorController()
-        : positionController(0.5, 0.05, 0.0)
-        , velocityController(1.0, 0.05, 0.0)
-        , torqueController(1.0, 0.05, 0.0)
+    TorqueMotorController::TorqueMotorController() :
+        positionController(0.5, 0.05, 0.0),
+        velocityController(1.0, 0.05, 0.0),
+        torqueController(1.0, 0.05, 0.0)
     {
     }
 
     TorqueMotorController::TorqueMotorController(const PIDController& positionController,
-            const PIDController& velocityController,
-            const PIDController& torqueController)
-        : positionController(positionController)
-        , velocityController(velocityController)
-        , torqueController(torqueController)
+                                                 const PIDController& velocityController,
+                                                 const PIDController& torqueController) :
+        positionController(positionController),
+        velocityController(velocityController),
+        torqueController(torqueController)
     {
     }
 
-
-    double TorqueMotorController::update(double positionError, double velocityError, double torqueError, ActuationMode actuation, double dt)
+    double
+    TorqueMotorController::update(double positionError,
+                                  double velocityError,
+                                  double torqueError,
+                                  ActuationMode actuation,
+                                  double dt)
     {
         double posUpdate = 0.0;
         double velUpdate = 0.0;
@@ -137,23 +138,30 @@ namespace SimDynamics
         return 0.0f;
     }
 
-    VelocityMotorController::VelocityMotorController(double maxVelocity, double maxAcceleration, double maxJerk)
-        : positionController(10.0, 0.0, 0.0)
-        , maxVelocity(maxVelocity)
-        , maxAcceleration(maxAcceleration)
-        , maxJerk(maxJerk > 0 ? maxJerk : 15000)
-        , velocity(0)
-        , acceleration(0)
+    VelocityMotorController::VelocityMotorController(double maxVelocity,
+                                                     double maxAcceleration,
+                                                     double maxJerk) :
+        positionController(10.0, 0.0, 0.0),
+        maxVelocity(maxVelocity),
+        maxAcceleration(maxAcceleration),
+        maxJerk(maxJerk > 0 ? maxJerk : 15000),
+        velocity(0),
+        acceleration(0)
     {
     }
 
-    void VelocityMotorController::setCurrentVelocity(double vel)
+    void
+    VelocityMotorController::setCurrentVelocity(double vel)
     {
-//        std::cout << "Velocity of " << name << " is now " << vel << std::endl;
+        //        std::cout << "Velocity of " << name << " is now " << vel << std::endl;
         velocity = vel;
     }
 
-    double VelocityMotorController::update(double positionError, double targetVelocity, ActuationMode actuation, double dt)
+    double
+    VelocityMotorController::update(double positionError,
+                                    double targetVelocity,
+                                    ActuationMode actuation,
+                                    double dt)
     {
         double posUpdate = 0.0;
 
@@ -208,65 +216,77 @@ namespace SimDynamics
         return output_velocity;
     }
 
-    void VelocityMotorController::reset()
+    void
+    VelocityMotorController::reset()
     {
         positionController.reset();
     }
 
-    void VelocityMotorController::reset(double pid_pos_gainP, double pid_pos_gainI, double pid_pos_gainD)
+    void
+    VelocityMotorController::reset(double pid_pos_gainP, double pid_pos_gainI, double pid_pos_gainD)
     {
         positionController.reset(pid_pos_gainP, pid_pos_gainI, pid_pos_gainD);
     }
 
-    void VelocityMotorController::getPosPID(double& storeP, double& storeI, double& storeD)
+    void
+    VelocityMotorController::getPosPID(double& storeP, double& storeI, double& storeD)
     {
         positionController.getPID(storeP, storeI, storeD);
     }
 
-    std::string VelocityMotorController::getName() const
+    std::string
+    VelocityMotorController::getName() const
     {
         return name;
     }
 
-    void VelocityMotorController::setName(const std::string &value)
+    void
+    VelocityMotorController::setName(const std::string& value)
     {
         name = value;
     }
 
-    double VelocityMotorController::getMaxVelocity() const
+    double
+    VelocityMotorController::getMaxVelocity() const
     {
         return maxVelocity;
     }
 
-    void VelocityMotorController::setMaxVelocity(double value)
+    void
+    VelocityMotorController::setMaxVelocity(double value)
     {
         maxVelocity = value;
     }
 
-    double VelocityMotorController::getMaxAcceleration() const
+    double
+    VelocityMotorController::getMaxAcceleration() const
     {
         return maxAcceleration;
     }
 
-    void VelocityMotorController::setMaxAcceleration(double value)
+    void
+    VelocityMotorController::setMaxAcceleration(double value)
     {
         maxAcceleration = value;
     }
 
-    double VelocityMotorController::getMaxJerk() const
+    double
+    VelocityMotorController::getMaxJerk() const
     {
         return maxJerk;
     }
 
-    void VelocityMotorController::setMaxJerk(double value)
+    void
+    VelocityMotorController::setMaxJerk(double value)
     {
         maxJerk = value;
     }
-    void VelocityMotorController::debug()
+
+    void
+    VelocityMotorController::debug()
     {
         positionController.debug();
     }
 
 
-
-    }
+} // namespace SimDynamics

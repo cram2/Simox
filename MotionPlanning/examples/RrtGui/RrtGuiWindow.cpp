@@ -1,43 +1,51 @@
 
 #include "RrtGuiWindow.h"
-#include "VirtualRobot/EndEffector/EndEffector.h"
-#include "VirtualRobot/Workspace/Reachability.h"
-#include "VirtualRobot/ManipulationObject.h"
-#include "VirtualRobot/Grasping/Grasp.h"
-#include "VirtualRobot/IK/GenericIKSolver.h"
-#include "VirtualRobot/Grasping/GraspSet.h"
-#include "VirtualRobot/CollisionDetection/CDManager.h"
-#include "VirtualRobot/XML/ObjectIO.h"
-#include "VirtualRobot/XML/RobotIO.h"
-#include "VirtualRobot/Visualization/CoinVisualization/CoinVisualizationFactory.h"
-#include "MotionPlanning/CSpace/CSpaceSampled.h"
-#include "MotionPlanning/Planner/Rrt.h"
-#include "MotionPlanning/Planner/BiRrt.h"
-#include "MotionPlanning/PostProcessing/ShortcutProcessor.h"
-#include <MotionPlanning/Visualization/CoinVisualization/CoinRrtWorkspaceVisualization.h>
-#include <QFileDialog>
-#include <Eigen/Geometry>
-#include <ctime>
-#include <vector>
-#include <iostream>
+
 #include <cmath>
+#include <ctime>
+#include <iostream>
+#include <sstream>
+#include <vector>
+
+#include <QFileDialog>
+
+#include <Eigen/Geometry>
 
 #include "Inventor/actions/SoLineHighlightRenderAction.h"
-#include <Inventor/nodes/SoShapeHints.h>
-#include <Inventor/nodes/SoLightModel.h>
-#include <Inventor/sensors/SoTimerSensor.h>
+#include "MotionPlanning/CSpace/CSpaceSampled.h"
+#include "MotionPlanning/Planner/BiRrt.h"
+#include "MotionPlanning/Planner/Rrt.h"
+#include "MotionPlanning/PostProcessing/ShortcutProcessor.h"
+#include "VirtualRobot/CollisionDetection/CDManager.h"
+#include "VirtualRobot/EndEffector/EndEffector.h"
+#include "VirtualRobot/Grasping/Grasp.h"
+#include "VirtualRobot/Grasping/GraspSet.h"
+#include "VirtualRobot/IK/GenericIKSolver.h"
+#include "VirtualRobot/ManipulationObject.h"
+#include "VirtualRobot/Scene.h"
+#include "VirtualRobot/Visualization/CoinVisualization/CoinVisualizationFactory.h"
+#include "VirtualRobot/Workspace/Reachability.h"
+#include "VirtualRobot/XML/ObjectIO.h"
+#include "VirtualRobot/XML/RobotIO.h"
 #include <Inventor/nodes/SoEventCallback.h>
+#include <Inventor/nodes/SoLightModel.h>
 #include <Inventor/nodes/SoMatrixTransform.h>
-
-#include <sstream>
+#include <Inventor/nodes/SoShapeHints.h>
+#include <Inventor/sensors/SoTimerSensor.h>
+#include <MotionPlanning/Visualization/CoinVisualization/CoinRrtWorkspaceVisualization.h>
 using namespace std;
 using namespace VirtualRobot;
 
 float TIMER_MS = 200.0f;
 
-RrtGuiWindow::RrtGuiWindow(const std::string& sceneFile, const std::string& sConf, const std::string& gConf,
-                           const std::string& rns, const std::string& colModelRob1, const std::string& colModelRob2,  const std::string& colModelEnv)
-    : QMainWindow(nullptr)
+RrtGuiWindow::RrtGuiWindow(const std::string& sceneFile,
+                           const std::string& sConf,
+                           const std::string& gConf,
+                           const std::string& rns,
+                           const std::string& colModelRob1,
+                           const std::string& colModelRob2,
+                           const std::string& colModelEnv) :
+    QMainWindow(nullptr)
 {
     VR_INFO << " start " << std::endl;
 
@@ -101,21 +109,20 @@ RrtGuiWindow::RrtGuiWindow(const std::string& sceneFile, const std::string& sCon
     sensor_mgr->insertTimerSensor(timer);
 }
 
-
 RrtGuiWindow::~RrtGuiWindow()
 {
     allSep->unref();
 }
 
-
-void RrtGuiWindow::timerCB(void* data, SoSensor* /*sensor*/)
+void
+RrtGuiWindow::timerCB(void* data, SoSensor* /*sensor*/)
 {
     RrtGuiWindow* ikWindow = static_cast<RrtGuiWindow*>(data);
     ikWindow->redraw();
 }
 
-
-void RrtGuiWindow::setupUI()
+void
+RrtGuiWindow::setupUI()
 {
     UI.setupUi(this);
     viewer = new SoQtExaminerViewer(UI.frameViewer, "", TRUE, SoQtExaminerViewer::BUILD_POPUP);
@@ -163,31 +170,31 @@ void RrtGuiWindow::setupUI()
     connect(UI.comboBoxGoal, SIGNAL(activated(int)), this, SLOT(selectGoal(int)));
     connect(UI.comboBoxRNS, SIGNAL(activated(int)), this, SLOT(selectRNS(int)));
     connect(UI.comboBoxColModelRobot, SIGNAL(activated(int)), this, SLOT(selectColModelRobA(int)));
-    connect(UI.comboBoxColModelRobotStatic, SIGNAL(activated(int)), this, SLOT(selectColModelRobB(int)));
+    connect(UI.comboBoxColModelRobotStatic,
+            SIGNAL(activated(int)),
+            this,
+            SLOT(selectColModelRobB(int)));
     connect(UI.comboBoxColModelEnv, SIGNAL(activated(int)), this, SLOT(selectColModelEnv(int)));
-
-
 }
 
-
-
-
-void RrtGuiWindow::closeEvent(QCloseEvent* event)
+void
+RrtGuiWindow::closeEvent(QCloseEvent* event)
 {
     quit();
     QMainWindow::closeEvent(event);
 }
 
-
-void RrtGuiWindow::buildVisu()
+void
+RrtGuiWindow::buildVisu()
 {
     sceneFileSep->removeAllChildren();
 
-    SceneObject::VisualizationType colModel = (UI.checkBoxColModel->isChecked()) ? SceneObject::Collision : SceneObject::Full;
+    SceneObject::VisualizationType colModel =
+        (UI.checkBoxColModel->isChecked()) ? SceneObject::Collision : SceneObject::Full;
 
     if (scene)
     {
-        visualization = scene->getVisualization<CoinVisualization>(colModel);
+        visualization = scene->getVisualization(colModel);
         SoNode* visualisationNode = nullptr;
 
         if (visualization)
@@ -231,24 +238,27 @@ void RrtGuiWindow::buildVisu()
     redraw();
 }
 
-int RrtGuiWindow::main()
+int
+RrtGuiWindow::main()
 {
     SoQt::show(this);
     SoQt::mainLoop();
     return 0;
 }
 
-
-void RrtGuiWindow::quit()
+void
+RrtGuiWindow::quit()
 {
     std::cout << "RrtGuiWindow: Closing" << std::endl;
     this->close();
     SoQt::exitMainLoop();
 }
 
-void RrtGuiWindow::loadSceneWindow()
+void
+RrtGuiWindow::loadSceneWindow()
 {
-    QString fi = QFileDialog::getOpenFileName(this, tr("Open Scene File"), QString(), tr("XML Files (*.xml)"));
+    QString fi = QFileDialog::getOpenFileName(
+        this, tr("Open Scene File"), QString(), tr("XML Files (*.xml)"));
 
     if (fi == "")
     {
@@ -259,7 +269,8 @@ void RrtGuiWindow::loadSceneWindow()
     loadScene();
 }
 
-void RrtGuiWindow::loadScene()
+void
+RrtGuiWindow::loadScene()
 {
     this->rns.reset();
     robot.reset();
@@ -272,7 +283,7 @@ void RrtGuiWindow::loadScene()
     }
 
     //SceneIO::saveScene(scene,"testSaveScene.xml");
-    std::vector< RobotPtr > robots = scene->getRobots();
+    std::vector<RobotPtr> robots = scene->getRobots();
 
     if (robots.size() != 1)
     {
@@ -294,7 +305,7 @@ void RrtGuiWindow::loadScene()
     UI.comboBoxGoal->clear();
     UI.comboBoxStart->clear();
 
-    for (auto & config : configs)
+    for (auto& config : configs)
     {
         QString qtext = config->getName().c_str();
         UI.comboBoxStart->addItem(qtext);
@@ -310,7 +321,7 @@ void RrtGuiWindow::loadScene()
     UI.comboBoxColModelEnv->clear();
     QString qtext;
 
-    for (auto & sos : soss)
+    for (auto& sos : soss)
     {
         qtext = sos->getName().c_str();
         UI.comboBoxColModelEnv->addItem(qtext);
@@ -324,7 +335,7 @@ void RrtGuiWindow::loadScene()
     UI.comboBoxColModelRobotStatic->clear();
     UI.comboBoxRNS->clear();
 
-    for (auto & rns : rnss)
+    for (auto& rns : rnss)
     {
         qtext = rns->getName().c_str();
         UI.comboBoxColModelRobot->addItem(qtext);
@@ -339,7 +350,8 @@ void RrtGuiWindow::loadScene()
     buildVisu();
 }
 
-void RrtGuiWindow::selectStart(const std::string& conf)
+void
+RrtGuiWindow::selectStart(const std::string& conf)
 {
     for (size_t i = 0; i < configs.size(); i++)
     {
@@ -353,7 +365,9 @@ void RrtGuiWindow::selectStart(const std::string& conf)
 
     VR_ERROR << "No configuration with name <" << conf << "> found..." << std::endl;
 }
-void RrtGuiWindow::selectGoal(const std::string& conf)
+
+void
+RrtGuiWindow::selectGoal(const std::string& conf)
 {
     for (size_t i = 0; i < configs.size(); i++)
     {
@@ -368,14 +382,15 @@ void RrtGuiWindow::selectGoal(const std::string& conf)
     VR_ERROR << "No configuration with name <" << conf << "> found..." << std::endl;
 }
 
-void RrtGuiWindow::selectRNS(const std::string& rns)
+void
+RrtGuiWindow::selectRNS(const std::string& rns)
 {
     if (!robot)
     {
         return;
     }
 
-    std::vector< RobotNodeSetPtr > rnss = robot->getRobotNodeSets();
+    std::vector<RobotNodeSetPtr> rnss = robot->getRobotNodeSets();
 
     for (size_t i = 0; i < rnss.size(); i++)
     {
@@ -390,14 +405,15 @@ void RrtGuiWindow::selectRNS(const std::string& rns)
     VR_ERROR << "No rns with name <" << rns << "> found..." << std::endl;
 }
 
-void RrtGuiWindow::selectColModelRobA(const std::string& colModel)
+void
+RrtGuiWindow::selectColModelRobA(const std::string& colModel)
 {
     if (!robot)
     {
         return;
     }
 
-    std::vector< RobotNodeSetPtr > rnss = robot->getRobotNodeSets();
+    std::vector<RobotNodeSetPtr> rnss = robot->getRobotNodeSets();
 
     for (size_t i = 0; i < rnss.size(); i++)
     {
@@ -411,14 +427,16 @@ void RrtGuiWindow::selectColModelRobA(const std::string& colModel)
 
     VR_ERROR << "No col model set with name <" << colModel << "> found..." << std::endl;
 }
-void RrtGuiWindow::selectColModelRobB(const std::string& colModel)
+
+void
+RrtGuiWindow::selectColModelRobB(const std::string& colModel)
 {
     if (!robot)
     {
         return;
     }
 
-    std::vector< RobotNodeSetPtr > rnss = robot->getRobotNodeSets();
+    std::vector<RobotNodeSetPtr> rnss = robot->getRobotNodeSets();
 
     for (size_t i = 0; i < rnss.size(); i++)
     {
@@ -432,14 +450,16 @@ void RrtGuiWindow::selectColModelRobB(const std::string& colModel)
 
     VR_ERROR << "No col model set with name <" << colModel << "> found..." << std::endl;
 }
-void RrtGuiWindow::selectColModelEnv(const std::string& colModel)
+
+void
+RrtGuiWindow::selectColModelEnv(const std::string& colModel)
 {
     if (!scene)
     {
         return;
     }
 
-    std::vector< SceneObjectSetPtr > rnss = scene->getSceneObjectSets();
+    std::vector<SceneObjectSetPtr> rnss = scene->getSceneObjectSets();
 
     for (size_t i = 0; i < rnss.size(); i++)
     {
@@ -454,7 +474,8 @@ void RrtGuiWindow::selectColModelEnv(const std::string& colModel)
     VR_ERROR << "No scene object set with name <" << colModel << "> found..." << std::endl;
 }
 
-void RrtGuiWindow::selectStart(int nr)
+void
+RrtGuiWindow::selectStart(int nr)
 {
     if (nr < 0 || nr >= (int)configs.size())
     {
@@ -478,7 +499,8 @@ void RrtGuiWindow::selectStart(int nr)
     }
 }
 
-void RrtGuiWindow::selectGoal(int nr)
+void
+RrtGuiWindow::selectGoal(int nr)
 {
     if (nr < 0 || nr >= (int)configs.size())
     {
@@ -497,7 +519,9 @@ void RrtGuiWindow::selectGoal(int nr)
         rns->getJointValues(goalConfig);
     }
 }
-void RrtGuiWindow::selectRNS(int nr)
+
+void
+RrtGuiWindow::selectRNS(int nr)
 {
     this->rns.reset();
 
@@ -506,7 +530,7 @@ void RrtGuiWindow::selectRNS(int nr)
         return;
     }
 
-    std::vector< RobotNodeSetPtr > rnss = robot->getRobotNodeSets();
+    std::vector<RobotNodeSetPtr> rnss = robot->getRobotNodeSets();
 
     if (nr < 0 || nr >= (int)rnss.size())
     {
@@ -515,7 +539,9 @@ void RrtGuiWindow::selectRNS(int nr)
 
     this->rns = rnss[nr];
 }
-void RrtGuiWindow::selectColModelRobA(int nr)
+
+void
+RrtGuiWindow::selectColModelRobA(int nr)
 {
     colModelRobA.reset();
 
@@ -524,7 +550,7 @@ void RrtGuiWindow::selectColModelRobA(int nr)
         return;
     }
 
-    std::vector< RobotNodeSetPtr > rnss = robot->getRobotNodeSets();
+    std::vector<RobotNodeSetPtr> rnss = robot->getRobotNodeSets();
 
     if (nr < 0 || nr >= (int)rnss.size())
     {
@@ -533,7 +559,9 @@ void RrtGuiWindow::selectColModelRobA(int nr)
 
     this->colModelRobA = robot->getRobotNodeSet(rnss[nr]->getName());
 }
-void RrtGuiWindow::selectColModelRobB(int nr)
+
+void
+RrtGuiWindow::selectColModelRobB(int nr)
 {
     colModelRobB.reset();
 
@@ -542,7 +570,7 @@ void RrtGuiWindow::selectColModelRobB(int nr)
         return;
     }
 
-    std::vector< RobotNodeSetPtr > rnss = robot->getRobotNodeSets();
+    std::vector<RobotNodeSetPtr> rnss = robot->getRobotNodeSets();
 
     if (nr < 0 || nr >= (int)rnss.size())
     {
@@ -551,7 +579,9 @@ void RrtGuiWindow::selectColModelRobB(int nr)
 
     this->colModelRobB = robot->getRobotNodeSet(rnss[nr]->getName());
 }
-void RrtGuiWindow::selectColModelEnv(int nr)
+
+void
+RrtGuiWindow::selectColModelEnv(int nr)
 {
     colModelEnv.reset();
 
@@ -560,7 +590,7 @@ void RrtGuiWindow::selectColModelEnv(int nr)
         return;
     }
 
-    std::vector< SceneObjectSetPtr > rnss = scene->getSceneObjectSets();
+    std::vector<SceneObjectSetPtr> rnss = scene->getSceneObjectSets();
 
     if (nr < 0 || nr >= (int)rnss.size())
     {
@@ -569,7 +599,9 @@ void RrtGuiWindow::selectColModelEnv(int nr)
 
     this->colModelEnv = scene->getSceneObjectSet(rnss[nr]->getName());
 }
-void RrtGuiWindow::buildRRTVisu()
+
+void
+RrtGuiWindow::buildRRTVisu()
 {
     rrtSep->removeAllChildren();
 
@@ -578,7 +610,8 @@ void RrtGuiWindow::buildRRTVisu()
         return;
     }
 
-    std::shared_ptr<Saba::CoinRrtWorkspaceVisualization> w(new Saba::CoinRrtWorkspaceVisualization(robot, cspace, rns->getTCP()->getName()));
+    std::shared_ptr<Saba::CoinRrtWorkspaceVisualization> w(
+        new Saba::CoinRrtWorkspaceVisualization(robot, cspace, rns->getTCP()->getName()));
 
     if (UI.checkBoxShowRRT->isChecked())
     {
@@ -609,7 +642,8 @@ void RrtGuiWindow::buildRRTVisu()
     rrtSep->addChild(sol);
 }
 
-void RrtGuiWindow::plan()
+void
+RrtGuiWindow::plan()
 {
     if (!robot || !rns)
     {
@@ -699,7 +733,8 @@ void RrtGuiWindow::plan()
     {
         VR_INFO << " Planning succeeded " << std::endl;
         solution = mp->getSolution();
-        Saba::ShortcutProcessorPtr postProcessing(new Saba::ShortcutProcessor(solution, cspace, false));
+        Saba::ShortcutProcessorPtr postProcessing(
+            new Saba::ShortcutProcessor(solution, cspace, false));
         solutionOptimized = postProcessing->optimize(100);
         tree = mp->getTree();
 
@@ -711,7 +746,6 @@ void RrtGuiWindow::plan()
         {
             tree2.reset();
         }
-
     }
     else
     {
@@ -723,15 +757,20 @@ void RrtGuiWindow::plan()
     buildVisu();
 }
 
-void RrtGuiWindow::colModel()
+void
+RrtGuiWindow::colModel()
 {
     buildVisu();
 }
-void RrtGuiWindow::solutionSelected()
+
+void
+RrtGuiWindow::solutionSelected()
 {
     sliderSolution(UI.horizontalSliderPos->sliderPosition());
 }
-void RrtGuiWindow::sliderSolution(int pos)
+
+void
+RrtGuiWindow::sliderSolution(int pos)
 {
     if (!solution)
     {
@@ -752,7 +791,8 @@ void RrtGuiWindow::sliderSolution(int pos)
     redraw();
 }
 
-void RrtGuiWindow::redraw()
+void
+RrtGuiWindow::redraw()
 {
     viewer->scheduleRedraw();
     UI.frameViewer->update();
@@ -760,5 +800,3 @@ void RrtGuiWindow::redraw()
     this->update();
     viewer->scheduleRedraw();
 }
-
-

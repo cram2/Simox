@@ -35,15 +35,24 @@ namespace VirtualRobot
         CartesianPositionController(CartesianPositionController&&) = default;
         CartesianPositionController& operator=(CartesianPositionController&&) = default;
 
-        Eigen::VectorXf calculate(const Eigen::Matrix4f& targetPose, IKSolver::CartesianSelection mode) const;
+        Eigen::VectorXf calculate(const Eigen::Matrix4f& targetPose,
+                                  IKSolver::CartesianSelection mode) const;
         Eigen::VectorXf calculatePos(const Eigen::Vector3f& targetPos) const;
 
         float getPositionError(const Eigen::Matrix4f& targetPose) const;
         float getOrientationError(const Eigen::Matrix4f& targetPose) const;
         static float GetPositionError(const Eigen::Matrix4f& targetPose, const RobotNodePtr& tcp);
-        static float GetOrientationError(const Eigen::Matrix4f& targetPose, const RobotNodePtr& tcp);
-        static bool Reached(const Eigen::Matrix4f& targetPose, const RobotNodePtr& tcp, bool checkOri, float thresholdPosReached, float thresholdOriReached);
-        bool reached(const Eigen::Matrix4f& targetPose, VirtualRobot::IKSolver::CartesianSelection mode, float thresholdPosReached, float thresholdOriReached);
+        static float GetOrientationError(const Eigen::Matrix4f& targetPose,
+                                         const RobotNodePtr& tcp);
+        static bool Reached(const Eigen::Matrix4f& targetPose,
+                            const RobotNodePtr& tcp,
+                            bool checkOri,
+                            float thresholdPosReached,
+                            float thresholdOriReached);
+        bool reached(const Eigen::Matrix4f& targetPose,
+                     VirtualRobot::IKSolver::CartesianSelection mode,
+                     float thresholdPosReached,
+                     float thresholdOriReached);
 
         Eigen::Vector3f getPositionDiff(const Eigen::Matrix4f& targetPose) const;
         Eigen::Vector3f getPositionDiffVec3(const Eigen::Vector3f& targetPosition) const;
@@ -59,4 +68,4 @@ namespace VirtualRobot
     private:
         RobotNodePtr tcp;
     };
-}
+} // namespace VirtualRobot

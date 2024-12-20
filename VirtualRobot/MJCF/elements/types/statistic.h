@@ -5,11 +5,11 @@
 namespace mjcf
 {
 
-struct StatisticSection : public Element<StatisticSection>
-{
-    static const std::string tag;
-    mjcf_ElementDerivedConstructors(StatisticSection)
-};
+    struct StatisticSection : public Element<StatisticSection>
+    {
+        static const std::string tag;
+        mjcf_ElementDerivedConstructors(StatisticSection)
+    };
 
 
-}
+} // namespace mjcf

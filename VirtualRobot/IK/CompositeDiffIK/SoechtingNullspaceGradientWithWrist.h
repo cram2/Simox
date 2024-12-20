@@ -33,9 +33,9 @@ namespace VirtualRobot
             RobotNodePtr shoulder1 = nullptr;
             RobotNodePtr shoulder2 = nullptr;
             RobotNodePtr shoulder3 = nullptr;
-            RobotNodePtr elbow     = nullptr;
+            RobotNodePtr elbow = nullptr;
 
-            RobotNodePtr forearm     = nullptr;
+            RobotNodePtr forearm = nullptr;
 
             RobotNodePtr wristAdduction = nullptr;
             RobotNodePtr wristExtension = nullptr;

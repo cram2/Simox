@@ -5,15 +5,15 @@
 */
 
 #include "OSGVisualizationNode.h"
-#include "OSGVisualizationFactory.h"
-#include "../TriMeshModel.h"
-#include "../../VirtualRobotException.h"
 
-#include <osg/TriangleFunctor>
+#include "../../VirtualRobotException.h"
+#include "../TriMeshModel.h"
+#include "OSGVisualizationFactory.h"
 #include <osg/Geode>
-#include <osg/Node>
 #include <osg/Group>
+#include <osg/Node>
 #include <osg/PositionAttitudeTransform>
+#include <osg/TriangleFunctor>
 
 namespace VirtualRobot
 {
@@ -51,7 +51,6 @@ namespace VirtualRobot
         globalPoseTransform->addChild(visualization);
     }
 
-
     /**
      */
     OSGVisualizationNode::~OSGVisualizationNode()
@@ -79,7 +78,8 @@ namespace VirtualRobot
      * If the model doesn't exist construct it by calling
      * OSGVisualizationNode::createTriMeshModel().
      */
-    TriMeshModelPtr OSGVisualizationNode::getTriMeshModel()
+    TriMeshModelPtr
+    OSGVisualizationNode::getTriMeshModel()
     {
         if (!triMeshModel)
         {
@@ -89,7 +89,6 @@ namespace VirtualRobot
         return triMeshModel;
     }
 
-
     /**
      * This method constructs an instance of TriMeshModel and stores it in
      * OSGVisualizationNode::triMeshModel.
@@ -98,9 +97,11 @@ namespace VirtualRobot
      * Otherwise OSGVisualizationNode::InentorTriangleCB() is called on the
      * OSG graph stored in OSGVisualizationNode::visualization.
      */
-    void OSGVisualizationNode::createTriMeshModel()
+    void
+    OSGVisualizationNode::createTriMeshModel()
     {
-        THROW_VR_EXCEPTION_IF(!visualization, "OSGVisualizationNode::createTriMeshModel(): no OSG model present!");
+        THROW_VR_EXCEPTION_IF(!visualization,
+                              "OSGVisualizationNode::createTriMeshModel(): no OSG model present!");
 
         if (triMeshModel)
         {
@@ -130,7 +131,10 @@ namespace VirtualRobot
         }
     }
 
-    void OSGVisualizationNode::addGeodeTriData(osg::Geode* geode, TriMeshModelPtr mesh, osg::Node* rootNode)
+    void
+    OSGVisualizationNode::addGeodeTriData(osg::Geode* geode,
+                                          TriMeshModelPtr mesh,
+                                          osg::Node* rootNode)
     {
         if (!geode || !mesh)
         {
@@ -143,12 +147,16 @@ namespace VirtualRobot
             tf.triMeshModel = mesh;
             //tf.rootNode = rootNode;
             tf.mat = *(OSGVisualizationFactory::getRelativePose(geode, rootNode));
-            cout << "MAT translation:" << tf.mat(0, 3) << "," << tf.mat(1, 3)  << "," << tf.mat(2, 3) << endl;
+            cout << "MAT translation:" << tf.mat(0, 3) << "," << tf.mat(1, 3) << "," << tf.mat(2, 3)
+                 << endl;
             geode->getDrawable(i)->accept(tf);
         }
     }
 
-    void OSGVisualizationNode::addGroupTriData(osg::Group* visuGroup, TriMeshModelPtr mesh, osg::Node* rootNode)
+    void
+    OSGVisualizationNode::addGroupTriData(osg::Group* visuGroup,
+                                          TriMeshModelPtr mesh,
+                                          osg::Node* rootNode)
     {
         for (unsigned int i = 0; i < visuGroup->getNumChildren(); ++i)
         {
@@ -170,16 +178,17 @@ namespace VirtualRobot
         }
     }
 
-
     /**
      * This mehtod returns the internal OSGVisualizationNode::visualization.
      */
-    osg::Node* OSGVisualizationNode::getOSGVisualization()
+    osg::Node*
+    OSGVisualizationNode::getOSGVisualization()
     {
         return visualizationAtGlobalPose;
     }
 
-    void OSGVisualizationNode::setGlobalPose(const Eigen::Matrix4f& m)
+    void
+    OSGVisualizationNode::setGlobalPose(const Eigen::Matrix4f& m)
     {
         globalPose = m;
 
@@ -197,7 +206,8 @@ namespace VirtualRobot
         }
     }
 
-    void OSGVisualizationNode::print()
+    void
+    OSGVisualizationNode::print()
     {
         cout << "  OSGVisualization: ";
 
@@ -211,10 +221,11 @@ namespace VirtualRobot
             Eigen::Vector3f mi;
             Eigen::Vector3f ma;
             triMeshModel->getSize(mi, ma);
-            cout << triMeshModel->faces.size() << " triangles" << endl;// Extend: " << ma[0]-mi[0] << ", " << ma[1] - mi[1] << ", " << ma[2] - mi[2] << endl;
+            cout
+                << triMeshModel->faces.size() << " triangles"
+                << endl; // Extend: " << ma[0]-mi[0] << ", " << ma[1] - mi[1] << ", " << ma[2] - mi[2] << endl;
             cout << "    Min point: (" << mi[0] << "," << mi[1] << "," << mi[2] << ")" << endl;
             cout << "    Max point: (" << ma[0] << "," << ma[1] << "," << ma[2] << ")" << endl;
-
         }
         else
         {
@@ -222,11 +233,13 @@ namespace VirtualRobot
         }
     }
 
-    void OSGVisualizationNode::attachVisualization(const std::string& name, VisualizationNodePtr v)
+    void
+    OSGVisualizationNode::attachVisualization(const std::string& name, VisualizationNodePtr v)
     {
         VisualizationNode::attachVisualization(name, v);
 
-        boost::shared_ptr<OSGVisualizationNode> osgNode = boost::dynamic_pointer_cast<OSGVisualizationNode>(v);
+        boost::shared_ptr<OSGVisualizationNode> osgNode =
+            boost::dynamic_pointer_cast<OSGVisualizationNode>(v);
 
         if (osgNode && osgNode->getOSGVisualization())
         {
@@ -235,10 +248,11 @@ namespace VirtualRobot
         }
     }
 
-    void OSGVisualizationNode::detachVisualization(const std::string& name)
+    void
+    OSGVisualizationNode::detachVisualization(const std::string& name)
     {
         VisualizationNode::detachVisualization(name);
-        std::map< std::string, osg::Node* >::const_iterator i = attachedOSGVisualizations.begin();
+        std::map<std::string, osg::Node*>::const_iterator i = attachedOSGVisualizations.begin();
 
         while (i != attachedOSGVisualizations.end())
         {
@@ -253,8 +267,8 @@ namespace VirtualRobot
         }
     }
 
-
-    VirtualRobot::VisualizationNodePtr OSGVisualizationNode::clone(bool deepCopy, float scaling)
+    VirtualRobot::VisualizationNodePtr
+    OSGVisualizationNode::clone(bool deepCopy, float scaling)
     {
         osg::Group* newModel = NULL;
 
@@ -272,7 +286,8 @@ namespace VirtualRobot
 
             if (deepCopy)
             {
-                newModel->addChild(static_cast<osg::Node*>(visualization->clone(osg::CopyOp::DEEP_COPY_ALL)));
+                newModel->addChild(
+                    static_cast<osg::Node*>(visualization->clone(osg::CopyOp::DEEP_COPY_ALL)));
             }
             else
             {
@@ -292,7 +307,8 @@ namespace VirtualRobot
         p->setFilename(filename, boundingBox);
 
         // clone attached visualizations
-        std::map< std::string, VisualizationNodePtr >::const_iterator i = attachedVisualizations.begin();
+        std::map<std::string, VisualizationNodePtr>::const_iterator i =
+            attachedVisualizations.begin();
 
         while (i != attachedVisualizations.end())
         {
@@ -304,7 +320,9 @@ namespace VirtualRobot
         return p;
     }
 
-    void OSGVisualizationNode::setupVisualization(bool showVisualization, bool showAttachedVisualizations)
+    void
+    OSGVisualizationNode::setupVisualization(bool showVisualization,
+                                             bool showAttachedVisualizations)
     {
         VisualizationNode::setupVisualization(showVisualization, showAttachedVisualizations);
 
@@ -313,12 +331,14 @@ namespace VirtualRobot
             return;
         }
 
-        if (showAttachedVisualizations && !globalPoseTransform->containsNode(attachedVisualizationsSeparator))
+        if (showAttachedVisualizations &&
+            !globalPoseTransform->containsNode(attachedVisualizationsSeparator))
         {
             globalPoseTransform->addChild(attachedVisualizationsSeparator);
         }
 
-        if (!showAttachedVisualizations && globalPoseTransform->containsNode(attachedVisualizationsSeparator))
+        if (!showAttachedVisualizations &&
+            globalPoseTransform->containsNode(attachedVisualizationsSeparator))
         {
             globalPoseTransform->removeChild(attachedVisualizationsSeparator);
         }

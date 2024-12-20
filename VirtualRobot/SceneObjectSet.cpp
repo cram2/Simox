@@ -1,12 +1,16 @@
 
 #include "SceneObjectSet.h"
-#include "CollisionDetection/CollisionModel.h"
-#include "CollisionDetection/CollisionChecker.h"
-#include "Visualization//VisualizationNode.h"
-#include "RobotNodeSet.h"
-#include "Obstacle.h"
-#include "ManipulationObject.h"
 
+#include <iostream>
+
+#include "CollisionDetection/CollisionChecker.h"
+#include "CollisionDetection/CollisionModel.h"
+#include "Logging.h"
+#include "ManipulationObject.h"
+#include "Obstacle.h"
+#include "RobotNodeSet.h"
+#include "VirtualRobot/Nodes/RobotNode.h"
+#include "Visualization//VisualizationNode.h"
 
 namespace VirtualRobot
 {
@@ -28,7 +32,6 @@ namespace VirtualRobot
         }
     }
 
-
     //----------------------------------------------------------------------
     // class SceneObjectSet destructor
     //----------------------------------------------------------------------
@@ -37,21 +40,20 @@ namespace VirtualRobot
         destroyData();
     }
 
-
-
-    void SceneObjectSet::destroyData()
+    void
+    SceneObjectSet::destroyData()
     {
         sceneObjects.clear();
     }
 
-
-    std::string SceneObjectSet::getName() const
+    std::string
+    SceneObjectSet::getName() const
     {
         return name;
     }
 
-
-    bool SceneObjectSet::addSceneObject(SceneObjectPtr sceneObject)
+    bool
+    SceneObjectSet::addSceneObject(SceneObjectPtr sceneObject)
     {
         if (!sceneObject)
         {
@@ -61,7 +63,8 @@ namespace VirtualRobot
 
         if (colChecker != sceneObject->getCollisionChecker())
         {
-            VR_WARNING << " col model belongs to different instance of collision checker, in: '" << name << "'" << std::endl;
+            VR_WARNING << " col model belongs to different instance of collision checker, in: '"
+                       << name << "'" << std::endl;
             return false;
         }
 
@@ -76,9 +79,8 @@ namespace VirtualRobot
         return true;
     }
 
-
-
-    bool SceneObjectSet::addSceneObjects(SceneObjectSetPtr sceneObjectSet)
+    bool
+    SceneObjectSet::addSceneObjects(SceneObjectSetPtr sceneObjectSet)
     {
         if (!sceneObjectSet)
         {
@@ -88,11 +90,12 @@ namespace VirtualRobot
 
         if (colChecker != sceneObjectSet->getCollisionChecker())
         {
-            VR_WARNING << "col model set belongs to different instance of collision checker, in: " << getName().c_str() << std::endl;
+            VR_WARNING << "col model set belongs to different instance of collision checker, in: "
+                       << getName().c_str() << std::endl;
             return false;
         }
 
-        std::vector< SceneObjectPtr > so = sceneObjectSet->getSceneObjects();
+        std::vector<SceneObjectPtr> so = sceneObjectSet->getSceneObjects();
 
         for (const auto& i : so)
         {
@@ -105,7 +108,8 @@ namespace VirtualRobot
         return true;
     }
 
-    bool SceneObjectSet::addSceneObjects(RobotNodeSetPtr robotNodeSet)
+    bool
+    SceneObjectSet::addSceneObjects(RobotNodeSetPtr robotNodeSet)
     {
         if (!robotNodeSet)
         {
@@ -113,11 +117,12 @@ namespace VirtualRobot
             return false;
         }
 
-        std::vector< RobotNodePtr > robotNodes = robotNodeSet->getAllRobotNodes();
+        std::vector<RobotNodePtr> robotNodes = robotNodeSet->getAllRobotNodes();
         return addSceneObjects(robotNodes);
     }
 
-    bool SceneObjectSet::addSceneObjects(std::vector<RobotNodePtr> robotNodes)
+    bool
+    SceneObjectSet::addSceneObjects(std::vector<RobotNodePtr> robotNodes)
     {
         for (auto& robotNode : robotNodes)
         {
@@ -127,7 +132,9 @@ namespace VirtualRobot
             {
                 if (colChecker != cm->getCollisionChecker())
                 {
-                    VR_WARNING << "col model of " << robotNode->getName() << " belongs to different instance of collision checker, in: " << getName().c_str() << std::endl;
+                    VR_WARNING << "col model of " << robotNode->getName()
+                               << " belongs to different instance of collision checker, in: "
+                               << getName().c_str() << std::endl;
                 }
                 else
                 {
@@ -142,7 +149,8 @@ namespace VirtualRobot
         return true;
     }
 
-    void SceneObjectSet::addSceneObjects(std::vector<SceneObjectPtr> sceneObjects)
+    void
+    SceneObjectSet::addSceneObjects(std::vector<SceneObjectPtr> sceneObjects)
     {
         for (auto& so : sceneObjects)
         {
@@ -150,7 +158,8 @@ namespace VirtualRobot
         }
     }
 
-    void SceneObjectSet::addSceneObjects(std::vector<ManipulationObjectPtr> mos)
+    void
+    SceneObjectSet::addSceneObjects(std::vector<ManipulationObjectPtr> mos)
     {
         for (auto& mobj : mos)
         {
@@ -159,7 +168,8 @@ namespace VirtualRobot
         }
     }
 
-    bool SceneObjectSet::removeSceneObject(SceneObjectPtr sceneObject)
+    bool
+    SceneObjectSet::removeSceneObject(SceneObjectPtr sceneObject)
     {
         if (!sceneObject)
         {
@@ -168,7 +178,9 @@ namespace VirtualRobot
 
         bool found = false;
 
-        for (std::vector< SceneObjectPtr >::iterator iter = sceneObjects.begin(); iter != sceneObjects.end(); iter++)
+        for (std::vector<SceneObjectPtr>::iterator iter = sceneObjects.begin();
+             iter != sceneObjects.end();
+             iter++)
         {
             if (*iter == sceneObject)
             {
@@ -186,6 +198,7 @@ namespace VirtualRobot
 
         return true;
     }
+
     /*
     void SceneObjectSet::GetAABB( SbBox3f& store_aabb )
     {
@@ -239,7 +252,9 @@ namespace VirtualRobot
     }*/
 
 
-    bool SceneObjectSet::getCurrentSceneObjectConfig(std::map< SceneObjectPtr, Eigen::Matrix4f >& storeConfig)
+    bool
+    SceneObjectSet::getCurrentSceneObjectConfig(
+        std::map<SceneObjectPtr, Eigen::Matrix4f>& storeConfig)
     {
         for (auto& sceneObject : sceneObjects)
         {
@@ -249,7 +264,8 @@ namespace VirtualRobot
         return true;
     }
 
-    bool SceneObjectSet::hasSceneObject(SceneObjectPtr sceneObject)
+    bool
+    SceneObjectSet::hasSceneObject(SceneObjectPtr sceneObject)
     {
         for (auto& iter : sceneObjects)
         {
@@ -262,9 +278,10 @@ namespace VirtualRobot
         return false;
     }
 
-    std::vector< CollisionModelPtr > SceneObjectSet::getCollisionModels()
+    std::vector<CollisionModelPtr>
+    SceneObjectSet::getCollisionModels()
     {
-        std::vector< CollisionModelPtr > result;
+        std::vector<CollisionModelPtr> result;
 
         for (auto& sceneObject : sceneObjects)
         {
@@ -277,23 +294,27 @@ namespace VirtualRobot
         return result;
     }
 
-    const std::vector< SceneObjectPtr >& SceneObjectSet::getSceneObjects()
+    const std::vector<SceneObjectPtr>&
+    SceneObjectSet::getSceneObjects()
     {
         return sceneObjects;
     }
 
-    unsigned int SceneObjectSet::getSize() const
+    unsigned int
+    SceneObjectSet::getSize() const
     {
         return (unsigned int)sceneObjects.size();
     }
 
-    VirtualRobot::SceneObjectPtr SceneObjectSet::getSceneObject(unsigned int nr)
+    VirtualRobot::SceneObjectPtr
+    SceneObjectSet::getSceneObject(unsigned int nr)
     {
         VR_ASSERT((nr < (unsigned int)sceneObjects.size()));
         return sceneObjects[nr];
     }
 
-    std::string SceneObjectSet::toXML(int tabs)
+    std::string
+    SceneObjectSet::toXML(int tabs)
     {
         std::stringstream ss;
         std::string t = "\t";
@@ -315,7 +336,8 @@ namespace VirtualRobot
         return ss.str();
     }
 
-    VirtualRobot::SceneObjectSetPtr SceneObjectSet::clone(const std::string& newName /*= ""*/)
+    VirtualRobot::SceneObjectSetPtr
+    SceneObjectSet::clone(const std::string& newName /*= ""*/)
     {
         SceneObjectSetPtr result(new SceneObjectSet(newName, colChecker));
 
@@ -327,8 +349,8 @@ namespace VirtualRobot
         return result;
     }
 
-
-    VirtualRobot::SceneObjectSetPtr SceneObjectSet::clone(const std::string& newName, CollisionCheckerPtr newColChecker)
+    VirtualRobot::SceneObjectSetPtr
+    SceneObjectSet::clone(const std::string& newName, CollisionCheckerPtr newColChecker)
     {
         SceneObjectSetPtr result(new SceneObjectSet(newName, newColChecker));
 
@@ -341,7 +363,8 @@ namespace VirtualRobot
         return result;
     }
 
-    VirtualRobot::ObstaclePtr SceneObjectSet::createStaticObstacle(const std::string& name)
+    VirtualRobot::ObstaclePtr
+    SceneObjectSet::createStaticObstacle(const std::string& name)
     {
         //VisualizationNodePtr visus(new VisualizationNode());
         std::vector<VisualizationNodePtr> visus;

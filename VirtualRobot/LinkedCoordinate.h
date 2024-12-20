@@ -23,12 +23,12 @@
 
 #pragma once
 
-#include "VirtualRobotImportExport.h"
-#include "Nodes/RobotNode.h"
 #include <string>
-#include <vector>
-#include "VirtualRobotException.h"
 
+#include <Eigen/Core>
+
+#include "VirtualRobot.h"
+#include "VirtualRobotImportExport.h"
 
 namespace VirtualRobot
 {
@@ -46,16 +46,19 @@ namespace VirtualRobot
      * successing joints should be easy to confirm if there is a getTransformFromParent().
      * @todo Check if the order of const and throw is okay.
      */
-    class VIRTUAL_ROBOT_IMPORT_EXPORT LinkedCoordinate //: public boost::enable_shared_from_this<LinkedCoordinate>
+    class VIRTUAL_ROBOT_IMPORT_EXPORT
+        LinkedCoordinate //: public boost::enable_shared_from_this<LinkedCoordinate>
     {
     public:
-
-
         /** Creates a new intelligent coordinate.
          * @param virtualRobot Pointer to the virtual robot the coordinate is connected to.
          */
-        LinkedCoordinate(const RobotPtr& virtualRobot) : robot(virtualRobot), pose(Eigen::Matrix4f::Identity()) {}
-        LinkedCoordinate(const LinkedCoordinate& other);    // copy constructor
+        LinkedCoordinate(const RobotPtr& virtualRobot) :
+            robot(virtualRobot), pose(Eigen::Matrix4f::Identity())
+        {
+        }
+
+        LinkedCoordinate(const LinkedCoordinate& other); // copy constructor
         LinkedCoordinate& operator=(const LinkedCoordinate& other);
 
         virtual ~LinkedCoordinate();
@@ -69,7 +72,8 @@ namespace VirtualRobot
          * @details If you want to use a different format for the pose you can use these
          * helper functions @sa EulerToMatrix4x4 and @sa QuaternionsToMatrix4x4
          */
-        void set(const RobotNodePtr& frame, const Eigen::Matrix4f& pose = Eigen::Matrix4f::Identity());
+        void set(const RobotNodePtr& frame,
+                 const Eigen::Matrix4f& pose = Eigen::Matrix4f::Identity());
 
         /** Sets the frame of reference and the coordinate relative to it.
          * @param frame The name of the robot node that defines the reference frame of the coordinate.
@@ -89,7 +93,8 @@ namespace VirtualRobot
          * @sa set(Eigen::Matrix4x4,const RobotNodePtr &)
          */
 
-        void set(const std::string& frame, const Eigen::Matrix4f& pose = Eigen::Matrix4f::Identity());
+        void set(const std::string& frame,
+                 const Eigen::Matrix4f& pose = Eigen::Matrix4f::Identity());
 
         /** Sets the frame of reference and the coordinate relative to it.
          * @param frame The name of the robot node that defines the reference frame of the coordinate.
@@ -104,7 +109,8 @@ namespace VirtualRobot
          * @returns The reference or an empty RobotNodePtr is none has been defined.
          * @details The actual matrix then can be obtained by calling RobotNode::getGlobalPose().
          */
-        inline RobotNodePtr getFrame() const
+        inline RobotNodePtr
+        getFrame() const
         {
             return this->frame;
         };
@@ -147,28 +153,29 @@ namespace VirtualRobot
         /** Returns the actual pose stored in this object.
          * @details If you are only interested in the translational part use iCoord::getPosition() or Eigen::Matrix4f::block<3,1>(0,3).
          */
-        inline Eigen::Matrix4f getPose() const
+        inline Eigen::Matrix4f
+        getPose() const
         {
             return this->pose;
         };
 
         /** Conveniently returns the translational part of the actual pose stored in this object.
          */
-        inline Eigen::Vector3f getPosition() const
+        inline Eigen::Vector3f
+        getPosition() const
         {
             return this->getPose().block<3, 1>(0, 3);
         }
 
         /// Computes the transformation matrix that represents a coordinate transformation.
         static Eigen::Matrix4f getCoordinateTransformation(const RobotNodePtr& origin,
-                const RobotNodePtr& destination, const RobotPtr& robot);
+                                                           const RobotNodePtr& destination,
+                                                           const RobotPtr& robot);
 
     protected:
-
         RobotPtr robot;
         Eigen::Matrix4f pose;
         RobotNodePtr frame;
     };
 
 } // namespace VirtualRobot
-

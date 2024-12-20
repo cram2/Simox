@@ -4,7 +4,6 @@
 // Eigen
 #include <Eigen/Core>
 
-
 namespace simox::math
 {
 
@@ -20,4 +19,4 @@ namespace simox::math
         return v;
     }
 
-}
+} // namespace simox::math

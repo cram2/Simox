@@ -1,14 +1,16 @@
 
 #include "RobotNodePrismatic.h"
-#include "../Robot.h"
-#include "../VirtualRobotException.h"
-#include "../CollisionDetection/CollisionModel.h"
-#include "../Visualization/VisualizationNode.h"
 
-#include <cmath>
 #include <algorithm>
+#include <cmath>
+#include <iostream>
 
 #include <Eigen/Geometry>
+
+#include "../CollisionDetection/CollisionModel.h"
+#include "../Robot.h"
+#include "../VirtualRobotException.h"
+#include "../Visualization/VisualizationNode.h"
 
 namespace VirtualRobot
 {
@@ -26,8 +28,17 @@ namespace VirtualRobot
                                            float jointValueOffset,
                                            const SceneObject::Physics& p,
                                            CollisionCheckerPtr colChecker,
-                                           RobotNodeType type
-                                          ) : RobotNode(rob, name, jointLimitLo, jointLimitHi, visualization, collisionModel, jointValueOffset, p, colChecker, type)
+                                           RobotNodeType type) :
+        RobotNode(rob,
+                  name,
+                  jointLimitLo,
+                  jointLimitHi,
+                  visualization,
+                  collisionModel,
+                  jointValueOffset,
+                  p,
+                  colChecker,
+                  type)
     {
         initialized = false;
         visuScaling = false;
@@ -42,14 +53,26 @@ namespace VirtualRobot
                                            const std::string& name,
                                            float jointLimitLo,
                                            float jointLimitHi,
-                                           float a, float d, float alpha, float theta,
+                                           float a,
+                                           float d,
+                                           float alpha,
+                                           float theta,
                                            VisualizationNodePtr visualization,
                                            CollisionModelPtr collisionModel,
                                            float jointValueOffset,
                                            const SceneObject::Physics& p,
                                            CollisionCheckerPtr colChecker,
-                                           RobotNodeType type
-                                          ) : RobotNode(rob, name, jointLimitLo, jointLimitHi, visualization, collisionModel, jointValueOffset, p, colChecker, type)
+                                           RobotNodeType type) :
+        RobotNode(rob,
+                  name,
+                  jointLimitLo,
+                  jointLimitHi,
+                  visualization,
+                  collisionModel,
+                  jointValueOffset,
+                  p,
+                  colChecker,
+                  type)
     {
         initialized = false;
         optionalDHParameter.isSet = true;
@@ -81,20 +104,22 @@ namespace VirtualRobot
         checkValidRobotNodeType();
     }
 
-    RobotNodePrismatic::~RobotNodePrismatic()
-    = default;
+    RobotNodePrismatic::~RobotNodePrismatic() = default;
 
-
-    bool RobotNodePrismatic::initialize(SceneObjectPtr parent, const std::vector<SceneObjectPtr>& children)
+    bool
+    RobotNodePrismatic::initialize(SceneObjectPtr parent,
+                                   const std::vector<SceneObjectPtr>& children)
     {
         bool res = RobotNode::initialize(parent, children);
         unscaledLocalCoM = physics.localCoM;
         return res;
     }
 
-    void RobotNodePrismatic::updateTransformationMatrices(const Eigen::Matrix4f& parentPose)
+    void
+    RobotNodePrismatic::updateTransformationMatrices(const Eigen::Matrix4f& parentPose)
     {
-        Eigen::Affine3f tmpT(Eigen::Translation3f((this->getJointValue() + jointValueOffset)*jointTranslationDirection));
+        Eigen::Affine3f tmpT(Eigen::Translation3f((this->getJointValue() + jointValueOffset) *
+                                                  jointTranslationDirection));
         globalPose = parentPose * localTransformation /*getLocalTransformation()*/ * tmpT.matrix();
 
         if (visuScaling)
@@ -134,7 +159,8 @@ namespace VirtualRobot
         }
     }
 
-    void RobotNodePrismatic::print(bool printChildren, bool printDecoration) const
+    void
+    RobotNodePrismatic::print(bool printChildren, bool printDecoration) const
     {
         ReadLockPtr lock = getRobot()->getReadLock();
 
@@ -145,12 +171,15 @@ namespace VirtualRobot
 
         RobotNode::print(false, false);
 
-        std::cout << "* jointTranslationDirection: " << jointTranslationDirection[0] << ", " << jointTranslationDirection[1] << "," << jointTranslationDirection[2] << std::endl;
+        std::cout << "* jointTranslationDirection: " << jointTranslationDirection[0] << ", "
+                  << jointTranslationDirection[1] << "," << jointTranslationDirection[2]
+                  << std::endl;
         std::cout << "* VisuScaling: ";
 
         if (visuScaling)
         {
-            std::cout << visuScaleFactor[0] << ", " << visuScaleFactor[1] << "," << visuScaleFactor[2] << std::endl;
+            std::cout << visuScaleFactor[0] << ", " << visuScaleFactor[1] << ","
+                      << visuScaleFactor[2] << std::endl;
         }
         else
         {
@@ -163,16 +192,22 @@ namespace VirtualRobot
         }
 
 
-        std::vector< SceneObjectPtr > children = this->getChildren();
+        std::vector<SceneObjectPtr> children = this->getChildren();
 
         if (printChildren)
         {
-            std::for_each(children.begin(), children.end(), std::bind(&SceneObject::print,
-                                                                      std::placeholders::_1, true, true));
+            std::for_each(children.begin(),
+                          children.end(),
+                          std::bind(&SceneObject::print, std::placeholders::_1, true, true));
         }
     }
 
-    RobotNodePtr RobotNodePrismatic::_clone(const RobotPtr newRobot, const VisualizationNodePtr visualizationModel, const CollisionModelPtr collisionModel, CollisionCheckerPtr colChecker, float scaling)
+    RobotNodePtr
+    RobotNodePrismatic::_clone(const RobotPtr newRobot,
+                               const VisualizationNodePtr visualizationModel,
+                               const CollisionModelPtr collisionModel,
+                               CollisionCheckerPtr colChecker,
+                               float scaling)
     {
         std::shared_ptr<RobotNodePrismatic> result;
         ReadLockPtr lock = getRobot()->getReadLock();
@@ -180,13 +215,37 @@ namespace VirtualRobot
 
         if (optionalDHParameter.isSet)
         {
-            result.reset(new RobotNodePrismatic(newRobot, name, jointLimitLo, jointLimitHi, optionalDHParameter.aMM()*scaling, optionalDHParameter.dMM()*scaling, optionalDHParameter.alphaRadian(), optionalDHParameter.thetaRadian(), visualizationModel, collisionModel, jointValueOffset, p, colChecker, nodeType));
+            result.reset(new RobotNodePrismatic(newRobot,
+                                                name,
+                                                jointLimitLo,
+                                                jointLimitHi,
+                                                optionalDHParameter.aMM() * scaling,
+                                                optionalDHParameter.dMM() * scaling,
+                                                optionalDHParameter.alphaRadian(),
+                                                optionalDHParameter.thetaRadian(),
+                                                visualizationModel,
+                                                collisionModel,
+                                                jointValueOffset,
+                                                p,
+                                                colChecker,
+                                                nodeType));
         }
         else
         {
             Eigen::Matrix4f lt = getLocalTransformation();
             lt.block(0, 3, 3, 1) *= scaling;
-            result.reset(new RobotNodePrismatic(newRobot, name, jointLimitLo, jointLimitHi, lt, jointTranslationDirection, visualizationModel, collisionModel, jointValueOffset, p, colChecker, nodeType));
+            result.reset(new RobotNodePrismatic(newRobot,
+                                                name,
+                                                jointLimitLo,
+                                                jointLimitHi,
+                                                lt,
+                                                jointTranslationDirection,
+                                                visualizationModel,
+                                                collisionModel,
+                                                jointValueOffset,
+                                                p,
+                                                colChecker,
+                                                nodeType));
         }
 
         if (result && visuScaling)
@@ -197,13 +256,14 @@ namespace VirtualRobot
         return result;
     }
 
-    bool RobotNodePrismatic::isTranslationalJoint() const noexcept
+    bool
+    RobotNodePrismatic::isTranslationalJoint() const noexcept
     {
         return true;
     }
 
-
-    Eigen::Vector3f RobotNodePrismatic::getJointTranslationDirection(const SceneObjectPtr coordSystem) const
+    Eigen::Vector3f
+    RobotNodePrismatic::getJointTranslationDirection(const SceneObjectPtr coordSystem) const
     {
         ReadLockPtr lock = getRobot()->getReadLock();
         Eigen::Vector4f result4f = Eigen::Vector4f::Zero();
@@ -219,7 +279,9 @@ namespace VirtualRobot
         return result4f.segment(0, 3);
     }
 
-    void RobotNodePrismatic::updateVisualizationPose(const Eigen::Matrix4f& globalPose, bool updateChildren /*= false*/)
+    void
+    RobotNodePrismatic::updateVisualizationPose(const Eigen::Matrix4f& globalPose,
+                                                bool updateChildren /*= false*/)
     {
         RobotNode::updateVisualizationPose(globalPose, updateChildren);
 
@@ -253,32 +315,40 @@ namespace VirtualRobot
         */
     }
 
-    Eigen::Vector3f RobotNodePrismatic::getJointTranslationDirectionJointCoordSystem() const
+    Eigen::Vector3f
+    RobotNodePrismatic::getJointTranslationDirectionJointCoordSystem() const
     {
         return jointTranslationDirection;
     }
 
-    void RobotNodePrismatic::checkValidRobotNodeType()
+    void
+    RobotNodePrismatic::checkValidRobotNodeType()
     {
         RobotNode::checkValidRobotNodeType();
-        THROW_VR_EXCEPTION_IF(nodeType == Body || nodeType == Transform, "RobotNodePrismatic must be a JointNode or a GenericNode");
+        THROW_VR_EXCEPTION_IF(nodeType == Body || nodeType == Transform,
+                              "RobotNodePrismatic must be a JointNode or a GenericNode");
     }
 
-    std::string RobotNodePrismatic::_toXML(const std::string& /*modelPath*/)
+    std::string
+    RobotNodePrismatic::_toXML(const std::string& /*modelPath*/)
     {
         std::stringstream ss;
         ss << "\t\t<Joint type='prismatic'>" << std::endl;
-        ss << "\t\t\t<translationdirection x='" << jointTranslationDirection[0] << "' y='" << jointTranslationDirection[1] << "' z='" << jointTranslationDirection[2] << "'/>" << std::endl;
-        ss << "\t\t\t<limits lo='" << jointLimitLo << "' hi='" << jointLimitHi << "' units='mm'/>" << std::endl;
+        ss << "\t\t\t<translationdirection x='" << jointTranslationDirection[0] << "' y='"
+           << jointTranslationDirection[1] << "' z='" << jointTranslationDirection[2] << "'/>"
+           << std::endl;
+        ss << "\t\t\t<limits lo='" << jointLimitLo << "' hi='" << jointLimitHi << "' units='mm'/>"
+           << std::endl;
         ss << "\t\t\t<MaxAcceleration value='" << maxAcceleration << "'/>" << std::endl;
         ss << "\t\t\t<MaxVelocity value='" << maxVelocity << "'/>" << std::endl;
         ss << "\t\t\t<MaxTorque value='" << maxTorque << "'/>" << std::endl;
 
-        std::map< std::string, float >::iterator propIt = propagatedJointValues.begin();
+        std::map<std::string, float>::iterator propIt = propagatedJointValues.begin();
 
         while (propIt != propagatedJointValues.end())
         {
-            ss << "\t\t\t<PropagateJointValue name='" << propIt->first << "' factor='" << propIt->second << "'/>" << std::endl;
+            ss << "\t\t\t<PropagateJointValue name='" << propIt->first << "' factor='"
+               << propIt->second << "'/>" << std::endl;
             propIt++;
         }
 
@@ -286,7 +356,8 @@ namespace VirtualRobot
         return ss.str();
     }
 
-    void RobotNodePrismatic::setVisuScaleFactor(Eigen::Vector3f& scaleFactor)
+    void
+    RobotNodePrismatic::setVisuScaleFactor(Eigen::Vector3f& scaleFactor)
     {
         if (scaleFactor.norm() == 0.0f)
         {
@@ -300,5 +371,4 @@ namespace VirtualRobot
     }
 
 
-
-} // namespace
+} // namespace VirtualRobot

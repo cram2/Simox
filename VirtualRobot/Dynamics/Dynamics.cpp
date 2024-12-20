@@ -1,8 +1,9 @@
 
 #include "Dynamics.h"
 
-#include <iostream>
 #include <math.h>
+
+#include <iostream>
 #include <string>
 
 #include <Eigen/Dense>
@@ -13,9 +14,12 @@
 #include <VirtualRobot/Nodes/RobotNodePrismatic.h>
 #include <VirtualRobot/Nodes/RobotNodeRevolute.h>
 #include <VirtualRobot/Robot.h>
+#include <VirtualRobot/RobotNodeSet.h>
 #include <VirtualRobot/Units.h>
 #include <VirtualRobot/XML/RobotIO.h>
 
+#include "Logging.h"
+#include "VirtualRobotException.h"
 #include <rbdl/rbdl.h>
 #include <rbdl/rbdl_utils.h>
 

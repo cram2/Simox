@@ -4,21 +4,22 @@
 * @copyright  2010 Nikolaus Vahrenkamp
 */
 
+#include "RobotNodeSet.h"
 #define BOOST_TEST_MODULE VirtualRobot_VirtualRobotJacobianTest
 
-#include <VirtualRobot/VirtualRobotTest.h>
-#include <VirtualRobot/VirtualRobot.h>
-#include <VirtualRobot/IK/DifferentialIK.h>
-#include <VirtualRobot/XML/RobotIO.h>
-#include <VirtualRobot/Robot.h>
-#include <VirtualRobot/Nodes/RobotNode.h>
+#include <algorithm>
 #include <string>
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
+#include <VirtualRobot/IK/DifferentialIK.h>
+#include <VirtualRobot/Nodes/RobotNode.h>
+#include <VirtualRobot/Robot.h>
 #include <VirtualRobot/RuntimeEnvironment.h>
-#include <algorithm>
+#include <VirtualRobot/VirtualRobot.h>
+#include <VirtualRobot/VirtualRobotTest.h>
+#include <VirtualRobot/XML/RobotIO.h>
 
 BOOST_AUTO_TEST_SUITE(RobotNode)
 
@@ -71,11 +72,12 @@ BOOST_AUTO_TEST_CASE(testJacobianRevoluteJoint)
     BOOST_REQUIRE(r2);
     BOOST_REQUIRE(r3);
 
-    std::vector< VirtualRobot::RobotNodePtr > nodes;
+    std::vector<VirtualRobot::RobotNodePtr> nodes;
     nodes.push_back(r1);
     nodes.push_back(r2);
     nodes.push_back(r3);
-    VirtualRobot::RobotNodeSetPtr kc(VirtualRobot::RobotNodeSet::createRobotNodeSet(rob, "KinChain", nodes, r1));
+    VirtualRobot::RobotNodeSetPtr kc(
+        VirtualRobot::RobotNodeSet::createRobotNodeSet(rob, "KinChain", nodes, r1));
     BOOST_REQUIRE(kc);
     BOOST_CHECK_EQUAL(kc->isKinematicChain(), true);
 
@@ -92,20 +94,21 @@ BOOST_AUTO_TEST_CASE(testJacobianRevoluteJoint)
     // Calculate the Differences quotient
     Eigen::Matrix4f a = r3->getGlobalPose();
     Eigen::MatrixXf DiffQuot(3, 2);
-    jV << 0.78f + STEP_SIZE, 0.78f, 0 ;
+    jV << 0.78f + STEP_SIZE, 0.78f, 0;
     rob->setJointValues(kc, jV);
-    DiffQuot.block<3, 1>(0, 0) = (r3->getGlobalPose().block<3, 1>(0, 3) - a.block<3, 1>(0, 3)) / STEP_SIZE;
+    DiffQuot.block<3, 1>(0, 0) =
+        (r3->getGlobalPose().block<3, 1>(0, 3) - a.block<3, 1>(0, 3)) / STEP_SIZE;
     jV << 0.78f, 0.78f + STEP_SIZE, 0;
     rob->setJointValues(kc, jV);
-    DiffQuot.block<3, 1>(0, 1) = (r3->getGlobalPose().block<3, 1>(0, 3) - a.block<3, 1>(0, 3)) / STEP_SIZE;
+    DiffQuot.block<3, 1>(0, 1) =
+        (r3->getGlobalPose().block<3, 1>(0, 3) - a.block<3, 1>(0, 3)) / STEP_SIZE;
 
     // Compare both and check if they are similar enough.
 
     //std::cout << "Jacobian:\n " << jacobian.block<3,2>(0,0) << std::endl;
     //std::cout << "Differential quotient:\n " << DiffQuot << std::endl;
     //std::cout << (  (jacobian.block<3,2>(0,0) -  DiffQuot).array().abs() < 0.2     ).all() << std::endl;
-    BOOST_CHECK(((jacobian.block<3, 2>(0, 0) -  DiffQuot).array().abs() < MAX_ERROR).all());
-
+    BOOST_CHECK(((jacobian.block<3, 2>(0, 0) - DiffQuot).array().abs() < MAX_ERROR).all());
 }
 
 BOOST_AUTO_TEST_CASE(testJacobianRegularization)
@@ -129,7 +132,8 @@ BOOST_AUTO_TEST_CASE(testJacobianRegularization)
         Eigen::MatrixXf invjac = ik.computePseudoInverseJacobianMatrix(jacobi, Eigen::VectorXf());
         Eigen::MatrixXf test = jacobi * invjac;
 
-        Eigen::MatrixXf errMat = ik.getJacobiRegularization().asDiagonal() * (test - Eigen::MatrixXf::Identity(6, 6));
+        Eigen::MatrixXf errMat =
+            ik.getJacobiRegularization().asDiagonal() * (test - Eigen::MatrixXf::Identity(6, 6));
         std::cout << test << std::endl;
         std::cout << errMat << std::endl;
 
@@ -142,10 +146,12 @@ BOOST_AUTO_TEST_CASE(testJacobianRegularization)
 
         VirtualRobot::DifferentialIK ik(rns, RobotNodePtr(), JacobiProvider::eSVDDamped);
         Eigen::MatrixXf jacobi = ik.getJacobianMatrix(rns->getTCP());
-        Eigen::MatrixXf invjac = ik.computePseudoInverseJacobianMatrix(jacobi, ik.getJacobiRegularization());
+        Eigen::MatrixXf invjac =
+            ik.computePseudoInverseJacobianMatrix(jacobi, ik.getJacobiRegularization());
         Eigen::MatrixXf test = jacobi * invjac;
 
-        Eigen::MatrixXf errMat = ik.getJacobiRegularization().asDiagonal() * (test - Eigen::MatrixXf::Identity(6, 6));
+        Eigen::MatrixXf errMat =
+            ik.getJacobiRegularization().asDiagonal() * (test - Eigen::MatrixXf::Identity(6, 6));
         std::cout << test << std::endl;
         std::cout << errMat << std::endl;
 
@@ -161,7 +167,8 @@ BOOST_AUTO_TEST_CASE(testJacobianRegularization)
 
         VirtualRobot::DifferentialIK ik(rns, RobotNodePtr(), JacobiProvider::eSVD);
         Eigen::MatrixXf jacobi = ik.getJacobianMatrix(rns->getTCP());
-        Eigen::MatrixXf invjac = ik.computePseudoInverseJacobianMatrix(jacobi, ik.getJacobiRegularization());
+        Eigen::MatrixXf invjac =
+            ik.computePseudoInverseJacobianMatrix(jacobi, ik.getJacobiRegularization());
         Eigen::MatrixXf test = jacobi * invjac;
         std::cout << test << std::endl;
 
@@ -192,10 +199,11 @@ BOOST_AUTO_TEST_CASE(testJacobianSingularity)
         rns->setJointValues(initialJointAngles);
         VirtualRobot::DifferentialIK ik(rns, RobotNodePtr(), JacobiProvider::eSVD);
         float maxError = 0;
-        for(int i = 0; i < 40; i++)
+        for (int i = 0; i < 40; i++)
         {
             Eigen::MatrixXf jacobi = ik.getJacobianMatrix(rns->getTCP());
-            Eigen::MatrixXf invjac = ik.computePseudoInverseJacobianMatrix(jacobi, ik.getJacobiRegularization());
+            Eigen::MatrixXf invjac =
+                ik.computePseudoInverseJacobianMatrix(jacobi, ik.getJacobiRegularization());
             Eigen::VectorXf jointVel = invjac * vel;
             //std::cout << jacobi << std::endl;
             //std::cout << (jacobi * jointVel).transpose() << std::endl;
@@ -210,7 +218,6 @@ BOOST_AUTO_TEST_CASE(testJacobianSingularity)
         }
         std::cout << "maxError: " << maxError << std::endl;
         BOOST_CHECK_GE(maxError, 50);
-
     }
     std::cout << "#### eSVDDamped" << std::endl;
     {
@@ -218,10 +225,11 @@ BOOST_AUTO_TEST_CASE(testJacobianSingularity)
         VirtualRobot::DifferentialIK ik(rns, RobotNodePtr(), JacobiProvider::eSVDDamped);
         ik.setDampedSvdLambda(0.2);
         float maxError = 0;
-        for(int i = 0; i < 40; i++)
+        for (int i = 0; i < 40; i++)
         {
             Eigen::MatrixXf jacobi = ik.getJacobianMatrix(rns->getTCP());
-            Eigen::MatrixXf invjac = ik.computePseudoInverseJacobianMatrix(jacobi, ik.getJacobiRegularization());
+            Eigen::MatrixXf invjac =
+                ik.computePseudoInverseJacobianMatrix(jacobi, ik.getJacobiRegularization());
             Eigen::VectorXf jointVel = invjac * vel;
             //std::cout << (jacobi * jointVel).transpose() << std::endl;
             //std::cout << rns->getTCP()->getPositionInRootFrame().transpose() << std::endl;

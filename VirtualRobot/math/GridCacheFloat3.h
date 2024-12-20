@@ -26,13 +26,12 @@
 namespace math
 {
 
-class GridCacheFloat3
-{
-public:
+    class GridCacheFloat3
+    {
+    public:
+        GridCacheFloat3(int size, std::function<float(Index3)>& getData);
 
-    GridCacheFloat3(int size, std::function<float(Index3)> &getData);
-
-    float Get(int x, int y, int z);
+        float Get(int x, int y, int z);
 
     private:
         Array3DFloatPtr data;
@@ -40,5 +39,4 @@ public:
         int size;
         std::function<float(Index3)> getData;
     };
-}
-
+} // namespace math

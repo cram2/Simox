@@ -2,30 +2,34 @@
 
 #include <VirtualRobot/MathTools.h>
 
+#include "Logging.h"
+#include "VirtualRobotException.h"
+
 using namespace VirtualRobot;
 using namespace std;
-
 
 namespace VirtualRobot
 {
 
 
-    HierarchicalIK::HierarchicalIK(VirtualRobot::RobotNodeSetPtr rns, JacobiProvider::InverseJacobiMethod method)
-        : rns(rns), method(method)
+    HierarchicalIK::HierarchicalIK(VirtualRobot::RobotNodeSetPtr rns,
+                                   JacobiProvider::InverseJacobiMethod method) :
+        rns(rns), method(method)
     {
         VR_ASSERT(this->rns);
         verbose = false;
     }
 
-    HierarchicalIK::~HierarchicalIK()
-    = default;
+    HierarchicalIK::~HierarchicalIK() = default;
 
-    void HierarchicalIK::setVerbose(bool v)
+    void
+    HierarchicalIK::setVerbose(bool v)
     {
         verbose = v;
     }
 
-    Eigen::VectorXf HierarchicalIK::computeStep(const std::vector<JacobiProviderPtr>& jacDefs, float stepSize)
+    Eigen::VectorXf
+    HierarchicalIK::computeStep(const std::vector<JacobiProviderPtr>& jacDefs, float stepSize)
     {
         const double invDamped_lamba = 10.0;
 
@@ -45,8 +49,9 @@ namespace VirtualRobot
 
         for (size_t i = 0; i < jacDefs.size(); i++)
         {
-            THROW_VR_EXCEPTION_IF(!jacDefs[i]->isInitialized(), "JacobiProvider is not initialized...");
-            Eigen::MatrixXd j = jacDefs[i]->getJacobianMatrixD();// jacDefs[i].tcp);
+            THROW_VR_EXCEPTION_IF(!jacDefs[i]->isInitialized(),
+                                  "JacobiProvider is not initialized...");
+            Eigen::MatrixXd j = jacDefs[i]->getJacobianMatrixD(); // jacDefs[i].tcp);
             jacobies.push_back(j);
 
             if (verbose)
@@ -54,7 +59,7 @@ namespace VirtualRobot
                 VR_INFO << "Jacoby " << i << ":\n" << j << std::endl;
             }
 
-            j = jacDefs[i]->computePseudoInverseJacobianMatrixD(j);// jacDefs[i].tcp);
+            j = jacDefs[i]->computePseudoInverseJacobianMatrixD(j); // jacDefs[i].tcp);
             invJacobies.push_back(j);
 
             errors.push_back(jacDefs[i]->getError().cast<double>());
@@ -66,12 +71,15 @@ namespace VirtualRobot
 
             if (jacobies[i].cols() != ndof)
             {
-                THROW_VR_EXCEPTION("Expecting " << ndof << " DOFs, but Jacobi " << i << " has " << jacobies[i].cols() << " columns ");
+                THROW_VR_EXCEPTION("Expecting " << ndof << " DOFs, but Jacobi " << i << " has "
+                                                << jacobies[i].cols() << " columns ");
             }
 
             if (jacobies[i].rows() != errors[i].rows())
             {
-                THROW_VR_EXCEPTION("Jacobi " << i << " has " << jacobies[i].rows() << " rows, but delta has " << jacDefs[i]->getError().rows() << " rows ");
+                THROW_VR_EXCEPTION("Jacobi " << i << " has " << jacobies[i].rows()
+                                             << " rows, but delta has "
+                                             << jacDefs[i]->getError().rows() << " rows ");
             }
         }
 
@@ -190,7 +198,9 @@ namespace VirtualRobot
 
             if (verbose)
             {
-                VR_INFO << "jacDefs[i]->getError() " << i << ":\n" << endl << errors[i].transpose() << std::endl;
+                VR_INFO << "jacDefs[i]->getError() " << i << ":\n"
+                        << endl
+                        << errors[i].transpose() << std::endl;
             }
 
             result_i = result_i_min1 + Jinv_tilde_i * (errors[i] * stepSize - J_i * result_i_min1);
@@ -204,7 +214,6 @@ namespace VirtualRobot
         }
 
         return result_i.cast<float>();
-
     }
 
 } // namespace VirtualRobot

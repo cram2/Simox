@@ -1,7 +1,10 @@
 #include "DynamicsRobot.h"
-#include "../DynamicsWorld.h"
 
 #include <VirtualRobot/SceneObject.h>
+
+#include "../DynamicsWorld.h"
+#include "VirtualRobot/Assert.h"
+#include "VirtualRobot/Nodes/RobotNode.h"
 
 namespace SimDynamics
 {
@@ -14,20 +17,21 @@ namespace SimDynamics
         //engineMutexPtr.reset(new boost::recursive_mutex()); // may be overwritten by another mutex!
     }
 
-    DynamicsRobot::~DynamicsRobot()
-    = default;
+    DynamicsRobot::~DynamicsRobot() = default;
 
-    std::string DynamicsRobot::getName() const
+    std::string
+    DynamicsRobot::getName() const
     {
         return robot->getName();
     }
 
-    void DynamicsRobot::ensureKinematicConstraints()
+    void
+    DynamicsRobot::ensureKinematicConstraints()
     {
-
     }
 
-    void DynamicsRobot::createDynamicsNode(VirtualRobot::RobotNodePtr node)
+    void
+    DynamicsRobot::createDynamicsNode(VirtualRobot::RobotNodePtr node)
     {
         MutexLockPtr lock = getScopedLock();
         VR_ASSERT(node);
@@ -44,11 +48,12 @@ namespace SimDynamics
         dynamicRobotNodes[node] = drn;
     }
 
-
-    std::vector<DynamicsObjectPtr> DynamicsRobot::getDynamicsRobotNodes()
+    std::vector<DynamicsObjectPtr>
+    DynamicsRobot::getDynamicsRobotNodes()
     {
         MutexLockPtr lock = getScopedLock();
-        std::map<VirtualRobot::RobotNodePtr, DynamicsObjectPtr>::iterator it = dynamicRobotNodes.begin();
+        std::map<VirtualRobot::RobotNodePtr, DynamicsObjectPtr>::iterator it =
+            dynamicRobotNodes.begin();
         std::vector<DynamicsObjectPtr> res;
 
         while (it != dynamicRobotNodes.end())
@@ -60,7 +65,8 @@ namespace SimDynamics
         return res;
     }
 
-    bool DynamicsRobot::hasDynamicsRobotNode(VirtualRobot::RobotNodePtr node)
+    bool
+    DynamicsRobot::hasDynamicsRobotNode(VirtualRobot::RobotNodePtr node)
     {
         MutexLockPtr lock = getScopedLock();
 
@@ -72,10 +78,12 @@ namespace SimDynamics
         return true;
     }
 
-    DynamicsObjectPtr DynamicsRobot::getDynamicsRobotNode(const std::string &nodeName)
+    DynamicsObjectPtr
+    DynamicsRobot::getDynamicsRobotNode(const std::string& nodeName)
     {
         MutexLockPtr lock = getScopedLock();
-        std::map<VirtualRobot::RobotNodePtr, DynamicsObjectPtr>::iterator it = dynamicRobotNodes.begin();
+        std::map<VirtualRobot::RobotNodePtr, DynamicsObjectPtr>::iterator it =
+            dynamicRobotNodes.begin();
         std::vector<DynamicsObjectPtr> res;
 
         while (it != dynamicRobotNodes.end())
@@ -87,8 +95,8 @@ namespace SimDynamics
         return DynamicsObjectPtr();
     }
 
-
-    DynamicsObjectPtr DynamicsRobot::getDynamicsRobotNode(VirtualRobot::RobotNodePtr node)
+    DynamicsObjectPtr
+    DynamicsRobot::getDynamicsRobotNode(VirtualRobot::RobotNodePtr node)
     {
         MutexLockPtr lock = getScopedLock();
         VR_ASSERT(node);
@@ -101,7 +109,8 @@ namespace SimDynamics
         return dynamicRobotNodes[node];
     }
 
-    void DynamicsRobot::actuateNode(const std::string& node, double jointValue)
+    void
+    DynamicsRobot::actuateNode(const std::string& node, double jointValue)
     {
         MutexLockPtr lock = getScopedLock();
         VR_ASSERT(robot);
@@ -109,7 +118,8 @@ namespace SimDynamics
         actuateNode(robot->getRobotNode(node), jointValue);
     }
 
-    void DynamicsRobot::addJointFriction(VirtualRobot::RobotNodePtr node)
+    void
+    DynamicsRobot::addJointFriction(VirtualRobot::RobotNodePtr node)
     {
         MutexLockPtr lock = getScopedLock();
         VR_ASSERT(robot);
@@ -131,7 +141,8 @@ namespace SimDynamics
 
         if (actuationControllers.find(node) == actuationControllers.end())
         {
-            actuationControllers[node] = VelocityMotorController(node->getMaxVelocity(), node->getMaxAcceleration());
+            actuationControllers[node] =
+                VelocityMotorController(node->getMaxVelocity(), node->getMaxAcceleration());
             actuationControllers[node].reset(PID_p, PID_i, PID_d);
         }
         else
@@ -140,7 +151,8 @@ namespace SimDynamics
         }
     }
 
-    void DynamicsRobot::actuateNode(VirtualRobot::RobotNodePtr node, double jointValue)
+    void
+    DynamicsRobot::actuateNode(VirtualRobot::RobotNodePtr node, double jointValue)
     {
         MutexLockPtr lock = getScopedLock();
         VR_ASSERT(robot);
@@ -156,7 +168,8 @@ namespace SimDynamics
 
         if (actuationControllers.find(node) == actuationControllers.end())
         {
-            actuationControllers[node] = VelocityMotorController(node->getMaxVelocity(), node->getMaxAcceleration());
+            actuationControllers[node] =
+                VelocityMotorController(node->getMaxVelocity(), node->getMaxAcceleration());
             actuationControllers[node].reset(PID_p, PID_i, PID_d);
         }
         else
@@ -165,7 +178,10 @@ namespace SimDynamics
         }
     }
 
-    void DynamicsRobot::actuateNode(VirtualRobot::RobotNodePtr node, double jointValue , double jointVelocity)
+    void
+    DynamicsRobot::actuateNode(VirtualRobot::RobotNodePtr node,
+                               double jointValue,
+                               double jointVelocity)
     {
         MutexLockPtr lock = getScopedLock();
         VR_ASSERT(robot);
@@ -183,7 +199,8 @@ namespace SimDynamics
 
         if (actuationControllers.find(node) == actuationControllers.end())
         {
-            actuationControllers[node] = VelocityMotorController(node->getMaxVelocity(), node->getMaxAcceleration());
+            actuationControllers[node] =
+                VelocityMotorController(node->getMaxVelocity(), node->getMaxAcceleration());
             actuationControllers[node].reset(PID_p, PID_i, PID_d);
         }
         else
@@ -192,7 +209,8 @@ namespace SimDynamics
         }
     }
 
-    void DynamicsRobot::actuateNodeVel(const std::string& node, double jointVelocity)
+    void
+    DynamicsRobot::actuateNodeVel(const std::string& node, double jointVelocity)
     {
         MutexLockPtr lock = getScopedLock();
         VR_ASSERT(robot);
@@ -201,7 +219,8 @@ namespace SimDynamics
         actuateNodeVel(robot->getRobotNode(node), jointVelocity);
     }
 
-    void DynamicsRobot::actuateNodeVel(VirtualRobot::RobotNodePtr node, double jointVelocity)
+    void
+    DynamicsRobot::actuateNodeVel(VirtualRobot::RobotNodePtr node, double jointVelocity)
     {
         MutexLockPtr lock = getScopedLock();
         VR_ASSERT(robot);
@@ -218,14 +237,14 @@ namespace SimDynamics
         target.actuation.modes.position = 0;
         target.node = node;
         bool modeChanged = oldTargetIt == actuationTargets.end() ||
-                                          oldTargetIt->second.actuation.modes.velocity != 1 ||
-                                          oldTargetIt->second.actuation.modes.position != 0;
-//        if(!modeChanged)
-//        {
-//            target.jointValueTarget = oldTargetIt->second.jointValueTarget;
-//        }
-//        else
-        if(std::abs(jointVelocity) < 1e-10)
+                           oldTargetIt->second.actuation.modes.velocity != 1 ||
+                           oldTargetIt->second.actuation.modes.position != 0;
+        //        if(!modeChanged)
+        //        {
+        //            target.jointValueTarget = oldTargetIt->second.jointValueTarget;
+        //        }
+        //        else
+        if (std::abs(jointVelocity) < 1e-10)
         {
             //do not move
             target.jointValueTarget = oldTargetIt->second.jointValueTarget;
@@ -241,20 +260,21 @@ namespace SimDynamics
 
         if (actuationControllers.find(node) == actuationControllers.end())
         {
-            actuationControllers[node] = VelocityMotorController(node->getMaxVelocity(), node->getMaxAcceleration());
+            actuationControllers[node] =
+                VelocityMotorController(node->getMaxVelocity(), node->getMaxAcceleration());
             actuationControllers[node].reset(PID_p, PID_i, PID_d);
-
         }
         else
         {
-            if(modeChanged)
+            if (modeChanged)
             {
                 actuationControllers[node].reset();
             }
         }
     }
 
-    void DynamicsRobot::actuateNodeTorque(const std::string& node, double jointTorque)
+    void
+    DynamicsRobot::actuateNodeTorque(const std::string& node, double jointTorque)
     {
         MutexLockPtr lock = getScopedLock();
         VR_ASSERT(robot);
@@ -262,7 +282,8 @@ namespace SimDynamics
         actuateNodeTorque(robot->getRobotNode(node), jointTorque);
     }
 
-    void DynamicsRobot::actuateNodeTorque(VirtualRobot::RobotNodePtr node, double jointTorque)
+    void
+    DynamicsRobot::actuateNodeTorque(VirtualRobot::RobotNodePtr node, double jointTorque)
     {
         MutexLockPtr lock = getScopedLock();
         VR_ASSERT(robot);
@@ -284,7 +305,8 @@ namespace SimDynamics
 
         if (actuationControllers.find(node) == actuationControllers.end())
         {
-            actuationControllers[node] = VelocityMotorController(node->getMaxVelocity(), node->getMaxAcceleration());
+            actuationControllers[node] =
+                VelocityMotorController(node->getMaxVelocity(), node->getMaxAcceleration());
             actuationControllers[node].reset(PID_p, PID_i, PID_d);
         }
         else
@@ -293,7 +315,8 @@ namespace SimDynamics
         }
     }
 
-    void DynamicsRobot::disableNodeActuation(VirtualRobot::RobotNodePtr node)
+    void
+    DynamicsRobot::disableNodeActuation(VirtualRobot::RobotNodePtr node)
     {
         MutexLockPtr lock = getScopedLock();
 
@@ -303,10 +326,12 @@ namespace SimDynamics
         }
     }
 
-    void DynamicsRobot::enableActuation(ActuationMode mode)
+    void
+    DynamicsRobot::enableActuation(ActuationMode mode)
     {
         MutexLockPtr lock = getScopedLock();
-        std::map<VirtualRobot::RobotNodePtr, robotNodeActuationTarget>::iterator it = actuationTargets.begin();
+        std::map<VirtualRobot::RobotNodePtr, robotNodeActuationTarget>::iterator it =
+            actuationTargets.begin();
 
         while (it != actuationTargets.end())
         {
@@ -315,10 +340,12 @@ namespace SimDynamics
         }
     }
 
-    void DynamicsRobot::disableActuation()
+    void
+    DynamicsRobot::disableActuation()
     {
         MutexLockPtr lock = getScopedLock();
-        std::map<VirtualRobot::RobotNodePtr, robotNodeActuationTarget>::iterator it = actuationTargets.begin();
+        std::map<VirtualRobot::RobotNodePtr, robotNodeActuationTarget>::iterator it =
+            actuationTargets.begin();
 
         while (it != actuationTargets.end())
         {
@@ -326,12 +353,14 @@ namespace SimDynamics
             it++;
         }
     }
-    void DynamicsRobot::actuateJoints(double /*dt*/)
-    {
 
+    void
+    DynamicsRobot::actuateJoints(double /*dt*/)
+    {
     }
 
-    bool DynamicsRobot::isNodeActuated(VirtualRobot::RobotNodePtr node)
+    bool
+    DynamicsRobot::isNodeActuated(VirtualRobot::RobotNodePtr node)
     {
         MutexLockPtr lock = getScopedLock();
         VR_ASSERT(node);
@@ -344,7 +373,8 @@ namespace SimDynamics
         return actuationTargets[node].actuation.mode != 0;
     }
 
-    double DynamicsRobot::getNodeTarget(VirtualRobot::RobotNodePtr node)
+    double
+    DynamicsRobot::getNodeTarget(VirtualRobot::RobotNodePtr node)
     {
         MutexLockPtr lock = getScopedLock();
         VR_ASSERT(node);
@@ -355,25 +385,28 @@ namespace SimDynamics
         }
 
         return actuationTargets[node].jointValueTarget;
-
     }
 
-    double DynamicsRobot::getJointAngle(VirtualRobot::RobotNodePtr /*rn*/)
+    double
+    DynamicsRobot::getJointAngle(VirtualRobot::RobotNodePtr /*rn*/)
     {
         return 0.0f;
     }
 
-    double DynamicsRobot::getJointSpeed(VirtualRobot::RobotNodePtr /*rn*/)
+    double
+    DynamicsRobot::getJointSpeed(VirtualRobot::RobotNodePtr /*rn*/)
     {
         return 0.0f;
     }
 
-    double DynamicsRobot::getJointTargetSpeed(VirtualRobot::RobotNodePtr /*rn*/)
+    double
+    DynamicsRobot::getJointTargetSpeed(VirtualRobot::RobotNodePtr /*rn*/)
     {
         return 0.0f;
     }
 
-    Eigen::Matrix4f DynamicsRobot::getComGlobal(const VirtualRobot::RobotNodePtr& rn)
+    Eigen::Matrix4f
+    DynamicsRobot::getComGlobal(const VirtualRobot::RobotNodePtr& rn)
     {
         MutexLockPtr lock = getScopedLock();
         Eigen::Matrix4f com = Eigen::Matrix4f::Identity();
@@ -382,36 +415,43 @@ namespace SimDynamics
         return com;
     }
 
-    Eigen::Vector3f DynamicsRobot::getComGlobal(const VirtualRobot::RobotNodeSetPtr& /*bodies*/)
+    Eigen::Vector3f
+    DynamicsRobot::getComGlobal(const VirtualRobot::RobotNodeSetPtr& /*bodies*/)
     {
         return Eigen::Vector3f::Zero();
     }
 
-    Eigen::Vector3f DynamicsRobot::getComVelocityGlobal(const VirtualRobot::RobotNodeSetPtr& /*bodies*/)
+    Eigen::Vector3f
+    DynamicsRobot::getComVelocityGlobal(const VirtualRobot::RobotNodeSetPtr& /*bodies*/)
     {
         return Eigen::Vector3f::Zero();
     }
 
-    Eigen::Vector3f DynamicsRobot::getLinearMomentumGlobal(const VirtualRobot::RobotNodeSetPtr& /*set*/)
+    Eigen::Vector3f
+    DynamicsRobot::getLinearMomentumGlobal(const VirtualRobot::RobotNodeSetPtr& /*set*/)
     {
         return Eigen::Vector3f::Zero();
     }
 
-    Eigen::Vector3f DynamicsRobot::getAngularMomentumGlobal(const VirtualRobot::RobotNodeSetPtr& /*set*/)
+    Eigen::Vector3f
+    DynamicsRobot::getAngularMomentumGlobal(const VirtualRobot::RobotNodeSetPtr& /*set*/)
     {
         return Eigen::Vector3f::Zero();
     }
 
-    Eigen::Vector3f DynamicsRobot::getAngularMomentumLocal(const VirtualRobot::RobotNodeSetPtr& /*set*/)
+    Eigen::Vector3f
+    DynamicsRobot::getAngularMomentumLocal(const VirtualRobot::RobotNodeSetPtr& /*set*/)
     {
         return Eigen::Vector3f::Zero();
     }
 
-    void DynamicsRobot::setGlobalPose(const Eigen::Matrix4f& gp)
+    void
+    DynamicsRobot::setGlobalPose(const Eigen::Matrix4f& gp)
     {
         MutexLockPtr lock = getScopedLock();
 
-        std::map<VirtualRobot::RobotNodePtr, DynamicsObjectPtr>::iterator it = dynamicRobotNodes.begin();
+        std::map<VirtualRobot::RobotNodePtr, DynamicsObjectPtr>::iterator it =
+            dynamicRobotNodes.begin();
 
         robot->setGlobalPose(gp);
         while (it != dynamicRobotNodes.end())
@@ -422,29 +462,34 @@ namespace SimDynamics
         }
     }
 
-    void DynamicsRobot::setMutex(std::shared_ptr<std::recursive_mutex> engineMutexPtr)
+    void
+    DynamicsRobot::setMutex(std::shared_ptr<std::recursive_mutex> engineMutexPtr)
     {
         this->engineMutexPtr = engineMutexPtr;
     }
 
-    std::map<VirtualRobot::RobotNodePtr, VelocityMotorController>& DynamicsRobot::getControllers()
+    std::map<VirtualRobot::RobotNodePtr, VelocityMotorController>&
+    DynamicsRobot::getControllers()
     {
         return actuationControllers;
     }
 
-    bool DynamicsRobot::attachObject(const std::string& /*nodeName*/, DynamicsObjectPtr /*object*/)
-    {
-        return false;
-    }
-    bool DynamicsRobot::detachObject(DynamicsObjectPtr /*object*/)
+    bool
+    DynamicsRobot::attachObject(const std::string& /*nodeName*/, DynamicsObjectPtr /*object*/)
     {
         return false;
     }
 
-
-    DynamicsRobot::MutexLockPtr DynamicsRobot::getScopedLock()
+    bool
+    DynamicsRobot::detachObject(DynamicsObjectPtr /*object*/)
     {
-        std::shared_ptr< std::scoped_lock<std::recursive_mutex> > scoped_lock;
+        return false;
+    }
+
+    DynamicsRobot::MutexLockPtr
+    DynamicsRobot::getScopedLock()
+    {
+        std::shared_ptr<std::scoped_lock<std::recursive_mutex>> scoped_lock;
 
         if (engineMutexPtr)
         {
@@ -454,30 +499,33 @@ namespace SimDynamics
         return scoped_lock;
     }
 
-    void DynamicsRobot::setPIDParameters(float p, float i, float d)
+    void
+    DynamicsRobot::setPIDParameters(float p, float i, float d)
     {
         PID_p = p;
         PID_i = i;
         PID_d = d;
-        for(auto& pair : actuationControllers)
+        for (auto& pair : actuationControllers)
         {
-            pair.second.reset(p,i,d);
+            pair.second.reset(p, i, d);
         }
     }
 
-    void DynamicsRobot::enableSelfCollisions(bool enable)
+    void
+    DynamicsRobot::enableSelfCollisions(bool enable)
     {
         // deactivate all self collisions
-        for (const auto & i : robotNodes)
+        for (const auto& i : robotNodes)
         {
             auto drn1 = getDynamicsRobotNode(i);
-            for (const auto & robotNode : robotNodes)
+            for (const auto& robotNode : robotNodes)
             {
                 auto drn2 = getDynamicsRobotNode(robotNode);
-                if(enable)
+                if (enable)
                     DynamicsWorld::GetWorld()->getEngine()->enableCollision(drn1.get(), drn2.get());
                 else
-                    DynamicsWorld::GetWorld()->getEngine()->disableCollision(drn1.get(), drn2.get());
+                    DynamicsWorld::GetWorld()->getEngine()->disableCollision(drn1.get(),
+                                                                             drn2.get());
             }
         }
     }
@@ -496,4 +544,4 @@ namespace SimDynamics
     }*/
 
 
-    } // namespace SimDynamics
+} // namespace SimDynamics

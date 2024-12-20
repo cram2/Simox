@@ -22,17 +22,19 @@
 */
 #pragma once
 
-#include "../VirtualRobot.h"
-
-#include <string>
-#include <vector>
 #include <map>
+#include <vector>
+
+#include "../VirtualRobot.h"
+#include "../Assert.h"
+
 //#define VoxelTreeNDElement_DEBUG_OUTPUT
 
 namespace VirtualRobot
 {
     template <typename T, unsigned int N>
     class VoxelTreeND;
+
     /*!
         A template definition for storing elements of a voxelized n-d grid.
         Internally the elements are copied!
@@ -41,11 +43,14 @@ namespace VirtualRobot
     class VoxelTreeNDElement
     {
         friend class VoxelTreeND<T, N>;
+
     public:
         /*!
             Construct an element at position p with given extends.
         */
-        VoxelTreeNDElement(float p[N], /*float extends[N],*/ int level, /*int maxLevels,*/ VoxelTreeND<T, N>* master)
+        VoxelTreeNDElement(float p[N],
+                           /*float extends[N],*/ int level,
+                           /*int maxLevels,*/ VoxelTreeND<T, N>* master)
         {
             VR_ASSERT(master);
             this->tree = master;
@@ -70,7 +75,7 @@ namespace VirtualRobot
             }
 
 
-            memcpy(&(this->pos[0]), &(p[0]), sizeof(float)*N);
+            memcpy(&(this->pos[0]), &(p[0]), sizeof(float) * N);
             //memcpy (&(this->extends[0]),&(extends[0]),sizeof(float)*N);
             this->level = level;
             //this->maxLevels = maxLevels;
@@ -87,7 +92,8 @@ namespace VirtualRobot
             Automatically checks if a new child element has to be created.
             A copy of e is stored.
         */
-        bool setEntry(float p[N], const T& e)
+        bool
+        setEntry(float p[N], const T& e)
         {
             if (!covers(p))
             {
@@ -123,7 +129,8 @@ namespace VirtualRobot
             Checks if there is an entry at the given position.
             True when this node is a leaf and the entry is set or the child at p exists and returns true on getChild(p)->hasEntry(p).
         */
-        bool hasEntry(float p[N])
+        bool
+        hasEntry(float p[N])
         {
             if (leaf)
             {
@@ -155,7 +162,8 @@ namespace VirtualRobot
         /*!
             Returns pointer to element when existing. NULL if not.
         */
-        T* getEntry(float p[N])
+        T*
+        getEntry(float p[N])
         {
             if (leaf)
             {
@@ -172,8 +180,8 @@ namespace VirtualRobot
             return children[indx]->getEntry(p);
         }
 
-
-        VoxelTreeNDElement* getLeaf(float pos[N])
+        VoxelTreeNDElement*
+        getLeaf(float pos[N])
         {
             if (leaf)
             {
@@ -190,8 +198,8 @@ namespace VirtualRobot
             return children[indx]->getLeaf(pos);
         }
 
-
-        VoxelTreeNDElement* maxLeaf(const Eigen::VectorXf& pos)
+        VoxelTreeNDElement*
+        maxLeaf(const Eigen::VectorXf& pos)
         {
             if (leaf)
             {
@@ -229,7 +237,8 @@ namespace VirtualRobot
             return maxElement;
         }
 
-        std::vector<VoxelTreeNDElement*> getAllLeafs(const Eigen::VectorXf& pos)
+        std::vector<VoxelTreeNDElement*>
+        getAllLeafs(const Eigen::VectorXf& pos)
         {
             std::vector<VoxelTreeNDElement*> res;
 
@@ -265,28 +274,33 @@ namespace VirtualRobot
             return res;
         }
 
-        bool isLeaf()
+        bool
+        isLeaf()
         {
             return leaf;
         }
 
         //! if isLeaf the corresponding entry is returned
-        T* getEntry()
+        T*
+        getEntry()
         {
             return entry;
         }
 
-        float getExtend(unsigned int d)
+        float
+        getExtend(unsigned int d)
         {
             return tree->getExtends(level, d);
         }
 
-        int getLevel()
+        int
+        getLevel()
         {
             return level;
         }
 
-        Eigen::VectorXf getVoxelCenter()
+        Eigen::VectorXf
+        getVoxelCenter()
         {
             Eigen::VectorXf c(N);
 
@@ -298,7 +312,8 @@ namespace VirtualRobot
             return c;
         }
 
-        long countNodesRecursive()
+        long
+        countNodesRecursive()
         {
             long counter = 0;
 
@@ -318,7 +333,8 @@ namespace VirtualRobot
         }
 
     protected:
-        std::vector<int> getAllChildrenIndx(const Eigen::VectorXf& p)
+        std::vector<int>
+        getAllChildrenIndx(const Eigen::VectorXf& p)
         {
             std::vector<int> c;
             int depth = p.rows();
@@ -365,7 +381,8 @@ namespace VirtualRobot
             unsigned int id;
         };
 
-        bool write(datablock& storeData)
+        bool
+        write(datablock& storeData)
         {
             storeData.children.clear();
 
@@ -404,7 +421,9 @@ namespace VirtualRobot
             return true;
         }
 
-        bool read(const datablock& data, const std::map< unsigned int, VoxelTreeNDElement* >& idElementMapping)
+        bool
+        read(const datablock& data,
+             const std::map<unsigned int, VoxelTreeNDElement*>& idElementMapping)
         {
             deleteData();
 
@@ -431,11 +450,13 @@ namespace VirtualRobot
                 {
                     if (data.children[i] > 0)
                     {
-                        typename std::map< unsigned int, VoxelTreeNDElement<T, N>* >::const_iterator it = idElementMapping.find(data.children[i]);
+                        typename std::map<unsigned int, VoxelTreeNDElement<T, N>*>::const_iterator
+                            it = idElementMapping.find(data.children[i]);
 
                         if (it == idElementMapping.end())
                         {
-                            VR_ERROR << "Could not find Element with id " << data.children[i] << std::endl;
+                            VR_ERROR << "Could not find Element with id " << data.children[i]
+                                     << std::endl;
                             return false;
                         }
                         else
@@ -456,7 +477,8 @@ namespace VirtualRobot
             return true;
         }
 
-        VoxelTreeNDElement<T, N>* createChild(float p[N])
+        VoxelTreeNDElement<T, N>*
+        createChild(float p[N])
         {
             VR_ASSERT(!leaf);
             int indx = getChildIndx(p);
@@ -502,11 +524,13 @@ namespace VirtualRobot
                 //newExtends[i] = 0.5f * extends[i];
             }
 
-            children[indx] = new VoxelTreeNDElement(newPos,/*newExtends,*/level + 1,/*maxLevels,*/tree);
+            children[indx] =
+                new VoxelTreeNDElement(newPos, /*newExtends,*/ level + 1, /*maxLevels,*/ tree);
             return children[indx];
         };
 
-        int getChildIndx(float p[N])
+        int
+        getChildIndx(float p[N])
         {
             if (!covers(p))
             {
@@ -542,7 +566,8 @@ namespace VirtualRobot
             return res;
         };
 
-        bool covers(float p[N])
+        bool
+        covers(float p[N])
         {
             for (unsigned int i = 0; i < N; i++)
             {
@@ -555,7 +580,8 @@ namespace VirtualRobot
             return true;
         };
 
-        void accumulateMemoryConsumtion(long& storeMemStructure, long& storeMemData)
+        void
+        accumulateMemoryConsumtion(long& storeMemStructure, long& storeMemData)
         {
             storeMemStructure += sizeof(VoxelTreeNDElement<T, N>);
 
@@ -581,7 +607,8 @@ namespace VirtualRobot
             }
         }
 
-        void collectElements(std::vector<VoxelTreeNDElement*>& elements)
+        void
+        collectElements(std::vector<VoxelTreeNDElement*>& elements)
         {
             elements.push_back(this);
 
@@ -597,11 +624,14 @@ namespace VirtualRobot
             }
         }
 
-        void propagateData(float p[N], /*float extends[N],*/ int level, /*int maxLevels,*/ VoxelTreeND<T, N>* master)
+        void
+        propagateData(float p[N],
+                      /*float extends[N],*/ int level,
+                      /*int maxLevels,*/ VoxelTreeND<T, N>* master)
         {
             VR_ASSERT(master);
             this->tree = master;
-            memcpy(&(this->pos[0]), &(p[0]), sizeof(float)*N);
+            memcpy(&(this->pos[0]), &(p[0]), sizeof(float) * N);
             //memcpy (&(this->extends[0]),&(extends[0]),sizeof(float)*N);
             this->level = level;
 
@@ -642,13 +672,15 @@ namespace VirtualRobot
                             }
                         }
 
-                        children[i]->propagateData(newP,/*newExtends,*/level + 1/*,maxLevels*/, master);
+                        children[i]->propagateData(
+                            newP, /*newExtends,*/ level + 1 /*,maxLevels*/, master);
                     }
                 }
             }
         }
 
-        void deleteData()
+        void
+        deleteData()
         {
             if (children)
             {
@@ -665,7 +697,8 @@ namespace VirtualRobot
             entry = NULL;
         }
 
-        VoxelTreeNDElement<T, N>* getNextChild(int startIndex, int& storeElementNr)
+        VoxelTreeNDElement<T, N>*
+        getNextChild(int startIndex, int& storeElementNr)
         {
             VR_ASSERT(!leaf);
 
@@ -694,5 +727,4 @@ namespace VirtualRobot
     };
 
 
-} // namespace
-
+} // namespace VirtualRobot

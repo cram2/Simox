@@ -22,12 +22,12 @@
 */
 #pragma once
 
-#include <VirtualRobot/VirtualRobot.h>
-#include <VirtualRobot/Workspace/WorkspaceRepresentation.h>
-#include <VirtualRobot/Workspace/Manipulability.h>
 #include <VirtualRobot/IK/PoseQualityMeasurement.h>
+#include <VirtualRobot/VirtualRobot.h>
+#include <VirtualRobot/Workspace/Manipulability.h>
+#include <VirtualRobot/Workspace/WorkspaceRepresentation.h>
 
-
+#include "VirtualRobot/MathTools.h"
 
 namespace VirtualRobot
 {
@@ -37,7 +37,8 @@ namespace VirtualRobot
             In this implementation, contacts are defined as all surface points of the passed collision models which have
             a distance to MathTools::FloorPlane that is lower than 5mm.
     */
-    class VIRTUAL_ROBOT_IMPORT_EXPORT SupportPolygon : public std::enable_shared_from_this<SupportPolygon>
+    class VIRTUAL_ROBOT_IMPORT_EXPORT SupportPolygon :
+        public std::enable_shared_from_this<SupportPolygon>
     {
     public:
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -61,13 +62,12 @@ namespace VirtualRobot
         SceneObjectSetPtr getContactModels();
 
     protected:
-
         float getSquaredDistLine(Eigen::Vector2f& p, Eigen::Vector2f& pt1, Eigen::Vector2f& pt2);
 
         SceneObjectSetPtr contactModels;
 
-        std::vector< CollisionModelPtr > colModels;
-        std::vector< Eigen::Vector2f > currentContactPoints2D;
+        std::vector<CollisionModelPtr> colModels;
+        std::vector<Eigen::Vector2f> currentContactPoints2D;
 
         MathTools::Plane floor;
         MathTools::ConvexHull2DPtr suportPolygonFloor;
@@ -76,4 +76,3 @@ namespace VirtualRobot
     typedef std::shared_ptr<SupportPolygon> SupportPolygonPtr;
 
 } // namespace VirtualRobot
-

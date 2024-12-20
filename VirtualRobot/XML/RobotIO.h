@@ -26,11 +26,11 @@
 #include <string>
 #include <vector>
 
-#include "../EndEffector/EndEffectorActor.h"
-#include "../Nodes/RobotNode.h"
-#include "../Robot.h"
-#include "../VirtualRobot.h"
-#include "BaseIO.h"
+#include <VirtualRobot/Nodes/RobotNode.h>
+#include <VirtualRobot/VirtualRobot.h>
+
+#include "VirtualRobot/EndEffector/EndEffectorActor.h"
+#include "VirtualRobot/XML/BaseIO.h"
 
 // using forward declarations here, so that the rapidXML header does not have to be parsed when this file is included
 namespace rapidxml
@@ -124,7 +124,7 @@ namespace VirtualRobot
             std::map<std::string, std::vector<std::string>>& attachments,
             std::map<std::string, std::map<std::string, float>>& configurations,
             RobotDescription loadMode = eFull);
-        
+
         static RobotNodePtr processRobotNode(rapidxml::xml_node<char>* robotNodeXMLNode,
                                              RobotPtr robo,
                                              const std::string& basePath,
@@ -164,7 +164,8 @@ namespace VirtualRobot
         static void processLimitsNode(rapidxml::xml_node<char>* limitsXMLNode,
                                       float& jointLimitLo,
                                       float& jointLimitHi,
-                                      bool& limitless, bool &allowJointLimitAvoidance);
+                                      bool& limitless,
+                                      bool& allowJointLimitAvoidance);
         static std::map<std::string, int> robot_name_counter;
         static VisualizationNodePtr checkUseAsColModel(rapidxml::xml_node<char>* visuXMLNode,
                                                        const std::string& robotNodeName,

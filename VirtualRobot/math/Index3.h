@@ -23,40 +23,63 @@
 
 #include "MathForwardDefinitions.h"
 
-
-
-
-
 namespace math
 {
 
-struct Index3
-{
-private:
-    int x;
-    int y;
-    int z;
+    struct Index3
+    {
+    private:
+        int x;
+        int y;
+        int z;
 
-public :
-    int X() {  return x; }
-    int Y() {  return y;}
-    int Z() { return z; }
-    void SetX(int value){ x = value; }
-    void SetY(int value){ y = value; }
-    void SetZ(int value){ z = value; }
+    public:
+        int
+        X()
+        {
+            return x;
+        }
 
-    Index3(int x, int y, int z);
+        int
+        Y()
+        {
+            return y;
+        }
 
-std::string ToString();
+        int
+        Z()
+        {
+            return z;
+        }
 
-};
+        void
+        SetX(int value)
+        {
+            x = value;
+        }
 
-/*static Index3 operator -(Index3 a);
+        void
+        SetY(int value)
+        {
+            y = value;
+        }
+
+        void
+        SetZ(int value)
+        {
+            z = value;
+        }
+
+        Index3(int x, int y, int z);
+
+        std::string ToString();
+    };
+
+    /*static Index3 operator -(Index3 a);
 static Index3 operator +(Index3 a, Index3 b);
 static Index3 operator -(Index3 a, Index3 b);
 static Index3 operator *(Index3 a, int f);
 static Index3 operator *(int f, Index3 a);
 static Index3 operator /(Index3 a, int f);*/
 
-}
-
+} // namespace math

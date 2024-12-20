@@ -1,6 +1,5 @@
 #include "linear.hpp"
 
-
 namespace simox::math
 {
     template class LinearRegression<1, float>;
@@ -15,4 +14,4 @@ namespace simox::math
     template class LinearRegression<4, float>;
     template class LinearRegression<4, double>;
 
-}
+} // namespace simox::math

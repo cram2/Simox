@@ -22,13 +22,15 @@
 */
 #pragma once
 
+#include <utility>
+#include <vector>
+
+#include <Eigen/Core>
+
+#include "../BoundingBox.h"
+#include "../MathTools.h"
 #include "../VirtualRobot.h"
 #include "../Visualization/VisualizationFactory.h"
-#include "../MathTools.h"
-#include "../BoundingBox.h"
-#include <Eigen/Core>
-#include <vector>
-#include <utility>
 
 namespace VirtualRobot
 {
@@ -56,16 +58,27 @@ namespace VirtualRobot
         struct triangle
         {
             triangle() = default;
-            triangle(const Eigen::Vector3f& v1, const Eigen::Vector3f& v2, const Eigen::Vector3f& v3) :
-                vertex1(v1), vertex2(v2), vertex3(v3) {}
-            triangle(const Eigen::Vector3f& v) :
-                triangle(v, v, v) {}
-            triangle(float x, float y, float z) :
-                triangle(Eigen::Vector3f{x, y, z}) {}
+
+            triangle(const Eigen::Vector3f& v1,
+                     const Eigen::Vector3f& v2,
+                     const Eigen::Vector3f& v3) :
+                vertex1(v1), vertex2(v2), vertex3(v3)
+            {
+            }
+
+            triangle(const Eigen::Vector3f& v) : triangle(v, v, v)
+            {
+            }
+
+            triangle(float x, float y, float z) : triangle(Eigen::Vector3f{x, y, z})
+            {
+            }
+
             Eigen::Vector3f vertex1;
             Eigen::Vector3f vertex2;
             Eigen::Vector3f vertex3;
         };
+
         /// Construct from vector of triangles.
         TriMeshModel(const std::vector<triangle>& triangles);
 
@@ -74,7 +87,8 @@ namespace VirtualRobot
         virtual ~TriMeshModel() = default;
 
         template <typename T>
-        Eigen::Vector3f nonUniformSampleSurface(T& gen) const
+        Eigen::Vector3f
+        nonUniformSampleSurface(T& gen) const
         {
             if (faces.empty())
             {
@@ -86,36 +100,57 @@ namespace VirtualRobot
             const float f1 = 1 + d(gen);
             const float f2 = 1 + d(gen);
             const Eigen::Vector3f factors = Eigen::Vector3f{f0, f1, f2}.normalized();
-            return factors(0) * vertices.at(f.id1) +
-                   factors(1) * vertices.at(f.id2) +
+            return factors(0) * vertices.at(f.id1) + factors(1) * vertices.at(f.id2) +
                    factors(2) * vertices.at(f.id3);
         }
 
-        void addTriangleWithFace(const Eigen::Vector3f& vertex1, const Eigen::Vector3f& vertex2, const Eigen::Vector3f& vertex3);
-        void addTriangleWithFace(const Eigen::Vector3f& vertex1, const Eigen::Vector3f& vertex2, const Eigen::Vector3f& vertex3, Eigen::Vector3f normal,
-                                 const VisualizationFactory::Color& color1 = VisualizationFactory::Color::Gray(),
-                                 const VisualizationFactory::Color& color2 = VisualizationFactory::Color::Gray(),
-                                 const VisualizationFactory::Color& color3 = VisualizationFactory::Color::Gray());
-        void addTriangleWithFace(const Eigen::Vector3f& vertex1, const Eigen::Vector3f& vertex2, const Eigen::Vector3f& vertex3, const Eigen::Vector4f& vertexColor1, const Eigen::Vector4f& vertexColor2, const Eigen::Vector4f& vertexColor3);
+        void addTriangleWithFace(const Eigen::Vector3f& vertex1,
+                                 const Eigen::Vector3f& vertex2,
+                                 const Eigen::Vector3f& vertex3);
+        void addTriangleWithFace(
+            const Eigen::Vector3f& vertex1,
+            const Eigen::Vector3f& vertex2,
+            const Eigen::Vector3f& vertex3,
+            Eigen::Vector3f normal,
+            const VisualizationFactory::Color& color1 = VisualizationFactory::Color::Gray(),
+            const VisualizationFactory::Color& color2 = VisualizationFactory::Color::Gray(),
+            const VisualizationFactory::Color& color3 = VisualizationFactory::Color::Gray());
+        void addTriangleWithFace(const Eigen::Vector3f& vertex1,
+                                 const Eigen::Vector3f& vertex2,
+                                 const Eigen::Vector3f& vertex3,
+                                 const Eigen::Vector4f& vertexColor1,
+                                 const Eigen::Vector4f& vertexColor2,
+                                 const Eigen::Vector4f& vertexColor3);
         void addMesh(const TriMeshModel& mesh);
-        static Eigen::Vector3f CreateNormal(const Eigen::Vector3f& vertex1, const Eigen::Vector3f& vertex2, const Eigen::Vector3f& vertex3);
+        static Eigen::Vector3f CreateNormal(const Eigen::Vector3f& vertex1,
+                                            const Eigen::Vector3f& vertex2,
+                                            const Eigen::Vector3f& vertex3);
         void addFace(const MathTools::TriangleFace& face);
         int addVertex(const Eigen::Vector3f& vertex);
-        int addVertex(float x, float y, float z)
+
+        int
+        addVertex(float x, float y, float z)
         {
             return addVertex({x, y, z});
         }
+
         unsigned int addNormal(const Eigen::Vector3f& normal);
-        unsigned int addNormal(float x, float y, float z)
+
+        unsigned int
+        addNormal(float x, float y, float z)
         {
             return addNormal({x, y, z});
         }
+
         unsigned int addColor(const VisualizationFactory::Color& color);
         unsigned int addColor(const Eigen::Vector4f& color);
-        unsigned int addColor(float r, float g, float b, float a)
+
+        unsigned int
+        addColor(float r, float g, float b, float a)
         {
             return addColor(Eigen::Vector4f{r, g, b, a});
         }
+
         unsigned int addMaterial(const VisualizationFactory::PhongMaterial& material);
         void addFace(unsigned int id0, unsigned int id1, unsigned int id2);
         void clear();
@@ -133,7 +168,8 @@ namespace VirtualRobot
          * @param color Default Color
          * @return Number of created colors entries
          */
-        unsigned int addMissingColors(const VisualizationFactory::Color& color = VisualizationFactory::Color::Gray());
+        unsigned int addMissingColors(
+            const VisualizationFactory::Color& color = VisualizationFactory::Color::Gray());
 
         /**
          * @brief Smoothes the normal surface by calculating the average of all face-normals of one vertex.
@@ -182,7 +218,9 @@ namespace VirtualRobot
         void printFaces();
         Eigen::Vector3f getCOM();
         bool getSize(Eigen::Vector3f& storeMinSize, Eigen::Vector3f& storeMaxSize);
-        bool checkFacesHaveSameEdge(const MathTools::TriangleFace& face1, const MathTools::TriangleFace& face2, std::vector<std::pair<int, int> >& commonVertexIds) const;
+        bool checkFacesHaveSameEdge(const MathTools::TriangleFace& face1,
+                                    const MathTools::TriangleFace& face2,
+                                    std::vector<std::pair<int, int>>& commonVertexIds) const;
         unsigned int checkAndCorrectNormals(bool inverted);
 
         Eigen::Vector3f getNormalOfFace(std::size_t faceId) const;
@@ -201,4 +239,3 @@ namespace VirtualRobot
         BoundingBox boundingBox;
     };
 } // namespace VirtualRobot
-

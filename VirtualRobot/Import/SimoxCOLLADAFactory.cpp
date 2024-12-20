@@ -1,21 +1,24 @@
 
 
 #include "SimoxCOLLADAFactory.h"
-#include "COLLADA-light/ColladaSimox.h"
 
+#include <iostream>
+
+#include "COLLADA-light/ColladaSimox.h"
+#include "Logging.h"
+#include "VirtualRobotException.h"
 
 namespace VirtualRobot
 {
 
-    SimoxCOLLADAFactory::SimoxCOLLADAFactory()
-    = default;
+    SimoxCOLLADAFactory::SimoxCOLLADAFactory() = default;
 
 
-    SimoxCOLLADAFactory::~SimoxCOLLADAFactory()
-    = default;
+    SimoxCOLLADAFactory::~SimoxCOLLADAFactory() = default;
 
-
-    RobotPtr SimoxCOLLADAFactory::loadFromFile(const std::string& filename, RobotIO::RobotDescription /*loadMode*/)
+    RobotPtr
+    SimoxCOLLADAFactory::loadFromFile(const std::string& filename,
+                                      RobotIO::RobotDescription /*loadMode*/)
     {
         RobotPtr robot;
 
@@ -41,12 +44,14 @@ namespace VirtualRobot
         return robot;
     }
 
-    std::string SimoxCOLLADAFactory::getFileExtension()
+    std::string
+    SimoxCOLLADAFactory::getFileExtension()
     {
         return std::string("dae");
     }
 
-    std::string SimoxCOLLADAFactory::getFileFilter()
+    std::string
+    SimoxCOLLADAFactory::getFileFilter()
     {
         return std::string("COLLADA (*.dae)");
     }
@@ -54,22 +59,24 @@ namespace VirtualRobot
     /**
      * register this class in the super class factory
      */
-    RobotImporterFactory::SubClassRegistry SimoxCOLLADAFactory::registry(SimoxCOLLADAFactory::getName(), &SimoxCOLLADAFactory::createInstance);
-
+    RobotImporterFactory::SubClassRegistry
+        SimoxCOLLADAFactory::registry(SimoxCOLLADAFactory::getName(),
+                                      &SimoxCOLLADAFactory::createInstance);
 
     /**
      * \return "SimoxCOLLADA"
      */
-    std::string SimoxCOLLADAFactory::getName()
+    std::string
+    SimoxCOLLADAFactory::getName()
     {
         return "SimoxCOLLADA";
     }
 
-
     /**
      * \return new instance of SimoxCOLLADAFactory.
      */
-    std::shared_ptr<RobotImporterFactory> SimoxCOLLADAFactory::createInstance(void*)
+    std::shared_ptr<RobotImporterFactory>
+    SimoxCOLLADAFactory::createInstance(void*)
     {
         std::shared_ptr<SimoxCOLLADAFactory> COLLADAFactory(new SimoxCOLLADAFactory());
         return COLLADAFactory;

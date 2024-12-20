@@ -4,15 +4,15 @@
 
 #include <Eigen/Geometry>
 
+#include <GeometricPlanning/ParametricPath.h>
+#include <GeometricPlanning/assert/assert.h>
+#include <GeometricPlanning/path_primitives/CircleSegment.h>
+#include <GeometricPlanning/path_primitives/Line.h>
 #include <SimoxUtility/color/Color.h>
 #include <VirtualRobot/Nodes/RobotNode.h>
 #include <VirtualRobot/Visualization/CoinVisualization/CoinVisualizationFactory.h>
 #include <VirtualRobot/Visualization/VisualizationFactory.h>
 
-#include <GeometricPlanning/ParametricPath.h>
-#include <GeometricPlanning/assert/assert.h>
-#include <GeometricPlanning/path_primitives/CircleSegment.h>
-#include <GeometricPlanning/path_primitives/Line.h>
 #include <Inventor/SbMatrix.h>
 #include <Inventor/SbRotation.h>
 #include <Inventor/SbVec3f.h>
@@ -25,7 +25,6 @@ namespace simox::geometric_planning
     constexpr std::size_t numberOfCircleParts = 20;
     inline const simox::Color DefaultColor = simox::Color::blue();
 
-    
     namespace detail
     {
         SoNode*
@@ -35,12 +34,8 @@ namespace simox::geometric_planning
             const auto endPos = path.getPosition(path.parameterRange().max);
 
             return VirtualRobot::CoinVisualizationFactory::createCoinLine(
-                startPos,
-                endPos,
-                defaultWidth,
-                DefaultColor);
+                startPos, endPos, defaultWidth, DefaultColor);
         }
-
 
         SoNode*
         visualizeCircleSegment(const geometric_planning::ParametricPath& path)
@@ -86,7 +81,6 @@ namespace simox::geometric_planning
             return separator;
         }
     } // namespace detail
-
 
     SoNode*
     visualize(const geometric_planning::ParametricPath& path)

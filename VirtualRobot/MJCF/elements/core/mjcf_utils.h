@@ -1,19 +1,18 @@
 #pragma once
 
-#include "exceptions.h"
+#include <string>
+#include <type_traits>
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
-#include <type_traits>
-#include <string>
-
+#include "exceptions.h"
 
 namespace std
 {
     bool operator==(const char* lhs, const string& rhs);
     bool operator==(const string& lhs, const char* rhs);
-}
+} // namespace std
 
 namespace Eigen
 {
@@ -21,22 +20,25 @@ namespace Eigen
     using Vector6f = Eigen::Matrix<float, 6, 1>;
     using Vector7f = Eigen::Matrix<float, 7, 1>;
 
-    template<typename Derived>
+    template <typename Derived>
     struct is_matrix_expression :
-            std::is_base_of<Eigen::MatrixBase<typename std::decay<Derived>::type>, typename std::decay<Derived>::type>
-    {};
+        std::is_base_of<Eigen::MatrixBase<typename std::decay<Derived>::type>,
+                        typename std::decay<Derived>::type>
+    {
+    };
 
-    template<typename Derived>
+    template <typename Derived>
     struct is_quaternion_expression :
-            std::is_base_of<Eigen::QuaternionBase<typename std::decay<Derived>::type>, typename std::decay<Derived>::type>
-    {};
+        std::is_base_of<Eigen::QuaternionBase<typename std::decay<Derived>::type>,
+                        typename std::decay<Derived>::type>
+    {
+    };
 
-    template<typename Derived>
-    struct is_eigen_expression :
-            is_matrix_expression<Derived>, is_quaternion_expression<Derived>
-    {};
-}
-
+    template <typename Derived>
+    struct is_eigen_expression : is_matrix_expression<Derived>, is_quaternion_expression<Derived>
+    {
+    };
+} // namespace Eigen
 
 namespace mjcf
 {
@@ -51,8 +53,9 @@ namespace mjcf
 
     // Convert to MJCF XML attribute format.
 
-    template <typename AttrT,
-              typename std::enable_if<!Eigen::is_eigen_expression<AttrT>::value, AttrT>::type* = nullptr>
+    template <
+        typename AttrT,
+        typename std::enable_if<!Eigen::is_eigen_expression<AttrT>::value, AttrT>::type* = nullptr>
     std::string toAttr(const AttrT& b);
     template <>
     std::string toAttr<bool>(const bool& b);
@@ -70,10 +73,10 @@ namespace mjcf
     Eigen::Quaternionf strToQuat(const char* string);
 
 
-
     /// Single values via boost::lexical cast. Only enabled for non-Eigen types.
-    template <typename AttrT,
-              typename std::enable_if<!Eigen::is_eigen_expression<AttrT>::value, AttrT>::type* = nullptr>
+    template <
+        typename AttrT,
+        typename std::enable_if<!Eigen::is_eigen_expression<AttrT>::value, AttrT>::type* = nullptr>
     void fromAttr(const std::string& valueStr, AttrT& value);
 
     /// Bool
@@ -87,51 +90,50 @@ namespace mjcf
     void fromAttr(const std::string& valueStr, Eigen::QuaternionBase<Derived>& value);
 
 
-
     template <typename Scalar>
     std::vector<Scalar> parseCoeffs(const std::string& string, char delim = ' ');
-
 
     // DEFINITIONS of templated methods
 
     template <typename AttrT,
               typename std::enable_if<!Eigen::is_eigen_expression<AttrT>::value, AttrT>::type*>
-    std::string toAttr(const AttrT& b)
+    std::string
+    toAttr(const AttrT& b)
     {
-        static_assert (!Eigen::is_eigen_expression<AttrT>::value, "Resolved an Eigen type.");
-        static_assert (!std::is_same<bool, AttrT>::value, "Resolved bool.");
+        static_assert(!Eigen::is_eigen_expression<AttrT>::value, "Resolved an Eigen type.");
+        static_assert(!std::is_same<bool, AttrT>::value, "Resolved bool.");
         std::stringstream s;
         s << b;
         return s.str();
     }
 
-    template<typename Derived>
-    std::string toAttr(const Eigen::MatrixBase<Derived>& mat)
+    template <typename Derived>
+    std::string
+    toAttr(const Eigen::MatrixBase<Derived>& mat)
     {
-        static const Eigen::IOFormat iof
-        {
-            Eigen::FullPrecision, Eigen::DontAlignCols, " ", " ", "", "", "", ""
-        };
+        static const Eigen::IOFormat iof{
+            Eigen::FullPrecision, Eigen::DontAlignCols, " ", " ", "", "", "", ""};
 
         std::stringstream ss;
         ss << mat.format(iof);
         return ss.str();
     }
 
-    template<typename Derived>
-    std::string toAttr(const Eigen::QuaternionBase<Derived>& quat)
+    template <typename Derived>
+    std::string
+    toAttr(const Eigen::QuaternionBase<Derived>& quat)
     {
         std::stringstream ss;
         ss << quat.w() << " " << quat.x() << " " << quat.y() << " " << quat.z();
         return ss.str();
     }
 
-
     template <typename AttrT,
               typename std::enable_if<!Eigen::is_eigen_expression<AttrT>::value, AttrT>::type*>
-    void fromAttr(const std::string& valueStr, AttrT& value)
+    void
+    fromAttr(const std::string& valueStr, AttrT& value)
     {
-        static_assert (!Eigen::is_eigen_expression<AttrT>::value, "Resolved an Eigen type.");
+        static_assert(!Eigen::is_eigen_expression<AttrT>::value, "Resolved an Eigen type.");
         std::stringstream s(valueStr);
         if (!(s >> value))
         {
@@ -140,7 +142,8 @@ namespace mjcf
     }
 
     template <typename Derived>
-    void fromAttr(const std::string& valueStr, Eigen::MatrixBase<Derived>& value)
+    void
+    fromAttr(const std::string& valueStr, Eigen::MatrixBase<Derived>& value)
     {
         using Matrix = Eigen::MatrixBase<Derived>;
         using Scalar = typename Matrix::Scalar;
@@ -157,7 +160,8 @@ namespace mjcf
 
         if (value.size() >= 0 && static_cast<long>(coeffs.size()) != value.size())
         {
-            throw mjcf::ParseAttributeError(valueStr, typeid(Matrix), "Number of coefficients does not match.");
+            throw mjcf::ParseAttributeError(
+                valueStr, typeid(Matrix), "Number of coefficients does not match.");
         }
 
         long i = 0;
@@ -168,7 +172,8 @@ namespace mjcf
     }
 
     template <typename Derived>
-    void fromAttr(const std::string& valueStr, Eigen::QuaternionBase<Derived>& value)
+    void
+    fromAttr(const std::string& valueStr, Eigen::QuaternionBase<Derived>& value)
     {
         using Quaternion = Eigen::QuaternionBase<Derived>;
         using Scalar = typename Quaternion::Scalar;
@@ -186,8 +191,8 @@ namespace mjcf
 
         if (coeffs.size() != 4)
         {
-            throw mjcf::ParseAttributeError(valueStr, typeid(Quaternion),
-                                            "Number of coefficients does not match.");
+            throw mjcf::ParseAttributeError(
+                valueStr, typeid(Quaternion), "Number of coefficients does not match.");
         }
 
         value.w() = coeffs[0];
@@ -196,9 +201,9 @@ namespace mjcf
         value.z() = coeffs[3];
     }
 
-
     template <typename Scalar>
-    std::vector<Scalar> parseCoeffs(const std::string& string, char delim)
+    std::vector<Scalar>
+    parseCoeffs(const std::string& string, char delim)
     {
         std::vector<Scalar> coeffs;
 
@@ -216,5 +221,4 @@ namespace mjcf
 
         return coeffs;
     }
-}
-
+} // namespace mjcf

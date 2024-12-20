@@ -1,8 +1,16 @@
 
 #include "PoseQualityMeasurement.h"
 
-#include <Eigen/Geometry>
 #include <Eigen/Dense>
+#include <Eigen/Geometry>
+
+#include "../IK/DifferentialIK.h"
+#include "../Nodes/RobotNode.h"
+#include "../Robot.h"
+#include "../RobotNodeSet.h"
+#include "../VirtualRobotException.h"
+#include "Assert.h"
+#include "Logging.h"
 
 using namespace std;
 
@@ -10,8 +18,7 @@ namespace VirtualRobot
 {
 
 
-    PoseQualityMeasurement::PoseQualityMeasurement(VirtualRobot::RobotNodeSetPtr rns)
-        : rns(rns)
+    PoseQualityMeasurement::PoseQualityMeasurement(VirtualRobot::RobotNodeSetPtr rns) : rns(rns)
     {
         THROW_VR_EXCEPTION_IF((!rns || !rns->getTCP()), "NULL data");
         name = "PoseQualityMeasurement";
@@ -19,62 +26,71 @@ namespace VirtualRobot
         verbose = false;
     }
 
+    PoseQualityMeasurement::~PoseQualityMeasurement() = default;
 
-    PoseQualityMeasurement::~PoseQualityMeasurement()
-    = default;
-
-    float PoseQualityMeasurement::getPoseQuality()
+    float
+    PoseQualityMeasurement::getPoseQuality()
     {
         VR_WARNING << "Please use derived classes..." << std::endl;
         return 0.0f;
     }
 
-    float PoseQualityMeasurement::getPoseQuality(const Eigen::VectorXf& /*direction*/)
+    float
+    PoseQualityMeasurement::getPoseQuality(const Eigen::VectorXf& /*direction*/)
     {
         // VR_ASSERT(direction.rows() == 3 || direction.rows() == 6);
         VR_WARNING << "Please use derived classes..." << std::endl;
         return 0.0f;
     }
 
-    void PoseQualityMeasurement::setVerbose(bool v)
+    void
+    PoseQualityMeasurement::setVerbose(bool v)
     {
         verbose = v;
     }
 
-    std::string PoseQualityMeasurement::getName()
+    std::string
+    PoseQualityMeasurement::getName()
     {
         return name;
     }
 
-    VirtualRobot::RobotNodeSetPtr PoseQualityMeasurement::getRNS()
+    VirtualRobot::RobotNodeSetPtr
+    PoseQualityMeasurement::getRNS()
     {
         return rns;
     }
 
-    bool PoseQualityMeasurement::consideringJointLimits()
+    bool
+    PoseQualityMeasurement::consideringJointLimits()
     {
         return false;
     }
 
-    void PoseQualityMeasurement::setObstacleDistanceVector(const Eigen::Vector3f& directionSurfaceToObstance)
+    void
+    PoseQualityMeasurement::setObstacleDistanceVector(
+        const Eigen::Vector3f& directionSurfaceToObstance)
     {
         considerObstacle = true;
         obstacleDir = directionSurfaceToObstance;
     }
 
-    void PoseQualityMeasurement::disableObstacleDistance()
+    void
+    PoseQualityMeasurement::disableObstacleDistance()
     {
         considerObstacle = false;
     }
 
-    PoseQualityMeasurementPtr PoseQualityMeasurement::clone(RobotPtr newRobot)
+    PoseQualityMeasurementPtr
+    PoseQualityMeasurement::clone(RobotPtr newRobot)
     {
         VR_ASSERT(newRobot);
         VR_ASSERT(newRobot->getRobotNodeSet(rns->getName()));
         VR_ASSERT(newRobot->getRobotNodeSet(rns->getName())->getSize() == rns->getSize());
 
-        PoseQualityMeasurementPtr m(new PoseQualityMeasurement(newRobot->getRobotNodeSet(rns->getName())));
+        PoseQualityMeasurementPtr m(
+            new PoseQualityMeasurement(newRobot->getRobotNodeSet(rns->getName())));
         return m;
     }
 
-}
+} // namespace VirtualRobot

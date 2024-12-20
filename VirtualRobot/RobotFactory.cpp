@@ -4,11 +4,15 @@
 #include <algorithm>
 #include <cassert>
 #include <deque>
+#include <iostream>
+#include <queue>
 
 #include <SimoxUtility/math/pose/invert.h>
 
+#include "Assert.h"
 #include "CollisionDetection/CollisionModel.h"
 #include "EndEffector/EndEffector.h"
+#include "Logging.h"
 #include "Nodes/RobotNode.h"
 #include "Nodes/RobotNodeFixed.h"
 #include "Nodes/RobotNodeFixedFactory.h"
@@ -399,8 +403,8 @@ namespace VirtualRobot
                 }
                 else
                 {
-                    const float l
-                        = node->getLocalTransformation().block(0, 3, 3, 1).cwiseAbs().maxCoeff();
+                    const float l =
+                        node->getLocalTransformation().block(0, 3, 3, 1).cwiseAbs().maxCoeff();
                     if (l > 0.0f)
                     {
                         model_height_scaling = 1.0f / l * segLengthIt->second;

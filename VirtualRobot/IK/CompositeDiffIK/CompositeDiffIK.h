@@ -18,23 +18,27 @@
 */
 
 #pragma once
-#include <VirtualRobot/IK/DifferentialIK.h>
-#include <VirtualRobot/Controller/CartesianPositionController.h>
-#include <VirtualRobot/Controller/CartesianVelocityController.h>
-#include <VirtualRobot/Manipulability/AbstractManipulabilityTracking.h>
-
 #include <memory>
 #include <set>
+
+#include <VirtualRobot/Controller/CartesianPositionController.h>
+#include <VirtualRobot/Controller/CartesianVelocityController.h>
+#include <VirtualRobot/IK/DifferentialIK.h>
+#include <VirtualRobot/Manipulability/AbstractManipulabilityTracking.h>
 
 namespace VirtualRobot
 {
     typedef std::shared_ptr<class CompositeDiffIK> CompositeDiffIKPtr;
+
     class CompositeDiffIK
     {
     public:
         struct Parameters
         {
-            Parameters() {}
+            Parameters()
+            {
+            }
+
             // IK params
             size_t steps = 40;
 
@@ -53,7 +57,7 @@ namespace VirtualRobot
         class NullspaceGradient
         {
         public:
-            NullspaceGradient(const std::vector<std::string> &jointNames);
+            NullspaceGradient(const std::vector<std::string>& jointNames);
 
             virtual void init(Parameters& params) = 0;
 
@@ -62,10 +66,10 @@ namespace VirtualRobot
             //! Adjusts the gradient when using different robot node sets for ik solver and nullspace
             virtual Eigen::VectorXf getGradientAdjusted(Parameters& params, int stepNr);
 
-            void setMapping(const RobotNodeSetPtr &rns);
+            void setMapping(const RobotNodeSetPtr& rns);
 
             //! Returns a mapping from the nullspace robot node set to the robot node set used in the ik solver
-            std::map<int, int> getMapping(const RobotNodeSetPtr &rns);
+            std::map<int, int> getMapping(const RobotNodeSetPtr& rns);
 
             float kP = 1;
 
@@ -92,8 +96,13 @@ namespace VirtualRobot
         class NullspaceTarget : public NullspaceGradient
         {
         public:
-            NullspaceTarget(const RobotNodeSetPtr& rns, const RobotNodePtr& tcp, const Eigen::Matrix4f& target, IKSolver::CartesianSelection mode);
-            NullspaceTarget(const RobotNodeSetPtr& rns, const RobotNodePtr& tcp, const Eigen::Vector3f& target);
+            NullspaceTarget(const RobotNodeSetPtr& rns,
+                            const RobotNodePtr& tcp,
+                            const Eigen::Matrix4f& target,
+                            IKSolver::CartesianSelection mode);
+            NullspaceTarget(const RobotNodeSetPtr& rns,
+                            const RobotNodePtr& tcp,
+                            const Eigen::Vector3f& target);
 
             RobotNodePtr tcp;
             Eigen::Matrix4f target;
@@ -111,8 +120,17 @@ namespace VirtualRobot
         class AdaptableNullspaceTarget : public NullspaceTarget
         {
         public:
-            AdaptableNullspaceTarget(const RobotNodeSetPtr& rns, const RobotNodePtr& tcp, const Eigen::Matrix4f& target, IKSolver::CartesianSelection mode, int startStepNr, int endStepNr);
-            AdaptableNullspaceTarget(const RobotNodeSetPtr& rns, const RobotNodePtr& tcp, const Eigen::Vector3f& target, int startStepNr, int endStepNr);
+            AdaptableNullspaceTarget(const RobotNodeSetPtr& rns,
+                                     const RobotNodePtr& tcp,
+                                     const Eigen::Matrix4f& target,
+                                     IKSolver::CartesianSelection mode,
+                                     int startStepNr,
+                                     int endStepNr);
+            AdaptableNullspaceTarget(const RobotNodeSetPtr& rns,
+                                     const RobotNodePtr& tcp,
+                                     const Eigen::Vector3f& target,
+                                     int startStepNr,
+                                     int endStepNr);
 
             int startStepNr;
             int endStepNr;
@@ -126,7 +144,9 @@ namespace VirtualRobot
         {
         public:
             NullspaceJointTarget(const RobotNodeSetPtr& rns);
-            NullspaceJointTarget(const RobotNodeSetPtr& rns, const Eigen::VectorXf& target, const Eigen::VectorXf& weight);
+            NullspaceJointTarget(const RobotNodeSetPtr& rns,
+                                 const Eigen::VectorXf& target,
+                                 const Eigen::VectorXf& weight);
             void set(int index, float target, float weight);
             void set(const std::string& jointName, float target, float weight);
             void set(const RobotNodePtr& rn, float target, float weight);
@@ -169,7 +189,9 @@ namespace VirtualRobot
         class Target
         {
         public:
-            Target(const RobotNodePtr& tcp, const Eigen::Matrix4f& target, IKSolver::CartesianSelection mode);
+            Target(const RobotNodePtr& tcp,
+                   const Eigen::Matrix4f& target,
+                   IKSolver::CartesianSelection mode);
 
             RobotNodePtr tcp;
             Eigen::Matrix4f target;
@@ -180,10 +202,13 @@ namespace VirtualRobot
             float maxOriError = 0.05f;
             std::vector<TargetStep> ikSteps;
 
-            bool isReached() {
+            bool
+            isReached()
+            {
                 return pCtrl.reached(target, mode, maxPosError, maxOriError);
             }
         };
+
         typedef std::shared_ptr<Target> TargetPtr;
 
         struct Result
@@ -211,18 +236,22 @@ namespace VirtualRobot
         };
 
         static Eigen::VectorXf LimitInfNormTo(Eigen::VectorXf vec, float maxValue);
-        Eigen::VectorXf LimitInfNormTo(Eigen::VectorXf vec, float maxValue, const std::set<std::string> &ignore);
+        Eigen::VectorXf
+        LimitInfNormTo(Eigen::VectorXf vec, float maxValue, const std::set<std::string>& ignore);
 
         CompositeDiffIK(const RobotNodeSetPtr& rns);
 
         void addTarget(const TargetPtr& target);
-        TargetPtr addTarget(const RobotNodePtr& tcp, const Eigen::Matrix4f& target, IKSolver::CartesianSelection mode);
+        TargetPtr addTarget(const RobotNodePtr& tcp,
+                            const Eigen::Matrix4f& target,
+                            IKSolver::CartesianSelection mode);
         void addNullspaceGradient(const NullspaceGradientPtr& gradient);
-        NullspaceTargetPtr addNullspacePositionTarget(const RobotNodePtr& tcp, const Eigen::Vector3f& target);
+        NullspaceTargetPtr addNullspacePositionTarget(const RobotNodePtr& tcp,
+                                                      const Eigen::Vector3f& target);
 
 
         Result solve(Parameters params);
-        Result solve(Parameters params, SolveState &s);
+        Result solve(Parameters params, SolveState& s);
         static Eigen::MatrixXf CalculateNullspaceSVD(const Eigen::Matrix4f& jacobi);
         static Eigen::MatrixXf CalculateNullspaceLU(const Eigen::Matrix4f& jacobi);
         void step(Parameters& params, SolveState& s, int stepNr);
@@ -242,4 +271,4 @@ namespace VirtualRobot
         std::vector<NullspaceGradientPtr> nullspaceGradients;
         DifferentialIKPtr ik;
     };
-}
+} // namespace VirtualRobot

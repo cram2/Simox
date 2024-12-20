@@ -1,7 +1,10 @@
 
 #include "GenericIKWindow.h"
-#include "VirtualRobot/Visualization/CoinVisualization/CoinVisualizationNode.h"
+
 #include "VirtualRobot/EndEffector/EndEffector.h"
+#include "VirtualRobot/Logging.h"
+#include "VirtualRobot/MathTools.h"
+#include "VirtualRobot/Visualization/CoinVisualization/CoinVisualizationNode.h"
 
 #ifdef USE_NLOPT
 #include "VirtualRobot/IK/ConstrainedOptimizationIK.h"
@@ -9,17 +12,16 @@
 #endif
 
 #include <ctime>
-#include <vector>
 #include <iostream>
 #include <sstream>
+#include <vector>
 
 using namespace std;
 using namespace VirtualRobot;
 
 float TIMER_MS = 30.0f;
 
-GenericIKWindow::GenericIKWindow(std::string& sRobotFilename)
-    : QMainWindow(nullptr)
+GenericIKWindow::GenericIKWindow(std::string& sRobotFilename) : QMainWindow(nullptr)
 {
     VR_INFO << " start " << std::endl;
     //this->setCaption(QString("ShowRobot - KIT - Humanoids Group"));
@@ -45,13 +47,13 @@ GenericIKWindow::GenericIKWindow(std::string& sRobotFilename)
     exViewer->viewAll();
 }
 
-
 GenericIKWindow::~GenericIKWindow()
 {
     sceneSep->unref();
 }
 
-void GenericIKWindow::setupUI()
+void
+GenericIKWindow::setupUI()
 {
     UI.setupUi(this);
     exViewer = new SoQtExaminerViewer(UI.frameViewer, "", TRUE, SoQtExaminerViewer::BUILD_POPUP);
@@ -90,7 +92,8 @@ void GenericIKWindow::setupUI()
     timer->schedule();
 }
 
-void GenericIKWindow::updateCB(void* data, SoSensor* /*sensor*/)
+void
+GenericIKWindow::updateCB(void* data, SoSensor* /*sensor*/)
 {
     if (!data)
     {
@@ -117,7 +120,8 @@ void GenericIKWindow::updateCB(void* data, SoSensor* /*sensor*/)
     }
 }
 
-void GenericIKWindow::updatBoxPos(float x, float y, float z, float a, float b, float g)
+void
+GenericIKWindow::updatBoxPos(float x, float y, float z, float a, float b, float g)
 {
     if (!box)
     {
@@ -135,7 +139,8 @@ void GenericIKWindow::updatBoxPos(float x, float y, float z, float a, float b, f
     exViewer->render();
 }
 
-QString GenericIKWindow::formatString(const char* s, float f)
+QString
+GenericIKWindow::formatString(const char* s, float f)
 {
     QString str1(s);
 
@@ -165,8 +170,8 @@ QString GenericIKWindow::formatString(const char* s, float f)
     return str1;
 }
 
-
-void GenericIKWindow::resetSceneryAll()
+void
+GenericIKWindow::resetSceneryAll()
 {
     if (!robot)
     {
@@ -181,9 +186,8 @@ void GenericIKWindow::resetSceneryAll()
     exViewer->render();
 }
 
-
-
-void GenericIKWindow::collisionModel()
+void
+GenericIKWindow::collisionModel()
 {
     if (!robot)
     {
@@ -192,9 +196,10 @@ void GenericIKWindow::collisionModel()
 
     robotSep->removeAllChildren();
     useColModel = UI.checkBoxColModel->checkState() == Qt::Checked;
-    SceneObject::VisualizationType colModel = useColModel ? SceneObject::Collision : SceneObject::Full;
+    SceneObject::VisualizationType colModel =
+        useColModel ? SceneObject::Collision : SceneObject::Full;
 
-    std::shared_ptr<CoinVisualization> visualization = robot->getVisualization<CoinVisualization>(colModel);
+    std::shared_ptr<CoinVisualization> visualization = robot->getVisualization(colModel);
     SoNode* visualisationNode = nullptr;
 
     if (visualization)
@@ -210,30 +215,31 @@ void GenericIKWindow::collisionModel()
     exViewer->render();
 }
 
-
-void GenericIKWindow::closeEvent(QCloseEvent* event)
+void
+GenericIKWindow::closeEvent(QCloseEvent* event)
 {
     quit();
     QMainWindow::closeEvent(event);
 }
 
-
-int GenericIKWindow::main()
+int
+GenericIKWindow::main()
 {
     SoQt::show(this);
     SoQt::mainLoop();
     return 0;
 }
 
-
-void GenericIKWindow::quit()
+void
+GenericIKWindow::quit()
 {
     std::cout << "GenericIKWindow: Closing" << std::endl;
     this->close();
     SoQt::exitMainLoop();
 }
 
-void GenericIKWindow::updateKCBox()
+void
+GenericIKWindow::updateKCBox()
 {
     UI.comboBoxKC->clear();
 
@@ -246,7 +252,7 @@ void GenericIKWindow::updateKCBox()
     robot->getRobotNodeSets(rns);
     kinChains.clear();
 
-    for (auto & rn : rns)
+    for (auto& rn : rns)
     {
         if (rn->isKinematicChain())
         {
@@ -256,7 +262,8 @@ void GenericIKWindow::updateKCBox()
     }
 }
 
-void GenericIKWindow::selectKC(int nr)
+void
+GenericIKWindow::selectKC(int nr)
 {
     std::cout << "Selecting kinematic chain nr " << nr << std::endl;
 
@@ -304,7 +311,8 @@ void GenericIKWindow::selectKC(int nr)
 
     if (kc->getNode(kc->getSize() - 1)->isTranslationalJoint())
     {
-        ikGazeSolver.reset(new GazeIK(kc, std::dynamic_pointer_cast<RobotNodePrismatic>(kc->getNode(kc->getSize() - 1))));
+        ikGazeSolver.reset(new GazeIK(
+            kc, std::dynamic_pointer_cast<RobotNodePrismatic>(kc->getNode(kc->getSize() - 1))));
     }
     else
     {
@@ -324,15 +332,17 @@ void GenericIKWindow::selectKC(int nr)
     collisionModel();
 }
 
-void GenericIKWindow::selectIK(int nr)
+void
+GenericIKWindow::selectIK(int nr)
 {
-    if(nr == 0)
+    if (nr == 0)
     {
         UI.comboBoxKC->setCurrentIndex(0);
     }
 }
 
-void GenericIKWindow::sliderReleased()
+void
+GenericIKWindow::sliderReleased()
 {
     UI.horizontalSliderX->setSliderPosition(0);
     UI.horizontalSliderY->setSliderPosition(0);
@@ -343,8 +353,8 @@ void GenericIKWindow::sliderReleased()
     exViewer->render();
 }
 
-
-void GenericIKWindow::solve()
+void
+GenericIKWindow::solve()
 {
     if (!kc || !ikSolver || !tcp)
     {
@@ -381,7 +391,7 @@ void GenericIKWindow::solve()
         std::cout << "Solving with Gaze IK" << std::endl;
         ikGazeSolver->solve(targetPose.block(0, 3, 3, 1));
     }
-    else if(UI.comboBoxIKMethod->currentIndex() == 1)
+    else if (UI.comboBoxIKMethod->currentIndex() == 1)
     {
         std::cout << "Solving with Differential IK" << std::endl;
         ikSolver->solve(targetPose, s, 50);
@@ -428,7 +438,7 @@ void GenericIKWindow::solve()
     std::cout << "Joint values:" << std::endl;
     std::vector<RobotNodePtr> nodes = kc->getAllRobotNodes();
 
-    for (auto & node : nodes)
+    for (auto& node : nodes)
     {
         std::cout << node->getJointValue() << std::endl;
     }
@@ -443,7 +453,8 @@ void GenericIKWindow::solve()
     std::cout << "---- END Solve IK ----" << std::endl;
 }
 
-void GenericIKWindow::box2TCP()
+void
+GenericIKWindow::box2TCP()
 {
     if (!tcp || !box)
     {
@@ -456,11 +467,13 @@ void GenericIKWindow::box2TCP()
     exViewer->render();
 }
 
-void GenericIKWindow::sliderPressed()
+void
+GenericIKWindow::sliderPressed()
 {
 }
 
-void GenericIKWindow::loadRobot()
+void
+GenericIKWindow::loadRobot()
 {
     std::cout << "GenericIKWindow: Loading robot" << std::endl;
     robotSep->removeAllChildren();
@@ -499,4 +512,3 @@ void GenericIKWindow::loadRobot()
     exViewer->viewAll();
     exViewer->render();
 }
-

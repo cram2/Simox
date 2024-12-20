@@ -25,29 +25,36 @@
 
 #include <VirtualRobot/MathTools.h>
 
+#include "Logging.h"
+#include "Robot.h"
+#include "VirtualRobotException.h"
+
 using namespace VirtualRobot;
 
 using std::cout;
 using std::endl;
 
-BalanceConstraintOptimizationFunction::BalanceConstraintOptimizationFunction(const SupportPolygonPtr &supportPolygon) :
+BalanceConstraintOptimizationFunction::BalanceConstraintOptimizationFunction(
+    const SupportPolygonPtr& supportPolygon) :
     supportPolygon(supportPolygon)
 {
     update();
 }
 
-void BalanceConstraintOptimizationFunction::updateSupportPolygon()
+void
+BalanceConstraintOptimizationFunction::updateSupportPolygon()
 {
     supportPolygon->updateSupportPolygon();
     update();
 }
 
-double BalanceConstraintOptimizationFunction::evaluateOptimizationFunction(const Eigen::Vector2f &com)
+double
+BalanceConstraintOptimizationFunction::evaluateOptimizationFunction(const Eigen::Vector2f& com)
 {
     double result = 1;
 
     unsigned int numHalfspaces = matrices.size();
-    for(unsigned int i = 0; i < numHalfspaces; i++)
+    for (unsigned int i = 0; i < numHalfspaces; i++)
     {
         Eigen::Matrix2f R = matrices[i];
         Eigen::Vector2f d = displacements[i];
@@ -58,14 +65,16 @@ double BalanceConstraintOptimizationFunction::evaluateOptimizationFunction(const
     return 1 - result;
 }
 
-Eigen::VectorXf BalanceConstraintOptimizationFunction::evaluateOptimizationGradient(const Eigen::Vector2f &com, const Eigen::MatrixXf &Jcom)
+Eigen::VectorXf
+BalanceConstraintOptimizationFunction::evaluateOptimizationGradient(const Eigen::Vector2f& com,
+                                                                    const Eigen::MatrixXf& Jcom)
 {
     unsigned int numHalfspaces = matrices.size();
 
     std::vector<double> f_i(numHalfspaces);
     std::vector<Eigen::VectorXf> f_prime_i(numHalfspaces);
 
-    for(unsigned int i = 0; i < numHalfspaces; i++)
+    for (unsigned int i = 0; i < numHalfspaces; i++)
     {
         Eigen::Matrix2f R = matrices[i];
         Eigen::Vector2f d = displacements[i];
@@ -79,12 +88,12 @@ Eigen::VectorXf BalanceConstraintOptimizationFunction::evaluateOptimizationGradi
     Eigen::VectorXf result(Jcom.cols());
     result.setZero();
 
-    for(unsigned int i = 0; i < numHalfspaces; i++)
+    for (unsigned int i = 0; i < numHalfspaces; i++)
     {
         double prod = 1;
-        for(unsigned int k = 0; k < numHalfspaces; k++)
+        for (unsigned int k = 0; k < numHalfspaces; k++)
         {
-            if(k == i)
+            if (k == i)
             {
                 continue;
             }
@@ -98,18 +107,19 @@ Eigen::VectorXf BalanceConstraintOptimizationFunction::evaluateOptimizationGradi
     return -result;
 }
 
-void BalanceConstraintOptimizationFunction::update()
+void
+BalanceConstraintOptimizationFunction::update()
 {
     matrices.clear();
     displacements.clear();
 
     MathTools::ConvexHull2DPtr convexHull = supportPolygon->getSupportPolygon2D();
-    if(!convexHull)
+    if (!convexHull)
     {
         return;
     }
 
-    for(MathTools::Segment2D &segment : convexHull->segments)
+    for (MathTools::Segment2D& segment : convexHull->segments)
     {
         Eigen::Vector2f p1 = convexHull->vertices[segment.id1];
         Eigen::Vector2f p2 = convexHull->vertices[segment.id2];
@@ -119,43 +129,80 @@ void BalanceConstraintOptimizationFunction::update()
         Eigen::Vector2f v = (p2 - p1).normalized();
 
         Eigen::Matrix2f R;
-        R << -v[1], v[0],
-              v[0], v[1];
+        R << -v[1], v[0], v[0], v[1];
         matrices.push_back(R.transpose());
     }
 }
 
-double BalanceConstraintOptimizationFunction::sigmoid(double x)
+double
+BalanceConstraintOptimizationFunction::sigmoid(double x)
 {
     float beta = 0.1f;
     return 1.0 / (1.0 + exp(-beta * x));
 }
 
-double BalanceConstraintOptimizationFunction::sigmoid_prime(double x)
+double
+BalanceConstraintOptimizationFunction::sigmoid_prime(double x)
 {
     return sigmoid(x) * (1 - sigmoid(x));
 }
 
-
-BalanceConstraint::BalanceConstraint(const RobotPtr& robot, const RobotNodeSetPtr& joints, const RobotNodeSetPtr& bodies, const SceneObjectSetPtr& contactNodes,
-                                     float tolerance, float minimumStability, float maxSupportDistance, bool supportPolygonUpdates, bool considerCoMHeight) :
+BalanceConstraint::BalanceConstraint(const RobotPtr& robot,
+                                     const RobotNodeSetPtr& joints,
+                                     const RobotNodeSetPtr& bodies,
+                                     const SceneObjectSetPtr& contactNodes,
+                                     float tolerance,
+                                     float minimumStability,
+                                     float maxSupportDistance,
+                                     bool supportPolygonUpdates,
+                                     bool considerCoMHeight) :
     Constraint(joints)
 {
-    initialize(robot, joints, bodies, contactNodes, tolerance, minimumStability, maxSupportDistance, supportPolygonUpdates, considerCoMHeight);
+    initialize(robot,
+               joints,
+               bodies,
+               contactNodes,
+               tolerance,
+               minimumStability,
+               maxSupportDistance,
+               supportPolygonUpdates,
+               considerCoMHeight);
     name = "BalanceConstraint";
 }
 
-BalanceConstraint::BalanceConstraint(const RobotPtr& robot, const RobotNodeSetPtr& joints, const RobotNodeSetPtr& bodies, const SupportPolygonPtr& supportPolygon,
-                                     float tolerance, float minimumStability, float maxSupportDistance, bool supportPolygonUpdates, bool considerCoMHeight) :
+BalanceConstraint::BalanceConstraint(const RobotPtr& robot,
+                                     const RobotNodeSetPtr& joints,
+                                     const RobotNodeSetPtr& bodies,
+                                     const SupportPolygonPtr& supportPolygon,
+                                     float tolerance,
+                                     float minimumStability,
+                                     float maxSupportDistance,
+                                     bool supportPolygonUpdates,
+                                     bool considerCoMHeight) :
     Constraint(joints)
 {
-    initialize(robot, joints, bodies, supportPolygon->getContactModels(), tolerance, minimumStability, maxSupportDistance, supportPolygonUpdates, considerCoMHeight);
+    initialize(robot,
+               joints,
+               bodies,
+               supportPolygon->getContactModels(),
+               tolerance,
+               minimumStability,
+               maxSupportDistance,
+               supportPolygonUpdates,
+               considerCoMHeight);
     name = "BalanceConstraint";
-
 }
 
-void BalanceConstraint::initialize(const RobotPtr& robot, const RobotNodeSetPtr& joints, const RobotNodeSetPtr& bodies, const SceneObjectSetPtr& contactNodes,
-                                   float tolerance, float minimumStability, float maxSupportDistance, bool supportPolygonUpdates, bool considerCoMHeight)
+void
+BalanceConstraint::initialize(const RobotPtr& robot,
+                              const RobotNodeSetPtr& joints,
+                              const RobotNodeSetPtr& bodies,
+                              const SceneObjectSetPtr& contactNodes,
+                              float tolerance,
+                              float minimumStability,
+                              float maxSupportDistance,
+                              bool supportPolygonUpdates,
+                              bool considerCoMHeight)
 {
     this->joints = joints;
     this->bodies = bodies;
@@ -191,7 +238,8 @@ void BalanceConstraint::initialize(const RobotPtr& robot, const RobotNodeSetPtr&
     initialized = true;
 }
 
-void BalanceConstraint::updateSupportPolygon()
+void
+BalanceConstraint::updateSupportPolygon()
 {
     supportPolygon->updateSupportPolygon(maxSupportDistance);
 
@@ -216,9 +264,10 @@ void BalanceConstraint::updateSupportPolygon()
     }
 }
 
-float BalanceConstraint::getDifferentiableStabilityIndex()
+float
+BalanceConstraint::getDifferentiableStabilityIndex()
 {
-    if(supportPolygonUpdates)
+    if (supportPolygonUpdates)
     {
         supportPolygon->updateSupportPolygon();
     }
@@ -234,26 +283,29 @@ float BalanceConstraint::getDifferentiableStabilityIndex()
     return 0;
 }
 
-Eigen::VectorXf BalanceConstraint::getDifferentiableStabilityIndexGradient()
+Eigen::VectorXf
+BalanceConstraint::getDifferentiableStabilityIndexGradient()
 {
     Eigen::VectorXf result;
     return result;
 }
 
-void BalanceConstraint::setCoMHeight(float currentheight)
+void
+BalanceConstraint::setCoMHeight(float currentheight)
 {
     height = currentheight;
 }
 
-double BalanceConstraint::optimizationFunction(unsigned int /*id*/)
+double
+BalanceConstraint::optimizationFunction(unsigned int /*id*/)
 {
-    if(supportPolygonUpdates)
+    if (supportPolygonUpdates)
     {
         differnentiableStability->updateSupportPolygon();
     }
 
     Eigen::Vector2f com = rns->getCoM().head(2);
-    if(considerCoMHeight)
+    if (considerCoMHeight)
     {
         VR_WARNING << "COM Height not yet supported by NLopt balance constraint" << std::endl;
     }
@@ -261,15 +313,16 @@ double BalanceConstraint::optimizationFunction(unsigned int /*id*/)
     return differnentiableStability->evaluateOptimizationFunction(com);
 }
 
-Eigen::VectorXf BalanceConstraint::optimizationGradient(unsigned int /*id*/)
+Eigen::VectorXf
+BalanceConstraint::optimizationGradient(unsigned int /*id*/)
 {
-    if(supportPolygonUpdates)
+    if (supportPolygonUpdates)
     {
         differnentiableStability->updateSupportPolygon();
     }
 
     Eigen::Vector2f com = rns->getCoM().head(2);
-    if(considerCoMHeight)
+    if (considerCoMHeight)
     {
         VR_WARNING << "COM Height not yet supported by NLopt balance constraint" << std::endl;
     }
@@ -277,17 +330,20 @@ Eigen::VectorXf BalanceConstraint::optimizationGradient(unsigned int /*id*/)
     return differnentiableStability->evaluateOptimizationGradient(com, comIK->getJacobianMatrix());
 }
 
-Eigen::MatrixXf BalanceConstraint::getJacobianMatrix()
+Eigen::MatrixXf
+BalanceConstraint::getJacobianMatrix()
 {
     return comIK->getJacobianMatrix();
 }
 
-Eigen::MatrixXf BalanceConstraint::getJacobianMatrix(SceneObjectPtr tcp)
+Eigen::MatrixXf
+BalanceConstraint::getJacobianMatrix(SceneObjectPtr tcp)
 {
     return comIK->getJacobianMatrix(tcp);
 }
 
-Eigen::VectorXf BalanceConstraint::getError(float stepSize)
+Eigen::VectorXf
+BalanceConstraint::getError(float stepSize)
 {
     float stability = supportPolygon->getStabilityIndex(bodies, supportPolygonUpdates);
 
@@ -310,17 +366,20 @@ Eigen::VectorXf BalanceConstraint::getError(float stepSize)
     }
 }
 
-bool BalanceConstraint::checkTolerances()
+bool
+BalanceConstraint::checkTolerances()
 {
     return (supportPolygon->getStabilityIndex(bodies, supportPolygonUpdates) >= minimumStability);
 }
 
-Eigen::Vector3f BalanceConstraint::getCoM()
+Eigen::Vector3f
+BalanceConstraint::getCoM()
 {
     return bodies->getCoM();
 }
 
-SupportPolygonPtr BalanceConstraint::getSupportPolygon()
+SupportPolygonPtr
+BalanceConstraint::getSupportPolygon()
 {
     return supportPolygon;
 }

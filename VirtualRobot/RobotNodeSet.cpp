@@ -1,14 +1,18 @@
 
 #include "RobotNodeSet.h"
-#include "SceneObjectSet.h"
-#include "Robot.h"
-#include "RobotConfig.h"
-#include "VirtualRobot.h"
-#include "VirtualRobotException.h"
-#include "CollisionDetection/CollisionChecker.h"
 
 #include <algorithm>
+#include <iostream>
 #include <set>
+
+#include "CollisionDetection/CollisionChecker.h"
+#include "Logging.h"
+#include "Nodes/RobotNode.h"
+#include "Robot.h"
+#include "RobotConfig.h"
+#include "SceneObjectSet.h"
+#include "VirtualRobot.h"
+#include "VirtualRobotException.h"
 
 namespace VirtualRobot
 {
@@ -17,11 +21,16 @@ namespace VirtualRobot
 
     RobotNodeSet::RobotNodeSet(const std::string& name,
                                RobotWeakPtr r,
-                               const std::vector< RobotNodePtr >& robotNodes,
+                               const std::vector<RobotNodePtr>& robotNodes,
                                const RobotNodePtr kinematicRoot /*= RobotNodePtr()*/,
-                               const RobotNodePtr tcp /*= RobotNodePtr()*/)
-        : SceneObjectSet(name, robotNodes.size() > 0 ? robotNodes[0]->getCollisionChecker() : CollisionCheckerPtr()),
-          robotNodes{robotNodes}, robot{r}, kinematicRoot{kinematicRoot}, tcp{tcp}
+                               const RobotNodePtr tcp /*= RobotNodePtr()*/) :
+        SceneObjectSet(name,
+                       robotNodes.size() > 0 ? robotNodes[0]->getCollisionChecker()
+                                             : CollisionCheckerPtr()),
+        robotNodes{robotNodes},
+        robot{r},
+        kinematicRoot{kinematicRoot},
+        tcp{tcp}
     {
         RobotPtr rob = robot.lock();
 
@@ -45,7 +54,7 @@ namespace VirtualRobot
             {
                 std::stringstream str;
                 str << "RobotNodeSet " << name << " initialized with invalid kinematic root '"
-                    << oldRootName  << "': Can't fall back to robot root node (it is null)";
+                    << oldRootName << "': Can't fall back to robot root node (it is null)";
                 VR_ERROR << str.str() << std::endl;
                 throw std::invalid_argument{str.str()};
             }
@@ -66,7 +75,9 @@ namespace VirtualRobot
             {
                 if (colChecker != cm->getCollisionChecker())
                 {
-                    VR_WARNING << "col model of " << robotNode->getName() << " belongs to different instance of collision checker, in: " << getName().c_str() << std::endl;
+                    VR_WARNING << "col model of " << robotNode->getName()
+                               << " belongs to different instance of collision checker, in: "
+                               << getName().c_str() << std::endl;
                 }
                 else
                 {
@@ -75,13 +86,14 @@ namespace VirtualRobot
             }
         }
     }
-    RobotNodeSetPtr RobotNodeSet::createRobotNodeSet(
-        RobotPtr robot,
-        const std::string& name,
-        const std::vector< RobotNodeSetPtr >& robotNodes,
-        const RobotNodePtr kinematicRoot,
-        const RobotNodePtr tcp,
-        bool registerToRobot)
+
+    RobotNodeSetPtr
+    RobotNodeSet::createRobotNodeSet(RobotPtr robot,
+                                     const std::string& name,
+                                     const std::vector<RobotNodeSetPtr>& robotNodes,
+                                     const RobotNodePtr kinematicRoot,
+                                     const RobotNodePtr tcp,
+                                     bool registerToRobot)
     {
         std::set<RobotNodePtr> nodeSet;
         std::vector<RobotNodePtr> nodes;
@@ -101,16 +113,16 @@ namespace VirtualRobot
         return createRobotNodeSet(robot, name, nodes, kinematicRoot, tcp, registerToRobot);
     }
 
-
-    RobotNodeSetPtr RobotNodeSet::createRobotNodeSet(RobotPtr robot,
-            const std::string& name,
-            const std::vector< std::string >& robotNodeNames,
-            const std::string& kinematicRootName,
-            const std::string& tcpName,
-            bool registerToRobot)
+    RobotNodeSetPtr
+    RobotNodeSet::createRobotNodeSet(RobotPtr robot,
+                                     const std::string& name,
+                                     const std::vector<std::string>& robotNodeNames,
+                                     const std::string& kinematicRootName,
+                                     const std::string& tcpName,
+                                     bool registerToRobot)
     {
         VR_ASSERT(robot != nullptr);
-        std::vector< RobotNodePtr > robotNodes;
+        std::vector<RobotNodePtr> robotNodes;
 
         if (robotNodeNames.empty())
         {
@@ -121,7 +133,8 @@ namespace VirtualRobot
             for (const auto& robotNodeName : robotNodeNames)
             {
                 RobotNodePtr node = robot->getRobotNode(robotNodeName);
-                THROW_VR_EXCEPTION_IF(!node, "No robot node with name " << robotNodeName << " found...");
+                THROW_VR_EXCEPTION_IF(!node,
+                                      "No robot node with name " << robotNodeName << " found...");
                 robotNodes.push_back(node);
             }
         }
@@ -131,7 +144,8 @@ namespace VirtualRobot
         if (!kinematicRootName.empty())
         {
             RobotNodePtr node = robot->getRobotNode(kinematicRootName);
-            THROW_VR_EXCEPTION_IF(!node, "No root node with name " << kinematicRootName << " found...");
+            THROW_VR_EXCEPTION_IF(!node,
+                                  "No root node with name " << kinematicRootName << " found...");
             kinematicRoot = node;
         }
         else
@@ -158,17 +172,18 @@ namespace VirtualRobot
             }
         }
 
-        RobotNodeSetPtr rns = RobotNodeSet::createRobotNodeSet(robot, name, robotNodes, kinematicRoot, tcp, registerToRobot);
+        RobotNodeSetPtr rns = RobotNodeSet::createRobotNodeSet(
+            robot, name, robotNodes, kinematicRoot, tcp, registerToRobot);
         return rns;
     }
 
-
-    RobotNodeSetPtr RobotNodeSet::createRobotNodeSet(RobotPtr robot,
-            const std::string& name,
-            const std::vector< RobotNodePtr >& robotNodes,
-            const RobotNodePtr kinematicRoot,
-            const RobotNodePtr tcp,
-            bool registerToRobot)
+    RobotNodeSetPtr
+    RobotNodeSet::createRobotNodeSet(RobotPtr robot,
+                                     const std::string& name,
+                                     const std::vector<RobotNodePtr>& robotNodes,
+                                     const RobotNodePtr kinematicRoot,
+                                     const RobotNodePtr tcp,
+                                     bool registerToRobot)
     {
         VR_ASSERT(robot != nullptr);
 
@@ -187,7 +202,7 @@ namespace VirtualRobot
                     THROW_VR_EXCEPTION("Robot nodes belong to different robots");
                 }
 
-                if (cc !=  robotNodes[i]->getCollisionChecker())
+                if (cc != robotNodes[i]->getCollisionChecker())
                 {
                     THROW_VR_EXCEPTION("Robot nodes belong to different collision checkers");
                 }
@@ -205,7 +220,9 @@ namespace VirtualRobot
 
         if (!tcpNode)
         {
-            THROW_VR_EXCEPTION_IF(robotNodes.empty(), "can not determine the tcp node need for creating a RobotNodeSet");
+            THROW_VR_EXCEPTION_IF(
+                robotNodes.empty(),
+                "can not determine the tcp node need for creating a RobotNodeSet");
             tcpNode = robotNodes[robotNodes.size() - 1];
         }
 
@@ -213,19 +230,23 @@ namespace VirtualRobot
 
         if (registerToRobot)
         {
-            THROW_VR_EXCEPTION_IF(robot->hasRobotNodeSet(rns), "RobotNodeSet with name " << rns->getName() << " already present in the robot");
+            THROW_VR_EXCEPTION_IF(robot->hasRobotNodeSet(rns),
+                                  "RobotNodeSet with name " << rns->getName()
+                                                            << " already present in the robot");
             robot->registerRobotNodeSet(rns);
         }
 
         return rns;
     }
 
-    RobotNodePtr RobotNodeSet::getTCP() const
+    RobotNodePtr
+    RobotNodeSet::getTCP() const
     {
         return tcp;
     }
 
-    RobotNodeSetPtr RobotNodeSet::clone(RobotPtr newRobot, const RobotNodePtr newKinematicRoot)
+    RobotNodeSetPtr
+    RobotNodeSet::clone(RobotPtr newRobot, const RobotNodePtr newKinematicRoot)
     {
         if (!newRobot)
         {
@@ -259,28 +280,32 @@ namespace VirtualRobot
             tcpName = tcp->getName();
         }
 
-        RobotNodeSetPtr nodeSet = RobotNodeSet::createRobotNodeSet(newRobot, name, nodeNames, kinRootName, tcpName, true);
+        RobotNodeSetPtr nodeSet =
+            RobotNodeSet::createRobotNodeSet(newRobot, name, nodeNames, kinRootName, tcpName, true);
         return nodeSet;
     }
 
-
-    RobotPtr RobotNodeSet::getRobot()
+    RobotPtr
+    RobotNodeSet::getRobot()
     {
         RobotPtr rob = robot.lock();
         return rob;
     }
 
-    bool RobotNodeSet::hasRobotNode(const RobotNodePtr& robotNode) const
+    bool
+    RobotNodeSet::hasRobotNode(const RobotNodePtr& robotNode) const
     {
         return getRobotNodeIndex(robotNode) >= 0;
     }
 
-    bool RobotNodeSet::hasRobotNode(const std::string& nodeName) const
+    bool
+    RobotNodeSet::hasRobotNode(const std::string& nodeName) const
     {
         return getRobotNodeIndex(nodeName) >= 0;
     }
 
-    int RobotNodeSet::getRobotNodeIndex(const RobotNodePtr& robotNode) const
+    int
+    RobotNodeSet::getRobotNodeIndex(const RobotNodePtr& robotNode) const
     {
         for (size_t i = 0; i < robotNodes.size(); i++)
         {
@@ -292,7 +317,8 @@ namespace VirtualRobot
         return -1;
     }
 
-    int RobotNodeSet::getRobotNodeIndex(const std::string& nodeName) const
+    int
+    RobotNodeSet::getRobotNodeIndex(const std::string& nodeName) const
     {
         for (size_t i = 0; i < robotNodes.size(); i++)
         {
@@ -304,13 +330,14 @@ namespace VirtualRobot
         return -1;
     }
 
-
-    const std::vector< RobotNodePtr >& RobotNodeSet::getAllRobotNodes() const
+    const std::vector<RobotNodePtr>&
+    RobotNodeSet::getAllRobotNodes() const
     {
         return robotNodes;
     }
 
-    std::vector<std::string> RobotNodeSet::getNodeNames() const
+    std::vector<std::string>
+    RobotNodeSet::getNodeNames() const
     {
         std::vector<std::string> res;
         for (auto n : robotNodes)
@@ -320,7 +347,8 @@ namespace VirtualRobot
         return res;
     }
 
-    std::vector<float> RobotNodeSet::getNodeLimitsLo() const
+    std::vector<float>
+    RobotNodeSet::getNodeLimitsLo() const
     {
         std::vector<float> r;
         r.reserve(robotNodes.size());
@@ -330,7 +358,9 @@ namespace VirtualRobot
         }
         return r;
     }
-    std::vector<float> RobotNodeSet::getNodeLimitsHi() const
+
+    std::vector<float>
+    RobotNodeSet::getNodeLimitsHi() const
     {
         std::vector<float> r;
         r.reserve(robotNodes.size());
@@ -341,22 +371,26 @@ namespace VirtualRobot
         return r;
     }
 
-    RobotNodePtr RobotNodeSet::getKinematicRoot() const
+    RobotNodePtr
+    RobotNodeSet::getKinematicRoot() const
     {
         return kinematicRoot;
     }
 
-    void RobotNodeSet::setKinematicRoot(RobotNodePtr robotNode)
+    void
+    RobotNodeSet::setKinematicRoot(RobotNodePtr robotNode)
     {
         kinematicRoot = robotNode;
     }
 
-    unsigned int RobotNodeSet::getSize() const
+    unsigned int
+    RobotNodeSet::getSize() const
     {
         return robotNodes.size();
     }
 
-    void RobotNodeSet::print() const
+    void
+    RobotNodeSet::print() const
     {
         std::cout << "  Robot Node Set <" << name << ">" << std::endl;
         std::cout << "  Root node: ";
@@ -396,13 +430,18 @@ namespace VirtualRobot
         }
     }
 
-    void RobotNodeSet::getJointValues(std::vector<float>& fillVector) const
+    void
+    RobotNodeSet::getJointValues(std::vector<float>& fillVector) const
     {
         fillVector.resize(robotNodes.size());
-        std::transform(robotNodes.begin(), robotNodes.end(), fillVector.begin(), std::mem_fn(&RobotNode::getJointValue));
+        std::transform(robotNodes.begin(),
+                       robotNodes.end(),
+                       fillVector.begin(),
+                       std::mem_fn(&RobotNode::getJointValue));
     }
 
-    void RobotNodeSet::getJointValues(Eigen::VectorXf& fillVector) const
+    void
+    RobotNodeSet::getJointValues(Eigen::VectorXf& fillVector) const
     {
         fillVector.resize(robotNodes.size());
 
@@ -410,10 +449,10 @@ namespace VirtualRobot
         {
             fillVector[i] = robotNodes[i]->getJointValue();
         }
-
     }
 
-    void RobotNodeSet::getJointValues(RobotConfigPtr fillVector) const
+    void
+    RobotNodeSet::getJointValues(RobotConfigPtr fillVector) const
     {
         THROW_VR_EXCEPTION_IF(!fillVector, "NULL data");
 
@@ -423,7 +462,8 @@ namespace VirtualRobot
         }
     }
 
-    std::map<std::string, float> RobotNodeSet::getJointValueMap() const
+    std::map<std::string, float>
+    RobotNodeSet::getJointValueMap() const
     {
         std::map<std::string, float> res;
         for (auto n : robotNodes)
@@ -433,24 +473,29 @@ namespace VirtualRobot
         return res;
     }
 
-    std::vector<float> RobotNodeSet::getJointValues() const
+    std::vector<float>
+    RobotNodeSet::getJointValues() const
     {
         std::vector<float> res;
         getJointValues(res);
         return res;
     }
 
-    Eigen::VectorXf RobotNodeSet::getJointValuesEigen() const
+    Eigen::VectorXf
+    RobotNodeSet::getJointValuesEigen() const
     {
         Eigen::VectorXf res;
         getJointValues(res);
         return res;
     }
 
-
-    void RobotNodeSet::respectJointLimits(std::vector<float>& jointValues) const
+    void
+    RobotNodeSet::respectJointLimits(std::vector<float>& jointValues) const
     {
-        THROW_VR_EXCEPTION_IF(jointValues.size() != robotNodes.size(), "Wrong vector dimension (robotNodes:" << robotNodes.size() << ", jointValues: " << jointValues.size() << ")" << endl);
+        THROW_VR_EXCEPTION_IF(jointValues.size() != robotNodes.size(),
+                              "Wrong vector dimension (robotNodes:"
+                                  << robotNodes.size() << ", jointValues: " << jointValues.size()
+                                  << ")" << endl);
 
         for (unsigned int i = 0; i < robotNodes.size(); i++)
         {
@@ -458,7 +503,8 @@ namespace VirtualRobot
         }
     }
 
-    void RobotNodeSet::respectJointLimits(Eigen::VectorXf& jointValues) const
+    void
+    RobotNodeSet::respectJointLimits(Eigen::VectorXf& jointValues) const
     {
         for (unsigned int i = 0; i < robotNodes.size(); i++)
         {
@@ -466,12 +512,17 @@ namespace VirtualRobot
         }
     }
 
-    void RobotNodeSet::setJointValues(const std::vector<float>& jointValues)
+    void
+    RobotNodeSet::setJointValues(const std::vector<float>& jointValues)
     {
-        THROW_VR_EXCEPTION_IF(jointValues.size() != robotNodes.size(), "Wrong vector dimension (robotNodes:" << robotNodes.size() << ", jointValues: " << jointValues.size() << ")" << endl);
+        THROW_VR_EXCEPTION_IF(jointValues.size() != robotNodes.size(),
+                              "Wrong vector dimension (robotNodes:"
+                                  << robotNodes.size() << ", jointValues: " << jointValues.size()
+                                  << ")" << endl);
 
         RobotPtr rob = robot.lock();
-        THROW_VR_EXCEPTION_IF(!rob, "RobotNodeSet::setJointValues: Robot is NULL (The last shared_ptr was deleted)");
+        THROW_VR_EXCEPTION_IF(
+            !rob, "RobotNodeSet::setJointValues: Robot is NULL (The last shared_ptr was deleted)");
         WriteLockPtr lock = rob->getWriteLock();
 
         for (unsigned int i = 0; i < robotNodes.size(); i++)
@@ -489,12 +540,16 @@ namespace VirtualRobot
         }
     }
 
-
-    void RobotNodeSet::setJointValues(const Eigen::VectorXf& jointValues)
+    void
+    RobotNodeSet::setJointValues(const Eigen::VectorXf& jointValues)
     {
-        THROW_VR_EXCEPTION_IF(static_cast<std::size_t>(jointValues.rows()) != robotNodes.size(), "Wrong vector dimension (robotNodes:" << robotNodes.size() << ", jointValues: " << jointValues.size() << ")" << endl);
+        THROW_VR_EXCEPTION_IF(static_cast<std::size_t>(jointValues.rows()) != robotNodes.size(),
+                              "Wrong vector dimension (robotNodes:"
+                                  << robotNodes.size() << ", jointValues: " << jointValues.size()
+                                  << ")" << endl);
         RobotPtr rob = robot.lock();
-        THROW_VR_EXCEPTION_IF(!rob, "RobotNodeSet::setJointValues: Robot is NULL (The last shared_ptr was deleted)");
+        THROW_VR_EXCEPTION_IF(
+            !rob, "RobotNodeSet::setJointValues: Robot is NULL (The last shared_ptr was deleted)");
         WriteLockPtr lock = rob->getWriteLock();
 
         for (unsigned int i = 0; i < robotNodes.size(); i++)
@@ -512,11 +567,13 @@ namespace VirtualRobot
         }
     }
 
-    void RobotNodeSet::setJointValues(const RobotConfigPtr jointValues)
+    void
+    RobotNodeSet::setJointValues(const RobotConfigPtr jointValues)
     {
         VR_ASSERT(jointValues);
         RobotPtr rob = robot.lock();
-        THROW_VR_EXCEPTION_IF(!rob, "RobotNodeSet::setJointValues: Robot is NULL (The last shared_ptr was deleted)");
+        THROW_VR_EXCEPTION_IF(
+            !rob, "RobotNodeSet::setJointValues: Robot is NULL (The last shared_ptr was deleted)");
         WriteLockPtr lock = rob->getWriteLock();
 
         for (auto& robotNode : robotNodes)
@@ -535,33 +592,36 @@ namespace VirtualRobot
         {
             rob->applyJointValues();
         }
-
     }
 
-
-
-    const RobotNodePtr& RobotNodeSet::getNode(const int i) const
+    const RobotNodePtr&
+    RobotNodeSet::getNode(const int i) const
     {
-        THROW_VR_EXCEPTION_IF((i >= (int)robotNodes.size() || i < 0), "Index out of bounds:" << i << ", (should be between 0 and " << (robotNodes.size() - 1));
+        THROW_VR_EXCEPTION_IF((i >= (int)robotNodes.size() || i < 0),
+                              "Index out of bounds:" << i << ", (should be between 0 and "
+                                                     << (robotNodes.size() - 1));
 
         return robotNodes.at(i);
     }
 
-    const RobotNodePtr& RobotNodeSet::getNode(const std::string& nodeName) const
+    const RobotNodePtr&
+    RobotNodeSet::getNode(const std::string& nodeName) const
     {
         return getNode(getRobotNodeIndex(nodeName));
     }
 
-
-    RobotNodePtr& RobotNodeSet::operator[](int i)
+    RobotNodePtr&
+    RobotNodeSet::operator[](int i)
     {
-        THROW_VR_EXCEPTION_IF((i >= (int)robotNodes.size() || i < 0), "Index out of bounds:" << i << ", (should be between 0 and " << (robotNodes.size() - 1));
+        THROW_VR_EXCEPTION_IF((i >= (int)robotNodes.size() || i < 0),
+                              "Index out of bounds:" << i << ", (should be between 0 and "
+                                                     << (robotNodes.size() - 1));
 
         return robotNodes[i];
     }
 
-
-    bool RobotNodeSet::isKinematicChain()
+    bool
+    RobotNodeSet::isKinematicChain()
     {
         for (unsigned int i = 0; i < this->robotNodes.size() - 1; i++)
         {
@@ -574,8 +634,8 @@ namespace VirtualRobot
         return true;
     }
 
-
-    void RobotNodeSet::highlight(VisualizationPtr visualization, bool enable)
+    void
+    RobotNodeSet::highlight(VisualizationPtr visualization, bool enable)
     {
         if (!visualization)
         {
@@ -588,7 +648,8 @@ namespace VirtualRobot
         }
     }
 
-    int RobotNodeSet::getNumFaces(bool collisionModel)
+    int
+    RobotNodeSet::getNumFaces(bool collisionModel)
     {
         int res = 0;
 
@@ -599,6 +660,7 @@ namespace VirtualRobot
 
         return res;
     }
+
     /*
     VirtualRobot::SceneObjectSetPtr RobotNodeSet::createSceneObjectSet()
     {
@@ -609,7 +671,8 @@ namespace VirtualRobot
         return cms;
     }*/
 
-    float RobotNodeSet::getMaximumExtension()
+    float
+    RobotNodeSet::getMaximumExtension()
     {
         float result = 0;
         Eigen::Matrix4f t;
@@ -639,7 +702,8 @@ namespace VirtualRobot
         return result;
     }
 
-    Eigen::Vector3f RobotNodeSet::getCoM()
+    Eigen::Vector3f
+    RobotNodeSet::getCoM()
     {
         Eigen::Vector3f res;
         res.setZero();
@@ -659,7 +723,8 @@ namespace VirtualRobot
         return res;
     }
 
-    float RobotNodeSet::getMass()
+    float
+    RobotNodeSet::getMass()
     {
         float res = 0;
 
@@ -671,7 +736,8 @@ namespace VirtualRobot
         return res;
     }
 
-    bool RobotNodeSet::nodesSufficient(std::vector<RobotNodePtr> nodes) const
+    bool
+    RobotNodeSet::nodesSufficient(std::vector<RobotNodePtr> nodes) const
     {
         bool tcpOk = false;
         bool krOk = false;
@@ -739,9 +805,13 @@ namespace VirtualRobot
         return true;
     }
 
-    bool RobotNodeSet::checkJointLimits(std::vector<float>& jointValues, bool verbose /*= false*/) const
+    bool
+    RobotNodeSet::checkJointLimits(std::vector<float>& jointValues, bool verbose /*= false*/) const
     {
-        THROW_VR_EXCEPTION_IF(jointValues.size() != robotNodes.size(), "Wrong vector dimension (robotNodes:" << robotNodes.size() << ", jointValues: " << jointValues.size() << ")" << endl);
+        THROW_VR_EXCEPTION_IF(jointValues.size() != robotNodes.size(),
+                              "Wrong vector dimension (robotNodes:"
+                                  << robotNodes.size() << ", jointValues: " << jointValues.size()
+                                  << ")" << endl);
 
         bool res = true;
 
@@ -753,9 +823,13 @@ namespace VirtualRobot
         return res;
     }
 
-    bool RobotNodeSet::checkJointLimits(Eigen::VectorXf& jointValues, bool verbose /*= false*/) const
+    bool
+    RobotNodeSet::checkJointLimits(Eigen::VectorXf& jointValues, bool verbose /*= false*/) const
     {
-        THROW_VR_EXCEPTION_IF(static_cast<std::size_t>(jointValues.size()) != robotNodes.size(), "Wrong vector dimension (robotNodes:" << robotNodes.size() << ", jointValues: " << jointValues.size() << ")" << endl);
+        THROW_VR_EXCEPTION_IF(static_cast<std::size_t>(jointValues.size()) != robotNodes.size(),
+                              "Wrong vector dimension (robotNodes:"
+                                  << robotNodes.size() << ", jointValues: " << jointValues.size()
+                                  << ")" << endl);
 
         bool res = true;
 
@@ -772,45 +846,51 @@ namespace VirtualRobot
         return res;
     }
 
-    bool RobotNodeSet::addSceneObject(SceneObjectPtr /*sceneObject*/)
+    bool
+    RobotNodeSet::addSceneObject(SceneObjectPtr /*sceneObject*/)
     {
         THROW_VR_EXCEPTION("Not allowed for RobotNodeSets.");
         return false;
     }
 
-    bool RobotNodeSet::addSceneObjects(SceneObjectSetPtr /*sceneObjectSet*/)
+    bool
+    RobotNodeSet::addSceneObjects(SceneObjectSetPtr /*sceneObjectSet*/)
     {
         THROW_VR_EXCEPTION("Not allowed for RobotNodeSets.");
         return false;
     }
 
-    bool RobotNodeSet::addSceneObjects(RobotNodeSetPtr /*robotNodeSet*/)
+    bool
+    RobotNodeSet::addSceneObjects(RobotNodeSetPtr /*robotNodeSet*/)
     {
         THROW_VR_EXCEPTION("Not allowed for RobotNodeSets.");
         return false;
     }
 
-    bool RobotNodeSet::addSceneObjects(std::vector<RobotNodePtr> /*robotNodes*/)
+    bool
+    RobotNodeSet::addSceneObjects(std::vector<RobotNodePtr> /*robotNodes*/)
     {
         THROW_VR_EXCEPTION("Not allowed for RobotNodeSets.");
         return false;
     }
 
-    bool RobotNodeSet::removeSceneObject(SceneObjectPtr /*sceneObject*/)
+    bool
+    RobotNodeSet::removeSceneObject(SceneObjectPtr /*sceneObject*/)
     {
         THROW_VR_EXCEPTION("Not allowed for RobotNodeSets.");
         return false;
     }
 
-    bool RobotNodeSet::mirror(const RobotNodeSet& targetNodeSet)
+    bool
+    RobotNodeSet::mirror(const RobotNodeSet& targetNodeSet)
     {
         const NodeMapping nodeMapping = getRobot()->getNodeMapping();
         const auto nodeNames = getNodeNames();
 
-        for(const auto& targetNode : targetNodeSet.getAllRobotNodes())
+        for (const auto& targetNode : targetNodeSet.getAllRobotNodes())
         {
             // if node exists in both node set, just copy the joint value
-            if(hasRobotNode(targetNode->getName()))
+            if (hasRobotNode(targetNode->getName()))
             {
                 targetNode->setJointValue(getNode(targetNode->getName())->getJointValue());
                 continue;
@@ -818,13 +898,13 @@ namespace VirtualRobot
 
             // otherwise, check if mirroring is possible
             const auto nodeIt = nodeMapping.find(targetNode->getName());
-            if(nodeIt == nodeMapping.end())
+            if (nodeIt == nodeMapping.end())
             {
                 return false;
             }
 
             const NodeMappingElement& mapping = nodeIt->second;
-            if(not hasRobotNode(mapping.node))
+            if (not hasRobotNode(mapping.node))
             {
                 return false;
             }
@@ -837,7 +917,8 @@ namespace VirtualRobot
         return true;
     }
 
-    bool RobotNodeSet::isKinematicRoot(RobotNodePtr robotNode)
+    bool
+    RobotNodeSet::isKinematicRoot(RobotNodePtr robotNode)
     {
         RobotNodePtr node;
         VR_ASSERT(robotNode);
@@ -854,9 +935,8 @@ namespace VirtualRobot
         return true;
     }
 
-
-
-    std::string RobotNodeSet::toXML(int tabs)
+    std::string
+    RobotNodeSet::toXML(int tabs)
     {
         std::stringstream ss;
         std::string t = "\t";
@@ -877,7 +957,6 @@ namespace VirtualRobot
         ss << pre << "</RobotNodeSet>\n";
         return ss.str();
     }
-
 
 
 } // namespace VirtualRobot

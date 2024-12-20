@@ -1,44 +1,46 @@
 
 #include "BulletEngineFactory.h"
+
 #include "BulletObject.h"
 #include "BulletRobot.h"
 
 namespace SimDynamics
 {
 
-    BulletEngineFactory::BulletEngineFactory()
-    = default;
+    BulletEngineFactory::BulletEngineFactory() = default;
 
 
-    BulletEngineFactory::~BulletEngineFactory()
-    = default;
+    BulletEngineFactory::~BulletEngineFactory() = default;
 
 
     /**
      * register this class in the super class factory
      */
-    DynamicsEngineFactory::SubClassRegistry BulletEngineFactory::registry(BulletEngineFactory::getName(), &BulletEngineFactory::createInstance);
-
+    DynamicsEngineFactory::SubClassRegistry
+        BulletEngineFactory::registry(BulletEngineFactory::getName(),
+                                      &BulletEngineFactory::createInstance);
 
     /**
      * \return "bullet"
      */
-    std::string BulletEngineFactory::getName()
+    std::string
+    BulletEngineFactory::getName()
     {
         return "bullet";
     }
 
-
     /**
      * \return new instance of BulletEngineFactory
      */
-    std::shared_ptr<DynamicsEngineFactory> BulletEngineFactory::createInstance(void*)
+    std::shared_ptr<DynamicsEngineFactory>
+    BulletEngineFactory::createInstance(void*)
     {
         std::shared_ptr<BulletEngineFactory> bulletFactory(new BulletEngineFactory());
         return bulletFactory;
     }
 
-    DynamicsEnginePtr BulletEngineFactory::createEngine(DynamicsEngineConfigPtr config)
+    DynamicsEnginePtr
+    BulletEngineFactory::createEngine(DynamicsEngineConfigPtr config)
     {
         BulletEnginePtr bulletEngine(new BulletEngine());
         //DynamicsEngine::DynamicsWorldInfo i; // standard gravity
@@ -46,12 +48,14 @@ namespace SimDynamics
         return bulletEngine;
     }
 
-    DynamicsObjectPtr BulletEngineFactory::createObject(VirtualRobot::SceneObjectPtr o)
+    DynamicsObjectPtr
+    BulletEngineFactory::createObject(VirtualRobot::SceneObjectPtr o)
     {
         return BulletObjectPtr(new BulletObject(o));
     }
 
-    SimDynamics::DynamicsRobotPtr BulletEngineFactory::createRobot(VirtualRobot::RobotPtr robot)
+    SimDynamics::DynamicsRobotPtr
+    BulletEngineFactory::createRobot(VirtualRobot::RobotPtr robot)
     {
         return BulletRobotPtr(new BulletRobot(robot));
     }

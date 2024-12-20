@@ -20,25 +20,31 @@
 
 #pragma once
 
-#include "MathForwardDefinitions.h"
+#include "Contact.h"
+#include "ContactList.h"
 #include "DataR3R1.h"
 #include "DataR3R2.h"
-#include "Contact.h"
 #include "Helpers.h"
-#include "SimpleAbstractFunctionR3R1.h"
-#include "ContactList.h"
 #include "Kernels.h"
+#include "MathForwardDefinitions.h"
+#include "SimpleAbstractFunctionR3R1.h"
 
 namespace math
 {
 
-    class GaussianImplicitSurface3DCombined :
-        public SimpleAbstractFunctionR3R1
+    class GaussianImplicitSurface3DCombined : public SimpleAbstractFunctionR3R1
     {
     public:
         GaussianImplicitSurface3DCombined(std::unique_ptr<KernelWithDerivatives> kernel);
-        void Calculate(const ContactList& normalSamples, const std::vector<DataR3R1>& samples, float noise, float normalNoise, float normalScale);
-        void Calculate(const ContactList& normalSamples, const std::vector<DataR3R2>& samples, float normalNoise, float normalScale);
+        void Calculate(const ContactList& normalSamples,
+                       const std::vector<DataR3R1>& samples,
+                       float noise,
+                       float normalNoise,
+                       float normalScale);
+        void Calculate(const ContactList& normalSamples,
+                       const std::vector<DataR3R2>& samples,
+                       float normalNoise,
+                       float normalScale);
         float Get(Eigen::Vector3f pos) override;
         float GetVariance(const Eigen::Vector3f& pos);
 
@@ -55,9 +61,13 @@ namespace math
         std::unique_ptr<KernelWithDerivatives> kernel;
 
         float Predict(const Eigen::Vector3f& pos);
-        void CalculateCovariance(const std::vector<Eigen::Vector3f>& points, const std::vector<Eigen::Vector3f>& normalPoints, float R, const std::vector<float>& noise, float normalNoise);
+        void CalculateCovariance(const std::vector<Eigen::Vector3f>& points,
+                                 const std::vector<Eigen::Vector3f>& normalPoints,
+                                 float R,
+                                 const std::vector<float>& noise,
+                                 float normalNoise);
 
         void MatrixInvert(const Eigen::VectorXd& b);
         Eigen::VectorXd getCux(const Eigen::Vector3f& pos);
     };
-}
+} // namespace math

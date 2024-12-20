@@ -1,13 +1,15 @@
 
 #include "showRobotWindow.h"
 
-#include <QFileDialog>
 #include <cmath>
 #include <ctime>
-#include <filesystem>
 #include <iostream>
-#include <sstream>
 #include <vector>
+
+#include <QFileDialog>
+
+// Bug in Qt: <filesystem must come after Qt includes
+#include <filesystem>
 
 #include <Eigen/Geometry>
 
@@ -21,6 +23,7 @@
 #include "Inventor/actions/SoLineHighlightRenderAction.h"
 #include "SimoxUtility/algorithm/get_map_keys_values.h"
 #include "VirtualRobot/EndEffector/EndEffector.h"
+#include "VirtualRobot/Logging.h"
 #include "VirtualRobot/VirtualRobot.h"
 #include "VirtualRobot/Workspace/Reachability.h"
 #include <Inventor/nodes/SoLightModel.h>
@@ -279,7 +282,7 @@ showRobotWindow::rebuildVisualization()
 
     if (UI.checkBoxColModel->checkState() == Qt::Checked)
     {
-        visualization = robot->getVisualization<CoinVisualization>(SceneObject::Collision);
+        visualization = robot->getVisualization(SceneObject::Collision);
         SoNode* visualisationNode = nullptr;
 
         if (visualization)
@@ -298,7 +301,7 @@ showRobotWindow::rebuildVisualization()
         UI.checkBoxRobotSensors->checkState() == Qt::Checked ||
         UI.checkBoxRobotCoordSystems->checkState() == Qt::Checked)
     {
-        visualization = robot->getVisualization<CoinVisualization>(SceneObject::Full);
+        visualization = robot->getVisualization(SceneObject::Full);
         SoNode* visualisationNode = nullptr;
 
         if (visualization)
@@ -393,7 +396,7 @@ showRobotWindow::exportVRML()
 
     robot->setPropagatingJointValuesEnabled(true);
 
-    visualization = robot->getVisualization<CoinVisualization>(colModel);
+    visualization = robot->getVisualization(colModel);
     visualization->exportToVRML2(s);
 }
 

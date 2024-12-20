@@ -23,15 +23,13 @@
 
 #include "AbstractFunctionR2R3.h"
 
-
-
 namespace math
 {
-    class TransformedFunctionR2R3 :
-            public AbstractFunctionR2R3
+    class TransformedFunctionR2R3 : public AbstractFunctionR2R3
     {
     public:
-        TransformedFunctionR2R3(const Eigen::Matrix4f& transformation, AbstractFunctionR2R3Ptr func);
+        TransformedFunctionR2R3(const Eigen::Matrix4f& transformation,
+                                AbstractFunctionR2R3Ptr func);
 
         Eigen::Vector3f GetPoint(float u, float v) override;
         Eigen::Vector3f GetDdu(float u, float v) override;
@@ -42,7 +40,5 @@ namespace math
         const Eigen::Matrix4f transformation;
         const Eigen::Matrix4f inv;
         const AbstractFunctionR2R3Ptr func;
-
     };
-}
-
+} // namespace math

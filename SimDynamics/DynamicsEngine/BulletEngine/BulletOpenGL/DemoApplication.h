@@ -16,31 +16,27 @@ subject to the following restrictions:
 #pragma once
 
 
-#include "GlutStuff.h"
-#include "GL_ShapeDrawer.h"
-
-#include <stdlib.h>
-#include <stdio.h>
 #include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
 
-
-#include "LinearMath/btVector3.h"
-#include "LinearMath/btMatrix3x3.h"
-#include "LinearMath/btTransform.h"
-#include "LinearMath/btQuickprof.h"
+#include "GL_ShapeDrawer.h"
+#include "GlutStuff.h"
 #include "LinearMath/btAlignedObjectArray.h"
+#include "LinearMath/btMatrix3x3.h"
+#include "LinearMath/btQuickprof.h"
+#include "LinearMath/btTransform.h"
+#include "LinearMath/btVector3.h"
 
-class   btCollisionShape;
-class   btDynamicsWorld;
-class   btRigidBody;
-class   btTypedConstraint;
-
-
+class btCollisionShape;
+class btDynamicsWorld;
+class btRigidBody;
+class btTypedConstraint;
 
 class DemoApplication
 {
 protected:
-    void    displayProfileString(int xOffset, int yStart, char* message);
+    void displayProfileString(int xOffset, int yStart, char* message);
     class CProfileIterator* m_profileIterator;
 
 protected:
@@ -49,33 +45,34 @@ protected:
 #endif //USE_BT_CLOCK
 
     ///this is the most important class
-    btDynamicsWorld*        m_dynamicsWorld;
+    btDynamicsWorld* m_dynamicsWorld;
 
     ///constraint for mouse picking
-    btTypedConstraint*      m_pickConstraint;
+    btTypedConstraint* m_pickConstraint;
 
     virtual void removePickingConstraint();
 
     virtual void pickObject(const btVector3& pickPos, const class btCollisionObject* hitObj);
 
 
-    btCollisionShape*   m_shootBoxShape;
+    btCollisionShape* m_shootBoxShape;
 
-    float   m_cameraDistance;
+    float m_cameraDistance;
     int m_debugMode;
 
     float m_ele;
     float m_azi;
     btVector3 m_cameraPosition;
-    btVector3 m_cameraTargetPosition;//look at
+    btVector3 m_cameraTargetPosition; //look at
 
     int m_mouseOldX;
     int m_mouseOldY;
     int m_mouseButtons;
+
 public:
     int m_modifierKeys;
-protected:
 
+protected:
     float m_scaleBottom;
     float m_scaleFactor;
     btVector3 m_cameraUp;
@@ -85,14 +82,14 @@ protected:
     int m_glutScreenWidth;
     int m_glutScreenHeight;
 
-    float   m_frustumZNear;
-    float   m_frustumZFar;
+    float m_frustumZNear;
+    float m_frustumZFar;
 
     int m_ortho;
 
-    float   m_ShootBoxInitialSpeed;
+    float m_ShootBoxInitialSpeed;
 
-    bool    m_stepping;
+    bool m_stepping;
     bool m_singleStep;
     bool m_idle;
     int m_lastKey;
@@ -101,26 +98,26 @@ protected:
     void renderscene(int pass);
 
     GL_ShapeDrawer* m_shapeDrawer;
-    bool            m_enableshadows;
-    btVector3       m_sundirection;
-    btScalar        m_defaultContactProcessingThreshold;
+    bool m_enableshadows;
+    btVector3 m_sundirection;
+    btScalar m_defaultContactProcessingThreshold;
 
 public:
-
     DemoApplication();
 
     virtual ~DemoApplication();
 
-    btDynamicsWorld*        getDynamicsWorld()
+    btDynamicsWorld*
+    getDynamicsWorld()
     {
         return m_dynamicsWorld;
     }
 
     virtual void initPhysics() = 0;
 
-    virtual void setDrawClusters(bool /*drawClusters*/)
+    virtual void
+    setDrawClusters(bool /*drawClusters*/)
     {
-
     }
 
     void overrideGLShapeDrawer(GL_ShapeDrawer* shapeDrawer);
@@ -128,48 +125,60 @@ public:
     void setOrthographicProjection();
     void resetPerspectiveProjection();
 
-    bool    setTexturing(bool enable)
+    bool
+    setTexturing(bool enable)
     {
         return (m_shapeDrawer->enableTexture(enable));
     }
-    bool    setShadows(bool enable)
+
+    bool
+    setShadows(bool enable)
     {
         bool p = m_enableshadows;
         m_enableshadows = enable;
         return (p);
     }
-    bool    getTexturing() const
+
+    bool
+    getTexturing() const
     {
         return m_shapeDrawer->hasTextureEnabled();
     }
-    bool    getShadows() const
+
+    bool
+    getShadows() const
     {
         return m_enableshadows;
     }
 
-
-    int     getDebugMode()
+    int
+    getDebugMode()
     {
-        return m_debugMode ;
+        return m_debugMode;
     }
 
-    void    setDebugMode(int mode);
+    void setDebugMode(int mode);
 
-    void    setAzi(float azi)
+    void
+    setAzi(float azi)
     {
         m_azi = azi;
     }
 
-    void    setEle(float ele)
+    void
+    setEle(float ele)
     {
         m_ele = ele;
     }
 
-    void    setCameraUp(const btVector3& camUp)
+    void
+    setCameraUp(const btVector3& camUp)
     {
         m_cameraUp = camUp;
     }
-    void    setCameraForwardAxis(int axis)
+
+    void
+    setCameraForwardAxis(int axis)
     {
         m_forwardAxis = axis;
     }
@@ -180,16 +189,20 @@ public:
 
     virtual void updateCamera();
 
-    btVector3   getCameraPosition()
+    btVector3
+    getCameraPosition()
     {
         return m_cameraPosition;
     }
-    btVector3   getCameraTargetPosition()
+
+    btVector3
+    getCameraTargetPosition()
     {
         return m_cameraTargetPosition;
     }
 
-    btScalar    getDeltaTimeMicroseconds()
+    btScalar
+    getDeltaTimeMicroseconds()
     {
 #ifdef USE_BT_CLOCK
         btScalar dt = (btScalar)m_clock.getTimeMicroseconds();
@@ -199,7 +212,9 @@ public:
         return btScalar(16666.);
 #endif
     }
-    void setFrustumZPlanes(float zNear, float zFar)
+
+    void
+    setFrustumZPlanes(float zNear, float zFar)
     {
         m_frustumZNear = zNear;
         m_frustumZFar = zFar;
@@ -207,46 +222,56 @@ public:
 
     ///glut callbacks
 
-    float   getCameraDistance();
-    void    setCameraDistance(float dist);
-    void    moveAndDisplay();
+    float getCameraDistance();
+    void setCameraDistance(float dist);
+    void moveAndDisplay();
 
     virtual void clientMoveAndDisplay() = 0;
 
-    virtual void    clientResetScene();
+    virtual void clientResetScene();
 
     ///Demo functions
     virtual void setShootBoxShape();
-    virtual void    shootBox(const btVector3& destination);
+    virtual void shootBox(const btVector3& destination);
 
 
-    btVector3   getRayTo(int x, int y);
+    btVector3 getRayTo(int x, int y);
 
-    btRigidBody*    localCreateRigidBody(float mass, const btTransform& startTransform, btCollisionShape* shape);
+    btRigidBody*
+    localCreateRigidBody(float mass, const btTransform& startTransform, btCollisionShape* shape);
 
     ///callback methods by glut
 
     virtual void keyboardCallback(unsigned char key, int x, int y);
 
-    virtual void keyboardUpCallback(unsigned char /*key*/, int /*x*/, int /*y*/) {}
+    virtual void
+    keyboardUpCallback(unsigned char /*key*/, int /*x*/, int /*y*/)
+    {
+    }
 
-    virtual void specialKeyboard(int /*key*/, int /*x*/, int /*y*/) {}
+    virtual void
+    specialKeyboard(int /*key*/, int /*x*/, int /*y*/)
+    {
+    }
 
-    virtual void specialKeyboardUp(int /*key*/, int /*x*/, int /*y*/) {}
+    virtual void
+    specialKeyboardUp(int /*key*/, int /*x*/, int /*y*/)
+    {
+    }
 
     virtual void reshape(int w, int h);
 
     virtual void mouseFunc(int button, int state, int x, int y);
 
-    virtual void    mouseMotionFunc(int x, int y);
+    virtual void mouseMotionFunc(int x, int y);
 
     virtual void displayCallback();
 
-    virtual     void renderme();
+    virtual void renderme();
 
-    virtual     void swapBuffers() = 0;
+    virtual void swapBuffers() = 0;
 
-    virtual     void    updateModifierKeys() = 0;
+    virtual void updateModifierKeys() = 0;
 
     void stepLeft();
     void stepRight();
@@ -255,18 +280,15 @@ public:
     void zoomIn();
     void zoomOut();
 
-    bool    isIdle() const
+    bool
+    isIdle() const
     {
-        return  m_idle;
+        return m_idle;
     }
 
-    void    setIdle(bool idle)
+    void
+    setIdle(bool idle)
     {
         m_idle = idle;
     }
-
-
 };
-
-
-

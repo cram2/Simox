@@ -1,16 +1,18 @@
 
-#include "VirtualRobot/CollisionDetection/CDManager.h"
 #include "CSpaceTree.h"
-#include "CSpaceNode.h"
-#include "CSpacePath.h"
-#include "CSpace.h"
-#include "VirtualRobot/Robot.h"
-#include "VirtualRobot/RobotNodeSet.h"
+
 #include <cfloat>
 #include <cmath>
+#include <ctime>
 #include <fstream>
 #include <iomanip>
-#include <ctime>
+
+#include "CSpace.h"
+#include "CSpaceNode.h"
+#include "CSpacePath.h"
+#include "VirtualRobot/CollisionDetection/CDManager.h"
+#include "VirtualRobot/Robot.h"
+#include "VirtualRobot/RobotNodeSet.h"
 
 using namespace std;
 
@@ -40,28 +42,29 @@ namespace Saba
         tmpConfig.setZero(dimension);
     }
 
-    CSpaceTree::~CSpaceTree()
-    = default;
+    CSpaceTree::~CSpaceTree() = default;
 
-    void CSpaceTree::lock()
+    void
+    CSpaceTree::lock()
     {
         mutex.lock();
     }
 
-    void CSpaceTree::unlock()
+    void
+    CSpaceTree::unlock()
     {
         mutex.unlock();
     }
 
-
-
-    void CSpaceTree::reset()
+    void
+    CSpaceTree::reset()
     {
         idNodeMapping.clear();
         nodes.clear();
     }
 
-    CSpaceNodePtr CSpaceTree::getNode(unsigned int id)
+    CSpaceNodePtr
+    CSpaceTree::getNode(unsigned int id)
     {
         if (idNodeMapping.find(id) == idNodeMapping.end())
         {
@@ -72,7 +75,8 @@ namespace Saba
         return idNodeMapping[id];
     }
 
-    bool CSpaceTree::hasNode(CSpaceNodePtr n)
+    bool
+    CSpaceTree::hasNode(CSpaceNodePtr n)
     {
         if (!n)
         {
@@ -87,7 +91,8 @@ namespace Saba
         return true;
     }
 
-    float CSpaceTree::getPathDist(unsigned int idStart, unsigned int idEnd, bool /*useMetricWeights*/)
+    float
+    CSpaceTree::getPathDist(unsigned int idStart, unsigned int idEnd, bool /*useMetricWeights*/)
     {
         float result = 0.0f;
 
@@ -109,7 +114,8 @@ namespace Saba
 
             if (/*actID2 < 0 ||*/ actNode->parentID < 0 || !actNode || !actNode2)
             {
-                std::cout << "CSpaceTree::getPathDist: error, no path from start to end ?!" << std::endl;
+                std::cout << "CSpaceTree::getPathDist: error, no path from start to end ?!"
+                          << std::endl;
                 return result;
             }
 
@@ -126,7 +132,8 @@ namespace Saba
     }
 
     // creates a copy of configuration
-    CSpaceNodePtr CSpaceTree::appendNode(const Eigen::VectorXf& config, int parentID, bool calcDistance)
+    CSpaceNodePtr
+    CSpaceTree::appendNode(const Eigen::VectorXf& config, int parentID, bool calcDistance)
     {
         SABA_ASSERT(config.rows() == dimension)
 
@@ -145,14 +152,14 @@ namespace Saba
         newNode->parentID = parentID;
 
 
-
         if (updateChildren && parentID >= 0)
         {
             CSpaceNodePtr n = getNode(parentID);
 
             if (!n)
             {
-                SABA_ERROR << "CSpaceTree::appendNode: No parent node with id : " << parentID << std::endl;
+                SABA_ERROR << "CSpaceTree::appendNode: No parent node with id : " << parentID
+                           << std::endl;
             }
             else
             {
@@ -183,9 +190,11 @@ namespace Saba
         return newNode;
     }
 
-
     // returns true if full path was added
-    bool CSpaceTree::appendPathUntilCollision(CSpaceNodePtr startNode, const Eigen::VectorXf& config, int* storeLastAddedID)
+    bool
+    CSpaceTree::appendPathUntilCollision(CSpaceNodePtr startNode,
+                                         const Eigen::VectorXf& config,
+                                         int* storeLastAddedID)
     {
         SABA_ASSERT(hasNode(startNode))
         SABA_ASSERT(config.rows() == dimension)
@@ -209,13 +218,14 @@ namespace Saba
         return (dist == 1.0f);
     }
 
-    bool CSpaceTree::appendPath(CSpaceNodePtr startNode, CSpacePathPtr path, int* storeLastAddedID)
+    bool
+    CSpaceTree::appendPath(CSpaceNodePtr startNode, CSpacePathPtr path, int* storeLastAddedID)
     {
         SABA_ASSERT(hasNode(startNode))
         SABA_ASSERT(path)
         CSpaceNodePtr n = startNode;
-        const std::vector<Eigen::VectorXf > data = path->getData();
-        std::vector<Eigen::VectorXf >::const_iterator it;
+        const std::vector<Eigen::VectorXf> data = path->getData();
+        std::vector<Eigen::VectorXf>::const_iterator it;
 
         for (it = data.begin(); it != data.end(); it++)
         {
@@ -233,7 +243,10 @@ namespace Saba
     // appends path from startNode to config, creates in-between nodes according to cspace if needed
     // no checks (for valid configs)
     // creates a copy of configuration
-    bool CSpaceTree::appendPath(CSpaceNodePtr startNode, const Eigen::VectorXf& config, int* storeLastAddedID)
+    bool
+    CSpaceTree::appendPath(CSpaceNodePtr startNode,
+                           const Eigen::VectorXf& config,
+                           int* storeLastAddedID)
     {
         SABA_ASSERT(hasNode(startNode))
         SABA_ASSERT(config.rows() == dimension)
@@ -249,8 +262,8 @@ namespace Saba
         return appendPath(startNode, res, storeLastAddedID);
     }
 
-
-    void CSpaceTree::removeNode(CSpaceNodePtr n)
+    void
+    CSpaceTree::removeNode(CSpaceNodePtr n)
     {
         if (!n)
         {
@@ -288,14 +301,14 @@ namespace Saba
         cspace->removeNode(n);
     }
 
-
-    CSpaceNodePtr CSpaceTree::getNearestNeighbor(const Eigen::VectorXf& config, float* storeDist)
+    CSpaceNodePtr
+    CSpaceTree::getNearestNeighbor(const Eigen::VectorXf& config, float* storeDist)
     {
         return getNode(getNearestNeighborID(config, storeDist));
     }
 
-
-    unsigned int CSpaceTree::getNearestNeighborID(const Eigen::VectorXf& config, float* storeDist)
+    unsigned int
+    CSpaceTree::getNearestNeighborID(const Eigen::VectorXf& config, float* storeDist)
     {
         // goes through complete list of nodes, toDO: everything is better than this: eg octrees,something hierarchical...
         // update: only if we have more than 1000 nodes in the tree!
@@ -329,17 +342,15 @@ namespace Saba
         return bestID;
     }
 
-
-
-
-
-    bool CSpaceTree::saveAllNodes(char const* filename)
+    bool
+    CSpaceTree::saveAllNodes(char const* filename)
     {
         std::ofstream file(filename, std::ios::out);
 
         if (!file.is_open())
         {
-            std::cout << "ERROR: rrtCSpace::saveAllNodes: Could not open file to write." << std::endl;
+            std::cout << "ERROR: rrtCSpace::saveAllNodes: Could not open file to write."
+                      << std::endl;
             return false;
         }
 
@@ -360,7 +371,7 @@ namespace Saba
 
         CSpaceNodePtr actualNode;
 
-        for (const auto & node : nodes)
+        for (const auto& node : nodes)
         {
             // save ID, configuration and parentID of each node in one row
             actualNode = node;
@@ -378,7 +389,8 @@ namespace Saba
         return true;
     }
 
-    CSpaceNodePtr CSpaceTree::getLastAddedNode()
+    CSpaceNodePtr
+    CSpaceTree::getLastAddedNode()
     {
         if (nodes.size() == 0)
         {
@@ -388,8 +400,8 @@ namespace Saba
         return nodes[nodes.size() - 1];
     }
 
-
-    bool CSpaceTree::createPath(CSpaceNodePtr startNode, CSpaceNodePtr goalNode, CSpacePathPtr fillPath)
+    bool
+    CSpaceTree::createPath(CSpaceNodePtr startNode, CSpaceNodePtr goalNode, CSpacePathPtr fillPath)
     {
         // creates a path from goal to startNode
 
@@ -426,7 +438,8 @@ namespace Saba
 
         if (!found)
         {
-            std::cout << "CSpaceTree::createPath: Start node not a parent of goalNode... goalID:" << goalNode->ID << ", startID:" << startNode->ID << std::endl;
+            std::cout << "CSpaceTree::createPath: Start node not a parent of goalNode... goalID:"
+                      << goalNode->ID << ", startID:" << startNode->ID << std::endl;
         }
         else
         {
@@ -456,7 +469,8 @@ namespace Saba
     }
     */
 
-    float CSpaceTree::getTreeLength(bool useMetricWeights)
+    float
+    CSpaceTree::getTreeLength(bool useMetricWeights)
     {
         unsigned int nMaxNodes = (int)nodes.size();
         float res = 0;
@@ -465,29 +479,35 @@ namespace Saba
         {
             if (nodes[i] && nodes[i]->parentID >= 0 && nodes[i]->parentID < (int)nMaxNodes)
             {
-                res += cspace->calcDist(nodes[i]->configuration, nodes[nodes[i]->parentID]->configuration, !useMetricWeights);
+                res += cspace->calcDist(nodes[i]->configuration,
+                                        nodes[nodes[i]->parentID]->configuration,
+                                        !useMetricWeights);
             }
         }
 
         return res;
     }
 
-    unsigned int CSpaceTree::getNrOfNodes() const
+    unsigned int
+    CSpaceTree::getNrOfNodes() const
     {
         return nodes.size();
     }
 
-    std::vector<CSpaceNodePtr> CSpaceTree::getNodes()
+    std::vector<CSpaceNodePtr>
+    CSpaceTree::getNodes()
     {
         return nodes;
     }
 
-    unsigned int CSpaceTree::getDimension() const
+    unsigned int
+    CSpaceTree::getDimension() const
     {
         return dimension;
     }
 
-    Saba::CSpacePtr CSpaceTree::getCSpace()
+    Saba::CSpacePtr
+    CSpaceTree::getCSpace()
     {
         return cspace;
     }

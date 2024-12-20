@@ -1,18 +1,23 @@
 
 #include "Robot.h"
+
+#include <iostream>
 #include <optional>
-#include "RobotConfig.h"
-#include "Trajectory.h"
-#include "VirtualRobot.h"
-#include "VirtualRobotException.h"
-#include "Nodes/Sensor.h"
-#include "Visualization/VisualizationNode.h"
+
 #include "CollisionDetection/CollisionChecker.h"
 #include "CollisionDetection/CollisionModel.h"
 #include "EndEffector/EndEffector.h"
-#include "Grasping/GraspSet.h"
+#include "Logging.h"
+#include "Nodes/RobotNode.h"
+#include "Nodes/Sensor.h"
+#include "RobotConfig.h"
+#include "RobotNodeSet.h"
+#include "Trajectory.h"
+#include "VirtualRobot.h"
+#include "VirtualRobotException.h"
+#include "Visualization/CoinVisualization/CoinVisualization.h"
+#include "Visualization/VisualizationNode.h"
 #include "math/Helpers.h"
-
 
 namespace VirtualRobot
 {
@@ -20,24 +25,22 @@ namespace VirtualRobot
     using std::endl;
 
     const RobotPtr Robot::NullPtr{nullptr};
-    Robot::Robot(const std::string& name, const std::string& type)
-        : SceneObject(name)
+
+    Robot::Robot(const std::string& name, const std::string& type) : SceneObject(name)
     {
         this->type = type;
         updateVisualization = true;
         use_mutex = true;
     }
 
-    Robot::Robot()
-        = default;
+    Robot::Robot() = default;
 
-    Robot::~Robot()
-        = default;
+    Robot::~Robot() = default;
 
     LocalRobot::~LocalRobot()
     {
         // clean up connections
-        std::map< std::string, RobotNodePtr > ::iterator it = robotNodeMap.begin();
+        std::map<std::string, RobotNodePtr>::iterator it = robotNodeMap.begin();
 
         while (it != robotNodeMap.end())
         {
@@ -63,7 +66,8 @@ namespace VirtualRobot
     {
     }
 
-    void LocalRobot::setRootNode(RobotNodePtr node)
+    void
+    LocalRobot::setRootNode(RobotNodePtr node)
     {
         attachChild(node);
         rootNode = node;
@@ -79,7 +83,7 @@ namespace VirtualRobot
             // create all globalposes
             applyJointValues();
 
-            std::vector< RobotNodePtr > allNodes;
+            std::vector<RobotNodePtr> allNodes;
             node->collectAllRobotNodes(allNodes);
 
             for (auto& allNode : allNodes)
@@ -88,19 +92,22 @@ namespace VirtualRobot
 
                 if (!this->hasRobotNode(name))
                 {
-                    VR_WARNING << "Robot node with name <" << name << "> was not registered, adding it to RobotNodeMap" << std::endl;
+                    VR_WARNING << "Robot node with name <" << name
+                               << "> was not registered, adding it to RobotNodeMap" << std::endl;
                     registerRobotNode(allNode);
                 }
             }
         }
     }
 
-    void Robot::setThreadsafe(bool flag)
+    void
+    Robot::setThreadsafe(bool flag)
     {
         use_mutex = flag;
     }
 
-    RobotNodePtr LocalRobot::getRobotNode(const std::string& robotNodeName) const
+    RobotNodePtr
+    LocalRobot::getRobotNode(const std::string& robotNodeName) const
     {
         if (robotNodeMap.find(robotNodeName) == robotNodeMap.end())
         {
@@ -111,7 +118,8 @@ namespace VirtualRobot
         return robotNodeMap.at(robotNodeName);
     }
 
-    void LocalRobot::registerRobotNode(RobotNodePtr node)
+    void
+    LocalRobot::registerRobotNode(RobotNodePtr node)
     {
         if (!node)
         {
@@ -123,7 +131,9 @@ namespace VirtualRobot
             // check for collision checker
             if (node->getCollisionChecker() != robotNodeMap.begin()->second->getCollisionChecker())
             {
-                THROW_VR_EXCEPTION("Different Collision Checkers in " << node->getName() << " and " << robotNodeMap.begin()->second->getName());
+                THROW_VR_EXCEPTION("Different Collision Checkers in "
+                                   << node->getName() << " and "
+                                   << robotNodeMap.begin()->second->getName());
             }
         }
 
@@ -131,7 +141,8 @@ namespace VirtualRobot
 
         if (robotNodeMap.find(robotNodeName) != robotNodeMap.end())
         {
-            THROW_VR_EXCEPTION("There are (at least) two robot nodes with name <" << robotNodeName << "> defined, the second one is skipped!");
+            THROW_VR_EXCEPTION("There are (at least) two robot nodes with name <"
+                               << robotNodeName << "> defined, the second one is skipped!");
         }
         else
         {
@@ -139,7 +150,8 @@ namespace VirtualRobot
         }
     }
 
-    bool LocalRobot::hasRobotNode(RobotNodePtr node) const
+    bool
+    LocalRobot::hasRobotNode(RobotNodePtr node) const
     {
         if (!node)
         {
@@ -156,13 +168,14 @@ namespace VirtualRobot
         return false;
     }
 
-    bool LocalRobot::hasRobotNode(const std::string& robotNodeName) const
+    bool
+    LocalRobot::hasRobotNode(const std::string& robotNodeName) const
     {
         return (robotNodeMap.find(robotNodeName) != robotNodeMap.end());
     }
 
-
-    void LocalRobot::deregisterRobotNode(RobotNodePtr node)
+    void
+    LocalRobot::deregisterRobotNode(RobotNodePtr node)
     {
         if (!node)
         {
@@ -170,7 +183,7 @@ namespace VirtualRobot
         }
 
         std::string robotNodeName = node->getName();
-        std::map< std::string, RobotNodePtr >::iterator i = robotNodeMap.find(robotNodeName);
+        std::map<std::string, RobotNodePtr>::iterator i = robotNodeMap.find(robotNodeName);
 
         if (i != robotNodeMap.end())
         {
@@ -178,8 +191,8 @@ namespace VirtualRobot
         }
     }
 
-
-    void LocalRobot::registerRobotNodeSet(RobotNodeSetPtr nodeSet)
+    void
+    LocalRobot::registerRobotNodeSet(RobotNodeSetPtr nodeSet)
     {
         if (!nodeSet)
         {
@@ -190,14 +203,16 @@ namespace VirtualRobot
 
         if (robotNodeSetMap.find(nodeSetName) != robotNodeSetMap.end())
         {
-            VR_WARNING << "There are (at least) two robot node sets with name <" << nodeSetName << "> defined, the second one overwrites first definition!" << std::endl;
+            VR_WARNING << "There are (at least) two robot node sets with name <" << nodeSetName
+                       << "> defined, the second one overwrites first definition!" << std::endl;
             // overwrite
         }
 
         robotNodeSetMap[nodeSetName] = nodeSet;
     }
 
-    bool Robot::hasRobotNodeSet(RobotNodeSetPtr nodeSet) const
+    bool
+    Robot::hasRobotNodeSet(RobotNodeSetPtr nodeSet) const
     {
         if (!nodeSet)
         {
@@ -209,12 +224,14 @@ namespace VirtualRobot
         return hasRobotNodeSet(nodeSetName);
     }
 
-    bool LocalRobot::hasRobotNodeSet(const std::string& name) const
+    bool
+    LocalRobot::hasRobotNodeSet(const std::string& name) const
     {
         return robotNodeSetMap.find(name) != robotNodeSetMap.end();
     }
 
-    void LocalRobot::deregisterRobotNodeSet(RobotNodeSetPtr nodeSet)
+    void
+    LocalRobot::deregisterRobotNodeSet(RobotNodeSetPtr nodeSet)
     {
         if (!nodeSet)
         {
@@ -222,7 +239,7 @@ namespace VirtualRobot
         }
 
         std::string nodeSetName = nodeSet->getName();
-        std::map< std::string, RobotNodeSetPtr >::iterator i = robotNodeSetMap.find(nodeSetName);
+        std::map<std::string, RobotNodeSetPtr>::iterator i = robotNodeSetMap.find(nodeSetName);
 
         if (i != robotNodeSetMap.end())
         {
@@ -230,14 +247,14 @@ namespace VirtualRobot
         }
     }
 
-
     /**
      * This method registers \p endEffector with the current VirtualRobot::Robot
      * instance.
      * It throws an exception if a VirtualRobot::EndEffector with the same name
      * has already been registered.
      */
-    void LocalRobot::registerEndEffector(EndEffectorPtr endEffector)
+    void
+    LocalRobot::registerEndEffector(EndEffectorPtr endEffector)
     {
         if (!endEffector)
         {
@@ -248,7 +265,8 @@ namespace VirtualRobot
 
         if (endEffectorMap.find(endEffectorName) != endEffectorMap.end())
         {
-            THROW_VR_EXCEPTION("Trying to register a second endeffector with name <" << endEffectorName << ">");
+            THROW_VR_EXCEPTION("Trying to register a second endeffector with name <"
+                               << endEffectorName << ">");
         }
         else
         {
@@ -256,11 +274,11 @@ namespace VirtualRobot
         }
     }
 
-
     /**
      * \return true if instance of VirtualRobot::Robot contains a reference to \p endEffector and false otherwise
      */
-    bool Robot::hasEndEffector(EndEffectorPtr endEffector) const
+    bool
+    Robot::hasEndEffector(EndEffectorPtr endEffector) const
     {
         if (!endEffector)
         {
@@ -277,11 +295,11 @@ namespace VirtualRobot
         return false;
     }
 
-
     /**
      * \return true if instance of VirtualRobot::Robot contains an endeffector with name \p endEffectorName and false otherwise
      */
-    bool LocalRobot::hasEndEffector(const std::string& endEffectorName) const
+    bool
+    LocalRobot::hasEndEffector(const std::string& endEffectorName) const
     {
         if (endEffectorName.empty())
         {
@@ -296,15 +314,16 @@ namespace VirtualRobot
         return true;
     }
 
-
     /**
      * \return reference to endeffector with name \p endEffectorName or Null-Pointer otherwise
      */
-    EndEffectorPtr LocalRobot::getEndEffector(const std::string& endEffectorName) const
+    EndEffectorPtr
+    LocalRobot::getEndEffector(const std::string& endEffectorName) const
     {
         if (endEffectorMap.find(endEffectorName) == endEffectorMap.end())
         {
-            VR_WARNING << "No endeffector node with name <" << endEffectorName << "> defined." << std::endl;
+            VR_WARNING << "No endeffector node with name <" << endEffectorName << "> defined."
+                       << std::endl;
             return EndEffectorPtr();
         }
 
@@ -315,7 +334,8 @@ namespace VirtualRobot
      * This method stores all endeffectors belonging to the robot in \p storeEEF.
      * If there are no registered endeffectors \p storeEEF will be empty.
      */
-    void LocalRobot::getEndEffectors(std::vector<EndEffectorPtr>& storeEEF) const
+    void
+    LocalRobot::getEndEffectors(std::vector<EndEffectorPtr>& storeEEF) const
     {
         storeEEF.clear();
         storeEEF.reserve(endEffectorMap.size());
@@ -328,28 +348,28 @@ namespace VirtualRobot
         }
     }
 
-
     /**
     * Can be called internally, when lock is already set.
     */
-    void LocalRobot::applyJointValuesNoLock()
+    void
+    LocalRobot::applyJointValuesNoLock()
     {
         rootNode->updatePose(globalPose);
     }
 
-
-    std::vector<EndEffectorPtr> Robot::getEndEffectors() const
+    std::vector<EndEffectorPtr>
+    Robot::getEndEffectors() const
     {
         std::vector<EndEffectorPtr> res;
         getEndEffectors(res);
         return res;
     }
 
-
     /**
      * \return VirtualRobot::Robot::name
      */
-    std::string Robot::getName() const
+    std::string
+    Robot::getName() const
     {
         return name;
     }
@@ -357,22 +377,26 @@ namespace VirtualRobot
     /**
      * \return VirtualRobot::Robot::type
      */
-    std::string Robot::getType() const
+    std::string
+    Robot::getType() const
     {
         return type;
     }
-    
-    void Robot::setType(const std::string& type) 
+
+    void
+    Robot::setType(const std::string& type)
     {
         this->type = type;
     }
-    
-    void Robot::setName(const std::string& name) 
+
+    void
+    Robot::setName(const std::string& name)
     {
         this->name = name;
     }
 
-    void Robot::print(bool /*printChildren*/, bool /*printDecoration*/) const
+    void
+    Robot::print(bool /*printChildren*/, bool /*printDecoration*/) const
     {
         std::cout << "******** Robot ********" << std::endl;
         std::cout << "* Name: " << name << std::endl;
@@ -417,11 +441,11 @@ namespace VirtualRobot
         std::cout << "******** Robot ********" << std::endl;
     }
 
-
     /**
      * This method returns a reference to Robot::rootNode;
      */
-    RobotNodePtr LocalRobot::getRootNode() const
+    RobotNodePtr
+    LocalRobot::getRootNode() const
     {
         return this->rootNode;
     }
@@ -429,7 +453,8 @@ namespace VirtualRobot
     /**
      * Update the transformations of all joints
      */
-    void Robot::applyJointValues()
+    void
+    Robot::applyJointValues()
     {
         WriteLock lock(mutex, use_mutex);
         this->getRootNode()->updatePose(this->getGlobalPose());
@@ -438,7 +463,8 @@ namespace VirtualRobot
     /**
      * Can be called internally, when lock is already set.
      */
-    void Robot::applyJointValuesNoLock()
+    void
+    Robot::applyJointValuesNoLock()
     {
         this->getRootNode()->updatePose(this->getGlobalPose());
         //rootNode->updatePose(globalPose);
@@ -458,7 +484,9 @@ namespace VirtualRobot
      * This method stores all nodes belonging to the robot in \p storeNodes.
      * If there are no registered nodes \p storeNodes will be empty.
      */
-    void LocalRobot::getRobotNodes(std::vector< RobotNodePtr >& storeNodes, bool clearVector /*=true*/) const
+    void
+    LocalRobot::getRobotNodes(std::vector<RobotNodePtr>& storeNodes,
+                              bool clearVector /*=true*/) const
     {
         if (clearVector)
         {
@@ -466,7 +494,7 @@ namespace VirtualRobot
         }
 
         storeNodes.reserve(robotNodeMap.size());
-        std::map< std::string, RobotNodePtr>::const_iterator iterator = robotNodeMap.begin();
+        std::map<std::string, RobotNodePtr>::const_iterator iterator = robotNodeMap.begin();
 
         while (robotNodeMap.end() != iterator)
         {
@@ -475,14 +503,16 @@ namespace VirtualRobot
         }
     }
 
-    std::vector< RobotNodePtr > Robot::getRobotNodes() const
+    std::vector<RobotNodePtr>
+    Robot::getRobotNodes() const
     {
-        std::vector< RobotNodePtr > res;
+        std::vector<RobotNodePtr> res;
         getRobotNodes(res);
         return res;
     }
 
-    std::vector<std::string> Robot::getRobotNodeNames() const
+    std::vector<std::string>
+    Robot::getRobotNodeNames() const
     {
         std::vector<std::string> res;
         const auto nodes = getRobotNodes();
@@ -494,12 +524,13 @@ namespace VirtualRobot
         return res;
     }
 
-    void Robot::setUpdateVisualization(bool enable)
+    void
+    Robot::setUpdateVisualization(bool enable)
     {
         SceneObject::setUpdateVisualization(enable);
 
         std::vector<RobotNodePtr> robotNodes = this->getRobotNodes();
-        std::vector<RobotNodePtr> ::const_iterator iterator = robotNodes.begin();
+        std::vector<RobotNodePtr>::const_iterator iterator = robotNodes.begin();
 
         while (robotNodes.end() != iterator)
         {
@@ -508,12 +539,13 @@ namespace VirtualRobot
         }
     }
 
-    void Robot::setUpdateCollisionModel(bool enable)
+    void
+    Robot::setUpdateCollisionModel(bool enable)
     {
         SceneObject::setUpdateCollisionModel(enable);
 
         std::vector<RobotNodePtr> robotNodes = this->getRobotNodes();
-        std::vector<RobotNodePtr> ::const_iterator iterator = robotNodes.begin();
+        std::vector<RobotNodePtr>::const_iterator iterator = robotNodes.begin();
 
         while (robotNodes.end() != iterator)
         {
@@ -522,7 +554,8 @@ namespace VirtualRobot
         }
     }
 
-    std::shared_ptr<Robot> Robot::shared_from_this() const
+    std::shared_ptr<Robot>
+    Robot::shared_from_this() const
     {
         auto sceneObject = SceneObject::shared_from_this();
         std::shared_ptr<const Robot> robotPtr = std::static_pointer_cast<const Robot>(sceneObject);
@@ -530,12 +563,14 @@ namespace VirtualRobot
         return result;
     }
 
-    RobotNodeSetPtr LocalRobot::getRobotNodeSet(const std::string& nodeSetName) const
+    RobotNodeSetPtr
+    LocalRobot::getRobotNodeSet(const std::string& nodeSetName) const
     {
         auto it = robotNodeSetMap.find(nodeSetName);
         if (it == robotNodeSetMap.end())
         {
-            VR_WARNING << "No robot node set with name <" << nodeSetName << "> defined." << std::endl;
+            VR_WARNING << "No robot node set with name <" << nodeSetName << "> defined."
+                       << std::endl;
             return RobotNodeSetPtr();
         }
 
@@ -546,7 +581,8 @@ namespace VirtualRobot
      * This method stores all endeffectors belonging to the robot in \p storeEEF.
      * If there are no registered endeffectors \p storeEEF will be empty.
      */
-    void LocalRobot::getRobotNodeSets(std::vector<RobotNodeSetPtr>& storeNodeSets) const
+    void
+    LocalRobot::getRobotNodeSets(std::vector<RobotNodeSetPtr>& storeNodeSets) const
     {
         storeNodeSets.clear();
         storeNodeSets.reserve(robotNodeSetMap.size());
@@ -559,14 +595,16 @@ namespace VirtualRobot
         }
     }
 
-    std::vector<RobotNodeSetPtr> Robot::getRobotNodeSets() const
+    std::vector<RobotNodeSetPtr>
+    Robot::getRobotNodeSets() const
     {
         std::vector<RobotNodeSetPtr> res;
         getRobotNodeSets(res);
         return res;
     }
 
-    std::vector<std::string> Robot::getRobotNodeSetNames() const
+    std::vector<std::string>
+    Robot::getRobotNodeSetNames() const
     {
         std::vector<std::string> res;
         const auto sets = getRobotNodeSets();
@@ -578,7 +616,8 @@ namespace VirtualRobot
         return res;
     }
 
-    void Robot::highlight(VisualizationPtr visualization, bool enable)
+    void
+    Robot::highlight(VisualizationPtr visualization, bool enable)
     {
         std::vector<RobotNodePtr> robotNodes = this->getRobotNodes();
         std::vector<RobotNodePtr>::const_iterator iterator = robotNodes.begin();
@@ -590,7 +629,8 @@ namespace VirtualRobot
         }
     }
 
-    void Robot::showStructure(bool enable, const std::string& type)
+    void
+    Robot::showStructure(bool enable, const std::string& type)
     {
         std::vector<RobotNodePtr> robotNodes = this->getRobotNodes();
         std::vector<RobotNodePtr>::const_iterator iterator = robotNodes.begin();
@@ -600,10 +640,12 @@ namespace VirtualRobot
             (*iterator)->showStructure(enable, type);
             ++iterator;
         }
-
     }
 
-    void Robot::showPhysicsInformation(bool enableCoM, bool enableInertial, VisualizationNodePtr comModel)
+    void
+    Robot::showPhysicsInformation(bool enableCoM,
+                                  bool enableInertial,
+                                  VisualizationNodePtr comModel)
     {
         std::vector<RobotNodePtr> robotNodes = this->getRobotNodes();
         std::vector<RobotNodePtr>::const_iterator iterator = robotNodes.begin();
@@ -613,10 +655,10 @@ namespace VirtualRobot
             (*iterator)->showPhysicsInformation(enableCoM, enableInertial, comModel);
             ++iterator;
         }
-
     }
 
-    void Robot::showCoordinateSystems(bool enable, const std::string& type)
+    void
+    Robot::showCoordinateSystems(bool enable, const std::string& type)
     {
         std::vector<RobotNodePtr> robotNodes = this->getRobotNodes();
         std::vector<RobotNodePtr>::const_iterator iterator = robotNodes.begin();
@@ -628,7 +670,8 @@ namespace VirtualRobot
         }
     }
 
-    void Robot::setupVisualization(bool showVisualization, bool showAttachedVisualizations)
+    void
+    Robot::setupVisualization(bool showVisualization, bool showAttachedVisualizations)
     {
         std::vector<RobotNodePtr> robotNodes = this->getRobotNodes();
         std::vector<RobotNodePtr>::const_iterator iterator = robotNodes.begin();
@@ -638,10 +681,10 @@ namespace VirtualRobot
             (*iterator)->setupVisualization(showVisualization, showAttachedVisualizations);
             ++iterator;
         }
-
     }
 
-    int Robot::getNumFaces(bool collisionModel)
+    int
+    Robot::getNumFaces(bool collisionModel)
     {
         int res = 0;
         std::vector<RobotNodePtr> robotNodes = this->getRobotNodes();
@@ -656,12 +699,14 @@ namespace VirtualRobot
         return res;
     }
 
-    void Robot::setGlobalPose(const Eigen::Matrix4f& globalPose)
+    void
+    Robot::setGlobalPose(const Eigen::Matrix4f& globalPose)
     {
         setGlobalPose(globalPose, true);
     }
 
-    VirtualRobot::CollisionCheckerPtr Robot::getCollisionChecker()
+    VirtualRobot::CollisionCheckerPtr
+    Robot::getCollisionChecker()
     {
         std::vector<RobotNodePtr> robotNodes = this->getRobotNodes();
 
@@ -673,12 +718,14 @@ namespace VirtualRobot
         return (*robotNodes.begin())->getCollisionChecker();
     }
 
-    void LocalRobot::setGlobalPose(const Eigen::Matrix4f& globalPose)
+    void
+    LocalRobot::setGlobalPose(const Eigen::Matrix4f& globalPose)
     {
         setGlobalPose(globalPose, true);
     }
 
-    void LocalRobot::setGlobalPose(const Eigen::Matrix4f& globalPose, bool applyJointValues /*= true*/)
+    void
+    LocalRobot::setGlobalPose(const Eigen::Matrix4f& globalPose, bool applyJointValues /*= true*/)
     {
         WriteLock lock(mutex, use_mutex);
         this->globalPose = globalPose;
@@ -689,20 +736,22 @@ namespace VirtualRobot
         }
     }
 
-    Eigen::Matrix4f LocalRobot::getGlobalPose() const
+    Eigen::Matrix4f
+    LocalRobot::getGlobalPose() const
     {
         ReadLock lock(mutex, use_mutex);
         return globalPose;
     }
 
-
-    Eigen::Vector3f Robot::getCoMLocal()
+    Eigen::Vector3f
+    Robot::getCoMLocal()
     {
         Eigen::Vector3f com = getCoMGlobal();
         return toLocalCoordinateSystemVec(com);
     }
 
-    Eigen::Vector3f Robot::getCoMGlobal()
+    Eigen::Vector3f
+    Robot::getCoMGlobal()
     {
         Eigen::Vector3f res;
         res.setZero();
@@ -727,7 +776,8 @@ namespace VirtualRobot
         return res;
     }
 
-    float Robot::getMass() const
+    float
+    Robot::getMass() const
     {
         float res = 0;
         std::vector<RobotNodePtr> robotNodes = this->getRobotNodes();
@@ -742,9 +792,10 @@ namespace VirtualRobot
         return res;
     }
 
-    std::vector< CollisionModelPtr > Robot::getCollisionModels() const
+    std::vector<CollisionModelPtr>
+    Robot::getCollisionModels() const
     {
-        std::vector< CollisionModelPtr > result;
+        std::vector<CollisionModelPtr> result;
         std::vector<RobotNodePtr> robotNodes = this->getRobotNodes();
         std::vector<RobotNodePtr>::const_iterator iterator = robotNodes.begin();
 
@@ -761,17 +812,20 @@ namespace VirtualRobot
         return result;
     }
 
-    VirtualRobot::RobotPtr Robot::extractSubPart(RobotNodePtr startJoint,
-            const std::string& newRobotType,
-            const std::string& newRobotName,
-            bool cloneRNS,
-            bool cloneEEFs,
-            CollisionCheckerPtr collisionChecker,
-            std::optional<float> scaling,
-            bool preventCloningMeshesIfScalingIs1)
+    VirtualRobot::RobotPtr
+    Robot::extractSubPart(RobotNodePtr startJoint,
+                          const std::string& newRobotType,
+                          const std::string& newRobotName,
+                          bool cloneRNS,
+                          bool cloneEEFs,
+                          CollisionCheckerPtr collisionChecker,
+                          std::optional<float> scaling,
+                          bool preventCloningMeshesIfScalingIs1)
     {
         THROW_VR_EXCEPTION_IF(!startJoint, " StartJoint is nullptr");
-        THROW_VR_EXCEPTION_IF(!hasRobotNode(startJoint), " StartJoint '" + startJoint->getName() + "' is not part of this robot '" + getName() + "'");
+        THROW_VR_EXCEPTION_IF(!hasRobotNode(startJoint),
+                              " StartJoint '" + startJoint->getName() +
+                                  "' is not part of this robot '" + getName() + "'");
         //THROW_VR_EXCEPTION_IF(scaling <= 0, " Scaling must be >0.");
         // If scaling is <= 0 this->scaling is used instead. This enables different scalings while still able to clone the robot
 
@@ -785,7 +839,8 @@ namespace VirtualRobot
         //stefan Warning!!!!! which robot-type to create
         RobotPtr result(new LocalRobot(newRobotName, newRobotType));
 
-        RobotNodePtr rootNew = startJoint->clone(result, true, RobotNodePtr(), colChecker, scaling, preventCloningMeshesIfScalingIs1);
+        RobotNodePtr rootNew = startJoint->clone(
+            result, true, RobotNodePtr(), colChecker, scaling, preventCloningMeshesIfScalingIs1);
         THROW_VR_EXCEPTION_IF(!rootNew, "Clone failed...");
         result->setRootNode(rootNew);
         result->setScaling(scaling.value_or(this->scaling));
@@ -849,12 +904,15 @@ namespace VirtualRobot
         return result;
     }
 
-    RobotPtr Robot::cloneScaling() {
+    RobotPtr
+    Robot::cloneScaling()
+    {
         return clone();
     }
 
-    Eigen::Matrix4f Robot::getGlobalPoseForRobotNode(
-        const RobotNodePtr& node, const Eigen::Matrix4f& globalPoseNode) const
+    Eigen::Matrix4f
+    Robot::getGlobalPoseForRobotNode(const RobotNodePtr& node,
+                                     const Eigen::Matrix4f& globalPoseNode) const
     {
         THROW_VR_EXCEPTION_IF(!node, "NULL node");
 
@@ -877,16 +935,18 @@ namespace VirtualRobot
         return tf;
     }
 
-    void Robot::setGlobalPoseForRobotNode(
-        const RobotNodePtr& node, const Eigen::Matrix4f& globalPoseNode)
+    void
+    Robot::setGlobalPoseForRobotNode(const RobotNodePtr& node,
+                                     const Eigen::Matrix4f& globalPoseNode)
     {
         THROW_VR_EXCEPTION_IF(!node, "NULL node");
 
         setGlobalPose(getGlobalPoseForRobotNode(node, globalPoseNode));
     }
 
-    Eigen::Matrix4f Robot::getGlobalPositionForRobotNode(
-        const RobotNodePtr& node, const Eigen::Vector3f& globalPositionNode) const
+    Eigen::Matrix4f
+    Robot::getGlobalPositionForRobotNode(const RobotNodePtr& node,
+                                         const Eigen::Vector3f& globalPositionNode) const
     {
         // get translation from current to wanted tcp pose
         const Eigen::Vector3f translation = globalPositionNode - node->getGlobalPosition();
@@ -897,24 +957,27 @@ namespace VirtualRobot
         return math::Helpers::Pose(robotPosition);
     }
 
-    void Robot::setGlobalPositionForRobotNode(
-        const RobotNodePtr& node, const Eigen::Vector3f& globalPositionNode)
+    void
+    Robot::setGlobalPositionForRobotNode(const RobotNodePtr& node,
+                                         const Eigen::Vector3f& globalPositionNode)
     {
         setGlobalPose(getGlobalPositionForRobotNode(node, globalPositionNode));
     }
 
-
-    VirtualRobot::RobotPtr Robot::clone(const std::string& name,
-                                        CollisionCheckerPtr collisionChecker,
-                                        std::optional<float> scaling,
-                                        bool preventCloningMeshesIfScalingIs1)
+    VirtualRobot::RobotPtr
+    Robot::clone(const std::string& name,
+                 CollisionCheckerPtr collisionChecker,
+                 std::optional<float> scaling,
+                 bool preventCloningMeshesIfScalingIs1)
     {
         VirtualRobot::RobotPtr result = extractSubPart(this->getRootNode(),
-                                        this->getType(),
-                                        name, true, true,
-                                        collisionChecker,
-                                        scaling,
-                                        preventCloningMeshesIfScalingIs1);
+                                                       this->getType(),
+                                                       name,
+                                                       true,
+                                                       true,
+                                                       collisionChecker,
+                                                       scaling,
+                                                       preventCloningMeshesIfScalingIs1);
         result->setGlobalPose(getGlobalPose());
         result->filename = filename;
         result->type = type;
@@ -922,7 +985,7 @@ namespace VirtualRobot
 
         result->nodeMapping = getNodeMapping();
 
-        if(getHumanMapping().has_value())
+        if (getHumanMapping().has_value())
         {
             result->registerHumanMapping(getHumanMapping().value());
         }
@@ -931,14 +994,16 @@ namespace VirtualRobot
         return result;
     }
 
-    RobotPtr Robot::clone(CollisionCheckerPtr collisionChecker,
-                          std::optional<float> scaling,
-                          bool preventCloningMeshesIfScalingIs1)
+    RobotPtr
+    Robot::clone(CollisionCheckerPtr collisionChecker,
+                 std::optional<float> scaling,
+                 bool preventCloningMeshesIfScalingIs1)
     {
         return clone(getName(), collisionChecker, scaling, preventCloningMeshesIfScalingIs1);
     }
 
-    void Robot::createVisualizationFromCollisionModels()
+    void
+    Robot::createVisualizationFromCollisionModels()
     {
         std::vector<RobotNodePtr> robotNodes = this->getRobotNodes();
         std::vector<RobotNodePtr>::const_iterator iterator = robotNodes.begin();
@@ -947,7 +1012,8 @@ namespace VirtualRobot
         {
             RobotNodePtr rn = *iterator;
 
-            if (rn->getVisualization(SceneObject::Full) && rn->getVisualization(SceneObject::Collision))
+            if (rn->getVisualization(SceneObject::Full) &&
+                rn->getVisualization(SceneObject::Collision))
             {
                 VisualizationNodePtr v = rn->getVisualization(SceneObject::Collision)->clone();
                 rn->setVisualization(v);
@@ -957,7 +1023,8 @@ namespace VirtualRobot
         }
     }
 
-    VirtualRobot::RobotConfigPtr Robot::getConfig() const
+    VirtualRobot::RobotConfigPtr
+    Robot::getConfig() const
     {
         RobotConfigPtr r(new RobotConfig(shared_from_this(), getName()));
 
@@ -972,7 +1039,8 @@ namespace VirtualRobot
         return r;
     }
 
-    bool Robot::setConfig(RobotConfigPtr c)
+    bool
+    Robot::setConfig(RobotConfigPtr c)
     {
         if (!c)
         {
@@ -983,17 +1051,20 @@ namespace VirtualRobot
         return true;
     }
 
-    void Robot::setFilename(const std::string& filename)
+    void
+    Robot::setFilename(const std::string& filename)
     {
         this->filename = filename;
     }
 
-    std::string Robot::getFilename() const
+    std::string
+    Robot::getFilename() const
     {
         return filename;
     }
 
-    ReadLockPtr Robot::getReadLock()
+    ReadLockPtr
+    Robot::getReadLock()
     {
         if (!use_mutex)
         {
@@ -1005,7 +1076,8 @@ namespace VirtualRobot
         }
     }
 
-    WriteLockPtr Robot::getWriteLock()
+    WriteLockPtr
+    Robot::getWriteLock()
     {
         if (!use_mutex)
         {
@@ -1017,23 +1089,26 @@ namespace VirtualRobot
         }
     }
 
-    void Robot::setJointValue(const std::string& nodeName, float jointValue)
+    void
+    Robot::setJointValue(const std::string& nodeName, float jointValue)
     {
         RobotNodePtr rn = getRobotNode(nodeName);
         setJointValue(rn, jointValue);
     }
 
-    void Robot::setJointValue(RobotNodePtr rn, float jointValue)
+    void
+    Robot::setJointValue(RobotNodePtr rn, float jointValue)
     {
         VR_ASSERT(rn);
         rn->setJointValue(jointValue);
     }
 
-    void Robot::setJointValues(const std::map< std::string, float >& jointValues)
+    void
+    Robot::setJointValues(const std::map<std::string, float>& jointValues)
     {
         WriteLock lock(mutex, use_mutex);
 
-        std::map< std::string, float >::const_iterator it = jointValues.begin();
+        std::map<std::string, float>::const_iterator it = jointValues.begin();
 
         while (it != jointValues.end())
         {
@@ -1052,7 +1127,8 @@ namespace VirtualRobot
         applyJointValuesNoLock();
     }
 
-    std::map<std::string, float> Robot::getJointValues() const
+    std::map<std::string, float>
+    Robot::getJointValues() const
     {
         ReadLock lock(mutex, use_mutex);
         std::map<std::string, float> values;
@@ -1066,11 +1142,12 @@ namespace VirtualRobot
         return values;
     }
 
-    void Robot::setJointValues(const std::map<RobotNodePtr, float>& jointValues)
+    void
+    Robot::setJointValues(const std::map<RobotNodePtr, float>& jointValues)
     {
         WriteLock lock(mutex, use_mutex);
 
-        std::map< RobotNodePtr, float >::const_iterator it = jointValues.begin();
+        std::map<RobotNodePtr, float>::const_iterator it = jointValues.begin();
 
         while (it != jointValues.end())
         {
@@ -1082,25 +1159,29 @@ namespace VirtualRobot
         applyJointValuesNoLock();
     }
 
-    void Robot::setJointValues(RobotNodeSetPtr rns, const std::vector<float>& jointValues)
+    void
+    Robot::setJointValues(RobotNodeSetPtr rns, const std::vector<float>& jointValues)
     {
         VR_ASSERT(rns);
         rns->setJointValues(jointValues);
     }
 
-    void Robot::setJointValues(RobotNodeSetPtr rns, const Eigen::VectorXf& jointValues)
+    void
+    Robot::setJointValues(RobotNodeSetPtr rns, const Eigen::VectorXf& jointValues)
     {
         VR_ASSERT(rns);
         rns->setJointValues(jointValues);
     }
 
-    void Robot::setJointValues(RobotConfigPtr config)
+    void
+    Robot::setJointValues(RobotConfigPtr config)
     {
         VR_ASSERT(config);
         config->setJointValues(shared_from_this());
     }
 
-    void Robot::setJointValues(TrajectoryPtr trajectory, float t)
+    void
+    Robot::setJointValues(TrajectoryPtr trajectory, float t)
     {
         VR_ASSERT(trajectory);
         Eigen::VectorXf c;
@@ -1108,28 +1189,31 @@ namespace VirtualRobot
         setJointValues(trajectory->getRobotNodeSet(), c);
     }
 
-    void Robot::setJointValues(RobotNodeSetPtr rns, RobotConfigPtr config)
+    void
+    Robot::setJointValues(RobotNodeSetPtr rns, RobotConfigPtr config)
     {
         VR_ASSERT(rns);
         VR_ASSERT(config);
         rns->setJointValues(config);
     }
 
-    void Robot::setJointValues(const std::vector<RobotNodePtr> rn, const std::vector<float>& jointValues)
+    void
+    Robot::setJointValues(const std::vector<RobotNodePtr> rn, const std::vector<float>& jointValues)
     {
         VR_ASSERT(rn.size() == jointValues.size());
         WriteLock lock(mutex, use_mutex);
 
         for (size_t i = 0; i < rn.size(); i++)
         {
-            VR_INFO << rn[i]->getName() << ": " <<  jointValues[i];
+            VR_INFO << rn[i]->getName() << ": " << jointValues[i];
             rn[i]->setJointValueNoUpdate(jointValues[i]);
         }
 
         applyJointValuesNoLock();
     }
 
-    VirtualRobot::BoundingBox Robot::getBoundingBox(bool collisionModel) const
+    VirtualRobot::BoundingBox
+    Robot::getBoundingBox(bool collisionModel) const
     {
         VirtualRobot::BoundingBox bbox;
         std::vector<RobotNodePtr> rn = getRobotNodes();
@@ -1149,7 +1233,8 @@ namespace VirtualRobot
         return bbox;
     }
 
-    SensorPtr Robot::getSensor(const std::string& name) const
+    SensorPtr
+    Robot::getSensor(const std::string& name) const
     {
         std::vector<RobotNodePtr> rn = getRobotNodes();
 
@@ -1169,7 +1254,8 @@ namespace VirtualRobot
         return SensorPtr();
     }
 
-    std::vector<SensorPtr> Robot::getSensors() const
+    std::vector<SensorPtr>
+    Robot::getSensors() const
     {
         std::vector<SensorPtr> result;
         std::vector<RobotNodePtr> rn = getRobotNodes();
@@ -1187,12 +1273,20 @@ namespace VirtualRobot
         return result;
     }
 
-    std::string Robot::toXML(const std::string& basePath,  const std::string& modelPath, bool storeEEF, bool storeRNS, bool storeSensors, bool storeModelFiles) const
+    std::string
+    Robot::toXML(const std::string& basePath,
+                 const std::string& modelPath,
+                 bool storeEEF,
+                 bool storeRNS,
+                 bool storeSensors,
+                 bool storeModelFiles) const
     {
         std::stringstream ss;
         ss << "<?xml version='1.0' encoding='UTF-8'?>" << endl << std::endl;
         //ss << "<Robot Type='" << this->type << "' RootNode='" << this->getRootNode()->getName() << "' RadianToMMfactor='" << this->radianToMMfactor << "'>" << endl << std::endl;
-        ss << "<Robot Type='" << this->type << "' RootNode='" << this->getRootNode()->getName() << "'>" << endl << std::endl;
+        ss << "<Robot Type='" << this->type << "' RootNode='" << this->getRootNode()->getName()
+           << "'>" << endl
+           << std::endl;
         std::vector<RobotNodePtr> nodes = getRobotNodes();
 
         for (auto& node : nodes)
@@ -1238,17 +1332,20 @@ namespace VirtualRobot
         return ss.str();
     }
 
-    float Robot::getScaling() const
+    float
+    Robot::getScaling() const
     {
         return scaling;
     }
 
-    void Robot::setScaling(float scaling)
+    void
+    Robot::setScaling(float scaling)
     {
         this->scaling = scaling;
     }
 
-    void Robot::inflateCollisionModel(float inflationInMM)
+    void
+    Robot::inflateCollisionModel(float inflationInMM)
     {
         for (auto& node : getRobotNodes())
         {
@@ -1259,38 +1356,47 @@ namespace VirtualRobot
         }
     }
 
-    bool Robot::getPropagatingJointValuesEnabled() const
+    bool
+    Robot::getPropagatingJointValuesEnabled() const
     {
         return propagatingJointValuesEnabled;
     }
 
-    void Robot::setPropagatingJointValuesEnabled(bool enabled)
+    void
+    Robot::setPropagatingJointValuesEnabled(bool enabled)
     {
         propagatingJointValuesEnabled = enabled;
     }
 
-    void Robot::validateNodeMapping(const NodeMapping& nodeMapping) const
+    void
+    Robot::validateNodeMapping(const NodeMapping& nodeMapping) const
     {
-        for(const auto& nodeMap : nodeMapping)
+        for (const auto& nodeMap : nodeMapping)
         {
-            THROW_VR_EXCEPTION_IF(not hasRobotNode(nodeMap.first), "Node '" + nodeMap.first + " not found in the node set!");
-            THROW_VR_EXCEPTION_IF(not hasRobotNode(nodeMap.second.node), "Node '" + nodeMap.second.node + " not found in the node set!");
+            THROW_VR_EXCEPTION_IF(not hasRobotNode(nodeMap.first),
+                                  "Node '" + nodeMap.first + " not found in the node set!");
+            THROW_VR_EXCEPTION_IF(not hasRobotNode(nodeMap.second.node),
+                                  "Node '" + nodeMap.second.node + " not found in the node set!");
         }
     }
 
-    void Robot::registerNodeMapping(const NodeMapping& nodeMapping){
+    void
+    Robot::registerNodeMapping(const NodeMapping& nodeMapping)
+    {
 
         validateNodeMapping(nodeMapping);
 
         this->nodeMapping = nodeMapping;
     }
 
-    void Robot::registerHumanMapping(const HumanMapping& humanMapping)
+    void
+    Robot::registerHumanMapping(const HumanMapping& humanMapping)
     {
         this->humanMapping = humanMapping;
     }
 
-    void Robot::removeAllSensors()
+    void
+    Robot::removeAllSensors()
     {
         if (auto rootNode = getRootNode())
         {
@@ -1298,39 +1404,47 @@ namespace VirtualRobot
         }
     }
 
-    const NodeMapping& Robot::getNodeMapping() const
+    const NodeMapping&
+    Robot::getNodeMapping() const
     {
         return nodeMapping;
     }
 
-    const std::optional<HumanMapping>& Robot::getHumanMapping() const
+    const std::optional<HumanMapping>&
+    Robot::getHumanMapping() const
     {
         return humanMapping;
     }
 
-    void Robot::registerConfiguration(const std::string& name, const std::map<std::string, float>& configuration)
+    void
+    Robot::registerConfiguration(const std::string& name,
+                                 const std::map<std::string, float>& configuration)
     {
-        if(hasConfiguration(name))
+        if (hasConfiguration(name))
         {
-            VR_WARNING << "You are registering a configuration with name `" << name 
-                       << "` which has already been registered. The new configuration will replace the old one." << std::endl;
-            
+            VR_WARNING << "You are registering a configuration with name `" << name
+                       << "` which has already been registered. The new configuration will replace "
+                          "the old one."
+                       << std::endl;
+
             // only works if 'name' is not already existing
             configurations.emplace(name, configuration);
             return;
         }
 
-        configurations[name] = configuration; 
+        configurations[name] = configuration;
     }
 
-    bool Robot::hasConfiguration(const std::string& name) const
+    bool
+    Robot::hasConfiguration(const std::string& name) const
     {
         return configurations.count(name) > 0;
     }
 
-    std::optional<std::map<std::string, float>> Robot::getConfiguration(const std::string& name) const
+    std::optional<std::map<std::string, float>>
+    Robot::getConfiguration(const std::string& name) const
     {
-        if(not hasConfiguration(name))
+        if (not hasConfiguration(name))
         {
             return std::nullopt;
         }
@@ -1338,14 +1452,16 @@ namespace VirtualRobot
         return configurations.at(name);
     }
 
-    std::map<std::string, std::map<std::string, float>> Robot::getConfigurations() const
+    std::map<std::string, std::map<std::string, float>>
+    Robot::getConfigurations() const
     {
         return configurations;
     }
 
-    bool Robot::setToConfiguration(const std::string& name)
+    bool
+    Robot::setToConfiguration(const std::string& name)
     {
-        if(not hasConfiguration(name))
+        if (not hasConfiguration(name))
         {
             return false;
         }
@@ -1355,6 +1471,42 @@ namespace VirtualRobot
         return true;
     }
 
-    
+    /**
+     * This method collects all visualization nodes and creates a new Visualization
+     * subclass which is given by the template parameter T.
+     * T must be a subclass of VirtualRobot::Visualization.
+     * A compile time error is thrown if a different class type is used as template argument.
+     */
+    // template <typename T>
+    std::shared_ptr<CoinVisualization>
+    Robot::getVisualization(SceneObject::VisualizationType visuType, bool sensors)
+    {
+        // static_assert(::std::is_base_of_v<Visualization, T>,
+        //   "TEMPLATE_PARAMETER_FOR_VirtualRobot_getVisualization_MUST_BT_A_SUBCLASS_OF_VirtualRobot__Visualization");
+        std::vector<RobotNodePtr> collectedRobotNodes;
+        getRobotNodes(collectedRobotNodes);
+        std::vector<VisualizationNodePtr> collectedVisualizationNodes;
+
+        for (size_t i = 0; i < collectedRobotNodes.size(); i++)
+        {
+            collectedVisualizationNodes.push_back(
+                collectedRobotNodes[i]->getVisualization(visuType));
+        }
+
+        if (sensors)
+        {
+            std::vector<SensorPtr> sn = getSensors();
+
+            for (size_t i = 0; i < sn.size(); i++)
+            {
+                collectedVisualizationNodes.push_back(sn[i]->getVisualization(visuType));
+            }
+        }
+
+        std::shared_ptr<CoinVisualization> visualization(
+            new CoinVisualization(collectedVisualizationNodes));
+        return visualization;
+    }
+
 
 } // namespace VirtualRobot

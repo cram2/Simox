@@ -20,40 +20,38 @@
  *             GNU General Public License
  */
 
-#define BOOST_TEST_MODULE SimoxUtility/color/ColorMap
+#define BOOST_TEST_MODULE SimoxUtility / color / ColorMap
+
+#include <iostream>
+#include <set>
+#include <vector>
 
 #include <boost/test/included/unit_test.hpp>
 
 #include <SimoxUtility/random/choice.h>
 
-#include <iostream>
-
-#include <set>
-#include <vector>
-
-
 namespace ChoiceTest
 {
 
-struct Fixture
-{
-
-    std::vector<std::string> vector { "a", "b", "c" };
-    std::set<std::string> set {vector.begin(), vector.end()};
-
-    Fixture()
+    struct Fixture
     {
-    }
-    ~Fixture()
-    {
-    }
-};
 
-}
+        std::vector<std::string> vector{"a", "b", "c"};
+        std::set<std::string> set{vector.begin(), vector.end()};
+
+        Fixture()
+        {
+        }
+
+        ~Fixture()
+        {
+        }
+    };
+
+} // namespace ChoiceTest
 
 
 BOOST_FIXTURE_TEST_SUITE(ChoiceTest, ChoiceTest::Fixture)
-
 
 BOOST_AUTO_TEST_CASE(test_choice_vector)
 {
@@ -70,7 +68,6 @@ BOOST_AUTO_TEST_CASE(test_choice_vector)
     BOOST_CHECK_EQUAL(allChosen.size(), 3);
 }
 
-
 BOOST_AUTO_TEST_CASE(test_choice_set)
 {
     std::set<std::string> allChosen;
@@ -85,7 +82,6 @@ BOOST_AUTO_TEST_CASE(test_choice_set)
     // All items must be hit at least once ... very likely.
     BOOST_CHECK_EQUAL(allChosen.size(), 3);
 }
-
 
 BOOST_AUTO_TEST_CASE(test_choice_empty)
 {

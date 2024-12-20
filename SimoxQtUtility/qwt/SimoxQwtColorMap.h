@@ -1,9 +1,9 @@
 #pragma once
 
+#include <qwt_color_map.h>
+
 #include <SimoxUtility/color/ColorMap.h>
 #include <SimoxUtility/color/cmaps/Named.h>
-
-#include <qwt_color_map.h>
 
 namespace simox::qt
 {

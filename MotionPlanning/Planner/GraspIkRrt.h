@@ -22,11 +22,12 @@
 */
 #pragma once
 
-#include "../Saba.h"
-#include "../CSpace/CSpaceSampled.h"
-#include "../CSpace/CSpacePath.h"
-#include <VirtualRobot/VirtualRobot.h>
 #include <VirtualRobot/IK/AdvancedIKSolver.h>
+#include <VirtualRobot/VirtualRobot.h>
+
+#include "../CSpace/CSpacePath.h"
+#include "../CSpace/CSpaceSampled.h"
+#include "../Saba.h"
 #include "BiRrt.h"
 
 namespace Saba
@@ -50,7 +51,11 @@ namespace Saba
             \param graspSet The grasps, defining potential goal configurations.
             \param probabSampleGoal Probability with which a goal config is created during planning loop.
         */
-        GraspIkRrt(CSpaceSampledPtr cspace, VirtualRobot::ManipulationObjectPtr object, VirtualRobot::AdvancedIKSolverPtr ikSolver, VirtualRobot::GraspSetPtr graspSet, float probabSampleGoal = 0.1f);
+        GraspIkRrt(CSpaceSampledPtr cspace,
+                   VirtualRobot::ManipulationObjectPtr object,
+                   VirtualRobot::AdvancedIKSolverPtr ikSolver,
+                   VirtualRobot::GraspSetPtr graspSet,
+                   float probabSampleGoal = 0.1f);
         ~GraspIkRrt() override;
 
         /*!
@@ -69,7 +74,6 @@ namespace Saba
         void reset() override;
 
     protected:
-
         //virtual bool createSolution(bool bQuiet = false);
         bool doPlanningCycle();
         bool searchNewGoal();
@@ -86,12 +90,8 @@ namespace Saba
 
         bool found; //!< Indicates if a solution was found
 
-        std::map < VirtualRobot::GraspPtr, Saba::CSpaceNodePtr > graspNodeMapping;
-        std::vector< Eigen::VectorXf > ikSolutions;
-
+        std::map<VirtualRobot::GraspPtr, Saba::CSpaceNodePtr> graspNodeMapping;
+        std::vector<Eigen::VectorXf> ikSolutions;
     };
 
-} // namespace
-
-
-
+} // namespace Saba

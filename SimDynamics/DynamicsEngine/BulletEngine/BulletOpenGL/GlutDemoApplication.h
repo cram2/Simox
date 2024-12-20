@@ -18,18 +18,14 @@ subject to the following restrictions:
 
 #include "DemoApplication.h"
 
-ATTRIBUTE_ALIGNED16(class) GlutDemoApplication :
-public DemoApplication
+ATTRIBUTE_ALIGNED16(class) GlutDemoApplication : public DemoApplication
 {
 public:
-
     BT_DECLARE_ALIGNED_ALLOCATOR();
 
     void specialKeyboard(int key, int x, int y) override;
 
     void swapBuffers() override;
 
-    void    updateModifierKeys() override;
-
+    void updateModifierKeys() override;
 };
-

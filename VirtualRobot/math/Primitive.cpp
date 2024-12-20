@@ -19,13 +19,15 @@
  *             GNU Lesser General Public License
  */
 
-#include "Line.h"
 #include "Primitive.h"
+
+#include "Line.h"
 
 namespace math
 {
-    void Primitive::AddTriangle(Eigen::Vector3f v1, Eigen::Vector3f v2, Eigen::Vector3f v3)
+    void
+    Primitive::AddTriangle(Eigen::Vector3f v1, Eigen::Vector3f v2, Eigen::Vector3f v3)
     {
         push_back(Triangle(v1, v2, v3));
     }
-}
+} // namespace math

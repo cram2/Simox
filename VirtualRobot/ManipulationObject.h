@@ -22,13 +22,12 @@
 */
 #pragma once
 
-#include "VirtualRobot.h"
-#include "Obstacle.h"
-#include "EndEffector/EndEffector.h"
-
 #include <string>
-#include <vector>
+
 #include <Eigen/Core>
+
+#include "Obstacle.h"
+#include "VirtualRobot.h"
 
 namespace VirtualRobot
 {
@@ -36,9 +35,14 @@ namespace VirtualRobot
     class VIRTUAL_ROBOT_IMPORT_EXPORT ManipulationObject : public Obstacle
     {
     public:
-
-        ManipulationObject(const std::string& name, VisualizationNodePtr visualization = VisualizationNodePtr(), CollisionModelPtr collisionModel = CollisionModelPtr(), const SceneObject::Physics& p = SceneObject::Physics(), CollisionCheckerPtr colChecker = CollisionCheckerPtr());
-        ManipulationObject(const std::string& name, const TriMeshModelPtr& trimesh, const std::string& filename = "");
+        ManipulationObject(const std::string& name,
+                           VisualizationNodePtr visualization = VisualizationNodePtr(),
+                           CollisionModelPtr collisionModel = CollisionModelPtr(),
+                           const SceneObject::Physics& p = SceneObject::Physics(),
+                           CollisionCheckerPtr colChecker = CollisionCheckerPtr());
+        ManipulationObject(const std::string& name,
+                           const TriMeshModelPtr& trimesh,
+                           const std::string& filename = "");
         ManipulationObject(const TriMeshModelPtr& trimesh);
         /*!
         */
@@ -53,13 +57,20 @@ namespace VirtualRobot
             \param storeLinkToFile If set, the data (e.g. grasps) are not explicitly listed, but an xml tag directing to the XML file,
                     from which this instance was loaded, is set. If not set a deep description is created.
         */
-        virtual std::string toXML(const std::string& basePath = std::string(), int tabs = 0, bool storeLinkToFile = false, const std::string& modelPathRelative = "", bool storeSensors = true);
+        virtual std::string toXML(const std::string& basePath = std::string(),
+                                  int tabs = 0,
+                                  bool storeLinkToFile = false,
+                                  const std::string& modelPathRelative = "",
+                                  bool storeSensors = true);
 
         /*!
             Clones this object. If no col checker is given, the one of the original object is used.
         */
-        ManipulationObjectPtr clone(const std::string& name, CollisionCheckerPtr colChecker = CollisionCheckerPtr(), bool deepVisuCopy = true) const;
-        ManipulationObjectPtr clone(CollisionCheckerPtr colChecker = CollisionCheckerPtr(), bool deepVisuCopy = true) const;
+        ManipulationObjectPtr clone(const std::string& name,
+                                    CollisionCheckerPtr colChecker = CollisionCheckerPtr(),
+                                    bool deepVisuCopy = true) const;
+        ManipulationObjectPtr clone(CollisionCheckerPtr colChecker = CollisionCheckerPtr(),
+                                    bool deepVisuCopy = true) const;
 
         /*!
         Create a standard obstacle from a mesh.
@@ -67,9 +78,10 @@ namespace VirtualRobot
         \param visualizationType Here the type of visualization can be specified (e.g. "Inventor"). If empty, the first registered visualization type (which is usually the only one) is used.
         \param colChecker Only needed if you plan to use the collision checker in parallel. If not given, the object is registered with the global singleton collision checker.
         */
-        static ManipulationObjectPtr createFromMesh(TriMeshModelPtr mesh, std::string visualizationType = "", CollisionCheckerPtr colChecker = CollisionCheckerPtr());
-
+        static ManipulationObjectPtr
+        createFromMesh(TriMeshModelPtr mesh,
+                       std::string visualizationType = "",
+                       CollisionCheckerPtr colChecker = CollisionCheckerPtr());
     };
 
-} // namespace
-
+} // namespace VirtualRobot

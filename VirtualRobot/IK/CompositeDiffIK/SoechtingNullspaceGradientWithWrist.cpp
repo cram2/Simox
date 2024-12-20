@@ -24,6 +24,7 @@
 #include <VirtualRobot/Robot.h>
 
 #include "MathTools.h"
+#include "RobotNodeSet.h"
 #include "Soechting.h"
 #include "VirtualRobot.h"
 
@@ -43,7 +44,8 @@ namespace VirtualRobot
     {
     }
 
-    void SoechtingNullspaceGradientWithWrist::init(CompositeDiffIK::Parameters&)
+    void
+    SoechtingNullspaceGradientWithWrist::init(CompositeDiffIK::Parameters&)
     {
         // Do nothing
     }
@@ -54,9 +56,9 @@ namespace VirtualRobot
     {
         const size_t dim = rns->getSize();
 
-        auto sa                 = calcShoulderAngles(params);
+        auto sa = calcShoulderAngles(params);
         Eigen::VectorXf weights = Eigen::VectorXf::Zero(dim);
-        Eigen::VectorXf target  = Eigen::VectorXf::Zero(dim);
+        Eigen::VectorXf target = Eigen::VectorXf::Zero(dim);
 
         const auto set = [&](const auto& joint, const float w, const float t)
         {
@@ -65,7 +67,7 @@ namespace VirtualRobot
                 auto id = rns->getRobotNodeIndex(joint);
                 VR_ASSERT(id >= 0);
                 weights[id] = w;
-                target[id]  = t;
+                target[id] = t;
             }
         };
 
@@ -81,12 +83,12 @@ namespace VirtualRobot
 
         switch (arm)
         {
-        case Soechting::ArmType::Left:
-            set(joints.wristExtension, 0.5F, -MathTools::deg2rad(20));
-            break;
-        case Soechting::ArmType::Right:
-            set(joints.wristExtension, 0.5F, +MathTools::deg2rad(20));
-            break;
+            case Soechting::ArmType::Left:
+                set(joints.wristExtension, 0.5F, -MathTools::deg2rad(20));
+                break;
+            case Soechting::ArmType::Right:
+                set(joints.wristExtension, 0.5F, +MathTools::deg2rad(20));
+                break;
         }
 
         // std::cout << "target" << target << std::endl;
@@ -102,10 +104,10 @@ namespace VirtualRobot
         const Eigen::Matrix4f currentShoulder = shoulder->getPoseInRootFrame();
 
         Soechting::Arm arm;
-        arm.armType        = this->arm;
-        arm.shoulder       = currentShoulder.block<3, 1>(0, 3);
+        arm.armType = this->arm;
+        arm.shoulder = currentShoulder.block<3, 1>(0, 3);
         arm.upperArmLength = 0.F;
-        arm.forearmLength  = 0.F;
+        arm.forearmLength = 0.F;
 
         Eigen::Vector3f targetPosition = target->target.block<3, 1>(0, 3);
         const auto sa = Soechting::CalculateAngles(targetPosition, arm, 1.3, false);
@@ -122,12 +124,13 @@ namespace VirtualRobot
         ShoulderAngles res;
         res.SR = std::max(-0.1F, SR);
         res.SE = sa.SE;
-        res.E  = sa.EE;
-        res.C  = 0;
+        res.E = sa.EE;
+        res.C = 0;
         return res;
     }
 
-    RobotNodeSetPtr SoechtingNullspaceGradientWithWrist::ArmJointsWithWrist::createRobotNodeSet(
+    RobotNodeSetPtr
+    SoechtingNullspaceGradientWithWrist::ArmJointsWithWrist::createRobotNodeSet(
         const std::string& name) const
     {
         std::vector<RobotNodePtr> robotNodes;

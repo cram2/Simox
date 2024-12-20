@@ -21,8 +21,8 @@
 
 #pragma once
 
-#include "MathForwardDefinitions.h"
 
+#include <Eigen/Core>
 
 namespace math
 {
@@ -30,12 +30,26 @@ namespace math
     class Triangle
     {
     public:
-        Triangle();//TODO
+        Triangle(); //TODO
         Triangle(Eigen::Vector3f p1, Eigen::Vector3f p2, Eigen::Vector3f p3);
 
-        Eigen::Vector3f P1() const {return p1;}
-        Eigen::Vector3f P2() const {return p2;}
-        Eigen::Vector3f P3() const {return p3;}
+        Eigen::Vector3f
+        P1() const
+        {
+            return p1;
+        }
+
+        Eigen::Vector3f
+        P2() const
+        {
+            return p2;
+        }
+
+        Eigen::Vector3f
+        P3() const
+        {
+            return p3;
+        }
 
         std::string ToString();
 
@@ -46,13 +60,17 @@ namespace math
         Eigen::Vector3f Centroid();
         std::vector<Triangle> Subdivide(int depth);
 
-        static void Subdivide(int depth, Eigen::Vector3f p1, Eigen::Vector3f p2, Eigen::Vector3f p3, std::vector<Triangle> &list);
+        static void Subdivide(int depth,
+                              Eigen::Vector3f p1,
+                              Eigen::Vector3f p2,
+                              Eigen::Vector3f p3,
+                              std::vector<Triangle>& list);
 
         Triangle Transform(Eigen::Vector3f center, float unitLength);
+
     private:
         Eigen::Vector3f p1;
         Eigen::Vector3f p2;
         Eigen::Vector3f p3;
     };
-}
-
+} // namespace math

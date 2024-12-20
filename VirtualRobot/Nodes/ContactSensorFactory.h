@@ -23,34 +23,38 @@
 #pragma once
 
 #include "../VirtualRobotImportExport.h"
-#include "../SceneObject.h"
 #include "SensorFactory.h"
-
-
 
 namespace VirtualRobot
 {
     class Sensor;
 
-    class VIRTUAL_ROBOT_IMPORT_EXPORT ContactSensorFactory  : public SensorFactory
+    class VIRTUAL_ROBOT_IMPORT_EXPORT ContactSensorFactory : public SensorFactory
     {
     public:
         ContactSensorFactory();
         ~ContactSensorFactory() override;
 
         //! Standard init method
-        SensorPtr createSensor(GraspableSensorizedObjectPtr node, const std::string& name, VisualizationNodePtr visualization = VisualizationNodePtr(),
-                                       const Eigen::Matrix4f& rnTrafo = Eigen::Matrix4f::Identity()) const override;
+        SensorPtr
+        createSensor(GraspableSensorizedObjectPtr node,
+                     const std::string& name,
+                     VisualizationNodePtr visualization = VisualizationNodePtr(),
+                     const Eigen::Matrix4f& rnTrafo = Eigen::Matrix4f::Identity()) const override;
 
         /*!
           Create sensor from XML tag.
           */
-        SensorPtr createSensor(GraspableSensorizedObjectPtr node, const rapidxml::xml_node<char>* sensorXMLNode, BaseIO::RobotDescription loadMode = RobotIO::eFull, const std::string basePath = std::string()) const override;
+        SensorPtr createSensor(GraspableSensorizedObjectPtr node,
+                               const rapidxml::xml_node<char>* sensorXMLNode,
+                               BaseIO::RobotDescription loadMode = RobotIO::eFull,
+                               const std::string basePath = std::string()) const override;
 
         // AbstractFactoryMethod
     public:
         static std::string getName();
         static std::shared_ptr<SensorFactory> createInstance(void*);
+
     private:
         static SubClassRegistry registry;
     };

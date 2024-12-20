@@ -22,7 +22,7 @@
 #pragma once
 
 
-#include "MathForwardDefinitions.h"
+#include <Eigen/Core>
 
 namespace math
 {
@@ -33,6 +33,7 @@ namespace math
         void Add(float value, float weight);
         float Average();
         float WeightSum();
+
     private:
         float sum = 0;
         float weightSum = 0;
@@ -44,9 +45,9 @@ namespace math
         void Add(Eigen::Vector3f value, float weight);
         Eigen::Vector3f Average();
         float WeightSum();
+
     private:
         Eigen::Vector3f sum;
         float weightSum = 0;
     };
-}
-
+} // namespace math

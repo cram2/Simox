@@ -5,7 +5,5 @@
 
 namespace mjcf
 {
-    const std::string CompilerSection::tag  = "compiler";
+    const std::string CompilerSection::tag = "compiler";
 }
-
-

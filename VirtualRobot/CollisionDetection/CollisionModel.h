@@ -22,14 +22,11 @@
 */
 #pragma once
 
-#include "../VirtualRobot.h"
-#include "../MathTools.h"
-#include "../BoundingBox.h"
-
 #include <string>
 #include <vector>
-#include <map>
-#include <set>
+
+#include "VirtualRobot/BoundingBox.h"
+#include "VirtualRobot/VirtualRobot.h"
 
 #if defined(VR_COLLISION_DETECTION_PQP)
 #include "PQP/CollisionModelPQP.h"
@@ -44,7 +41,7 @@ namespace VirtualRobot
 #else
     typedef CollisionModelDummy InternalCollisionModel;
 #endif
-    typedef std::shared_ptr< InternalCollisionModel > InternalCollisionModelPtr;
+    typedef std::shared_ptr<InternalCollisionModel> InternalCollisionModelPtr;
     class CollisionChecker;
 
     /*!
@@ -64,7 +61,11 @@ namespace VirtualRobot
             \param colChecker If not specified, the global singleton instance is used. Only useful, when parallel collision checks should be performed.
             \param id A user id.
         */
-        CollisionModel(const VisualizationNodePtr& visu, const std::string& name = "", CollisionCheckerPtr colChecker = CollisionCheckerPtr(), int id = 666, float margin = 0.0f);
+        CollisionModel(const VisualizationNodePtr& visu,
+                       const std::string& name = "",
+                       CollisionCheckerPtr colChecker = CollisionCheckerPtr(),
+                       int id = 666,
+                       float margin = 0.0f);
 
         CollisionModel(const TriMeshModelPtr& mesh);
 
@@ -84,22 +85,27 @@ namespace VirtualRobot
         */
         BoundingBox getBoundingBox(bool global = true);
 
-        [[deprecated("The behavior of this function has changed. To obtain the bounding box in the global coordinate frame, use getGlobalBoundingBox() instead.")]]
-        BoundingBox getLocalBoundingBox()
+        [[deprecated("The behavior of this function has changed. To obtain the bounding box in the "
+                     "global coordinate frame, use getGlobalBoundingBox() instead.")]] BoundingBox
+        getLocalBoundingBox()
         {
             return getBoundingBox(false);
         }
-        BoundingBox getGlobalBoundingBox()
+
+        BoundingBox
+        getGlobalBoundingBox()
         {
             return getBoundingBox();
         }
 
-        void setGlobalParentPose(const Eigen::Matrix4f& globalParentPose)
+        void
+        setGlobalParentPose(const Eigen::Matrix4f& globalParentPose)
         {
             setGlobalPose(globalParentPose * localPose);
         }
 
-        void setLocalPose(const Eigen::Matrix4f& localPose)
+        void
+        setLocalPose(const Eigen::Matrix4f& localPose)
         {
             this->localPose = localPose;
         }
@@ -107,42 +113,52 @@ namespace VirtualRobot
         /*!
         The global pose defines the position of the joint in the world. This value is used for visualization.
         */
-        inline Eigen::Matrix4f getGlobalPose() const
+        inline Eigen::Matrix4f
+        getGlobalPose() const
         {
             return globalPose;
         }
+
         virtual void setGlobalPose(const Eigen::Matrix4f& pose);
 
-        inline Eigen::Vector3f transformToGlobal(const Eigen::Vector3f& p) const
+        inline Eigen::Vector3f
+        transformToGlobal(const Eigen::Vector3f& p) const
         {
             Eigen::Vector4f h = getGlobalPose() * Eigen::Vector4f{p.x(), p.y(), p.z(), 1};
             return h.topRows<3>() / h(3);
         }
-        inline Eigen::Vector3f transformFromGlobal(const Eigen::Vector3f& p) const
+
+        inline Eigen::Vector3f
+        transformFromGlobal(const Eigen::Vector3f& p) const
         {
             Eigen::Vector4f h = getGlobalPose().inverse() * Eigen::Vector4f{p.x(), p.y(), p.z(), 1};
             return h.topRows<3>() / h(3);
         }
 
-        CollisionCheckerPtr getCollisionChecker()
+        CollisionCheckerPtr
+        getCollisionChecker()
         {
             return colChecker;
         }
 
 #if defined(VR_COLLISION_DETECTION_PQP)
-        const std::shared_ptr< CollisionModelPQP >& getCollisionModelImplementation()
+        const std::shared_ptr<CollisionModelPQP>&
+        getCollisionModelImplementation()
         {
             return collisionModelImplementation;
         }
 #else
-        const std::shared_ptr< CollisionModelDummy >& getCollisionModelImplementation()
+        const std::shared_ptr<CollisionModelDummy>&
+        getCollisionModelImplementation()
         {
             return collisionModelImplementation;
         }
 #endif
 
 
-        CollisionModelPtr clone(CollisionCheckerPtr colChecker = CollisionCheckerPtr(), float scaling = 1.0f, bool deepVisuCopy = true);
+        CollisionModelPtr clone(CollisionCheckerPtr colChecker = CollisionCheckerPtr(),
+                                float scaling = 1.0f,
+                                bool deepVisuCopy = true);
 
         void setVisualization(const VisualizationNodePtr visu);
 
@@ -159,12 +175,15 @@ namespace VirtualRobot
         VisualizationNodePtr getModelDataVisualization();
 
         template <class T>
-        std::shared_ptr<T> getVisualization()
+        std::shared_ptr<T>
+        getVisualization()
         {
             static_assert(::std::is_base_of_v<VisualizationNode, T>,
-                          "TEMPLATE_PARAMETER_FOR_VirtualRobot_getVisualization_MUST_BT_A_SUBCLASS_OF_VirtualRobot__Visualization");
+                          "TEMPLATE_PARAMETER_FOR_VirtualRobot_getVisualization_MUST_BT_A_SUBCLASS_"
+                          "OF_VirtualRobot__Visualization");
             return std::dynamic_pointer_cast<T>(getVisualization());
         }
+
         //! get number of faces (i.e. triangles) of this object
         virtual int getNumFaces();
 
@@ -176,9 +195,10 @@ namespace VirtualRobot
         /*!
             Return a vector with all vertices of this object at the current global pose.
         */
-        std::vector< Eigen::Vector3f > getModelVeticesGlobal();
+        std::vector<Eigen::Vector3f> getModelVeticesGlobal();
 
-        TriMeshModelPtr getTriMeshModel()
+        TriMeshModelPtr
+        getTriMeshModel()
         {
             return collisionModelImplementation->getTriMeshModel();
         }
@@ -190,7 +210,8 @@ namespace VirtualRobot
             Create a united collision model.
             All triangle data is copied to one model which usually improves the collision detection performance.
         */
-        static CollisionModelPtr CreateUnitedCollisionModel(const std::vector<CollisionModelPtr>& colModels);
+        static CollisionModelPtr
+        CreateUnitedCollisionModel(const std::vector<CollisionModelPtr>& colModels);
 
 
         /*!
@@ -212,16 +233,20 @@ namespace VirtualRobot
 
     protected:
         // internal constructor needed for flat copy of internal collision model
-        CollisionModel(const VisualizationNodePtr& visu, const std::string& name, CollisionCheckerPtr colChecker, int id, InternalCollisionModelPtr collisionModel);
+        CollisionModel(const VisualizationNodePtr& visu,
+                       const std::string& name,
+                       CollisionCheckerPtr colChecker,
+                       int id,
+                       InternalCollisionModelPtr collisionModel);
 
         //! delete all data
         void destroyData();
-        VisualizationNodePtr visualization;         // this is the modified visualization
-        VisualizationNodePtr origVisualization;         // this is the original visualization
-        VisualizationNodePtr modelVisualization;    // this is the visualization of the trimeshmodel
+        VisualizationNodePtr visualization; // this is the modified visualization
+        VisualizationNodePtr origVisualization; // this is the original visualization
+        VisualizationNodePtr modelVisualization; // this is the visualization of the trimeshmodel
         bool updateVisualization;
         TriMeshModelPtr model;
-        float margin;                        // inflates the model with this margin (in mm)
+        float margin; // inflates the model with this margin (in mm)
         BoundingBox bbox;
 
         //! the name
@@ -231,14 +256,15 @@ namespace VirtualRobot
 
         CollisionCheckerPtr colChecker;
 
-        Eigen::Matrix4f globalPose;     //< The transformation that is used for visualization and for updating the col model
+        Eigen::Matrix4f
+            globalPose; //< The transformation that is used for visualization and for updating the col model
 
         Eigen::Matrix4f localPose = Eigen::Matrix4f::Identity();
 
 #if defined(VR_COLLISION_DETECTION_PQP)
-        std::shared_ptr< CollisionModelPQP > collisionModelImplementation;
+        std::shared_ptr<CollisionModelPQP> collisionModelImplementation;
 #else
-        std::shared_ptr< CollisionModelDummy > collisionModelImplementation;
+        std::shared_ptr<CollisionModelDummy> collisionModelImplementation;
 #endif
     };
 

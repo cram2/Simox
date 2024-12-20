@@ -24,16 +24,15 @@
 
 #include "../../VirtualRobotImportExport.h"
 #include "../Visualization.h"
-
-#include <osg/Node>
 #include <osg/Group>
+#include <osg/Node>
+
 namespace VirtualRobot
 {
 
     class VIRTUAL_ROBOT_IMPORT_EXPORT OSGVisualization : public Visualization
     {
     public:
-
         OSGVisualization(const VisualizationNodePtr visualizationNode);
         OSGVisualization(const std::vector<VisualizationNodePtr>& visualizationNodes);
         virtual ~OSGVisualization();
@@ -47,7 +46,8 @@ namespace VirtualRobot
 
         osg::Node* getOSGVisualization();
 
-        static std::string getFactoryName()
+        static std::string
+        getFactoryName()
         {
             return "osg";
         }
@@ -60,4 +60,3 @@ namespace VirtualRobot
     };
 
 } // namespace VirtualRobot
-

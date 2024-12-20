@@ -1,44 +1,49 @@
 #pragma once
 
-#include <VirtualRobot/VirtualRobot.h>
-#include <VirtualRobot/Robot.h>
-#include <VirtualRobot/VirtualRobotException.h>
-#include <VirtualRobot/Nodes/RobotNode.h>
-#include <VirtualRobot/XML/SceneIO.h>
-#include <VirtualRobot/Visualization/VisualizationFactory.h>
-#include <VirtualRobot/Visualization/CoinVisualization/CoinVisualization.h>
-#include <VirtualRobot/Obstacle.h>
-#include <VirtualRobot/ManipulationObject.h>
-
-#include <GraspPlanning/GraspStudio.h>
-#include <GraspPlanning/GraspQuality/GraspQualityMeasureWrenchSpace.h>
-
-#include "MotionPlanning/Saba.h"
-#include "MotionPlanning/CSpace/CSpacePath.h"
-
 #include <string.h>
-#include <QtCore/QtGlobal>
-#include <QtGui/QtGui>
-#include <QtCore/QtCore>
-
-#include <Inventor/sensors/SoTimerSensor.h>
-#include <Inventor/nodes/SoEventCallback.h>
-#include <Inventor/Qt/viewers/SoQtExaminerViewer.h>
-#include <Inventor/Qt/SoQt.h>
-#include <Inventor/nodes/SoSeparator.h>
-
 
 #include <vector>
 
+#include <QtCore/QtCore>
+#include <QtCore/QtGlobal>
+#include <QtGui/QtGui>
+
+#include <VirtualRobot/ManipulationObject.h>
+#include <VirtualRobot/Nodes/RobotNode.h>
+#include <VirtualRobot/Obstacle.h>
+#include <VirtualRobot/Robot.h>
+#include <VirtualRobot/VirtualRobot.h>
+#include <VirtualRobot/VirtualRobotException.h>
+#include <VirtualRobot/Visualization/CoinVisualization/CoinVisualization.h>
+#include <VirtualRobot/Visualization/VisualizationFactory.h>
+#include <VirtualRobot/XML/SceneIO.h>
+
+#include "MotionPlanning/CSpace/CSpacePath.h"
+#include "MotionPlanning/Saba.h"
 #include "ui_GraspRrt.h"
+#include <GraspPlanning/GraspQuality/GraspQualityMeasureWrenchSpace.h>
+#include <GraspPlanning/GraspStudio.h>
+#include <Inventor/Qt/SoQt.h>
+#include <Inventor/Qt/viewers/SoQtExaminerViewer.h>
+#include <Inventor/nodes/SoEventCallback.h>
+#include <Inventor/nodes/SoSeparator.h>
+#include <Inventor/sensors/SoTimerSensor.h>
 
 class GraspRrtWindow : public QMainWindow
 {
     Q_OBJECT
 public:
-    GraspRrtWindow(const std::string& sceneFile, const std::string& sConf, const std::string& gConf,
-                   const std::string& rns, const std::string& rnsB, const std::string& eefName, const std::string& eefNameB,
-                   const std::string& colModelRob1, const std::string& colModelRob1B, const std::string& colModelRob2, const std::string& colModelRob2B,
+    GraspRrtWindow(const std::string& sceneFile,
+                   const std::string& sConf,
+                   const std::string& gConf,
+                   const std::string& rns,
+                   const std::string& rnsB,
+                   const std::string& eefName,
+                   const std::string& eefNameB,
+                   const std::string& colModelRob1,
+                   const std::string& colModelRob1B,
+                   const std::string& colModelRob2,
+                   const std::string& colModelRob2B,
                    const std::string& colModelEnv);
     ~GraspRrtWindow() override;
 
@@ -79,7 +84,6 @@ public slots:
     void closeEEF();
 
 protected:
-
     struct planSet
     {
         std::string eef;
@@ -112,7 +116,8 @@ protected:
     void testInit();
 
     Ui::MainWindowGraspRRTDemo UI;
-    SoQtExaminerViewer* viewer; /*!< Viewer to display the 3D model of the robot and the environment. */
+    SoQtExaminerViewer*
+        viewer; /*!< Viewer to display the 3D model of the robot and the environment. */
 
     SoSeparator* allSep;
     SoSeparator* sceneFileSep;
@@ -133,8 +138,8 @@ protected:
     VirtualRobot::SceneObjectSetPtr colModelRobB;
     VirtualRobot::SceneObjectSetPtr colModelEnv;
 
-    std::vector< VirtualRobot::RobotConfigPtr > configs;
-    std::vector< VirtualRobot::ObstaclePtr > obstacles;
+    std::vector<VirtualRobot::RobotConfigPtr> configs;
+    std::vector<VirtualRobot::ObstaclePtr> obstacles;
     VirtualRobot::ObstaclePtr targetObject;
 
     std::vector<VirtualRobot::GraspPtr> grasps;
@@ -152,4 +157,3 @@ protected:
     Saba::GraspRrtPtr test_graspRrt;
     Saba::CSpaceSampledPtr test_cspace;
 };
-

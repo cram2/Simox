@@ -22,19 +22,17 @@
 */
 #pragma once
 
-#include "../../SimDynamics.h"
-#include "../DynamicsObject.h"
-
-#include <btBulletCollisionCommon.h>
+#include <vector>
 
 #include <VirtualRobot/Nodes/RobotNodeActuator.h>
 #include <VirtualRobot/SceneObject.h>
 
-#include <vector>
+#include "../../SimDynamics.h"
+#include "../DynamicsObject.h"
+#include <btBulletCollisionCommon.h>
 
 namespace SimDynamics
 {
-
 
 
     /*!
@@ -43,13 +41,19 @@ namespace SimDynamics
     */
     struct SIMDYNAMICS_IMPORT_EXPORT SimoxMotionStateCallback
     {
-        SimoxMotionStateCallback() {}
-        virtual ~SimoxMotionStateCallback() {}
+        SimoxMotionStateCallback()
+        {
+        }
+
+        virtual ~SimoxMotionStateCallback()
+        {
+        }
+
         virtual void poseChanged(const btTransform& worldPose) = 0;
     };
 
 #ifdef _WIN32
-#pragma warning(disable: 4275)
+#pragma warning(disable : 4275)
 #endif
 
     class SIMDYNAMICS_IMPORT_EXPORT SimoxMotionState : public btDefaultMotionState
@@ -117,7 +121,8 @@ namespace SimDynamics
         Eigen::Vector3f com;
 
         VirtualRobot::SceneObjectPtr sceneObject;
-        VirtualRobot::RobotNodeActuatorPtr robotNodeActuator; // in case sceneObject is of type RobotNode, we  can actuate it with this actuator.
+        VirtualRobot::RobotNodeActuatorPtr
+            robotNodeActuator; // in case sceneObject is of type RobotNode, we  can actuate it with this actuator.
 
         // This is the bullet transformation.
         btTransform _transform;
@@ -128,7 +133,4 @@ namespace SimDynamics
         std::vector<SimoxMotionStateCallback*> callbacks;
     };
 
-}
-
-
-
+} // namespace SimDynamics

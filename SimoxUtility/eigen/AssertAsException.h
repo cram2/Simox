@@ -1,8 +1,14 @@
 #pragma once
 
 #ifdef __cplusplus
-#include <stdexcept>
+
+#include <stdexcept> // IWYU pragma: keep
 
 #undef eigen_assert
-#define eigen_assert(x) if (!(x)) { throw ::std::logic_error{__FILE__ ":"+ ::std::to_string(__LINE__) + " : Eigen assertion failed: " #x}; }
+#define eigen_assert(x)                                                                            \
+    if (!(x))                                                                                      \
+    {                                                                                              \
+        throw ::std::logic_error{__FILE__ ":" + ::std::to_string(__LINE__) +                       \
+                                 " : Eigen assertion failed: " #x};                                \
+    }
 #endif

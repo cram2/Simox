@@ -7,7 +7,6 @@
 // Simox
 #include <SimoxUtility/meta/eigen/is_eigen_matrix.h>
 
-
 namespace simox::math
 {
 
@@ -29,4 +28,4 @@ namespace simox::math
         }
     }
 
-}
+} // namespace simox::math

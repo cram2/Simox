@@ -1,5 +1,11 @@
-#include "CollisionDetection/CollisionChecker.h"
 #include "SupportPolygon.h"
+
+#include "CollisionDetection/CollisionChecker.h"
+#include "CollisionDetection/CollisionModel.h"
+#include "RobotNodeSet.h"
+#include "SceneObject.h"
+#include "SceneObjectSet.h"
+#include "VirtualRobotException.h"
 
 using namespace std;
 
@@ -7,8 +13,8 @@ namespace VirtualRobot
 {
 
 
-    SupportPolygon::SupportPolygon(SceneObjectSetPtr contactModels)
-        : contactModels(contactModels), floor(MathTools::getFloorPlane())
+    SupportPolygon::SupportPolygon(SceneObjectSetPtr contactModels) :
+        contactModels(contactModels), floor(MathTools::getFloorPlane())
     {
         VR_ASSERT(this->contactModels);
 
@@ -20,14 +26,16 @@ namespace VirtualRobot
             }
         }
 
-        THROW_VR_EXCEPTION_IF(colModels.size() == 0, "RobotNodeSet does not contain any collision models");
+        THROW_VR_EXCEPTION_IF(colModels.size() == 0,
+                              "RobotNodeSet does not contain any collision models");
     }
 
-    VirtualRobot::MathTools::ConvexHull2DPtr SupportPolygon::updateSupportPolygon(float maxFloorDist)
+    VirtualRobot::MathTools::ConvexHull2DPtr
+    SupportPolygon::updateSupportPolygon(float maxFloorDist)
     {
         CollisionCheckerPtr colChecker = colModels[0]->getCollisionChecker();
-        std::vector< CollisionModelPtr >::iterator i = colModels.begin();
-        std::vector< MathTools::ContactPoint > points;
+        std::vector<CollisionModelPtr>::iterator i = colModels.begin();
+        std::vector<MathTools::ContactPoint> points;
 
         while (i != colModels.end())
         {
@@ -37,7 +45,7 @@ namespace VirtualRobot
 
         currentContactPoints2D.clear();
 
-        for (auto & point : points)
+        for (auto& point : points)
         {
 
             Eigen::Vector2f pt2d = MathTools::projectPointToPlane2D(point.p, floor);
@@ -57,18 +65,22 @@ namespace VirtualRobot
         return suportPolygonFloor;
     }
 
-    VirtualRobot::MathTools::ConvexHull2DPtr SupportPolygon::getSupportPolygon2D()
+    VirtualRobot::MathTools::ConvexHull2DPtr
+    SupportPolygon::getSupportPolygon2D()
     {
         return suportPolygonFloor;
     }
 
-    VirtualRobot::MathTools::Plane SupportPolygon::getFloorPlane()
+    VirtualRobot::MathTools::Plane
+    SupportPolygon::getFloorPlane()
     {
         return floor;
     }
 
-
-    float SupportPolygon::getSquaredDistLine(Eigen::Vector2f& p, Eigen::Vector2f& pt1, Eigen::Vector2f& pt2)
+    float
+    SupportPolygon::getSquaredDistLine(Eigen::Vector2f& p,
+                                       Eigen::Vector2f& pt1,
+                                       Eigen::Vector2f& pt2)
     {
         //nearestPointOnLine
         Eigen::Vector2f lp = p - pt1;
@@ -81,8 +93,8 @@ namespace VirtualRobot
         return (ptOnLine - p).squaredNorm();
     }
 
-
-    float SupportPolygon::getStabilityIndex(VirtualRobot::RobotNodeSetPtr rns, bool update)
+    float
+    SupportPolygon::getStabilityIndex(VirtualRobot::RobotNodeSetPtr rns, bool update)
     {
         if (!rns)
         {
@@ -173,7 +185,8 @@ namespace VirtualRobot
         return res;
     }
 
-    VirtualRobot::SceneObjectSetPtr SupportPolygon::getContactModels()
+    VirtualRobot::SceneObjectSetPtr
+    SupportPolygon::getContactModels()
     {
         return contactModels;
     }

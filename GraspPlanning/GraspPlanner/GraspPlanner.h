@@ -22,12 +22,14 @@
 */
 #pragma once
 
-#include <GraspPlanning/GraspStudio.h>
-#include <GraspPlanning/GraspPlanner/GraspPlannerEvaluation.h>
-#include <VirtualRobot/EndEffector/EndEffector.h>
-#include <VirtualRobot/SceneObject.h>
-#include <VirtualRobot/Grasping/GraspSet.h>
 #include <vector>
+
+#include <VirtualRobot/EndEffector/EndEffector.h>
+#include <VirtualRobot/Grasping/GraspSet.h>
+#include <VirtualRobot/SceneObject.h>
+
+#include <GraspPlanning/GraspPlanner/GraspPlannerEvaluation.h>
+#include <GraspPlanning/GraspStudio.h>
 
 namespace GraspStudio
 {
@@ -39,7 +41,6 @@ namespace GraspStudio
     class GRASPSTUDIO_IMPORT_EXPORT GraspPlanner
     {
     public:
-
         /*!
             Constructor
             \param graspSet Append planned grasps to this set.
@@ -59,7 +60,8 @@ namespace GraspStudio
             \param obstacles
             \return Number of planned grasps.
         */
-        virtual int plan(int nrGrasps, int timeOutMS = 0, VirtualRobot::SceneObjectSetPtr obstacles = {}) = 0;
+        virtual int
+        plan(int nrGrasps, int timeOutMS = 0, VirtualRobot::SceneObjectSetPtr obstacles = {}) = 0;
 
         /*!
             Returns all grasps that have been generated. These grasps are also stored in the graspSet that was specified on construction.
@@ -76,12 +78,10 @@ namespace GraspStudio
 
 
     protected:
-
         bool verbose;
         VirtualRobot::GraspSetPtr graspSet;
         std::vector<VirtualRobot::GraspPtr> plannedGrasps;
 
         GraspPlannerEvaluation eval;
     };
-}
-
+} // namespace GraspStudio

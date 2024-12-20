@@ -1,25 +1,28 @@
 
 #include "ShortcutProcessor.h"
-#include "MotionPlanning/CSpace/CSpaceSampled.h"
-#include "MotionPlanning/CSpace/CSpacePath.h"
-#include <vector>
-#include <ctime>
+
 #include <cmath>
+#include <ctime>
+#include <vector>
+
+#include "MotionPlanning/CSpace/CSpacePath.h"
+#include "MotionPlanning/CSpace/CSpaceSampled.h"
 
 namespace Saba
 {
 
-    ShortcutProcessor::ShortcutProcessor(CSpacePathPtr path, CSpaceSampledPtr cspace, bool verbose) : PathProcessor(path, verbose), cspace(cspace)
+    ShortcutProcessor::ShortcutProcessor(CSpacePathPtr path,
+                                         CSpaceSampledPtr cspace,
+                                         bool verbose) :
+        PathProcessor(path, verbose), cspace(cspace)
     {
         stopOptimization = false;
     }
 
-    ShortcutProcessor::~ShortcutProcessor()
-    = default;
+    ShortcutProcessor::~ShortcutProcessor() = default;
 
-
-
-    int ShortcutProcessor::tryRandomShortcut(int maxSolutionPathDist)
+    int
+    ShortcutProcessor::tryRandomShortcut(int maxSolutionPathDist)
     {
         if (!path || !cspace)
         {
@@ -52,14 +55,16 @@ namespace Saba
 
         if (verbose)
         {
-            std::cout << "Creating direct shortcut from node " << startNodeIndex << " to node " << endNodeIndex << std::endl;
+            std::cout << "Creating direct shortcut from node " << startNodeIndex << " to node "
+                      << endNodeIndex << std::endl;
         }
 
         // complete path valid and dist is shorter
         return doShortcut(startNodeIndex, endNodeIndex);
     }
 
-    int ShortcutProcessor::doShortcut(int startIndex, int endIndex)
+    int
+    ShortcutProcessor::doShortcut(int startIndex, int endIndex)
     {
         if (!optimizedPath)
             if (!initSolution())
@@ -67,7 +72,9 @@ namespace Saba
                 return 0;
             }
 
-        if (!optimizedPath || !cspace || startIndex < 0 || endIndex < 0 || startIndex >= (int)optimizedPath->getNrOfPoints() || endIndex >= (int)optimizedPath->getNrOfPoints())
+        if (!optimizedPath || !cspace || startIndex < 0 || endIndex < 0 ||
+            startIndex >= (int)optimizedPath->getNrOfPoints() ||
+            endIndex >= (int)optimizedPath->getNrOfPoints())
         {
             return 0;
         }
@@ -81,7 +88,8 @@ namespace Saba
         if (verbose)
         {
             float distPathtest = optimizedPath->getLength(startIndex, startIndex + 1);
-            std::cout << "-- erased intermediate positions, distPath startIndex to (startIndex+1): " << distPathtest << std::endl;
+            std::cout << "-- erased intermediate positions, distPath startIndex to (startIndex+1): "
+                      << distPathtest << std::endl;
         }
 
         /*cout << "all2:" << std::endl;
@@ -118,7 +126,9 @@ namespace Saba
             {
                 float distPathtest2 = optimizedPath->getLength(u, u + 1);
                 sum += distPathtest2;
-                std::cout << "---- intermediate position: " << u << ", distPath to next pos: " << distPathtest2 << ", sum:" << sum << std::endl;
+                std::cout << "---- intermediate position: " << u
+                          << ", distPath to next pos: " << distPathtest2 << ", sum:" << sum
+                          << std::endl;
             }
         }
 
@@ -133,13 +143,14 @@ namespace Saba
         return nodes;
     }
 
-
-    CSpacePathPtr ShortcutProcessor::optimize(int optimizeSteps)
+    CSpacePathPtr
+    ShortcutProcessor::optimize(int optimizeSteps)
     {
         return shortenSolutionRandom(optimizeSteps);
     }
 
-    CSpacePathPtr ShortcutProcessor::shortenSolutionRandom(int shortenLoops /*=300*/, int maxSolutionPathDist)
+    CSpacePathPtr
+    ShortcutProcessor::shortenSolutionRandom(int shortenLoops /*=300*/, int maxSolutionPathDist)
     {
         stopOptimization = false;
         THROW_VR_EXCEPTION_IF((!cspace || !path), "NULL data");
@@ -157,8 +168,10 @@ namespace Saba
 
         if (verbose)
         {
-            SABA_INFO << ": solution size before shortenSolutionRandom:" << beforeCount << std::endl;
-            SABA_INFO << ": solution length before shortenSolutionRandom:" << beforeLength << std::endl;
+            SABA_INFO << ": solution size before shortenSolutionRandom:" << beforeCount
+                      << std::endl;
+            SABA_INFO << ": solution length before shortenSolutionRandom:" << beforeLength
+                      << std::endl;
         }
 
         clock_t startT = clock();
@@ -189,14 +202,17 @@ namespace Saba
         {
             SABA_INFO << ": shorten loops: " << loopsOverall << std::endl;
             SABA_INFO << ": shorten time: " << timems << " ms " << std::endl;
-            SABA_INFO << ": solution size after ShortenSolutionRandom (nr of positions) : " << afterCount << std::endl;
-            SABA_INFO << ": solution length after ShortenSolutionRandom : " << afterLength << std::endl;
+            SABA_INFO << ": solution size after ShortenSolutionRandom (nr of positions) : "
+                      << afterCount << std::endl;
+            SABA_INFO << ": solution length after ShortenSolutionRandom : " << afterLength
+                      << std::endl;
         }
 
         return optimizedPath;
     }
 
-    void ShortcutProcessor::doPathPruning()
+    void
+    ShortcutProcessor::doPathPruning()
     {
         THROW_VR_EXCEPTION_IF(!initSolution(), "Could not init");
 
@@ -223,7 +239,10 @@ namespace Saba
         }
     }
 
-    bool ShortcutProcessor::selectCandidatesRandom(int& storeStartIndex, int& storeEndIndex, int maxSolutionPathDist)
+    bool
+    ShortcutProcessor::selectCandidatesRandom(int& storeStartIndex,
+                                              int& storeEndIndex,
+                                              int maxSolutionPathDist)
     {
         if (!optimizedPath)
             if (!initSolution())
@@ -281,7 +300,8 @@ namespace Saba
         return true;
     }
 
-    bool ShortcutProcessor::validShortcut(int startIndex, int endIndex)
+    bool
+    ShortcutProcessor::validShortcut(int startIndex, int endIndex)
     {
         if (!optimizedPath)
             if (!initSolution())
@@ -301,7 +321,8 @@ namespace Saba
         // DEBUG
         if (verbose)
         {
-            std::cout << "-- distShortcut: " << distShortcut << " distPath: " << distPath << std::endl;
+            std::cout << "-- distShortcut: " << distShortcut << " distPath: " << distPath
+                      << std::endl;
         }
 
         // -------------------------------------------------------------------
@@ -328,7 +349,8 @@ namespace Saba
         return cspace->isPathValid(s, e);
     }
 
-    bool ShortcutProcessor::initSolution()
+    bool
+    ShortcutProcessor::initSolution()
     {
         if (!path)
         {
@@ -348,4 +370,4 @@ namespace Saba
     }
 
 
-} // namespace
+} // namespace Saba

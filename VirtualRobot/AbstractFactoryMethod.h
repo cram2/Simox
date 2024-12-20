@@ -7,11 +7,10 @@
 
 #pragma once
 
-#include <memory>
-#include <vector>
-#include <string>
 #include <map>
-
+#include <memory>
+#include <string>
+#include <vector>
 
 /**
 * A template that can be used as a superclass of a class hierarchy that
@@ -36,7 +35,8 @@ public:
     /**
     * Function which can be used to retrieve an object specified by string name.
     */
-    static std::shared_ptr<Base> fromName(const std::string& name, constructorArg params)
+    static std::shared_ptr<Base>
+    fromName(const std::string& name, constructorArg params)
     {
         if (subTypes()->find(name) == subTypes()->end())
         {
@@ -51,7 +51,8 @@ public:
     /**
     * Function which can be used to retrieve the first registered object.
     */
-    static std::shared_ptr<Base> first(constructorArg params)
+    static std::shared_ptr<Base>
+    first(constructorArg params)
     {
         if (subTypes()->size() == 0)
         {
@@ -67,7 +68,8 @@ public:
     * Returns the class's name. This is used to identify the class which the
     * user requests an instance of.
     */
-    static std::string getName()
+    static std::string
+    getName()
     {
         return "AbstractFactoryMethod";
     }
@@ -77,7 +79,8 @@ public:
     * It calls the constructor and returns a shared_ptr to the resulting
     * object.
     */
-    static std::shared_ptr<Base> createInstance(constructorArg)
+    static std::shared_ptr<Base>
+    createInstance(constructorArg)
     {
         return std::shared_ptr<Base>();
     }
@@ -86,7 +89,8 @@ public:
     * Statically called by subclasses to register their name and initialisation
     * function so they can be found by {@link fromName fromName}.
     */
-    static void registerClass(const std::string& name, initialisationFunction init)
+    static void
+    registerClass(const std::string& name, initialisationFunction init)
     {
         (*subTypes())[name] = init;
     }
@@ -94,7 +98,8 @@ public:
     /**
      * Set a description on the instance it is called on.
      */
-    void setDescription(const std::string& newDescription)
+    void
+    setDescription(const std::string& newDescription)
     {
         description = newDescription;
     }
@@ -102,7 +107,8 @@ public:
     /**
      * Return the description of the current instance.
      */
-    std::string getDescription() const
+    std::string
+    getDescription() const
     {
         return description;
     }
@@ -110,10 +116,12 @@ public:
     /**
      * Return a list of all registered subclasses.
      */
-    static std::vector<std::string> getSubclassList()
+    static std::vector<std::string>
+    getSubclassList()
     {
         std::vector<std::string> subclassList;
-        typename std::map<std::string, initialisationFunction>::const_iterator iter = subTypes()->begin();
+        typename std::map<std::string, initialisationFunction>::const_iterator iter =
+            subTypes()->begin();
 
         for (; iter != subTypes()->end(); ++iter)
         {
@@ -141,13 +149,14 @@ private:
     * before use. This can only be guaranteed through a static local variable
     * in a function.
     */
-    static std::shared_ptr<std::map<std::string, initialisationFunction> > subTypes()
+    static std::shared_ptr<std::map<std::string, initialisationFunction>>
+    subTypes()
     {
-        static std::shared_ptr<std::map<std::string, initialisationFunction> > subTypes(new std::map<std::string, initialisationFunction>);
+        static std::shared_ptr<std::map<std::string, initialisationFunction>> subTypes(
+            new std::map<std::string, initialisationFunction>);
 
         return subTypes;
     }
 
     std::string description;
 };
-

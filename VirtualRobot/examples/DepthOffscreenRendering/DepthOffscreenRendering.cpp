@@ -1,17 +1,17 @@
+#include "DepthOffscreenRendering.h"
+
+#include <iostream>
+
 #include <Eigen/Core>
+
+#include <SimoxUtility/math/convert/pos_rpy_to_mat4f.h>
+#include <VirtualRobot/Obstacle.h>
+#include <VirtualRobot/Visualization/CoinVisualization/CoinVisualizationNode.h>
+#include <VirtualRobot/Visualization/VisualizationFactory.h>
 
 #include <Inventor/Qt/SoQt.h>
 
-#include <SimoxUtility/math/convert/pos_rpy_to_mat4f.h>
-
-#include <VirtualRobot/Visualization/CoinVisualization/CoinVisualizationNode.h>
-#include <VirtualRobot/Visualization/VisualizationFactory.h>
-#include <VirtualRobot/Obstacle.h>
-
-#include "DepthOffscreenRendering.h"
-
-DepthOffscreenRenderingExample::DepthOffscreenRenderingExample()
-    : QMainWindow(nullptr)
+DepthOffscreenRenderingExample::DepthOffscreenRenderingExample() : QMainWindow(nullptr)
 {
     camRenderer = nullptr;
     //setup scene
@@ -28,9 +28,8 @@ DepthOffscreenRenderingExample::DepthOffscreenRenderingExample()
 
             auto s = VirtualRobot::Obstacle::createSphere(r);
             s->setGlobalPose(m);
-            sceneSep->addChild(
-                VirtualRobot::CoinVisualizationFactory::getCoinVisualization(
-                    s, VirtualRobot::SceneObject::Full));
+            sceneSep->addChild(VirtualRobot::CoinVisualizationFactory::getCoinVisualization(
+                s, VirtualRobot::SceneObject::Full));
         };
         addSphere(0, 1500, 1500, 400);
         addSphere(700, 900, 1500, 300);
@@ -41,8 +40,10 @@ DepthOffscreenRenderingExample::DepthOffscreenRenderingExample()
     //setup ui
     {
         UI.setupUi(this);
-        connect(UI.doubleSpinBoxCamYaw, SIGNAL(valueChanged(double)),
-                this, SLOT(camYawUpdated(double)));
+        connect(UI.doubleSpinBoxCamYaw,
+                SIGNAL(valueChanged(double)),
+                this,
+                SLOT(camYawUpdated(double)));
     }
     camYawUpdated(UI.doubleSpinBoxCamYaw->value());
 }
@@ -52,27 +53,31 @@ DepthOffscreenRenderingExample::~DepthOffscreenRenderingExample()
     sceneSep->unref();
 }
 
-void DepthOffscreenRenderingExample::closeEvent(QCloseEvent* event)
+void
+DepthOffscreenRenderingExample::closeEvent(QCloseEvent* event)
 {
     quit();
     QMainWindow::closeEvent(event);
 }
 
-int DepthOffscreenRenderingExample::main()
+int
+DepthOffscreenRenderingExample::main()
 {
     SoQt::show(this);
     SoQt::mainLoop();
     return 0;
 }
 
-void DepthOffscreenRenderingExample::quit()
+void
+DepthOffscreenRenderingExample::quit()
 {
     std::cout << "CShowRobotWindow: Closing" << std::endl;
     this->close();
     SoQt::exitMainLoop();
 }
 
-void DepthOffscreenRenderingExample::camYawUpdated(double yaw)
+void
+DepthOffscreenRenderingExample::camYawUpdated(double yaw)
 {
     const short width = 640;
     const short height = 480;
@@ -82,26 +87,33 @@ void DepthOffscreenRenderingExample::camYawUpdated(double yaw)
     {
         const auto pixelCount = width * height;
         camDepthBuffer.resize(pixelCount);
-        camRenderer  = VirtualRobot::CoinVisualizationFactory::createOffscreenRenderer(width, height);
+        camRenderer =
+            VirtualRobot::CoinVisualizationFactory::createOffscreenRenderer(width, height);
     }
 
     const float zNear = 10;
     const float zFar = 100000;
     const float fov = M_PI / 4;
 
-    const Eigen::Matrix4f pose =
-        simox::math::pos_rpy_to_mat4f(0, 0, 1500, 0, 0, yaw) *
-        simox::math::pos_rpy_to_mat4f(0, 0, 0, 0, -M_PI / 2, 0);
+    const Eigen::Matrix4f pose = simox::math::pos_rpy_to_mat4f(0, 0, 1500, 0, 0, yaw) *
+                                 simox::math::pos_rpy_to_mat4f(0, 0, 0, 0, -M_PI / 2, 0);
 
     std::vector<unsigned char> rgbImage;
     std::vector<Eigen::Vector3f> pointCloud;
-    VirtualRobot::CoinVisualizationFactory::renderOffscreenRgbDepthPointcloud(
-        camRenderer, pose, sceneSep, width, height,
-        false, rgbImage,
-        true, camDepthBuffer,
-        false, pointCloud,
-        zNear, zFar, fov
-    );
+    VirtualRobot::CoinVisualizationFactory::renderOffscreenRgbDepthPointcloud(camRenderer,
+                                                                              pose,
+                                                                              sceneSep,
+                                                                              width,
+                                                                              height,
+                                                                              false,
+                                                                              rgbImage,
+                                                                              true,
+                                                                              camDepthBuffer,
+                                                                              false,
+                                                                              pointCloud,
+                                                                              zNear,
+                                                                              zFar,
+                                                                              fov);
 
     QImage img(width, height, QImage::Format_Grayscale8);
     for (std::size_t i = 0; i < camDepthBuffer.size(); ++i)

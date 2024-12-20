@@ -21,33 +21,38 @@
 
 
 #include "TransformedFunctionR2R3.h"
+
 #include "Helpers.h"
 
 namespace math
 {
-    TransformedFunctionR2R3::TransformedFunctionR2R3(const Eigen::Matrix4f& transformation, AbstractFunctionR2R3Ptr func)
-        : transformation(transformation), inv(transformation.inverse()), func(func)
+    TransformedFunctionR2R3::TransformedFunctionR2R3(const Eigen::Matrix4f& transformation,
+                                                     AbstractFunctionR2R3Ptr func) :
+        transformation(transformation), inv(transformation.inverse()), func(func)
     {
-
     }
 
-    Eigen::Vector3f math::TransformedFunctionR2R3::GetPoint(float u, float v)
+    Eigen::Vector3f
+    math::TransformedFunctionR2R3::GetPoint(float u, float v)
     {
         return Helpers::TransformPosition(transformation, func->GetPoint(u, v));
     }
 
-    Eigen::Vector3f math::TransformedFunctionR2R3::GetDdu(float u, float v)
+    Eigen::Vector3f
+    math::TransformedFunctionR2R3::GetDdu(float u, float v)
     {
         return Helpers::TransformDirection(transformation, func->GetDdu(u, v));
     }
 
-    Eigen::Vector3f math::TransformedFunctionR2R3::GetDdv(float u, float v)
+    Eigen::Vector3f
+    math::TransformedFunctionR2R3::GetDdv(float u, float v)
     {
         return Helpers::TransformDirection(transformation, func->GetDdv(u, v));
     }
 
-    void math::TransformedFunctionR2R3::GetUV(Eigen::Vector3f pos, float& u, float& v)
+    void
+    math::TransformedFunctionR2R3::GetUV(Eigen::Vector3f pos, float& u, float& v)
     {
         func->GetUV(Helpers::TransformPosition(inv, pos), u, v);
     }
-}
+} // namespace math

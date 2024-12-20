@@ -1,8 +1,8 @@
-#include <VirtualRobot/VirtualRobot.h>
-#include <VirtualRobot/RuntimeEnvironment.h>
-
-#include <string>
 #include <iostream>
+#include <string>
+
+#include <VirtualRobot/RuntimeEnvironment.h>
+#include <VirtualRobot/VirtualRobot.h>
 
 using std::cout;
 using std::endl;
@@ -13,8 +13,8 @@ using namespace VirtualRobot;
 
 #include "GraspQualityWindow.h"
 
-
-int main(int argc, char* argv[])
+int
+main(int argc, char* argv[])
 {
     VirtualRobot::init(argc, argv, "Grasp Quality Demo");
     std::cout << " --- START --- " << std::endl;

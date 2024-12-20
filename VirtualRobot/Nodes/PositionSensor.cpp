@@ -1,9 +1,13 @@
 
 #include "PositionSensor.h"
-#include "PositionSensorFactory.h"
-#include "../XML/BaseIO.h"
+
+#include <iostream>
 
 #include <VirtualRobot/Visualization/VisualizationNode.h>
+
+#include "../XML/BaseIO.h"
+#include "PositionSensorFactory.h"
+#include "VirtualRobotException.h"
 
 namespace VirtualRobot
 {
@@ -11,19 +15,15 @@ namespace VirtualRobot
     PositionSensor::PositionSensor(GraspableSensorizedObjectWeakPtr parentNode,
                                    const std::string& name,
                                    VisualizationNodePtr visualization,
-                                   const Eigen::Matrix4f& rnTrafo
-                                  ) : Sensor(parentNode, name, visualization, rnTrafo)
+                                   const Eigen::Matrix4f& rnTrafo) :
+        Sensor(parentNode, name, visualization, rnTrafo)
     {
-
     }
 
+    PositionSensor::~PositionSensor() = default;
 
-    PositionSensor::~PositionSensor()
-    = default;
-
-
-
-    void PositionSensor::print(bool printChildren, bool printDecoration) const
+    void
+    PositionSensor::print(bool printChildren, bool printDecoration) const
     {
         if (printDecoration)
         {
@@ -33,8 +33,10 @@ namespace VirtualRobot
         Sensor::print(printChildren, false);
     }
 
-
-    SensorPtr PositionSensor::_clone(const GraspableSensorizedObjectPtr parentNode, const VisualizationNodePtr visualizationModel, float scaling)
+    SensorPtr
+    PositionSensor::_clone(const GraspableSensorizedObjectPtr parentNode,
+                           const VisualizationNodePtr visualizationModel,
+                           float scaling)
     {
         THROW_VR_EXCEPTION_IF(scaling < 0, "Scaling must be >0");
         Eigen::Matrix4f rnt = rnTransformation;
@@ -43,8 +45,8 @@ namespace VirtualRobot
         return result;
     }
 
-
-    std::string PositionSensor::toXML(const std::string& modelPath, int tabs)
+    std::string
+    PositionSensor::toXML(const std::string& modelPath, int tabs)
     {
         std::stringstream ss;
         std::string t = "\t";
@@ -55,7 +57,8 @@ namespace VirtualRobot
             pre += t;
         }
 
-        ss << pre << "<Sensor type='" << PositionSensorFactory::getName() << "' name='" << name << "'>" << std::endl;
+        ss << pre << "<Sensor type='" << PositionSensorFactory::getName() << "' name='" << name
+           << "'>" << std::endl;
         std::string pre2 = pre + t;
         std::string pre3 = pre2 + t;
         ss << pre2 << "<Transform>" << std::endl;

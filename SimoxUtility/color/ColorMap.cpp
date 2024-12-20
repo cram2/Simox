@@ -2,6 +2,7 @@
 
 #include <SimoxUtility/math/rescale.h>
 
+#include "SimoxUtility/color/interpolation.h"
 
 namespace simox::color
 {
@@ -14,12 +15,11 @@ namespace simox::color
     {
     }
 
-    ColorMap::ColorMap(std::initializer_list<std::pair<float, Color> > init) : ColorMap("", init)
+    ColorMap::ColorMap(std::initializer_list<std::pair<float, Color>> init) : ColorMap("", init)
     {
     }
 
-    ColorMap::ColorMap(const std::string& name, std::initializer_list<Color> init) :
-        _name(name)
+    ColorMap::ColorMap(const std::string& name, std::initializer_list<Color> init) : _name(name)
     {
         if (init.size() == 1)
         {
@@ -36,7 +36,8 @@ namespace simox::color
         }
     }
 
-    ColorMap::ColorMap(const std::string& name, std::initializer_list<std::pair<float, Color> > init) :
+    ColorMap::ColorMap(const std::string& name,
+                       std::initializer_list<std::pair<float, Color>> init) :
         _name(name)
     {
         for (const auto& [v, c] : init)
@@ -45,13 +46,14 @@ namespace simox::color
         }
     }
 
-
-    Color ColorMap::at(float value) const
+    Color
+    ColorMap::at(float value) const
     {
         return at(value, _vmin, _vmax);
     }
 
-    Color ColorMap::at(float value, std::optional<float> vmin, std::optional<float> vmax) const
+    Color
+    ColorMap::at(float value, std::optional<float> vmin, std::optional<float> vmax) const
     {
         if (empty())
         {
@@ -103,8 +105,8 @@ namespace simox::color
         return interpol::linear(t, lower->second, upper->second);
     }
 
-
-    ColorMap ColorMap::reversed() const
+    ColorMap
+    ColorMap::reversed() const
     {
         ColorMap rev;
         if (!empty())
@@ -127,8 +129,8 @@ namespace simox::color
         return rev;
     }
 
-
-    float ColorMap::original_vmin() const
+    float
+    ColorMap::original_vmin() const
     {
         if (empty())
         {
@@ -137,8 +139,8 @@ namespace simox::color
         return keys.begin()->first;
     }
 
-
-    float ColorMap::original_vmax() const
+    float
+    ColorMap::original_vmax() const
     {
         if (empty())
         {
@@ -149,4 +151,4 @@ namespace simox::color
         return it->first;
     }
 
-}
+} // namespace simox::color

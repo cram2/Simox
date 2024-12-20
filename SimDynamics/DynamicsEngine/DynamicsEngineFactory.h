@@ -22,12 +22,13 @@
 */
 #pragma once
 
+#include <VirtualRobot/AbstractFactoryMethod.h>
+#include <VirtualRobot/SceneObject.h>
+#include <VirtualRobot/VirtualRobot.h>
+
 #include "../SimDynamics.h"
 #include "DynamicsEngine.h"
 #include "DynamicsRobot.h"
-#include <VirtualRobot/AbstractFactoryMethod.h>
-#include <VirtualRobot/VirtualRobot.h>
-#include <VirtualRobot/SceneObject.h>
 
 namespace SimDynamics
 {
@@ -37,37 +38,40 @@ namespace SimDynamics
         Currently, the first registered factory is used to create the physics engine abstraction, so multiple coexisting factories are not yet supported.
         @see BulletEngineFactory
     */
-    class SIMDYNAMICS_IMPORT_EXPORT DynamicsEngineFactory  : public AbstractFactoryMethod<DynamicsEngineFactory, void*>
+    class SIMDYNAMICS_IMPORT_EXPORT DynamicsEngineFactory :
+        public AbstractFactoryMethod<DynamicsEngineFactory, void*>
     {
     public:
-
         DynamicsEngineFactory()
         {
             ;
         }
+
         virtual ~DynamicsEngineFactory()
         {
             ;
         }
 
         //! Derived classes must return the correct engine implementation.
-        virtual DynamicsEnginePtr createEngine(DynamicsEngineConfigPtr /*config*/ = DynamicsEngineConfigPtr())
+        virtual DynamicsEnginePtr
+        createEngine(DynamicsEngineConfigPtr /*config*/ = DynamicsEngineConfigPtr())
         {
             return DynamicsEnginePtr();
         }
 
-        virtual DynamicsObjectPtr createObject(VirtualRobot::SceneObjectPtr o)
+        virtual DynamicsObjectPtr
+        createObject(VirtualRobot::SceneObjectPtr o)
         {
             return DynamicsObjectPtr(new DynamicsObject(o));
         }
-        virtual DynamicsRobotPtr createRobot(VirtualRobot::RobotPtr robot)
+
+        virtual DynamicsRobotPtr
+        createRobot(VirtualRobot::RobotPtr robot)
         {
             return DynamicsRobotPtr(new DynamicsRobot(robot));
         }
-
     };
 
     typedef std::shared_ptr<DynamicsEngineFactory> DynamicsEngineFactoryPtr;
 
 } // namespace SimDynamics
-

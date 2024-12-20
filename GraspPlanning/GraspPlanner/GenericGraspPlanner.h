@@ -24,11 +24,10 @@
 
 #include <chrono>
 
-#include "../GraspStudio.h"
 #include "../ApproachMovementGenerator.h"
 #include "../GraspQuality/GraspQualityMeasure.h"
+#include "../GraspStudio.h"
 #include "GraspPlanner.h"
-
 
 namespace GraspStudio
 {
@@ -42,7 +41,6 @@ namespace GraspStudio
     class GRASPSTUDIO_IMPORT_EXPORT GenericGraspPlanner : public GraspPlanner
     {
     public:
-
         /*!
             Constructor
             \param graspSet All planned grasps are added to this GraspSet.
@@ -54,7 +52,8 @@ namespace GraspStudio
         GenericGraspPlanner(VirtualRobot::GraspSetPtr graspSet,
                             GraspStudio::GraspQualityMeasurePtr graspQuality,
                             GraspStudio::ApproachMovementGeneratorPtr approach,
-                            float minQuality = 0.0f, bool forceClosure = true);
+                            float minQuality = 0.0f,
+                            bool forceClosure = true);
 
         // destructor
         virtual ~GenericGraspPlanner() override;
@@ -66,7 +65,9 @@ namespace GraspStudio
             \param obstacles
             \return Number of generated grasps.
         */
-        int plan(int nrGrasps, int timeOutDuration = 0, VirtualRobot::SceneObjectSetPtr obstacles = {}) override;
+        int plan(int nrGrasps,
+                 int timeOutDuration = 0,
+                 VirtualRobot::SceneObjectSetPtr obstacles = {}) override;
 
         VirtualRobot::GraspPtr planGrasp(VirtualRobot::SceneObjectSetPtr obstacles = {});
 
@@ -82,7 +83,6 @@ namespace GraspStudio
         void setRetreatOnLowContacts(bool enable);
 
     protected:
-
         bool moveEEFAway(const Eigen::Vector3f& approachDir, float step, int maxLoops);
 
         bool timeout();
@@ -102,5 +102,4 @@ namespace GraspStudio
 
         bool retreatOnLowContacts;
     };
-}
-
+} // namespace GraspStudio

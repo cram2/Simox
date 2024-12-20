@@ -23,15 +23,12 @@
 #pragma once
 
 #include "../../VirtualRobotImportExport.h"
+#include "../TriMeshModel.h"
 #include "../VisualizationNode.h"
 #include "OSGVisualizationFactory.h"
-
-#include "../TriMeshModel.h"
-
-
-#include <osg/Node>
 #include <osg/Group>
 #include <osg/MatrixTransform>
+#include <osg/Node>
 
 namespace VirtualRobot
 {
@@ -77,7 +74,8 @@ namespace VirtualRobot
         */
         virtual VisualizationNodePtr clone(bool deepCopy = true, float scaling = 1.0f);
 
-        virtual std::string getType()
+        virtual std::string
+        getType()
         {
             return OSGVisualizationFactory::getName();
         }
@@ -90,14 +88,19 @@ namespace VirtualRobot
         //osg::Node* originalVisualization;
         osg::Group* visualizationAtGlobalPose;
         osg::Group* attachedVisualizationsSeparator;
-        std::map< std::string, osg::Node* > attachedOSGVisualizations;  //< These optional visualizations will not show up in the TriMeshModel
+        std::map<std::string, osg::Node*>
+            attachedOSGVisualizations; //< These optional visualizations will not show up in the TriMeshModel
 
         osg::MatrixTransform* globalPoseTransform;
         TriMeshModelPtr triMeshModel;
 
         struct osgTriangleConverter
         {
-            inline void operator()(const osg::Vec3& _v1, const osg::Vec3& _v2, const osg::Vec3& _v3, bool treatVertexDataAsTemporary)
+            inline void
+            operator()(const osg::Vec3& _v1,
+                       const osg::Vec3& _v2,
+                       const osg::Vec3& _v3,
+                       bool treatVertexDataAsTemporary)
             {
                 osg::Vec3 v1 = _v1 * mat;
                 osg::Vec3 v2 = _v2 * mat;
@@ -108,12 +111,13 @@ namespace VirtualRobot
                 float epsilon = 1e-8f;
 
                 // check for identical points
-                if (vV1V2.length() < epsilon || vV1V3.length() < epsilon || vV2V3.length() < epsilon)
+                if (vV1V2.length() < epsilon || vV1V3.length() < epsilon ||
+                    vV2V3.length() < epsilon)
                 {
                     return;
                 }
 
-                osg::Vec3 vNormal = vV1V2.operator ^ (vV1V3);
+                osg::Vec3 vNormal = vV1V2.operator^(vV1V3);
 
                 // read out vertices
                 Eigen::Vector3f a, b, c, n;
@@ -127,10 +131,7 @@ namespace VirtualRobot
 
             TriMeshModelPtr triMeshModel;
             osg::Matrix mat; // the globalPose of the object
-
         };
-
     };
 
 } // namespace VirtualRobot
-

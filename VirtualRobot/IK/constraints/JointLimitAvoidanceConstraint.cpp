@@ -23,31 +23,38 @@
 
 #include "JointLimitAvoidanceConstraint.h"
 
+#include "Nodes/RobotNode.h"
+#include "Robot.h"
+#include "RobotNodeSet.h"
+
 using namespace VirtualRobot;
 
-JointLimitAvoidanceConstraint::JointLimitAvoidanceConstraint(const RobotPtr &robot, const RobotNodeSetPtr &nodeSet) :
+JointLimitAvoidanceConstraint::JointLimitAvoidanceConstraint(const RobotPtr& robot,
+                                                             const RobotNodeSetPtr& nodeSet) :
     ReferenceConfigurationConstraint(robot, nodeSet)
 {
     Eigen::VectorXf reference(nodeSet->getSize());
 
-    for(unsigned int i = 0; i < nodeSet->getSize(); i++)
+    for (unsigned int i = 0; i < nodeSet->getSize(); i++)
     {
         RobotNodePtr node = nodeSet->getNode(i);
-        reference(i) = node->getJointLimitLo() + (node->getJointLimitHi() - node->getJointLimitLo()) / 2;
+        reference(i) =
+            node->getJointLimitLo() + (node->getJointLimitHi() - node->getJointLimitLo()) / 2;
     }
 
     setReferenceConfiguration(reference);
 }
 
-double JointLimitAvoidanceConstraint::optimizationFunction(unsigned int /*id*/)
+double
+JointLimitAvoidanceConstraint::optimizationFunction(unsigned int /*id*/)
 {
     double value = 0;
 
     float v;
-    for(size_t i = 0; i < nodeSet->getSize(); i++)
+    for (size_t i = 0; i < nodeSet->getSize(); i++)
     {
         RobotNodePtr node = nodeSet->getNode(i);
-        if(node->isLimitless())
+        if (node->isLimitless())
             continue;
         v = (node->getJointValue() - reference(i));
         value += v * v;
@@ -56,14 +63,15 @@ double JointLimitAvoidanceConstraint::optimizationFunction(unsigned int /*id*/)
     return optimizationFunctionFactor * value;
 }
 
-Eigen::VectorXf JointLimitAvoidanceConstraint::optimizationGradient(unsigned int /*id*/)
+Eigen::VectorXf
+JointLimitAvoidanceConstraint::optimizationGradient(unsigned int /*id*/)
 {
     Eigen::VectorXf gradient(nodeSet->getSize());
 
-    for(size_t i = 0; i < nodeSet->getSize(); i++)
+    for (size_t i = 0; i < nodeSet->getSize(); i++)
     {
         RobotNodePtr node = nodeSet->getNode(i);
-        if(!node->isLimitless())
+        if (!node->isLimitless())
             gradient(i) = 2 * (node->getJointValue() - reference(i));
         else
             gradient(i) = 0.0f;

@@ -3,7 +3,6 @@
 #include <string>
 #include <typeinfo>
 
-
 namespace simox::meta
 {
 
@@ -12,17 +11,18 @@ namespace simox::meta
 
     /// Return the demangled (static) type name of `t`.
     template <typename T>
-    std::string get_type_name()
+    std::string
+    get_type_name()
     {
-        return get_type_name(typeid (T));
+        return get_type_name(typeid(T));
     }
 
     /// Return the demangled (dynamic) type name of `t`.
     template <typename T>
-    std::string get_type_name(const T& t)
+    std::string
+    get_type_name(const T& t)
     {
-        return get_type_name(typeid (t));
+        return get_type_name(typeid(t));
     }
 
-}
-
+} // namespace simox::meta

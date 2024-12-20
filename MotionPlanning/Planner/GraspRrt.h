@@ -22,18 +22,17 @@
 */
 #pragma once
 
-#include "../Saba.h"
-#include "../CSpace/CSpaceSampled.h"
-#include "../CSpace/CSpacePath.h"
-#include "../CSpace/CSpaceNode.h"
-#include "../ApproachDiscretization.h"
-#include <VirtualRobot/VirtualRobot.h>
 #include <VirtualRobot/EndEffector/EndEffector.h>
+#include <VirtualRobot/IK/DifferentialIK.h>
+#include <VirtualRobot/IK/IKSolver.h>
 #include <VirtualRobot/Obstacle.h>
 #include <VirtualRobot/VirtualRobot.h>
-#include <VirtualRobot/IK/IKSolver.h>
-#include <VirtualRobot/IK/DifferentialIK.h>
-#include <VirtualRobot/Obstacle.h>
+
+#include "../ApproachDiscretization.h"
+#include "../CSpace/CSpaceNode.h"
+#include "../CSpace/CSpacePath.h"
+#include "../CSpace/CSpaceSampled.h"
+#include "../Saba.h"
 #include "Rrt.h"
 
 namespace Saba
@@ -72,7 +71,8 @@ namespace Saba
                  VirtualRobot::EndEffectorPtr eef,
                  VirtualRobot::ObstaclePtr object,
                  VirtualRobot::BasicGraspQualityMeasurePtr measure,
-                 VirtualRobot::SceneObjectSetPtr graspCollisionObjects = VirtualRobot::SceneObjectSetPtr(),
+                 VirtualRobot::SceneObjectSetPtr graspCollisionObjects =
+                     VirtualRobot::SceneObjectSetPtr(),
                  float probabGraspHypothesis = 0.1f,
                  float graspQualityMinScore = 0.01f);
 
@@ -109,7 +109,7 @@ namespace Saba
             VirtualRobot::EndEffector::ContactInfoVector contacts;
         };
 
-        typedef std::vector< GraspInfo, Eigen::aligned_allocator<GraspInfo> > GraspInfoVector;
+        typedef std::vector<GraspInfo, Eigen::aligned_allocator<GraspInfo>> GraspInfoVector;
 
 
         //! Stores all found grasps to given vector (thread safe)
@@ -150,14 +150,14 @@ namespace Saba
 
         enum MoveArmResult
         {
-            eMovedOneStep,              // arm movement was successful, but goal not reached yet
-            eGoalReached,               // goal reached
-            eCollision_Environment,     // arm or hand collided with environment
-            eGraspablePoseReached,      // a position which allows applying a feasible grasp was reached
-            eJointBoundaryViolation,    // joint limits were violated
-            eTrapped,                   // trapped in local minima
-            eError,                     // unexpected error
-            eFatalError                 // unexpected fatal error
+            eMovedOneStep, // arm movement was successful, but goal not reached yet
+            eGoalReached, // goal reached
+            eCollision_Environment, // arm or hand collided with environment
+            eGraspablePoseReached, // a position which allows applying a feasible grasp was reached
+            eJointBoundaryViolation, // joint limits were violated
+            eTrapped, // trapped in local minima
+            eError, // unexpected error
+            eFatalError // unexpected fatal error
         };
 
         /*!
@@ -167,7 +167,9 @@ namespace Saba
             \param storeCSpaceConf The result is stored here.
             \return The resulting state.
         */
-        MoveArmResult createWorkSpaceSamplingStep(const Eigen::Matrix4f& currentPose, const Eigen::Matrix4f& goalPose, Eigen::VectorXf& storeCSpaceConf);
+        MoveArmResult createWorkSpaceSamplingStep(const Eigen::Matrix4f& currentPose,
+                                                  const Eigen::Matrix4f& goalPose,
+                                                  Eigen::VectorXf& storeCSpaceConf);
 
         /*!
             Can be used for custom initialization. Usually this method is automatically called at the beginning of a planning query.
@@ -177,8 +179,8 @@ namespace Saba
         /*! By default min 3 contacts are needed, this number can be adjusted here.
         */
         void setMinGraspContacts(int nr);
-    protected:
 
+    protected:
         bool doPlanningCycle();
 
         /*!
@@ -195,9 +197,8 @@ namespace Saba
         VirtualRobot::EndEffectorPtr eef;
         VirtualRobot::RobotPtr robot;
 
-        std::map < VirtualRobot::GraspPtr, Saba::CSpaceNodePtr > graspNodeMapping;
-        std::vector< Eigen::VectorXf > ikSolutions;
-
+        std::map<VirtualRobot::GraspPtr, Saba::CSpaceNodePtr> graspNodeMapping;
+        std::vector<Eigen::VectorXf> ikSolutions;
 
 
         PlanningPerformance performanceMeasure;
@@ -211,10 +212,14 @@ namespace Saba
 
         float workSpaceSamplingCount;
 
-        VirtualRobot::ObstaclePtr gcpOject; //<! This object is used to determine the distances to the targetObject
+        VirtualRobot::ObstaclePtr
+            gcpOject; //<! This object is used to determine the distances to the targetObject
 
-        MoveArmResult moveTowardsGoal(CSpaceNodePtr startNode, const Eigen::Matrix4f& targetPose, int nMaxLoops);
-        MoveArmResult createWorkSpaceSamplingStep(const Eigen::Matrix4f& goalPose, CSpaceNodePtr extendNode, Eigen::VectorXf& storeCSpaceConf);
+        MoveArmResult
+        moveTowardsGoal(CSpaceNodePtr startNode, const Eigen::Matrix4f& targetPose, int nMaxLoops);
+        MoveArmResult createWorkSpaceSamplingStep(const Eigen::Matrix4f& goalPose,
+                                                  CSpaceNodePtr extendNode,
+                                                  Eigen::VectorXf& storeCSpaceConf);
 
         /*!
             Limit the step that is defined with p, so that the translational and rotational stepsize is limited by cartSamplingOriStepSize and cartSamplingPosStepSize
@@ -226,17 +231,22 @@ namespace Saba
             \param deltaPose Consists of the 3x3 rotation delta R and the 3 dim translational delta T in homogeneous notation. R and T must be given in global coordinate system.
             \param storeCSpaceConf The result is stored here.
         */
-        MoveArmResult moveArmDiffKin(const Eigen::Matrix4f& deltaPose, Eigen::VectorXf& storeCSpaceConf);
+        MoveArmResult moveArmDiffKin(const Eigen::Matrix4f& deltaPose,
+                                     Eigen::VectorXf& storeCSpaceConf);
 
 
         // Computes the grasp score for given configuration
         // nId is needed, to store the id of the rrt node which holds pConfig
-        float calculateGraspScore(const Eigen::VectorXf& c, int nId = -1, bool bStoreGraspInfoOnSuccess = false);
+        float calculateGraspScore(const Eigen::VectorXf& c,
+                                  int nId = -1,
+                                  bool bStoreGraspInfoOnSuccess = false);
 
 
-        VirtualRobot::SceneObjectSetPtr graspCollisionObjects; //!< These objects are considered as obstacles when closing the hand. The targetObject is handled explicitly and must not be part of these object set.
+        VirtualRobot::SceneObjectSetPtr
+            graspCollisionObjects; //!< These objects are considered as obstacles when closing the hand. The targetObject is handled explicitly and must not be part of these object set.
 
-        Rrt::ExtensionResult connectComplete(Eigen::VectorXf& c, CSpaceTreePtr tree, int& storeLastAddedID) override;
+        Rrt::ExtensionResult
+        connectComplete(Eigen::VectorXf& c, CSpaceTreePtr tree, int& storeLastAddedID) override;
 
         void printGraspInfo(GraspInfo& GrInfo);
 
@@ -251,7 +261,8 @@ namespace Saba
         VirtualRobot::DifferentialIKPtr diffIK;
 
         Eigen::Vector3f targetObjectPosition; // global pose of manipulation object
-        float tryGraspsDistance2; // TCP<->object distance in which grasp movements are tried (squared value)
+        float
+            tryGraspsDistance2; // TCP<->object distance in which grasp movements are tried (squared value)
 
         //bool m_bEndlessMode;
 
@@ -261,8 +272,11 @@ namespace Saba
 
         bool verbose;
 
-        std::map < CSpaceNodePtr, Eigen::Matrix4f, std::less<CSpaceNodePtr>,
-            Eigen::aligned_allocator<std::pair<const CSpaceNodePtr, Eigen::Matrix4f> > > mapConfigTcp; //!< Store the tcp (gcp) poses that correspond with the config
+        std::map<CSpaceNodePtr,
+                 Eigen::Matrix4f,
+                 std::less<CSpaceNodePtr>,
+                 Eigen::aligned_allocator<std::pair<const CSpaceNodePtr, Eigen::Matrix4f>>>
+            mapConfigTcp; //!< Store the tcp (gcp) poses that correspond with the config
 
         // grasp measurement
         VirtualRobot::BasicGraspQualityMeasurePtr graspQualityMeasure;
@@ -270,9 +284,6 @@ namespace Saba
         float graspQualityMinScore;
 
         bool plannerInitialized;
-
     };
 
-}
-
-
+} // namespace Saba

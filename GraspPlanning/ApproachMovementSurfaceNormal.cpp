@@ -1,30 +1,33 @@
 #include "ApproachMovementSurfaceNormal.h"
 
-#include <VirtualRobot/VirtualRobot.h>
-#include <VirtualRobot/Robot.h>
-#include <VirtualRobot/RobotConfig.h>
-#include <VirtualRobot/MathTools.h>
-#include <VirtualRobot/SceneObjectSet.h>
+#include <Eigen/Geometry>
+
 #include <VirtualRobot/CollisionDetection/CollisionChecker.h>
 #include <VirtualRobot/EndEffector/EndEffector.h>
+#include <VirtualRobot/MathTools.h>
 #include <VirtualRobot/Nodes/RobotNode.h>
+#include <VirtualRobot/Robot.h>
+#include <VirtualRobot/RobotConfig.h>
+#include <VirtualRobot/SceneObjectSet.h>
+#include <VirtualRobot/VirtualRobot.h>
 #include <VirtualRobot/Visualization/TriMeshModel.h>
-
-#include <Eigen/Geometry>
 
 
 using namespace std;
 using namespace VirtualRobot;
 
-
 namespace GraspStudio
 {
 
-    ApproachMovementSurfaceNormal::ApproachMovementSurfaceNormal(VirtualRobot::SceneObjectPtr object, VirtualRobot::EndEffectorPtr eef,
-            const std::string& graspPreshape, float maxRetreatDist, bool useFaceAreaDistribution)
-        : ApproachMovementGenerator(object, eef, graspPreshape),
-          distribUniform(0, objectModel->faces.size() - 1),
-          distribRetreatDistance(0, maxRetreatDist)
+    ApproachMovementSurfaceNormal::ApproachMovementSurfaceNormal(
+        VirtualRobot::SceneObjectPtr object,
+        VirtualRobot::EndEffectorPtr eef,
+        const std::string& graspPreshape,
+        float maxRetreatDist,
+        bool useFaceAreaDistribution) :
+        ApproachMovementGenerator(object, eef, graspPreshape),
+        distribUniform(0, objectModel->faces.size() - 1),
+        distribRetreatDistance(0, maxRetreatDist)
     {
         name = "ApproachMovementSurfaceNormal";
 
@@ -35,26 +38,27 @@ namespace GraspStudio
         }
     }
 
-    ApproachMovementSurfaceNormal::~ApproachMovementSurfaceNormal()
-        = default;
+    ApproachMovementSurfaceNormal::~ApproachMovementSurfaceNormal() = default;
 
-    bool ApproachMovementSurfaceNormal::getPositionOnObject(Eigen::Vector3f& storePos, Eigen::Vector3f& storeApproachDir)
+    bool
+    ApproachMovementSurfaceNormal::getPositionOnObject(Eigen::Vector3f& storePos,
+                                                       Eigen::Vector3f& storeApproachDir)
     {
         if (!object || objectModel->faces.size() == 0)
         {
             return false;
         }
 
-        std::size_t faceIndex = useFaceAreasDistrib ? distribFaceAreas(randomEngine)
-                                : distribUniform(randomEngine);
+        std::size_t faceIndex =
+            useFaceAreasDistrib ? distribFaceAreas(randomEngine) : distribUniform(randomEngine);
 
         std::size_t nVert1 = (objectModel->faces[faceIndex]).id1;
         std::size_t nVert2 = (objectModel->faces[faceIndex]).id2;
         std::size_t nVert3 = (objectModel->faces[faceIndex]).id3;
 
         storePos = VirtualRobot::MathTools::randomPointInTriangle(objectModel->vertices[nVert1],
-                   objectModel->vertices[nVert2],
-                   objectModel->vertices[nVert3]);
+                                                                  objectModel->vertices[nVert2],
+                                                                  objectModel->vertices[nVert3]);
 
         //storePos = (objectModel->vertices[nVert1] + objectModel->vertices[nVert2] + objectModel->vertices[nVert3]) / 3.0f;
         /*position(0) = (objectModel->vertices[nVert1].x + objectModel->vertices[nVert2].x + objectModel->vertices[nVert3].x) / 3.0f;
@@ -74,7 +78,8 @@ namespace GraspStudio
         return true;
     }
 
-    Eigen::Matrix4f ApproachMovementSurfaceNormal::createNewApproachPose()
+    Eigen::Matrix4f
+    ApproachMovementSurfaceNormal::createNewApproachPose()
     {
         // store current pose
         Eigen::Matrix4f pose = getEEFPose();
@@ -108,7 +113,8 @@ namespace GraspStudio
             Eigen::Vector3f delta = approachDir * distance;
             updateEEFPose(delta);
 
-            if (!eef_cloned->getCollisionChecker()->checkCollision(object, eef->createSceneObjectSet()))
+            if (!eef_cloned->getCollisionChecker()->checkCollision(object,
+                                                                   eef->createSceneObjectSet()))
             {
                 poseB = getEEFPose();
             } // else remain at original pose
@@ -120,8 +126,9 @@ namespace GraspStudio
         return poseB;
     }
 
-    bool ApproachMovementSurfaceNormal::setEEFToApproachPose(
-        const Eigen::Vector3f& position, const Eigen::Vector3f& approachDir)
+    bool
+    ApproachMovementSurfaceNormal::setEEFToApproachPose(const Eigen::Vector3f& position,
+                                                        const Eigen::Vector3f& approachDir)
     {
         VirtualRobot::RobotNodePtr graspNode = eef_cloned->getGCP();
 
@@ -204,8 +211,10 @@ namespace GraspStudio
         return true;
     }
 
-    void ApproachMovementSurfaceNormal::moveEEFAway(
-        const Eigen::Vector3f& approachDir, float step, int maxLoops)
+    void
+    ApproachMovementSurfaceNormal::moveEEFAway(const Eigen::Vector3f& approachDir,
+                                               float step,
+                                               int maxLoops)
     {
         VirtualRobot::SceneObjectSetPtr sceneObjectSet = eef_cloned->createSceneObjectSet();
         if (!sceneObjectSet)
@@ -226,10 +235,12 @@ namespace GraspStudio
         }
     }
 
-    Eigen::Matrix4f ApproachMovementSurfaceNormal::getEEFPose()
+    Eigen::Matrix4f
+    ApproachMovementSurfaceNormal::getEEFPose()
     {
         RobotNodePtr tcp;
-        if (!graspPreshape.empty() && eef_cloned->hasPreshape(graspPreshape) && eef_cloned->getPreshape(graspPreshape)->getTCP())
+        if (!graspPreshape.empty() && eef_cloned->hasPreshape(graspPreshape) &&
+            eef_cloned->getPreshape(graspPreshape)->getTCP())
         {
             tcp = eef_cloned->getPreshape(graspPreshape)->getTCP();
         }
@@ -240,10 +251,12 @@ namespace GraspStudio
         return tcp->getGlobalPose();
     }
 
-    bool ApproachMovementSurfaceNormal::setEEFPose(const Eigen::Matrix4f& pose)
+    bool
+    ApproachMovementSurfaceNormal::setEEFPose(const Eigen::Matrix4f& pose)
     {
         RobotNodePtr tcp;
-        if (!graspPreshape.empty() && eef_cloned->hasPreshape(graspPreshape) && eef_cloned->getPreshape(graspPreshape)->getTCP())
+        if (!graspPreshape.empty() && eef_cloned->hasPreshape(graspPreshape) &&
+            eef_cloned->getPreshape(graspPreshape)->getTCP())
         {
             tcp = eef_cloned->getPreshape(graspPreshape)->getTCP();
         }
@@ -255,4 +268,4 @@ namespace GraspStudio
         return true;
     }
 
-}
+} // namespace GraspStudio

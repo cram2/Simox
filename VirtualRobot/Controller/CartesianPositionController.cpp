@@ -18,17 +18,20 @@
 
 #include "CartesianPositionController.h"
 
-#include "VirtualRobot/math/Helpers.h"
 #include <Eigen/Dense>
+
+#include "../Nodes/RobotNode.h"
+#include "VirtualRobot/math/Helpers.h"
 
 namespace VirtualRobot
 {
-    CartesianPositionController::CartesianPositionController(const RobotNodePtr& tcp)
-        : tcp(tcp)
+    CartesianPositionController::CartesianPositionController(const RobotNodePtr& tcp) : tcp(tcp)
     {
     }
 
-    Eigen::VectorXf CartesianPositionController::calculate(const Eigen::Matrix4f& targetPose, IKSolver::CartesianSelection mode) const
+    Eigen::VectorXf
+    CartesianPositionController::calculate(const Eigen::Matrix4f& targetPose,
+                                           IKSolver::CartesianSelection mode) const
     {
         int posLen = mode & IKSolver::Position ? 3 : 0;
         int oriLen = mode & IKSolver::Orientation ? 3 : 0;
@@ -39,7 +42,7 @@ namespace VirtualRobot
             Eigen::Vector3f targetPos = targetPose.block<3, 1>(0, 3);
             Eigen::Vector3f currentPos = tcp->getPositionInRootFrame();
             Eigen::Vector3f errPos = targetPos - currentPos;
-            Eigen::Vector3f posVel =  errPos * KpPos;
+            Eigen::Vector3f posVel = errPos * KpPos;
             if (maxPosVel > 0)
             {
                 posVel = math::Helpers::LimitTo(posVel, maxPosVel);
@@ -65,12 +68,13 @@ namespace VirtualRobot
         return cartesianVel;
     }
 
-    Eigen::VectorXf CartesianPositionController::calculatePos(const Eigen::Vector3f& targetPos) const
+    Eigen::VectorXf
+    CartesianPositionController::calculatePos(const Eigen::Vector3f& targetPos) const
     {
         Eigen::VectorXf cartesianVel(3);
         Eigen::Vector3f currentPos = tcp->getPositionInRootFrame();
         Eigen::Vector3f errPos = targetPos - currentPos;
-        Eigen::Vector3f posVel =  errPos * KpPos;
+        Eigen::Vector3f posVel = errPos * KpPos;
         if (maxPosVel > 0)
         {
             posVel = math::Helpers::LimitTo(posVel, maxPosVel);
@@ -79,24 +83,30 @@ namespace VirtualRobot
         return cartesianVel;
     }
 
-    float CartesianPositionController::getPositionError(const Eigen::Matrix4f& targetPose) const
+    float
+    CartesianPositionController::getPositionError(const Eigen::Matrix4f& targetPose) const
     {
         return GetPositionError(targetPose, tcp);
     }
 
-    float CartesianPositionController::getOrientationError(const Eigen::Matrix4f& targetPose) const
+    float
+    CartesianPositionController::getOrientationError(const Eigen::Matrix4f& targetPose) const
     {
         return GetOrientationError(targetPose, tcp);
     }
 
-    float CartesianPositionController::GetPositionError(const Eigen::Matrix4f& targetPose, const RobotNodePtr& tcp)
+    float
+    CartesianPositionController::GetPositionError(const Eigen::Matrix4f& targetPose,
+                                                  const RobotNodePtr& tcp)
     {
         Eigen::Vector3f targetPos = targetPose.block<3, 1>(0, 3);
         Eigen::Vector3f errPos = targetPos - tcp->getPositionInRootFrame();
         return errPos.norm();
     }
 
-    float CartesianPositionController::GetOrientationError(const Eigen::Matrix4f& targetPose, const RobotNodePtr& tcp)
+    float
+    CartesianPositionController::GetOrientationError(const Eigen::Matrix4f& targetPose,
+                                                     const RobotNodePtr& tcp)
     {
         Eigen::Matrix3f targetOri = targetPose.block<3, 3>(0, 0);
         Eigen::Matrix3f tcpOri = tcp->getPoseInRootFrame().block<3, 3>(0, 0);
@@ -105,13 +115,22 @@ namespace VirtualRobot
         return aa.angle();
     }
 
-    bool CartesianPositionController::Reached(const Eigen::Matrix4f& targetPose, const RobotNodePtr& tcp, bool checkOri, float thresholdPosReached, float thresholdOriReached)
+    bool
+    CartesianPositionController::Reached(const Eigen::Matrix4f& targetPose,
+                                         const RobotNodePtr& tcp,
+                                         bool checkOri,
+                                         float thresholdPosReached,
+                                         float thresholdOriReached)
     {
-        return GetPositionError(targetPose, tcp) < thresholdPosReached
-               && (!checkOri || GetOrientationError(targetPose, tcp) < thresholdOriReached);
+        return GetPositionError(targetPose, tcp) < thresholdPosReached &&
+               (!checkOri || GetOrientationError(targetPose, tcp) < thresholdOriReached);
     }
 
-    bool CartesianPositionController::reached(const Eigen::Matrix4f& targetPose, VirtualRobot::IKSolver::CartesianSelection mode, float thresholdPosReached, float thresholdOriReached)
+    bool
+    CartesianPositionController::reached(const Eigen::Matrix4f& targetPose,
+                                         VirtualRobot::IKSolver::CartesianSelection mode,
+                                         float thresholdPosReached,
+                                         float thresholdOriReached)
     {
         if (mode & VirtualRobot::IKSolver::Position)
         {
@@ -130,19 +149,21 @@ namespace VirtualRobot
         return true;
     }
 
-
-    Eigen::Vector3f CartesianPositionController::getPositionDiff(const Eigen::Matrix4f& targetPose) const
+    Eigen::Vector3f
+    CartesianPositionController::getPositionDiff(const Eigen::Matrix4f& targetPose) const
     {
         Eigen::Vector3f targetPos = targetPose.block<3, 1>(0, 3);
         return targetPos - tcp->getPositionInRootFrame();
     }
 
-    Eigen::Vector3f CartesianPositionController::getPositionDiffVec3(const Eigen::Vector3f& targetPosition) const
+    Eigen::Vector3f
+    CartesianPositionController::getPositionDiffVec3(const Eigen::Vector3f& targetPosition) const
     {
         return targetPosition - tcp->getPositionInRootFrame();
     }
 
-    Eigen::Vector3f CartesianPositionController::getOrientationDiff(const Eigen::Matrix4f& targetPose) const
+    Eigen::Vector3f
+    CartesianPositionController::getOrientationDiff(const Eigen::Matrix4f& targetPose) const
     {
         Eigen::Matrix3f targetOri = targetPose.block<3, 3>(0, 0);
         Eigen::Matrix3f tcpOri = tcp->getPoseInRootFrame().block<3, 3>(0, 0);
@@ -151,8 +172,9 @@ namespace VirtualRobot
         return aa.axis() * aa.angle();
     }
 
-    RobotNodePtr CartesianPositionController::getTcp() const
+    RobotNodePtr
+    CartesianPositionController::getTcp() const
     {
         return tcp;
     }
-}
+} // namespace VirtualRobot

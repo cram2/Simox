@@ -30,6 +30,8 @@
 #include "../Visualization/VisualizationFactory.h"
 #include "../Visualization/VisualizationNode.h"
 #include "Affordances.h"
+#include "Logging.h"
+#include "MathTools.h"
 #include "SimoxUtility/algorithm/string/string_tools.h"
 #include "SimoxUtility/color/Color.h"
 #include "VirtualRobot.h"
@@ -181,11 +183,13 @@ namespace VirtualRobot
         return m;
     }
 
-    void 
-    BaseIO::processManipulationCapabilities(const rapidxml::xml_node<char>* XMLNode, ManipulationCapabilities& manipulationCapabilities)
+    void
+    BaseIO::processManipulationCapabilities(const rapidxml::xml_node<char>* XMLNode,
+                                            ManipulationCapabilities& manipulationCapabilities)
     {
 
-        const auto processManipulationCapability = [](const auto* capabiltyNode) -> std::optional<ManipulationCapabilities::Capability> 
+        const auto processManipulationCapability =
+            [](const auto* capabiltyNode) -> std::optional<ManipulationCapabilities::Capability>
         {
             ManipulationCapabilities::Capability capability;
 
@@ -219,15 +223,14 @@ namespace VirtualRobot
             }
 
             return capability;
-
         };
 
         ManipulationCapabilities::Capabilities capabilities;
         {
             auto* capabiltyNode = XMLNode->first_node("capability", 0, false);
-            while(capabiltyNode != nullptr)
+            while (capabiltyNode != nullptr)
             {
-                if(const auto capability = processManipulationCapability(capabiltyNode))
+                if (const auto capability = processManipulationCapability(capabiltyNode))
                 {
                     capabilities.push_back(capability.value());
                 }
@@ -1307,7 +1310,8 @@ namespace VirtualRobot
             else if (not primitives.empty())
             {
                 VisualizationFactoryPtr visualizationFactory = VisualizationFactory::first(NULL);
-                visualizationNode = visualizationFactory->getVisualizationFromPrimitives(primitives);
+                visualizationNode =
+                    visualizationFactory->getVisualizationFromPrimitives(primitives);
             }
 
 

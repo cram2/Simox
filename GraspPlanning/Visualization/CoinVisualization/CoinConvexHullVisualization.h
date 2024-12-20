@@ -39,13 +39,15 @@ namespace GraspStudio
     *
     * A Coin3D related visualization of a convex hull
     */
-    class GRASPSTUDIO_IMPORT_EXPORT CoinConvexHullVisualization : virtual public ConvexHullVisualization
+    class GRASPSTUDIO_IMPORT_EXPORT CoinConvexHullVisualization :
+        virtual public ConvexHullVisualization
     {
     public:
         /*!
             Constructor
         */
-        CoinConvexHullVisualization(VirtualRobot::MathTools::ConvexHull6DPtr convHull, bool useFirst3Coords = true);
+        CoinConvexHullVisualization(VirtualRobot::MathTools::ConvexHull6DPtr convHull,
+                                    bool useFirst3Coords = true);
         CoinConvexHullVisualization(VirtualRobot::MathTools::ConvexHull3DPtr convHull);
 
         ~CoinConvexHullVisualization() override;
@@ -53,18 +55,18 @@ namespace GraspStudio
         SoSeparator* getCoinVisualization();
 
     protected:
-
         void buildVisu();
-        SoSeparator* createConvexHullVisualization(VirtualRobot::MathTools::ConvexHull3DPtr& convHull);
-        SoSeparator* createConvexHullVisualization(VirtualRobot::MathTools::ConvexHull6DPtr& convHull, bool buseFirst3Coords);
+        SoSeparator*
+        createConvexHullVisualization(VirtualRobot::MathTools::ConvexHull3DPtr& convHull);
+        SoSeparator*
+        createConvexHullVisualization(VirtualRobot::MathTools::ConvexHull6DPtr& convHull,
+                                      bool buseFirst3Coords);
 
 
         SoSeparator* visualization;
-
     };
 
     typedef std::shared_ptr<CoinConvexHullVisualization> CoinConvexHullVisualizationPtr;
 
 
-} // namespace Saba
-
+} // namespace GraspStudio

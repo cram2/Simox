@@ -1,7 +1,7 @@
 #pragma once
 
-#include <vector>
 #include <algorithm>
+#include <vector>
 
 namespace simox::alg
 {
@@ -54,7 +54,7 @@ namespace simox::alg
     std::vector<TypeT>
     subvector(const std::vector<TypeT>& v, int startPos)
     {
-        return subvector(v, startPos, v.size()-1);
+        return subvector(v, startPos, v.size() - 1);
     }
 
     template <typename TypeT>
@@ -94,5 +94,4 @@ namespace simox::alg
     }
 
     // Todo: replace, split, ...
-}
-
+} // namespace simox::alg

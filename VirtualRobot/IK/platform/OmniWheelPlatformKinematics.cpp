@@ -17,6 +17,7 @@
 */
 
 #include "OmniWheelPlatformKinematics.h"
+
 #include <cmath>
 
 #include <Eigen/Core>
@@ -49,7 +50,8 @@ namespace VirtualRobot
         Eigen::Matrix3f relativeRotation = Eigen::Matrix3f::Identity();
         relativeRotation.block<2, 2>(0, 0) = Eigen::Rotation2Df(relativeAngle).toRotationMatrix();
 
-        return relativeRotation * wheelFactor.asDiagonal() * B().transpose().inverse() * 2 * M_PI * R / n;
+        return relativeRotation * wheelFactor.asDiagonal() * B().transpose().inverse() * 2 * M_PI *
+               R / n;
     }
 
     // OmniWheelPlatformKinematics

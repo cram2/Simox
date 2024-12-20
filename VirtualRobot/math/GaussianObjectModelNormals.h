@@ -22,20 +22,23 @@
 #pragma once
 
 #include "../VirtualRobot.h"
-#include "MathForwardDefinitions.h"
-
 #include "Contact.h"
 #include "GaussianImplicitSurface3DNormals.h"
 #include "ImplicitObjectModel.h"
+#include "MathForwardDefinitions.h"
 
 namespace math
 {
 
-    class VIRTUAL_ROBOT_IMPORT_EXPORT GaussianObjectModelNormals :
-            public ImplicitObjectModel
+    class VIRTUAL_ROBOT_IMPORT_EXPORT GaussianObjectModelNormals : public ImplicitObjectModel
     {
     public:
-        float Noise(){ return noise;}
+        float
+        Noise()
+        {
+            return noise;
+        }
+
         GaussianObjectModelNormals(float noise, float normalNoise, float normalScale);
         void AddContact(Contact contact);
         void Update() override;
@@ -48,7 +51,5 @@ namespace math
         float normalScale;
         GaussianImplicitSurface3DNormalsPtr gpModel;
         //ContactList contacts;
-
-     };
-}
-
+    };
+} // namespace math

@@ -22,11 +22,12 @@
 */
 #pragma once
 
-#include "../Saba.h"
-#include "VirtualRobot/VirtualRobot.h"
-#include "VirtualRobot/Robot.h"
 #include <Eigen/Core>
 #include <Eigen/Geometry>
+
+#include "../Saba.h"
+#include "VirtualRobot/Robot.h"
+#include "VirtualRobot/VirtualRobot.h"
 
 namespace Saba
 {
@@ -47,8 +48,12 @@ namespace Saba
             Robot must have a node with name TCPName.
             The visualizations are build by determining the TCP's position in workspace according to the configurations of a path or tree .
         */
-        RrtWorkspaceVisualization(VirtualRobot::RobotPtr robot, CSpacePtr cspace, const std::string& TCPName);
-        RrtWorkspaceVisualization(VirtualRobot::RobotPtr robot, VirtualRobot::RobotNodeSetPtr robotNodeSet, const std::string& TCPName);
+        RrtWorkspaceVisualization(VirtualRobot::RobotPtr robot,
+                                  CSpacePtr cspace,
+                                  const std::string& TCPName);
+        RrtWorkspaceVisualization(VirtualRobot::RobotPtr robot,
+                                  VirtualRobot::RobotNodeSetPtr robotNodeSet,
+                                  const std::string& TCPName);
 
         enum ColorSet
         {
@@ -76,29 +81,41 @@ namespace Saba
         /*!
             Add visualization of a path in cspace.
         */
-        virtual bool addCSpacePath(CSpacePathPtr path, RrtWorkspaceVisualization::ColorSet colorSet = eBlue) = 0;
-        virtual void setPathStyle(float lineSize = 4.0f, float nodeSize = 15.0f, float renderComplexity = 1.0f);
+        virtual bool addCSpacePath(CSpacePathPtr path,
+                                   RrtWorkspaceVisualization::ColorSet colorSet = eBlue) = 0;
+        virtual void
+        setPathStyle(float lineSize = 4.0f, float nodeSize = 15.0f, float renderComplexity = 1.0f);
 
         /*!
             Add visualization of a tree (e.g an RRT) in cspace.
         */
-        virtual bool addTree(CSpaceTreePtr tree, RrtWorkspaceVisualization::ColorSet colorSet = eRed) = 0;
-        virtual void setTreeStyle(float lineSize = 1.0f, float nodeSize = 15.0f, float renderComplexity = 0.1f);
+        virtual bool addTree(CSpaceTreePtr tree,
+                             RrtWorkspaceVisualization::ColorSet colorSet = eRed) = 0;
+        virtual void
+        setTreeStyle(float lineSize = 1.0f, float nodeSize = 15.0f, float renderComplexity = 0.1f);
 
         /*!
             Add visualization of a configuration in cspace.
         */
-        virtual bool addConfiguration(const Eigen::VectorXf& c, RrtWorkspaceVisualization::ColorSet colorSet = eGreen, float nodeSizeFactor = 1.0f) = 0;
+        virtual bool addConfiguration(const Eigen::VectorXf& c,
+                                      RrtWorkspaceVisualization::ColorSet colorSet = eGreen,
+                                      float nodeSizeFactor = 1.0f) = 0;
 
         /*!
             Set the custom line and node color. Does not affect already added trees or paths.
         */
-        virtual void setCustomColor(float nodeR, float nodeG, float nodeB, float lineR = 0.5f, float lineG = 0.5f, float lineB = 0.5f);
+        virtual void setCustomColor(float nodeR,
+                                    float nodeG,
+                                    float nodeB,
+                                    float lineR = 0.5f,
+                                    float lineG = 0.5f,
+                                    float lineB = 0.5f);
 
         /*!
             Set tree nodes with status flag equal to given parameter to the specified color.
         */
         virtual void colorizeTreeNodes(int status, ColorSet colorSet);
+
     protected:
         void init(); // is called by constructor
 
@@ -119,8 +136,6 @@ namespace Saba
 
         std::map<ColorSet, RenderColors> colors;
         std::map<int, ColorSet> treeNodeStatusColor;
-
     };
 
 } // namespace Saba
-

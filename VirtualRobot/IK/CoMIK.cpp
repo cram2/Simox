@@ -1,22 +1,28 @@
 #include "CoMIK.h"
-#include "DifferentialIK.h"
-#include "../Nodes/RobotNodeRevolute.h"
-#include "../Nodes/RobotNodePrismatic.h"
-#include "../VirtualRobotException.h"
-#include "../Robot.h"
-#include <VirtualRobot/MathTools.h>
+
+#include <cfloat>
 
 #include <Eigen/Geometry>
 
-#include <cfloat>
+#include <VirtualRobot/MathTools.h>
+
+#include "../Nodes/RobotNodePrismatic.h"
+#include "../Nodes/RobotNodeRevolute.h"
+#include "../Robot.h"
+#include "../VirtualRobotException.h"
+#include "DifferentialIK.h"
+#include "Logging.h"
 
 namespace VirtualRobot
 {
     using std::cout;
     using std::endl;
 
-    CoMIK::CoMIK(RobotNodeSetPtr rnsJoints, RobotNodeSetPtr rnsBodies, RobotNodePtr coordSystem, int dimensions)
-        : JacobiProvider(rnsJoints), coordSystem(coordSystem)
+    CoMIK::CoMIK(RobotNodeSetPtr rnsJoints,
+                 RobotNodeSetPtr rnsBodies,
+                 RobotNodePtr coordSystem,
+                 int dimensions) :
+        JacobiProvider(rnsJoints), coordSystem(coordSystem)
     {
         VR_ASSERT(rns);
         VR_ASSERT(rnsBodies);
@@ -28,7 +34,7 @@ namespace VirtualRobot
 
         bodyNodes = rnsBodies->getAllRobotNodes();
 
-        for (auto & bodyNode : bodyNodes)
+        for (auto& bodyNode : bodyNodes)
         {
             // get all joints that influence the body
             std::vector<RobotNodePtr> parentsN = bodyNode->getAllParents(rns);
@@ -40,18 +46,21 @@ namespace VirtualRobot
 
         if (rnsBodies->getMass() == 0)
         {
-            VR_ERROR << "The RNS does not contain any bodies or masses are not specified (mass==0)" << std::endl;
+            VR_ERROR << "The RNS does not contain any bodies or masses are not specified (mass==0)"
+                     << std::endl;
         }
     }
 
-    void CoMIK::setGoal(const Eigen::VectorXf& goal, float tolerance)
+    void
+    CoMIK::setGoal(const Eigen::VectorXf& goal, float tolerance)
     {
         target = goal;
         this->tolerance = tolerance;
         initialized = true;
     }
 
-    Eigen::MatrixXf CoMIK::getJacobianOfCoM(RobotNodePtr node)
+    Eigen::MatrixXf
+    CoMIK::getJacobianOfCoM(RobotNodePtr node)
     {
         // Get number of degrees of freedom
         size_t nDoF = rns->getAllRobotNodes().size();
@@ -64,7 +73,7 @@ namespace VirtualRobot
         // Iterate over all degrees of freedom
         for (size_t i = 0; i < nDoF; i++)
         {
-            RobotNodePtr dof = rns->getNode((int)i);// bodyNodes[i];
+            RobotNodePtr dof = rns->getNode((int)i); // bodyNodes[i];
 
             // Check if the tcp is affected by this DOF
             if (find(parentsN.begin(), parentsN.end(), dof) != parentsN.end())
@@ -73,8 +82,8 @@ namespace VirtualRobot
                 if (dof->isRotationalJoint())
                 {
                     // get axis
-                    std::shared_ptr<RobotNodeRevolute> revolute
-                        = std::dynamic_pointer_cast<RobotNodeRevolute>(dof);
+                    std::shared_ptr<RobotNodeRevolute> revolute =
+                        std::dynamic_pointer_cast<RobotNodeRevolute>(dof);
                     THROW_VR_EXCEPTION_IF(!revolute, "Internal error: expecting revolute joint");
                     // todo: find a better way of handling different joint types
                     Eigen::Vector3f axis = revolute->getJointRotationAxis(coordSystem);
@@ -82,8 +91,8 @@ namespace VirtualRobot
                     // For CoM-Jacobians only the positional part is necessary
                     //Eigen::Vector3f toTCP = node->getCoMLocal() + node->getGlobalPose().block(0, 3, 3, 1)
                     //                        - dof->getGlobalPose().block(0, 3, 3, 1);
-                    Eigen::Vector3f toTCP = node->getCoMGlobal()
-                                            - dof->getGlobalPose().block(0, 3, 3, 1);
+                    Eigen::Vector3f toTCP =
+                        node->getCoMGlobal() - dof->getGlobalPose().block(0, 3, 3, 1);
 
                     if (convertMMtoM)
                     {
@@ -95,8 +104,8 @@ namespace VirtualRobot
                 else if (dof->isTranslationalJoint())
                 {
                     // -> prismatic joint
-                    std::shared_ptr<RobotNodePrismatic> prismatic
-                        = std::dynamic_pointer_cast<RobotNodePrismatic>(dof);
+                    std::shared_ptr<RobotNodePrismatic> prismatic =
+                        std::dynamic_pointer_cast<RobotNodePrismatic>(dof);
                     THROW_VR_EXCEPTION_IF(!prismatic, "Internal error: expecting prismatic joint");
                     // todo: find a better way of handling different joint types
                     Eigen::Vector3f axis = prismatic->getJointTranslationDirection(coordSystem);
@@ -121,23 +130,26 @@ namespace VirtualRobot
         return position;
     }
 
-    void CoMIK::convertModelScalingtoM(bool enable)
+    void
+    CoMIK::convertModelScalingtoM(bool enable)
     {
         convertMMtoM = enable;
     }
 
-
-    Eigen::MatrixXf CoMIK::getJacobianMatrix(SceneObjectPtr /*tcp*/)
+    Eigen::MatrixXf
+    CoMIK::getJacobianMatrix(SceneObjectPtr /*tcp*/)
     {
         // ignoring tcp
         return getJacobianMatrix();
     }
 
-    Eigen::MatrixXf CoMIK::getJacobianMatrix()
+    Eigen::MatrixXf
+    CoMIK::getJacobianMatrix()
     {
         Eigen::MatrixXf Jsum(0, 0);
 
-        for (std::vector<RobotNodePtr>::const_iterator n = bodyNodes.begin(); n != bodyNodes.end(); n++)
+        for (std::vector<RobotNodePtr>::const_iterator n = bodyNodes.begin(); n != bodyNodes.end();
+             n++)
         {
             // Retrieve (positional) Jacobian for this node's CoM
             // Depeding on the set target, the Jacobian is already projected to the XY-plane
@@ -162,34 +174,40 @@ namespace VirtualRobot
         return Jsum;
     }
 
-    Eigen::VectorXf CoMIK::getError(float /*stepSize*/)
+    Eigen::VectorXf
+    CoMIK::getError(float /*stepSize*/)
     {
         return (target - rnsBodies->getCoM().head(target.rows()));
     }
 
-    Eigen::VectorXf CoMIK::computeStep(float stepSize)
+    Eigen::VectorXf
+    CoMIK::computeStep(float stepSize)
     {
         Eigen::VectorXf error = (target - rnsBodies->getCoM().head(target.rows())) * stepSize;
         return getPseudoInverseJacobianMatrix() * error;
     }
 
-    bool CoMIK::checkTolerances()
+    bool
+    CoMIK::checkTolerances()
     {
         float error = (target - rnsBodies->getCoM().head(target.rows())).norm();
         return error < tolerance;
     }
 
-    void CoMIK::checkImprovements(bool enable)
+    void
+    CoMIK::checkImprovements(bool enable)
     {
         checkImprovement = enable;
     }
 
-    bool CoMIK::isValid(const Eigen::VectorXf& v) const
+    bool
+    CoMIK::isValid(const Eigen::VectorXf& v) const
     {
         return MathTools::isValid(v);
     }
 
-    bool CoMIK::computeSteps(float stepSize, float minumChange, int maxNStep)
+    bool
+    CoMIK::computeSteps(float stepSize, float minumChange, int maxNStep)
     {
         std::vector<RobotNodePtr> rn = rns->getAllRobotNodes();
         RobotPtr robot = rns->getRobot();
@@ -228,13 +246,15 @@ namespace VirtualRobot
 
             if (dTheta.norm() < minumChange)
             {
-                VR_INFO << "Could not improve result any more (dTheta.norm()=" << d << "), loop:" << step << std::endl;
+                VR_INFO << "Could not improve result any more (dTheta.norm()=" << d
+                        << "), loop:" << step << std::endl;
                 return false;
             }
 
             if (checkImprovement && d > lastDist)
             {
-                VR_INFO << "Could not improve result any more (dTheta.norm()=" << d << ", last loop's norm:" << lastDist << "), loop:" << step << std::endl;
+                VR_INFO << "Could not improve result any more (dTheta.norm()=" << d
+                        << ", last loop's norm:" << lastDist << "), loop:" << step << std::endl;
                 return false;
             }
 
@@ -249,12 +269,14 @@ namespace VirtualRobot
         return false;
     }
 
-    bool CoMIK::solveIK(float stepSize, float minChange, int maxSteps)
+    bool
+    CoMIK::solveIK(float stepSize, float minChange, int maxSteps)
     {
         return computeSteps(stepSize, minChange, maxSteps);
     }
 
-    void CoMIK::print()
+    void
+    CoMIK::print()
     {
         JacobiProvider::print();
 
@@ -272,6 +294,5 @@ namespace VirtualRobot
         std::cout << "RNS bodies:" << rnsBodies->getName() << std::endl;
         std::cout << "CoM:" << rnsBodies->getCoM().head(target.rows()).transpose() << std::endl;
         std::cout << "Error:" << endl << getError().transpose() << std::endl;
-
     }
-}
+} // namespace VirtualRobot

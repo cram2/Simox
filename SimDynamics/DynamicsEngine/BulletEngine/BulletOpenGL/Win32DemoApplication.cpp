@@ -17,33 +17,33 @@ subject to the following restrictions:
 
 #include "Win32DemoApplication.h"
 
-void Win32DemoApplication::updateModifierKeys()
+void
+Win32DemoApplication::updateModifierKeys()
 {
     //not yet
 }
 
-
-
-void Win32DemoApplication::specialKeyboard(int key, int x, int y)
+void
+Win32DemoApplication::specialKeyboard(int key, int x, int y)
 {
     (void)x;
     (void)y;
 
     switch (key)
     {
-        case VK_LEFT :
+        case VK_LEFT:
             stepLeft();
             break;
 
-        case VK_RIGHT :
+        case VK_RIGHT:
             stepRight();
             break;
 
-        case VK_UP :
+        case VK_UP:
             stepFront();
             break;
 
-        case VK_DOWN :
+        case VK_DOWN:
             stepBack();
             break;
 
@@ -55,12 +55,11 @@ void Win32DemoApplication::specialKeyboard(int key, int x, int y)
             //        std::cout << "unused (special) key : " << key << std::endl;
             break;
     }
-
 }
 
-void    Win32DemoApplication::swapBuffers()
+void
+Win32DemoApplication::swapBuffers()
 {
 }
 
 #endif
-

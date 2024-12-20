@@ -22,12 +22,11 @@
 */
 #pragma once
 
-#include "VirtualRobot.h"
-#include "MathTools.h"
-#include "RobotNodeSet.h"
+#include <vector>
 
 #include <Eigen/Core>
-#include <vector>
+
+#include "VirtualRobot.h"
 
 namespace VirtualRobot
 {
@@ -48,8 +47,7 @@ namespace VirtualRobot
         virtual ~Trajectory();
 
 
-
-        const std::vector<Eigen::VectorXf> &getPoints() const;
+        const std::vector<Eigen::VectorXf>& getPoints() const;
 
 
         /*!
@@ -68,7 +66,9 @@ namespace VirtualRobot
         unsigned int getNrOfPoints() const;
 
         //! to retrieve entries of trajectory
-        bool getPoints(unsigned int start, unsigned int end , std::vector< Eigen::VectorXf >& storePosList) const;
+        bool getPoints(unsigned int start,
+                       unsigned int end,
+                       std::vector<Eigen::VectorXf>& storePosList) const;
 
 
         /*!
@@ -109,7 +109,8 @@ namespace VirtualRobot
           \param c configuration / valid joint values to insert as a point in trajectory
         */
         virtual void insertPosition(unsigned int pos, const Eigen::VectorXf& c);
-        virtual void insertPosition(unsigned int pos, std::vector<Eigen::VectorXf >& newConfigurations);
+        virtual void insertPosition(unsigned int pos,
+                                    std::vector<Eigen::VectorXf>& newConfigurations);
         virtual void insertTrajectory(unsigned int pos, TrajectoryPtr trajectoryToInsert);
 
         /*!
@@ -133,7 +134,7 @@ namespace VirtualRobot
         virtual void print() const;
 
         //! For quick access to data.
-        const std::vector <Eigen::VectorXf >& getData() const;
+        const std::vector<Eigen::VectorXf>& getData() const;
 
         Eigen::VectorXf& getPointRef(unsigned int pos);
 
@@ -144,7 +145,8 @@ namespace VirtualRobot
             \param r The RobotNode that should be considered (if not set, the TCP of the RobotNodeSet is used)
             \return For each point of this joint space trajectory, the pose of r in workspace is computed and added to the resulting vector.
         */
-        std::vector< Eigen::Matrix4f > createWorkspaceTrajectory(VirtualRobot::RobotNodePtr r = VirtualRobot::RobotNodePtr());
+        std::vector<Eigen::Matrix4f>
+        createWorkspaceTrajectory(VirtualRobot::RobotNodePtr r = VirtualRobot::RobotNodePtr());
 
 
         /*!
@@ -163,12 +165,11 @@ namespace VirtualRobot
         VisualizationNodePtr getVisualization(std::string visualizationFactoryName = "");
 
     protected:
-        std::vector < Eigen::VectorXf > path; //!< vector with configurations which represent the path
+        std::vector<Eigen::VectorXf> path; //!< vector with configurations which represent the path
         RobotNodeSetPtr rns;
         std::string name;
-        unsigned int dimension;     //!< dimension of rns
+        unsigned int dimension; //!< dimension of rns
     };
 
 
 } // namespace VirtualRobot
-

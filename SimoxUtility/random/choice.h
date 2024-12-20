@@ -1,10 +1,9 @@
 #pragma once
 
-#include <random>
 #include <iterator>
+#include <random>
 
 #include <SimoxUtility/error/SimoxError.h>
-
 
 namespace simox::random
 {
@@ -28,7 +27,6 @@ namespace simox::random
         std::advance(it, index);
         return *it;
     }
-
 
     template <class IterableT>
     const typename IterableT::value_type&

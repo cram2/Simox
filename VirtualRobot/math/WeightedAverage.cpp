@@ -23,34 +23,41 @@
 
 namespace math
 {
-    void math::WeightedFloatAverage::Add(float value, float weight)
+    void
+    math::WeightedFloatAverage::Add(float value, float weight)
     {
         sum += value * weight;
         weightSum += weight;
     }
 
-    float WeightedFloatAverage::Average()
+    float
+    WeightedFloatAverage::Average()
     {
         return sum / weightSum;
     }
 
-    float WeightedFloatAverage::WeightSum()
+    float
+    WeightedFloatAverage::WeightSum()
     {
         return weightSum;
     }
-    void math::WeightedVec3Average::Add(Eigen::Vector3f value, float weight)
+
+    void
+    math::WeightedVec3Average::Add(Eigen::Vector3f value, float weight)
     {
         sum += value * weight;
         weightSum += weight;
     }
 
-    Eigen::Vector3f WeightedVec3Average::Average()
+    Eigen::Vector3f
+    WeightedVec3Average::Average()
     {
         return sum / weightSum;
     }
 
-    float WeightedVec3Average::WeightSum()
+    float
+    WeightedVec3Average::WeightSum()
     {
         return weightSum;
     }
-}
+} // namespace math

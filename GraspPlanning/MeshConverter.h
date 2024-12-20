@@ -22,10 +22,12 @@
 */
 #pragma once
 
-#include "GraspStudio.h"
 #include <vector>
+
 #include <VirtualRobot/ManipulationObject.h>
 #include <VirtualRobot/Visualization/TriMeshModel.h>
+
+#include "GraspStudio.h"
 
 namespace GraspStudio
 {
@@ -38,15 +40,19 @@ namespace GraspStudio
         /*!
             Create an object. The visualization and collision model is created from the convex hull.
         */
-        static VirtualRobot::ManipulationObjectPtr CreateManipulationObject(const std::string& name, VirtualRobot::MathTools::ConvexHull3DPtr hull);
-        static VirtualRobot::TriMeshModelPtr CreateTriMeshModel(VirtualRobot::MathTools::ConvexHull3DPtr hull);
-        static VirtualRobot::ObstaclePtr RefineObjectSurface(VirtualRobot::ObstaclePtr object, float maxDist, bool verbose = true);
+        static VirtualRobot::ManipulationObjectPtr
+        CreateManipulationObject(const std::string& name,
+                                 VirtualRobot::MathTools::ConvexHull3DPtr hull);
+        static VirtualRobot::TriMeshModelPtr
+        CreateTriMeshModel(VirtualRobot::MathTools::ConvexHull3DPtr hull);
+        static VirtualRobot::ObstaclePtr
+        RefineObjectSurface(VirtualRobot::ObstaclePtr object, float maxDist, bool verbose = true);
 
         //! Returns -1 if obj is not part of vectList, otherwise the index of vectList is returned.
-        static int hasVertex(std::vector< Eigen::Vector3f>& vectList, Eigen::Vector3f& obj);
-        static void checkAndSplitVertex(VirtualRobot::TriMeshModelPtr tm, int faceIdx, float maxDist);
+        static int hasVertex(std::vector<Eigen::Vector3f>& vectList, Eigen::Vector3f& obj);
+        static void
+        checkAndSplitVertex(VirtualRobot::TriMeshModelPtr tm, int faceIdx, float maxDist);
 
         static float getMaxVertexDistance(VirtualRobot::TriMeshModelPtr tm);
-
     };
-}
+} // namespace GraspStudio

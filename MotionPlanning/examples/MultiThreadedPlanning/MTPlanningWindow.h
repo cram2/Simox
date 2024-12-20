@@ -1,29 +1,27 @@
 
 #pragma once
 
-#include "MotionPlanning/Saba.h"
-
-#include "MTPlanningScenery.h"
-#include <VirtualRobot/Robot.h>
-
-#include <qobject.h>
-#include <qmainwindow.h>
-#include <qpushbutton.h>
-#include <qtextedit.h>
-#include <qcombobox.h>
-#include <qprogressbar.h>
-#include <qlabel.h>
-#include <qslider.h>
-#include <qcheckbox.h>
 #include <string.h>
 #include <time.h>
 
-#include <Inventor/Qt/viewers/SoQtExaminerViewer.h>
-#include <Inventor/Qt/SoQt.h>
-#include <Inventor/SoOffscreenRenderer.h>
+#include <qcheckbox.h>
+#include <qcombobox.h>
+#include <qlabel.h>
+#include <qmainwindow.h>
+#include <qobject.h>
+#include <qprogressbar.h>
+#include <qpushbutton.h>
+#include <qslider.h>
+#include <qtextedit.h>
 
+#include <VirtualRobot/Robot.h>
 
+#include "MTPlanningScenery.h"
+#include "MotionPlanning/Saba.h"
 #include "ui_MTPlanning.h"
+#include <Inventor/Qt/SoQt.h>
+#include <Inventor/Qt/viewers/SoQtExaminerViewer.h>
+#include <Inventor/SoOffscreenRenderer.h>
 
 #define NUMBER_OF_PLANNING 30
 
@@ -55,7 +53,8 @@ public slots:
     void reset();
     void selectColCheckerComboBoxChanged(int value);
 
-    SoQtExaminerViewer* getExaminerViewer()
+    SoQtExaminerViewer*
+    getExaminerViewer()
     {
         return viewer;
     };
@@ -73,7 +72,8 @@ protected:
     static void timerCBOptimize(void* data, SoSensor* sensor);
 
     Ui::MainWindowMTPlanning UI;
-    SoQtExaminerViewer* viewer; /*!< Viewer to display the 3D model of the robot and the environment. */
+    SoQtExaminerViewer*
+        viewer; /*!< Viewer to display the 3D model of the robot and the environment. */
 
     SoSeparator* sceneSep;
     SoSeparator* robotSep;
@@ -93,4 +93,3 @@ protected:
     QPushButton *planButton;
     QPushButton *optiShowButton;*/
 };
-

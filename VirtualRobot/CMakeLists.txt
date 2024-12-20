@@ -34,6 +34,20 @@ if (Simox_USE_NLOPT)
 endif ()
 
 ##########################################
+#### Spacemouse
+
+find_package(SPNAV QUIET)
+
+if(${SPNAV_FOUND})
+    message(STATUS "SPNAV library found")
+    target_include_directories(VirtualRobot PRIVATE ${spnav_INCLUDE_DIR})
+    target_link_libraries(VirtualRobot PRIVATE ${spnav_LIBRARY})
+    target_compile_definitions(VirtualRobot PRIVATE SPNAV_AVAILABLE)
+endif()
+
+
+
+##########################################
 #### VISUALIZATION Coin3D+Qt+SoQt / OSG+Qt
 
 find_package(assimp REQUIRED)
@@ -177,7 +191,7 @@ SET(SOURCES
     Primitive.cpp
     Random.cpp
     Robot.cpp
-    # Safety.cpp
+    Safety.cpp
     RobotConfig.cpp
     RobotFactory.cpp
     RobotNodeSet.cpp
@@ -190,10 +204,14 @@ SET(SOURCES
     VirtualRobot.cpp
     VirtualRobotChecks.cpp
     VirtualRobotException.cpp
+    Units.cpp
+    Assert.cpp
+    Logging.cpp
 
     CollisionDetection/CDManager.cpp
     CollisionDetection/CollisionChecker.cpp
     CollisionDetection/CollisionModel.cpp
+    CollisionDetection/CollisionModelImplementation.cpp
 
     Compression/CompressionBZip2.cpp
     Compression/CompressionRLE.cpp

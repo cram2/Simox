@@ -20,20 +20,22 @@
  */
 
 #pragma once
+
+
 #include "MathForwardDefinitions.h"
-
 #include "SimpleAbstractFunctionR1R3.h"
-
 
 namespace math
 {
 
-    class LineStrip
-            : public SimpleAbstractFunctionR1R3
+    class LineStrip : public SimpleAbstractFunctionR1R3
     {
     public:
-
-        int Count() { return points.size(); }
+        int
+        Count()
+        {
+            return points.size();
+        }
 
         LineStrip(const std::vector<Eigen::Vector3f>& points, float minT, float maxT);
 
@@ -42,11 +44,9 @@ namespace math
 
     private:
         Eigen::Vector3f GetDirection(int i);
-        void GetIndex(float t,  int& i, float& f);
+        void GetIndex(float t, int& i, float& f);
 
         std::vector<Eigen::Vector3f> points;
         float minT, maxT;
-
     };
-}
-
+} // namespace math

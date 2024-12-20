@@ -23,18 +23,20 @@
 #pragma once
 
 #include "../../VirtualRobot.h"
-
 #include "../CollisionCheckerImplementation.h"
 
-
-#include <string>
-#include <vector>
-
-#include "PQP++/PQP_Compile.h"
-#include "PQP++/PQP.h"
+// #include "PQP++/PQP_Compile.h"
+// #include "PQP++/PQP.h"
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
+
+namespace PQP
+{
+    class PQP_Model;
+    class PQP_Checker;
+    class PQP_DistanceResult;
+} // namespace PQP
 
 namespace VirtualRobot
 {
@@ -49,11 +51,20 @@ namespace VirtualRobot
         CollisionCheckerPQP();
         ~CollisionCheckerPQP() override;
 
-        float calculateDistance(const CollisionModelPtr& model1, const CollisionModelPtr& model2, Eigen::Vector3f& P1, Eigen::Vector3f& P2, int* trID1 = NULL, int* trID2 = NULL) final;
-        bool checkCollision(const CollisionModelPtr& model1, const CollisionModelPtr& model2) final; //, Eigen::Vector3f *storeContact = NULL);
-        bool checkCollision(const CollisionModelPtr& model1, const Eigen::Vector3f& point, float tolerance = 0.0f) final;
+        float calculateDistance(const CollisionModelPtr& model1,
+                                const CollisionModelPtr& model2,
+                                Eigen::Vector3f& P1,
+                                Eigen::Vector3f& P2,
+                                int* trID1 = NULL,
+                                int* trID2 = NULL) final;
+        bool checkCollision(const CollisionModelPtr& model1, const CollisionModelPtr& model2)
+            final; //, Eigen::Vector3f *storeContact = NULL);
+        bool checkCollision(const CollisionModelPtr& model1,
+                            const Eigen::Vector3f& point,
+                            float tolerance = 0.0f) final;
 
-        MultiCollisionResult checkMultipleCollisions(CollisionModelPtr const& model1, CollisionModelPtr const& model2);
+        MultiCollisionResult checkMultipleCollisions(CollisionModelPtr const& model1,
+                                                     CollisionModelPtr const& model2);
 
         /*!
         If continuous collision detection (CCD) is supported, this method can be used to detect collisions on the path
@@ -63,16 +74,30 @@ namespace VirtualRobot
         //bool CheckContinuousCollision (CollisionModel *model1, Eigen::Matrix4f &mGoalPose1, CollisionModel *model2, Eigen::Matrix4f &mGoalPose2, float &fStoreTOC);
 
 
-        float getMinDistance(std::shared_ptr<PQP::PQP_Model> m1, std::shared_ptr<PQP::PQP_Model> m2, const Eigen::Matrix4f& mat1, const Eigen::Matrix4f& mat2);
-        float getMinDistance(std::shared_ptr<PQP::PQP_Model> m1, std::shared_ptr<PQP::PQP_Model> m2, const Eigen::Matrix4f& mat1, const Eigen::Matrix4f& mat2, Eigen::Vector3f& storeP1, Eigen::Vector3f& storeP2, int* storeID1, int* storeID2);
+        float getMinDistance(std::shared_ptr<PQP::PQP_Model> m1,
+                             std::shared_ptr<PQP::PQP_Model> m2,
+                             const Eigen::Matrix4f& mat1,
+                             const Eigen::Matrix4f& mat2);
+        float getMinDistance(std::shared_ptr<PQP::PQP_Model> m1,
+                             std::shared_ptr<PQP::PQP_Model> m2,
+                             const Eigen::Matrix4f& mat1,
+                             const Eigen::Matrix4f& mat2,
+                             Eigen::Vector3f& storeP1,
+                             Eigen::Vector3f& storeP2,
+                             int* storeID1,
+                             int* storeID2);
 
-        void GetPQPDistance(const std::shared_ptr<PQP::PQP_Model>& model1, const std::shared_ptr<PQP::PQP_Model>& model2, const Eigen::Matrix4f& matrix1, const Eigen::Matrix4f& matrix2, PQP::PQP_DistanceResult& pqpResult);
-
+        void GetPQPDistance(const std::shared_ptr<PQP::PQP_Model>& model1,
+                            const std::shared_ptr<PQP::PQP_Model>& model2,
+                            const Eigen::Matrix4f& matrix1,
+                            const Eigen::Matrix4f& matrix2,
+                            PQP::PQP_DistanceResult& pqpResult);
 
         /*!
         Does the underlying collision detection library support discrete collision detection.
         */
-        static bool IsSupported_CollisionDetection()
+        static bool
+        IsSupported_CollisionDetection()
         {
             return true;
         }
@@ -80,7 +105,8 @@ namespace VirtualRobot
         /*!
         Does the underlying collision detection library support continuous collision detection.
         */
-        static bool IsSupported_ContinuousCollisionDetection()
+        static bool
+        IsSupported_ContinuousCollisionDetection()
         {
             return false;
         }
@@ -88,7 +114,8 @@ namespace VirtualRobot
         /*!
         Does the underlying collision detection library support distance calculations.
         */
-        static bool IsSupported_DistanceCalculations()
+        static bool
+        IsSupported_DistanceCalculations()
         {
             return true;
         }
@@ -97,7 +124,8 @@ namespace VirtualRobot
         Does the underlying collision detection library support threadsafe access.
         E.g. multiple threads query the collision checker asynchronously.
         */
-        static bool IsSupported_Multithreading_Threadsafe()
+        static bool
+        IsSupported_Multithreading_Threadsafe()
         {
             return false;
         }
@@ -106,7 +134,8 @@ namespace VirtualRobot
         Does the underlying collision detection library support multiple instances of the collision checker.
         E.g. one per thread.
         */
-        static bool IsSupported_Multithreading_MultipleColCheckers()
+        static bool
+        IsSupported_Multithreading_MultipleColCheckers()
         {
             return true;
         }
@@ -114,9 +143,6 @@ namespace VirtualRobot
     protected:
         PQP::PQP_Checker* pqpChecker;
         std::unique_ptr<PQP::PQP_Model> pointModel;
-
     };
 
-} // namespace
-
-
+} // namespace VirtualRobot

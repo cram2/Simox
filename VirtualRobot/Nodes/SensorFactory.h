@@ -22,42 +22,44 @@
 */
 #pragma once
 
-#include "../VirtualRobot.h"
-#include "../VirtualRobot.h"
-#include "../AbstractFactoryMethod.h"
-#include "Sensor.h"
-#include "GraspableSensorizedObject.h"
-#include "../XML/RobotIO.h"
-
 #include <Eigen/Core>
 
+#include "../AbstractFactoryMethod.h"
+#include "../VirtualRobot.h"
+#include "../XML/RobotIO.h"
+#include "GraspableSensorizedObject.h"
+#include "Sensor.h"
 
 // using forward declarations here, so that the rapidXML header does not have to be parsed when this file is included
 namespace rapidxml
 {
-    template<class Ch>
+    template <class Ch>
     class xml_node;
 }
-
 
 namespace VirtualRobot
 {
 
-    class VIRTUAL_ROBOT_IMPORT_EXPORT SensorFactory  : public AbstractFactoryMethod<SensorFactory, void*>
+    class VIRTUAL_ROBOT_IMPORT_EXPORT SensorFactory :
+        public AbstractFactoryMethod<SensorFactory, void*>
     {
     public:
         SensorFactory()
         {
             ;
         }
+
         virtual ~SensorFactory()
         {
             ;
         }
 
         //! Standard init method
-        virtual SensorPtr createSensor(GraspableSensorizedObjectPtr /*node*/, const std::string& /*name*/, VisualizationNodePtr /*visualization*/ = VisualizationNodePtr(),
-                                       const Eigen::Matrix4f& /*rnTrafo*/ = Eigen::Matrix4f::Identity()) const
+        virtual SensorPtr
+        createSensor(GraspableSensorizedObjectPtr /*node*/,
+                     const std::string& /*name*/,
+                     VisualizationNodePtr /*visualization*/ = VisualizationNodePtr(),
+                     const Eigen::Matrix4f& /*rnTrafo*/ = Eigen::Matrix4f::Identity()) const
         {
             return SensorPtr();
         }
@@ -65,7 +67,11 @@ namespace VirtualRobot
         /*!
             Create sensor from XML tag. Factories of custom sensors can initialize with this method.
         */
-        virtual SensorPtr createSensor(GraspableSensorizedObjectPtr /*node*/, const rapidxml::xml_node<char>* /*sensorXMLNode*/, BaseIO::RobotDescription /*loadMode*/ = RobotIO::eFull, const std::string /*basePath*/ = std::string()) const
+        virtual SensorPtr
+        createSensor(GraspableSensorizedObjectPtr /*node*/,
+                     const rapidxml::xml_node<char>* /*sensorXMLNode*/,
+                     BaseIO::RobotDescription /*loadMode*/ = RobotIO::eFull,
+                     const std::string /*basePath*/ = std::string()) const
         {
             return SensorPtr();
         }

@@ -25,10 +25,10 @@
 #include "../../VirtualRobot.h"
 #include "../Visualization.h"
 
-#include <Inventor/nodes/SoSelection.h>
-#include <Inventor/nodes/SoMaterial.h>
-
 class SoNode;
+class SoMaterial;
+class SoSeparator;
+class SoSelection;
 
 namespace VirtualRobot
 {
@@ -59,11 +59,12 @@ namespace VirtualRobot
 
         VisualizationPtr clone() override;
 
-        SoNode* getCoinVisualization(bool selectable=true);
+        SoNode* getCoinVisualization(bool selectable = true);
 
-        void exportToVRML2(std::string filename, bool useRotation=true);
+        void exportToVRML2(std::string filename, bool useRotation = true);
 
-        static std::string getFactoryName()
+        static std::string
+        getFactoryName()
         {
             return "inventor";
         }
@@ -75,10 +76,9 @@ namespace VirtualRobot
         SoSelection* selection;
         SoSeparator* visuRoot;
 
-        SoMaterial *color;
+        SoMaterial* color;
     };
 
-    typedef std::shared_ptr<CoinVisualization> CoinVisualizationPtr;
+    using CoinVisualizationPtr = std::shared_ptr<CoinVisualization>;
 
 } // namespace VirtualRobot
-

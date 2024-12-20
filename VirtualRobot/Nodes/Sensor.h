@@ -22,23 +22,19 @@
 */
 #pragma once
 
-#include "../VirtualRobot.h"
-#include "../VirtualRobotException.h"
-
-#include "../SceneObject.h"
-
-#include <Eigen/Core>
-
 #include <string>
 #include <vector>
 
+#include <Eigen/Core>
+
+#include "../SceneObject.h"
+#include "../VirtualRobot.h"
 
 namespace VirtualRobot
 {
 
     class Sensor;
     typedef std::shared_ptr<Sensor> SensorPtr;
-
 
     /*!
         A sensor can be attached to a GraspableSensorizedObject.
@@ -56,8 +52,7 @@ namespace VirtualRobot
         Sensor(GraspableSensorizedObjectWeakPtr parentNode,
                const std::string& name,
                VisualizationNodePtr visualization = VisualizationNodePtr(),
-               const Eigen::Matrix4f& rnTrafo = Eigen::Matrix4f::Identity()
-              );
+               const Eigen::Matrix4f& rnTrafo = Eigen::Matrix4f::Identity());
 
         /*!
         */
@@ -71,7 +66,8 @@ namespace VirtualRobot
         /*!
             The transformation that specifies the pose of the sensor relatively to the pose of the parent node.
         */
-        virtual Eigen::Matrix4f getParentNodeToSensorTransformation()
+        virtual Eigen::Matrix4f
+        getParentNodeToSensorTransformation()
         {
             return rnTransformation;
         }
@@ -101,32 +97,32 @@ namespace VirtualRobot
 
 
         //! Forbid cloning method from SceneObject. We need to know the new parent node for cloning
-        SceneObjectPtr clone(const std::string& /*name*/, CollisionCheckerPtr /*colChecker*/ = CollisionCheckerPtr(), float /*scaling*/ = 1.0f) const
-        {
-            THROW_VR_EXCEPTION("Cloning not allowed this way...");
-        }
+        SceneObjectPtr clone(const std::string& /*name*/,
+                             CollisionCheckerPtr /*colChecker*/ = CollisionCheckerPtr(),
+                             float /*scaling*/ = 1.0f) const;
 
         /*!
             Compute/Update the transformations of this sensor. Therefore the parent is queried for its pose.
         */
         void updatePose(bool updateChildren = true) override;
 
-        bool initialize(SceneObjectPtr parent = SceneObjectPtr(), const std::vector<SceneObjectPtr>& children = std::vector<SceneObjectPtr>()) override;
+        bool initialize(
+            SceneObjectPtr parent = SceneObjectPtr(),
+            const std::vector<SceneObjectPtr>& children = std::vector<SceneObjectPtr>()) override;
 
         virtual std::string toXML(const std::string& modelPath, int tabs = 1);
 
     protected:
-
-
         /*!
             Update the pose according to parent pose
         */
         void updatePose(const Eigen::Matrix4f& parentPose, bool updateChildren = true) override;
 
-        Sensor() {};
+        Sensor(){};
 
 
-        Eigen::Matrix4f rnTransformation;           //<! Transformation from parent's coordinate system to this sensor
+        Eigen::Matrix4f
+            rnTransformation; //<! Transformation from parent's coordinate system to this sensor
 
         GraspableSensorizedObjectWeakPtr parentNode;
 
@@ -134,14 +130,13 @@ namespace VirtualRobot
             Derived classes must implement their clone method here.
             The visualization is already scaled, the kinematic information (i.e. transformations) have to be scaled by derived implementations.
         */
-        virtual SensorPtr _clone(const GraspableSensorizedObjectPtr newNode, const VisualizationNodePtr visualizationModel, float scaling) = 0;
+        virtual SensorPtr _clone(const GraspableSensorizedObjectPtr newNode,
+                                 const VisualizationNodePtr visualizationModel,
+                                 float scaling) = 0;
 
-        SceneObject* _clone(const std::string& /*name*/, CollisionCheckerPtr /*colChecker*/ = CollisionCheckerPtr(), float /*scaling*/ = 1.0f) const override
-        {
-            THROW_VR_EXCEPTION("Cloning not allowed this way...");
-        }
-
+        SceneObject* _clone(const std::string& /*name*/,
+                            CollisionCheckerPtr /*colChecker*/ = CollisionCheckerPtr(),
+                            float /*scaling*/ = 1.0f) const override;
     };
 
 } // namespace VirtualRobot
-

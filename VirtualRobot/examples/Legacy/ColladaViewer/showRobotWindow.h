@@ -1,32 +1,31 @@
 
 #pragma once
 
-#include <VirtualRobot/VirtualRobot.h>
-#include <VirtualRobot/Robot.h>
-#include <VirtualRobot/VirtualRobotException.h>
-#include <VirtualRobot/Nodes/RobotNode.h>
-#include <VirtualRobot/XML/RobotIO.h>
-#include <VirtualRobot/Visualization/VisualizationFactory.h>
-#include <VirtualRobot/Obstacle.h>
-#include <VirtualRobot/RobotNodeSet.h>
-#include <VirtualRobot/Visualization/CoinVisualization/CoinVisualizationNode.h>
-#include <VirtualRobot/Visualization/CoinVisualization/CoinVisualization.h>
-
 #include <string.h>
-#include <QtCore/QtGlobal>
-#include <QtGui/QtGui>
-#include <QtCore/QtCore>
-
-#include <Inventor/sensors/SoTimerSensor.h>
-#include <Inventor/nodes/SoEventCallback.h>
-#include <Inventor/Qt/viewers/SoQtExaminerViewer.h>
-#include <Inventor/Qt/SoQt.h>
-#include <Inventor/nodes/SoSeparator.h>
-
 
 #include <vector>
 
+#include <QtCore/QtCore>
+#include <QtCore/QtGlobal>
+#include <QtGui/QtGui>
+
+#include <VirtualRobot/Nodes/RobotNode.h>
+#include <VirtualRobot/Obstacle.h>
+#include <VirtualRobot/Robot.h>
+#include <VirtualRobot/RobotNodeSet.h>
+#include <VirtualRobot/VirtualRobot.h>
+#include <VirtualRobot/VirtualRobotException.h>
+#include <VirtualRobot/Visualization/CoinVisualization/CoinVisualization.h>
+#include <VirtualRobot/Visualization/CoinVisualization/CoinVisualizationNode.h>
+#include <VirtualRobot/Visualization/VisualizationFactory.h>
+#include <VirtualRobot/XML/RobotIO.h>
+
 #include "ui_RobotViewer.h"
+#include <Inventor/Qt/SoQt.h>
+#include <Inventor/Qt/viewers/SoQtExaminerViewer.h>
+#include <Inventor/nodes/SoEventCallback.h>
+#include <Inventor/nodes/SoSeparator.h>
+#include <Inventor/sensors/SoTimerSensor.h>
 
 class showRobotWindow : public QMainWindow
 {
@@ -64,8 +63,8 @@ public slots:
     void selectRobot();
     void displayPhysics();
 
-
-    SoQtExaminerViewer* getExaminerViewer()
+    SoQtExaminerViewer*
+    getExaminerViewer()
     {
         return viewer;
     };
@@ -78,17 +77,18 @@ protected:
     //void updateEEFBox();
     void displayTriangles();
     Ui::MainWindowShowRobot UI;
-    SoQtExaminerViewer* viewer; /*!< Viewer to display the 3D model of the robot and the environment. */
+    SoQtExaminerViewer*
+        viewer; /*!< Viewer to display the 3D model of the robot and the environment. */
 
     SoSeparator* sceneSep;
     SoSeparator* robotSep;
 
     VirtualRobot::RobotPtr robot;
     std::string m_sRobotFilename;
-    std::vector < VirtualRobot::RobotNodePtr > allRobotNodes;
-    std::vector < VirtualRobot::RobotNodePtr > currentRobotNodes;
-    std::vector < VirtualRobot::RobotNodeSetPtr > robotNodeSets;
-    std::vector < VirtualRobot::EndEffectorPtr > eefs;
+    std::vector<VirtualRobot::RobotNodePtr> allRobotNodes;
+    std::vector<VirtualRobot::RobotNodePtr> currentRobotNodes;
+    std::vector<VirtualRobot::RobotNodeSetPtr> robotNodeSets;
+    std::vector<VirtualRobot::EndEffectorPtr> eefs;
     VirtualRobot::EndEffectorPtr currentEEF;
     VirtualRobot::RobotNodeSetPtr currentRobotNodeSet;
     VirtualRobot::RobotNodePtr currentRobotNode;
@@ -101,4 +101,3 @@ protected:
 
     VirtualRobot::CoinVisualizationPtr visualization;
 };
-

@@ -1,8 +1,9 @@
 
 #include "CollisionCheckerDummy.h"
-#include "CollisionModelDummy.h"
+
 #include "../../CollisionChecker.h"
 #include "../../CollisionModel.h"
+#include "CollisionModelDummy.h"
 
 namespace VirtualRobot
 {
@@ -10,7 +11,7 @@ namespace VirtualRobot
     //----------------------------------------------------------------------
     // class CollisionChecker constructor
     //----------------------------------------------------------------------
-    CollisionCheckerDummy::CollisionCheckerDummy(): CollisionCheckerImplementation()
+    CollisionCheckerDummy::CollisionCheckerDummy() : CollisionCheckerImplementation()
     {
     }
 
@@ -21,17 +22,21 @@ namespace VirtualRobot
     {
     }
 
-
-    float CollisionCheckerDummy::calculateDistance(CollisionModelPtr model1, CollisionModelPtr model2, Eigen::Vector3f& P1, Eigen::Vector3f& P2, int* trID1, int* trID2)
+    float
+    CollisionCheckerDummy::calculateDistance(CollisionModelPtr model1,
+                                             CollisionModelPtr model2,
+                                             Eigen::Vector3f& P1,
+                                             Eigen::Vector3f& P2,
+                                             int* trID1,
+                                             int* trID2)
     {
         return -1.0f;
     }
 
-    bool CollisionCheckerDummy::checkCollision(CollisionModelPtr model1, CollisionModelPtr model2)
+    bool
+    CollisionCheckerDummy::checkCollision(CollisionModelPtr model1, CollisionModelPtr model2)
     {
         return false;
     }
 
-} // namespace
-
-
+} // namespace VirtualRobot

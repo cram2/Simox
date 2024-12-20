@@ -23,17 +23,16 @@
 #pragma once
 
 
-#include "../../VirtualRobotImportExport.h"
-#include "../VisualizationFactory.h"
-#include "../../BoundingBox.h"
-#include "../../SceneObject.h"
-#include "../../EndEffector/EndEffector.h"
-#include "../ColorMap.h"
-
 #include <string>
 
-#include <osg/Node>
+#include "../../BoundingBox.h"
+#include "../../EndEffector/EndEffector.h"
+#include "../../SceneObject.h"
+#include "../../VirtualRobotImportExport.h"
+#include "../ColorMap.h"
+#include "../VisualizationFactory.h"
 #include <osg/Group>
+#include <osg/Node>
 #include <osg/NodeVisitor>
 #include <osg/Transform>
 
@@ -41,7 +40,7 @@ namespace VirtualRobot
 {
     class VisualizationNode;
 
-    class VIRTUAL_ROBOT_IMPORT_EXPORT OSGVisualizationFactory  : public VisualizationFactory
+    class VIRTUAL_ROBOT_IMPORT_EXPORT OSGVisualizationFactory : public VisualizationFactory
     {
     public:
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -49,17 +48,50 @@ namespace VirtualRobot
         OSGVisualizationFactory();
         virtual ~OSGVisualizationFactory();
 
-        virtual VisualizationNodePtr getVisualizationFromFile(const std::string& filename, bool boundingBox = false);
-        virtual VisualizationNodePtr createBox(float width, float height, float depth, float colorR, float colorG, float colorB);
-        virtual VisualizationNodePtr createLine(const Eigen::Matrix4f& from, const Eigen::Matrix4f& to, float width = 1.0f, float colorR = 0.5f, float colorG = 0.5f, float colorB = 0.5f);
-        virtual VisualizationNodePtr createSphere(float radius, float colorR = 0.5f, float colorG = 0.5f, float colorB = 0.5f);
-        virtual VisualizationNodePtr createCoordSystem(float scaling = 1.0f, std::string* text = NULL, float axisLength = 100.0f, float axisSize = 3.0f, int nrOfBlocks = 10);
-        virtual VisualizationNodePtr createBoundingBox(const BoundingBox& bbox, bool wireFrame = false);
-        virtual VisualizationNodePtr createVertexVisualization(const Eigen::Vector3f& position, float radius, float transparency,  float colorR = 0.5f, float colorG = 0.5f, float colorB = 0.5f);
-        virtual VisualizationNodePtr createTriMeshModelVisualization(const TriMeshModelPtr& model, bool showNormals, const Eigen::Matrix4f& pose);
-        virtual VisualizationNodePtr createPlane(const Eigen::Vector3f& position, const Eigen::Vector3f& normal, float extend, float transparency,  float colorR = 0.5f, float colorG = 0.5f, float colorB = 0.5f);
-        virtual VisualizationNodePtr createArrow(const Eigen::Vector3f& n, float length = 50.0f, float width = 2.0f, const Color& color = Color::Gray());
-        virtual VisualizationNodePtr createTrajectory(TrajectoryPtr t, Color colorNode = Color::Blue(), Color colorLine = Color::Gray(), float nodeSize = 15.0f, float lineSize = 4.0f);
+        virtual VisualizationNodePtr getVisualizationFromFile(const std::string& filename,
+                                                              bool boundingBox = false);
+        virtual VisualizationNodePtr
+        createBox(float width, float height, float depth, float colorR, float colorG, float colorB);
+        virtual VisualizationNodePtr createLine(const Eigen::Matrix4f& from,
+                                                const Eigen::Matrix4f& to,
+                                                float width = 1.0f,
+                                                float colorR = 0.5f,
+                                                float colorG = 0.5f,
+                                                float colorB = 0.5f);
+        virtual VisualizationNodePtr
+        createSphere(float radius, float colorR = 0.5f, float colorG = 0.5f, float colorB = 0.5f);
+        virtual VisualizationNodePtr createCoordSystem(float scaling = 1.0f,
+                                                       std::string* text = NULL,
+                                                       float axisLength = 100.0f,
+                                                       float axisSize = 3.0f,
+                                                       int nrOfBlocks = 10);
+        virtual VisualizationNodePtr createBoundingBox(const BoundingBox& bbox,
+                                                       bool wireFrame = false);
+        virtual VisualizationNodePtr createVertexVisualization(const Eigen::Vector3f& position,
+                                                               float radius,
+                                                               float transparency,
+                                                               float colorR = 0.5f,
+                                                               float colorG = 0.5f,
+                                                               float colorB = 0.5f);
+        virtual VisualizationNodePtr createTriMeshModelVisualization(const TriMeshModelPtr& model,
+                                                                     bool showNormals,
+                                                                     const Eigen::Matrix4f& pose);
+        virtual VisualizationNodePtr createPlane(const Eigen::Vector3f& position,
+                                                 const Eigen::Vector3f& normal,
+                                                 float extend,
+                                                 float transparency,
+                                                 float colorR = 0.5f,
+                                                 float colorG = 0.5f,
+                                                 float colorB = 0.5f);
+        virtual VisualizationNodePtr createArrow(const Eigen::Vector3f& n,
+                                                 float length = 50.0f,
+                                                 float width = 2.0f,
+                                                 const Color& color = Color::Gray());
+        virtual VisualizationNodePtr createTrajectory(TrajectoryPtr t,
+                                                      Color colorNode = Color::Blue(),
+                                                      Color colorLine = Color::Gray(),
+                                                      float nodeSize = 15.0f,
+                                                      float lineSize = 4.0f);
 
         /*!
             Create an empty VisualizationNode.
@@ -69,18 +101,35 @@ namespace VirtualRobot
         //! Turn on wireframe drawing
         static void switchToWireframe(osg::Node* srcNode);
 
-        static osg::Node* CreateBoundingBoxVisualization(const BoundingBox& bbox, bool wireFrame = false);
+        static osg::Node* CreateBoundingBoxVisualization(const BoundingBox& bbox,
+                                                         bool wireFrame = false);
         static osg::Node* CreateBoundingBox(osg::Node* model, bool wireFrame = false);
         static osg::MatrixTransform* getMatrixTransform(const Eigen::Matrix4f& pose);
-        static osg::Node* getOSGVisualization(TriMeshModelPtr model, bool showNormals, VisualizationFactory::Color color = VisualizationFactory::Color::Gray());
-        static osg::Node* CreatePolygonVisualization(const std::vector<Eigen::Vector3f>& points, VisualizationFactory::Color colorInner = VisualizationFactory::Color::Blue(), VisualizationFactory::Color colorLine = VisualizationFactory::Color::Black(), float lineSize = 5.0f);
-        static osg::Node* CreateArrow(const Eigen::Vector3f& n, float length = 50.0f, float width = 2.0f, const Color& color = Color::Gray());
-        static osg::Node* CreateCoordSystemVisualization(float scaling, std::string* text, float axisLength, float axisSize, int nrOfBlocks);
+        static osg::Node* getOSGVisualization(
+            TriMeshModelPtr model,
+            bool showNormals,
+            VisualizationFactory::Color color = VisualizationFactory::Color::Gray());
+        static osg::Node* CreatePolygonVisualization(
+            const std::vector<Eigen::Vector3f>& points,
+            VisualizationFactory::Color colorInner = VisualizationFactory::Color::Blue(),
+            VisualizationFactory::Color colorLine = VisualizationFactory::Color::Black(),
+            float lineSize = 5.0f);
+        static osg::Node* CreateArrow(const Eigen::Vector3f& n,
+                                      float length = 50.0f,
+                                      float width = 2.0f,
+                                      const Color& color = Color::Gray());
+        static osg::Node* CreateCoordSystemVisualization(float scaling,
+                                                         std::string* text,
+                                                         float axisLength,
+                                                         float axisSize,
+                                                         int nrOfBlocks);
 
         //! Get pose of n in coordinate system of rootNode (if rootNode==NULL, the global coordinate system is used)
         static osg::Matrix* getRelativePose(osg::Node* n, osg::Node* rootNode);
+
         //! Get global pose
-        static osg::Matrix* getGlobalPose(osg::Node* n)
+        static osg::Matrix*
+        getGlobalPose(osg::Node* n)
         {
             return getRelativePose(n, NULL);
         }
@@ -89,6 +138,7 @@ namespace VirtualRobot
     public:
         static std::string getName();
         static boost::shared_ptr<VisualizationFactory> createInstance(void*);
+
     private:
         static SubClassRegistry registry;
     };
@@ -96,20 +146,22 @@ namespace VirtualRobot
     class globalPoseNodeVisitor : public osg::NodeVisitor
     {
     public:
-        globalPoseNodeVisitor(osg::Node* rootNode):
+        globalPoseNodeVisitor(osg::Node* rootNode) :
             osg::NodeVisitor(NodeVisitor::TRAVERSE_PARENTS), done(false)
         {
             gpMatrix = new osg::Matrix();
             gpMatrix->makeIdentity();
             this->rootNode = rootNode;
         }
-        virtual void apply(osg::Node& node)
+
+        virtual void
+        apply(osg::Node& node)
         {
             if (!done)
             {
 
-                if (0 == node.getNumParents() ||     // no parents
-                    &node == rootNode)              //  or rootNode reached
+                if (0 == node.getNumParents() || // no parents
+                    &node == rootNode) //  or rootNode reached
                 {
                     gpMatrix->set(osg::computeLocalToWorld(this->getNodePath()));
                     done = true;
@@ -118,10 +170,13 @@ namespace VirtualRobot
                 traverse(node);
             }
         }
-        osg::Matrix* getGlobalPose()
+
+        osg::Matrix*
+        getGlobalPose()
         {
             return gpMatrix;
         }
+
     private:
         bool done;
         osg::Matrix* gpMatrix;
@@ -129,4 +184,3 @@ namespace VirtualRobot
     };
 
 } // namespace VirtualRobot
-

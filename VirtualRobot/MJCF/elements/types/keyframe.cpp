@@ -6,4 +6,4 @@
 using namespace mjcf;
 
 
-const std::string KeyframeSection::tag  = "keyframe";
+const std::string KeyframeSection::tag = "keyframe";

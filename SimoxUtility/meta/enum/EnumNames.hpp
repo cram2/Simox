@@ -1,9 +1,9 @@
 #pragma once
 
 #include <map>
-#include <string>
-#include <stdexcept>
 #include <set>
+#include <stdexcept>
+#include <string>
 
 #include <boost/bimap.hpp>
 
@@ -33,6 +33,7 @@ namespace simox::meta
         using EnumT = _EnumT;
         using NameT = _NameT;
         using bimap = boost::bimap<EnumT, NameT>;
+
     public:
         EnumNames(std::initializer_list<std::pair<EnumT, NameT>> init)
         {
@@ -41,6 +42,7 @@ namespace simox::meta
                 _names.insert(typename bimap::value_type(it.first, it.second));
             }
         }
+
         EnumNames(std::initializer_list<std::pair<NameT, EnumT>> init)
         {
             for (const auto& it : init)
@@ -56,6 +58,7 @@ namespace simox::meta
                 _names.insert(typename bimap::value_type(it.first, it.second));
             }
         }
+
         EnumNames(const std::map<NameT, EnumT>& name_to_enum_map)
         {
             for (const auto& it : name_to_enum_map)
@@ -77,7 +80,8 @@ namespace simox::meta
         EnumT from_name(const NameT& name) const;
 
         /// Get the enum values.
-        std::set<EnumT> values() const
+        std::set<EnumT>
+        values() const
         {
             std::set<EnumT> values;
             for (const auto& it : _names.left)
@@ -88,7 +92,8 @@ namespace simox::meta
         }
 
         /// Get the enum names.
-        std::set<NameT> names() const
+        std::set<NameT>
+        names() const
         {
             std::set<NameT> values;
             for (const auto& it : _names.right)
@@ -97,8 +102,10 @@ namespace simox::meta
             }
             return values;
         }
-        template<template<class...> class Temp = std::vector>
-        Temp<NameT> names() const
+
+        template <template <class...> class Temp = std::vector>
+        Temp<NameT>
+        names() const
         {
             Temp<NameT> values;
             for (const auto& it : _names.right)
@@ -111,19 +118,20 @@ namespace simox::meta
         template <typename E, typename N>
         friend std::ostream& operator<<(std::ostream& os, const EnumNames<E, N>& rhs);
 
-        const bimap& map() const
+        const bimap&
+        map() const
         {
             return _names;
         }
 
-//        const auto& map_names() const
-//        {
-//            return _names.right;
-//        }
-//        const auto& map_values() const
-//        {
-//            return _names.left;
-//        }
+        //        const auto& map_names() const
+        //        {
+        //            return _names.right;
+        //        }
+        //        const auto& map_values() const
+        //        {
+        //            return _names.left;
+        //        }
     private:
         /// The bidirectional map of values to names and back.
         bimap _names;
@@ -138,33 +146,35 @@ namespace simox::meta
         class UnknownEnumValue : public std::out_of_range
         {
         public:
-
             template <typename E, typename N>
             UnknownEnumValue(E value, const EnumNames<E, N>& names) :
                 std::out_of_range(make_msg(int(value), names, "value"))
-            {}
+            {
+            }
 
             template <typename E, typename N>
             UnknownEnumValue(const N& value, const EnumNames<E, N>& names) :
                 std::out_of_range(make_msg(value, names, "name"))
-            {}
-
+            {
+            }
 
             template <typename Key, typename E, typename N>
-            static std::string make_msg(const Key& value, const EnumNames<E, N>& names, const std::string& what)
+            static std::string
+            make_msg(const Key& value, const EnumNames<E, N>& names, const std::string& what)
             {
                 std::stringstream ss;
                 ss << "Unknown enum " << what << " '" << value << "'"
                    << " of type '" << simox::meta::get_type_name<E>() << "'."
-                   << "\n" << names;
+                   << "\n"
+                   << names;
                 return ss.str();
             }
         };
-    }
+    } // namespace error
 
-
-    template<typename E, typename N>
-    N EnumNames<E, N>::to_name(const E& e) const
+    template <typename E, typename N>
+    N
+    EnumNames<E, N>::to_name(const E& e) const
     {
         try
         {
@@ -176,8 +186,9 @@ namespace simox::meta
         }
     }
 
-    template<typename E, typename N>
-    E EnumNames<E, N>::from_name(const N& name) const
+    template <typename E, typename N>
+    E
+    EnumNames<E, N>::from_name(const N& name) const
     {
         try
         {
@@ -189,9 +200,9 @@ namespace simox::meta
         }
     }
 
-
     template <typename E, typename N>
-    std::ostream& operator<<(std::ostream& os, const EnumNames<E, N>& rhs)
+    std::ostream&
+    operator<<(std::ostream& os, const EnumNames<E, N>& rhs)
     {
         os << "Names of enum '" << simox::meta::get_type_name<E>() << "':";
         for (const auto& it : rhs._names.left)
@@ -201,5 +212,4 @@ namespace simox::meta
         return os;
     }
 
-}
-
+} // namespace simox::meta

@@ -4,8 +4,9 @@
 * @copyright  2013 Nikolaus Vahrenkamp
 */
 
-#include "VirtualRobot.h"
 #include <boost/test/tools/old/interface.hpp>
+
+#include "VirtualRobot.h"
 #define BOOST_TEST_MODULE VirtualRobot_VirtualRobotIOTest
 
 #include <string>
@@ -34,15 +35,14 @@ BOOST_AUTO_TEST_CASE(testLoadManipulationObjectGlobalPose)
     VirtualRobot::ManipulationObjectPtr object;
 
     VirtualRobot::RobotPtr r;
-    BOOST_REQUIRE_NO_THROW(object =
-                               VirtualRobot::ObjectIO::loadManipulationObject(filename););
+    BOOST_REQUIRE_NO_THROW(object = VirtualRobot::ObjectIO::loadManipulationObject(filename););
     BOOST_REQUIRE(object);
 
     Eigen::Vector3f gtPosition{2697.64, 5225.85, 750.395};
 
     BOOST_REQUIRE_MESSAGE((gtPosition - object->getGlobalPosition()).norm() < 0.1,
-                          "Position is " << object->getGlobalPosition()
-                                         << " but should be " << gtPosition);
+                          "Position is " << object->getGlobalPosition() << " but should be "
+                                         << gtPosition);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

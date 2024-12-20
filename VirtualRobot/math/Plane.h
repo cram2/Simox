@@ -21,53 +21,60 @@
 
 #pragma once
 
-#include "MathForwardDefinitions.h"
 #include "AbstractFunctionR2R3.h"
-#include "Line.h"
 #include "ImplicitPlane.h"
-
-
-
-
+#include "Line.h"
+#include "MathForwardDefinitions.h"
 
 namespace math
 {
 
-class Plane :
-        public AbstractFunctionR2R3
-{
+    class Plane : public AbstractFunctionR2R3
+    {
 
-public:
-    Plane(Eigen::Vector3f pos, Eigen::Vector3f dir1, Eigen::Vector3f dir2);
+    public:
+        Plane(Eigen::Vector3f pos, Eigen::Vector3f dir1, Eigen::Vector3f dir2);
 
+        Eigen::Vector3f
+        Pos()
+        {
+            return pos;
+        }
 
-    Eigen::Vector3f Pos() {return pos;}
-    Eigen::Vector3f Dir1(){return dir1;}
-    Eigen::Vector3f Dir2(){return dir2;}
+        Eigen::Vector3f
+        Dir1()
+        {
+            return dir1;
+        }
 
-    Plane Transform(const Eigen::Matrix4f &transform);
-    Eigen::Vector3f GetPoint(float u, float v) override;
-    Eigen::Vector3f GetDdu(float u, float v) override;
-    Eigen::Vector3f GetDdv(float u, float v) override;
-    void GetUV(Eigen::Vector3f pos, float &u, float &v) override;
-    Eigen::Vector3f GetNormal();
-    Eigen::Vector3f GetNormal(const Eigen::Vector3f& preferredDirection);
-    Plane SwappedDirections();
-    Plane Normalized();
-    ImplicitPlane ToImplicit();
-    Eigen::Matrix3f GetRotationMatrix();
-    std::string ToString();
-    void GetUVW(Eigen::Vector3f pos, float &u, float &v, float &w);
-    float GetW(Eigen::Vector3f pos);
-    float Intersect(Line line, bool* exists);
-    Line Intersect(Plane p2);
+        Eigen::Vector3f
+        Dir2()
+        {
+            return dir2;
+        }
 
-    static Plane FromNormal(Eigen::Vector3f pos, Eigen::Vector3f normal);
-private:
-    Eigen::Vector3f pos;
-    Eigen::Vector3f dir1;
-    Eigen::Vector3f dir2;
+        Plane Transform(const Eigen::Matrix4f& transform);
+        Eigen::Vector3f GetPoint(float u, float v) override;
+        Eigen::Vector3f GetDdu(float u, float v) override;
+        Eigen::Vector3f GetDdv(float u, float v) override;
+        void GetUV(Eigen::Vector3f pos, float& u, float& v) override;
+        Eigen::Vector3f GetNormal();
+        Eigen::Vector3f GetNormal(const Eigen::Vector3f& preferredDirection);
+        Plane SwappedDirections();
+        Plane Normalized();
+        ImplicitPlane ToImplicit();
+        Eigen::Matrix3f GetRotationMatrix();
+        std::string ToString();
+        void GetUVW(Eigen::Vector3f pos, float& u, float& v, float& w);
+        float GetW(Eigen::Vector3f pos);
+        float Intersect(Line line, bool* exists);
+        Line Intersect(Plane p2);
 
-};
-}
+        static Plane FromNormal(Eigen::Vector3f pos, Eigen::Vector3f normal);
 
+    private:
+        Eigen::Vector3f pos;
+        Eigen::Vector3f dir1;
+        Eigen::Vector3f dir2;
+    };
+} // namespace math

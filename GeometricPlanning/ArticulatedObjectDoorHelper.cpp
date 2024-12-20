@@ -2,10 +2,11 @@
 
 #include <string>
 
+#include <GeometricPlanning/assert/assert.h>
 #include <VirtualRobot/Robot.h>
 #include <VirtualRobot/RobotNodeSet.h>
 
-#include <GeometricPlanning/assert/assert.h>
+#include "VirtualRobot/Nodes/RobotNode.h"
 
 namespace simox::geometric_planning
 {

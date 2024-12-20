@@ -22,10 +22,11 @@
 */
 #pragma once
 
-#include <VirtualRobot/VirtualRobotImportExport.h>
+#include <vector>
 
 #include <Eigen/Core>
-#include <vector>
+
+#include <VirtualRobot/VirtualRobotImportExport.h>
 
 namespace VirtualRobot
 {
@@ -35,6 +36,7 @@ namespace VirtualRobot
     }
 
     class CollisionChecker;
+
     /*!
         An axis oriented bounding box.
         Todo: Some parts of this class are similar to MathTools::OOBB.
@@ -46,7 +48,7 @@ namespace VirtualRobot
         friend class CollisionChecker;
 
         BoundingBox();
-        BoundingBox(const std::vector< Eigen::Vector3f >& p);
+        BoundingBox(const std::vector<Eigen::Vector3f>& p);
 
         /*!
             Returns true, if plane "hits" this bounding box.
@@ -57,7 +59,7 @@ namespace VirtualRobot
         /*!
             Returns 8 points that define the bounding box
         */
-        std::vector <Eigen::Vector3f> getPoints() const;
+        std::vector<Eigen::Vector3f> getPoints() const;
 
         //! Print some info
         void print();
@@ -65,7 +67,7 @@ namespace VirtualRobot
         /*!
             Consider these points for min/max calculation
         */
-        void addPoints(const std::vector < Eigen::Vector3f >& p);
+        void addPoints(const std::vector<Eigen::Vector3f>& p);
 
         /*!
             Consider these points for min/max calculation
@@ -110,4 +112,3 @@ namespace VirtualRobot
     };
 
 } // namespace VirtualRobot
-

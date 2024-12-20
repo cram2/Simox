@@ -22,15 +22,13 @@
 */
 #pragma once
 
-#include "../VirtualRobot.h"
-
-#include "RobotNode.h"
-
-#include <Eigen/Core>
-
 #include <string>
 #include <vector>
 
+#include <Eigen/Core>
+
+#include "../VirtualRobot.h"
+#include "RobotNode.h"
 
 namespace VirtualRobot
 {
@@ -44,36 +42,45 @@ namespace VirtualRobot
         /*!
         Constructor
         */
-        RobotNodeFixed(RobotWeakPtr rob,                //!< The robot
-                       const std::string& name,                    //!< The name
-                       const Eigen::Matrix4f& preJointTransform,   //!<  This is the fixed transformation of this RobotNode (used to compute globalPose)
-                       VisualizationNodePtr visualization = VisualizationNodePtr(),//!< A visualization model
-                       CollisionModelPtr collisionModel = CollisionModelPtr(),     //!< A collision model
-                       const SceneObject::Physics& p = SceneObject::Physics(),     //!< physics information
-                       CollisionCheckerPtr colChecker = CollisionCheckerPtr(),     //!< A collision checker instance (if not set, the global col checker is used)
-                       RobotNodeType type = Generic);
+        RobotNodeFixed(
+            RobotWeakPtr rob, //!< The robot
+            const std::string& name, //!< The name
+            const Eigen::Matrix4f&
+                preJointTransform, //!<  This is the fixed transformation of this RobotNode (used to compute globalPose)
+            VisualizationNodePtr visualization = VisualizationNodePtr(), //!< A visualization model
+            CollisionModelPtr collisionModel = CollisionModelPtr(), //!< A collision model
+            const SceneObject::Physics& p = SceneObject::Physics(), //!< physics information
+            CollisionCheckerPtr colChecker =
+                CollisionCheckerPtr(), //!< A collision checker instance (if not set, the global col checker is used)
+            RobotNodeType type = Generic);
         /*!
             Initialize with DH parameters.
 
             The DH parameters are all applied before! any visualization is added to the kinematic structure.
         */
-        RobotNodeFixed(RobotWeakPtr rob,                        //!< The robot
-                       const std::string& name,                            //!< The name
-                       float a,                                            //!< Use fixed DH parameters to specify the transformation of this RobotNode
-                       float d,                                            //!< Use fixed DH parameters to specify the transformation of this RobotNode
-                       float alpha,                                        //!< Use fixed DH parameters to specify the transformation of this RobotNode
-                       float theta,                                        //!< Use fixed DH parameters to specify the transformation of this RobotNode
-                       VisualizationNodePtr visualization = VisualizationNodePtr(),  //!< A visualization model
-                       CollisionModelPtr collisionModel = CollisionModelPtr(), //!< A collision model
-                       const SceneObject::Physics& p = SceneObject::Physics(), //!< physics information
-                       CollisionCheckerPtr colChecker = CollisionCheckerPtr(), //!< A collision checker instance (if not set, the global col checker is used)
-                       RobotNodeType type = Generic);
+        RobotNodeFixed(
+            RobotWeakPtr rob, //!< The robot
+            const std::string& name, //!< The name
+            float a, //!< Use fixed DH parameters to specify the transformation of this RobotNode
+            float d, //!< Use fixed DH parameters to specify the transformation of this RobotNode
+            float
+                alpha, //!< Use fixed DH parameters to specify the transformation of this RobotNode
+            float
+                theta, //!< Use fixed DH parameters to specify the transformation of this RobotNode
+            VisualizationNodePtr visualization = VisualizationNodePtr(), //!< A visualization model
+            CollisionModelPtr collisionModel = CollisionModelPtr(), //!< A collision model
+            const SceneObject::Physics& p = SceneObject::Physics(), //!< physics information
+            CollisionCheckerPtr colChecker =
+                CollisionCheckerPtr(), //!< A collision checker instance (if not set, the global col checker is used)
+            RobotNodeType type = Generic);
 
         /*!
         */
         ~RobotNodeFixed() override;
 
-        bool initialize(SceneObjectPtr parent = SceneObjectPtr(), const std::vector<SceneObjectPtr>& children = std::vector<SceneObjectPtr>()) override;
+        bool initialize(
+            SceneObjectPtr parent = SceneObjectPtr(),
+            const std::vector<SceneObjectPtr>& children = std::vector<SceneObjectPtr>()) override;
 
         /*!
         Print status information.
@@ -84,15 +91,17 @@ namespace VirtualRobot
         //! Checks if nodeType constraints are fulfilled. Otherwise an exception is thrown. Called on initialization.
         void checkValidRobotNodeType() override;
 
-        RobotNodeFixed() {};
+        RobotNodeFixed(){};
         void updateTransformationMatrices(const Eigen::Matrix4f& parentPose) override;
-        RobotNodePtr _clone(const RobotPtr newRobot, const VisualizationNodePtr visualizationModel, const CollisionModelPtr collisionModel, CollisionCheckerPtr colChecker, float scaling) override;
+        RobotNodePtr _clone(const RobotPtr newRobot,
+                            const VisualizationNodePtr visualizationModel,
+                            const CollisionModelPtr collisionModel,
+                            CollisionCheckerPtr colChecker,
+                            float scaling) override;
         /*!
             Derived classes add custom XML tags here
         */
         std::string _toXML(const std::string& modelPath) override;
-
     };
 
 } // namespace VirtualRobot
-

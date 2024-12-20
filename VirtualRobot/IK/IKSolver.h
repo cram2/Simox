@@ -22,14 +22,9 @@
 */
 #pragma once
 
-#include "../VirtualRobot.h"
-#include "../Nodes/RobotNode.h"
-#include "../RobotNodeSet.h"
+#include <memory>
 
-#include <string>
-#include <vector>
-
-
+#include "VirtualRobot/VirtualRobotImportExport.h"
 
 namespace VirtualRobot
 {
@@ -39,7 +34,6 @@ namespace VirtualRobot
     class VIRTUAL_ROBOT_IMPORT_EXPORT IKSolver : public std::enable_shared_from_this<IKSolver>
     {
     public:
-
         /*!
         @brief Flags for the selection of the target components.
         @details The flags can be combined with the +-operator.
@@ -57,7 +51,6 @@ namespace VirtualRobot
         IKSolver();
     };
 
-    typedef std::shared_ptr<IKSolver> IKSolverPtr;
+    using IKSolverPtr = std::shared_ptr<IKSolver>;
 
 } // namespace VirtualRobot
-

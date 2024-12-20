@@ -22,15 +22,10 @@
 */
 #pragma once
 
-#include "../VirtualRobot.h"
-
-#include <iostream>
-#include <string>
-#include <vector>
-#include <map>
-
 #include <Eigen/Core>
 #include <Eigen/Geometry>
+
+#include "VirtualRobot/VirtualRobot.h"
 
 namespace VirtualRobot
 {
@@ -48,44 +43,31 @@ namespace VirtualRobot
         /*!Standard Constructor
         If collision checks should be done in parallel, different CollisionCheckers can be specified.
         */
-        CollisionModelImplementation(const TriMeshModelPtr& modelData, const CollisionCheckerPtr& /*pColChecker*/, int id)
-        {
-            this->modelData = modelData;
-            this->id = id;
-        };
+        CollisionModelImplementation(const TriMeshModelPtr& modelData,
+                                     const CollisionCheckerPtr& /*pColChecker*/,
+                                     int id);
 
         /*!Standard Destructor
         */
-        virtual ~CollisionModelImplementation() {}
+        virtual ~CollisionModelImplementation();
 
 
         /*!
         Sets the position of the internal colModel data structure.
         */
-        void setGlobalPose(const Eigen::Matrix4f& m)
-        {
-            globalPose = m;
-        }
-        inline const Eigen::Matrix4f& getGlobalPose() const
-        {
-            return globalPose;
-        }
+        void setGlobalPose(const Eigen::Matrix4f& m);
+        const Eigen::Matrix4f& getGlobalPose() const;
 
 
-        virtual void print()
-        {
-            std::cout << "Dummy Collision Model Implementation..." << std::endl;
-        };
+        virtual void print();
 
-        const TriMeshModelPtr& getTriMeshModel()
-        {
-            return modelData;
-        }
+        const TriMeshModelPtr& getTriMeshModel();
 
 
-        virtual std::shared_ptr<CollisionModelImplementation> clone(bool deepCopy = false) const = 0;
+        virtual std::shared_ptr<CollisionModelImplementation>
+        clone(bool deepCopy = false) const = 0;
+
     protected:
-
         //! delete all data
         virtual void destroyData() = 0;
 
@@ -97,6 +79,4 @@ namespace VirtualRobot
     };
 
 
-
-} // namespace
-
+} // namespace VirtualRobot

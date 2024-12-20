@@ -1,19 +1,19 @@
+#include "CoinViewer.h"
+
 #include <chrono>
 #include <cmath>
+#include <iostream>
 
 #include <Eigen/Core>
 
+#include <VirtualRobot/Obstacle.h>
+#include <VirtualRobot/Visualization/CoinVisualization/CoinVisualization.h>
+#include <VirtualRobot/Visualization/CoinVisualization/CoinVisualizationNode.h>
+#include <VirtualRobot/Visualization/VisualizationFactory.h>
+
 #include <Inventor/actions/SoLineHighlightRenderAction.h>
 
-#include <VirtualRobot/Obstacle.h>
-#include <VirtualRobot/Visualization/VisualizationFactory.h>
-#include <VirtualRobot/Visualization/CoinVisualization/CoinVisualizationNode.h>
-#include <VirtualRobot/Visualization/CoinVisualization/CoinVisualization.h>
-
-#include "CoinViewer.h"
-
-CoinViewerExample::CoinViewerExample()
-    : QMainWindow(nullptr)
+CoinViewerExample::CoinViewerExample() : QMainWindow(nullptr)
 {
     //setup scene
     {
@@ -29,9 +29,8 @@ CoinViewerExample::CoinViewerExample()
 
             auto s = VirtualRobot::Obstacle::createSphere(r);
             s->setGlobalPose(m);
-            sceneSep->addChild(
-                VirtualRobot::CoinVisualizationFactory::getCoinVisualization(
-                    s, VirtualRobot::SceneObject::Full));
+            sceneSep->addChild(VirtualRobot::CoinVisualizationFactory::getCoinVisualization(
+                s, VirtualRobot::SceneObject::Full));
         };
 
         addSphere(0, 1500, 1500, 400);
@@ -64,27 +63,31 @@ CoinViewerExample::~CoinViewerExample()
     sceneSep->unref();
 }
 
-void CoinViewerExample::closeEvent(QCloseEvent* event)
+void
+CoinViewerExample::closeEvent(QCloseEvent* event)
 {
     quit();
     QMainWindow::closeEvent(event);
 }
 
-int CoinViewerExample::main()
+int
+CoinViewerExample::main()
 {
     SoQt::show(this);
     SoQt::mainLoop();
     return 0;
 }
 
-void CoinViewerExample::quit()
+void
+CoinViewerExample::quit()
 {
     std::cout << "CShowRobotWindow: Closing" << std::endl;
     this->close();
     SoQt::exitMainLoop();
 }
 
-void CoinViewerExample::timerEvent(QTimerEvent*)
+void
+CoinViewerExample::timerEvent(QTimerEvent*)
 {
     static const auto first = std::chrono::high_resolution_clock::now();
     const auto now = std::chrono::high_resolution_clock::now();

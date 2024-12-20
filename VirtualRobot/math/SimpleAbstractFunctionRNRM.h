@@ -21,32 +21,34 @@
 
 #pragma once
 
-#include "../VirtualRobot.h"
-#include "MathForwardDefinitions.h"
+#include <Eigen/Core>
+
+#include <VirtualRobot/VirtualRobotImportExport.h>
 
 namespace math
 {
-    template<int N, int M>
+    template <int N, int M>
     class VIRTUAL_ROBOT_IMPORT_EXPORT SimpleAbstractFunctionRNRM
     {
     public:
         using in_t = Eigen::Matrix<float, N, 1>;
         using out_t = Eigen::Matrix<float, M, 1>;
         virtual out_t Get(in_t t) const = 0;
+
     private:
     };
 
-    template<int M>
+    template <int M>
     class VIRTUAL_ROBOT_IMPORT_EXPORT SimpleAbstractFunctionRNRM<1, M>
     {
     public:
         using in_t = float;
         using out_t = Eigen::Matrix<float, M, 1>;
         virtual out_t Get(in_t t) const = 0;
+
     private:
     };
 
-    template<int M>
+    template <int M>
     using SimpleAbstractFunctionR1RM = SimpleAbstractFunctionRNRM<1, M>;
-}
-
+} // namespace math

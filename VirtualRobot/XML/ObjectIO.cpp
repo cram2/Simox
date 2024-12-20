@@ -1,28 +1,28 @@
 
 #include "ObjectIO.h"
-#include "../VirtualRobotException.h"
-#include "VirtualRobot.h"
-#include "rapidxml.hpp"
-
-
-#include "RobotIO.h"
-#include "../ManipulationObject.h"
-#include "../Visualization/TriMeshModel.h"
 
 #include <iostream>
+
+#include "../CollisionDetection/CollisionModel.h"
+#include "../ManipulationObject.h"
+#include "../VirtualRobotException.h"
+#include "../Visualization/TriMeshModel.h"
+#include "Logging.h"
+#include "RobotIO.h"
+#include "VirtualRobot.h"
+#include "rapidxml.hpp"
 
 using namespace std;
 
 namespace VirtualRobot
 {
 
-    ObjectIO::ObjectIO()
-        = default;
+    ObjectIO::ObjectIO() = default;
 
-    ObjectIO::~ObjectIO()
-        = default;
+    ObjectIO::~ObjectIO() = default;
 
-    VirtualRobot::ObstaclePtr ObjectIO::loadObstacle(const std::string& xmlFile)
+    VirtualRobot::ObstaclePtr
+    ObjectIO::loadObstacle(const std::string& xmlFile)
     {
         // load file
         std::ifstream in(xmlFile.c_str());
@@ -38,7 +38,8 @@ namespace VirtualRobot
         return res;
     }
 
-    VirtualRobot::ObstaclePtr ObjectIO::loadObstacle(const std::ifstream& xmlFile, const std::string& basePath /*= ""*/)
+    VirtualRobot::ObstaclePtr
+    ObjectIO::loadObstacle(const std::ifstream& xmlFile, const std::string& basePath /*= ""*/)
     {
         // load file
         THROW_VR_EXCEPTION_IF(!xmlFile.is_open(), "Could not open XML file");
@@ -52,8 +53,8 @@ namespace VirtualRobot
         return res;
     }
 
-
-    VirtualRobot::ManipulationObjectPtr ObjectIO::loadManipulationObject(const std::string& xmlFile)
+    VirtualRobot::ManipulationObjectPtr
+    ObjectIO::loadManipulationObject(const std::string& xmlFile)
     {
         // load file
         std::ifstream in(xmlFile.c_str());
@@ -69,7 +70,9 @@ namespace VirtualRobot
         return res;
     }
 
-    VirtualRobot::ManipulationObjectPtr ObjectIO::loadManipulationObject(const std::ifstream& xmlFile, const std::string& basePath /*= ""*/)
+    VirtualRobot::ManipulationObjectPtr
+    ObjectIO::loadManipulationObject(const std::ifstream& xmlFile,
+                                     const std::string& basePath /*= ""*/)
     {
         // load file
         THROW_VR_EXCEPTION_IF(!xmlFile.is_open(), "Could not open XML file");
@@ -78,13 +81,18 @@ namespace VirtualRobot
         buffer << xmlFile.rdbuf();
         std::string objectXML(buffer.str());
 
-        VirtualRobot::ManipulationObjectPtr res = createManipulationObjectFromString(objectXML, basePath);
+        VirtualRobot::ManipulationObjectPtr res =
+            createManipulationObjectFromString(objectXML, basePath);
         res->initialize();
         THROW_VR_EXCEPTION_IF(!res, "Error while parsing file.");
         return res;
     }
 
-    bool ObjectIO::writeSTL(TriMeshModelPtr t, const std::string& filename, const std::string& objectName, float scaling)
+    bool
+    ObjectIO::writeSTL(TriMeshModelPtr t,
+                       const std::string& filename,
+                       const std::string& objectName,
+                       float scaling)
     {
         if (!t || t->faces.size() == 0)
         {
@@ -109,9 +117,12 @@ namespace VirtualRobot
             auto& p1 = t->vertices.at(face.id1);
             auto& p2 = t->vertices.at(face.id2);
             auto& p3 = t->vertices.at(face.id3);
-            auto normal1 = face.idNormal1 < t->normals.size() ? t->normals.at(face.idNormal1) : face.normal;
-            auto normal2 = face.idNormal2 < t->normals.size() ? t->normals.at(face.idNormal2) : face.normal;
-            auto normal3 = face.idNormal3 < t->normals.size() ? t->normals.at(face.idNormal3) : face.normal;
+            auto normal1 =
+                face.idNormal1 < t->normals.size() ? t->normals.at(face.idNormal1) : face.normal;
+            auto normal2 =
+                face.idNormal2 < t->normals.size() ? t->normals.at(face.idNormal2) : face.normal;
+            auto normal3 =
+                face.idNormal3 < t->normals.size() ? t->normals.at(face.idNormal3) : face.normal;
             Eigen::Vector3f n = normal1 + normal2 + normal3;
             n.normalize();
 
@@ -123,9 +134,12 @@ namespace VirtualRobot
             //Vector norm = n / std::sqrt( n * n);
             of << "    facet normal " << n(0) << " " << n(1) << " " << n(2) << std::endl;
             of << "      outer loop " << std::endl;
-            of << "        vertex " << p1(0)*scaling << " " << p1(1)*scaling << " " << p1(2)*scaling <<  std::endl;
-            of << "        vertex " << p2(0)*scaling << " " << p2(1)*scaling << " " << p2(2)*scaling << std::endl;
-            of << "        vertex " << p3(0)*scaling << " " << p3(1)*scaling << " " << p3(2)*scaling << std::endl;
+            of << "        vertex " << p1(0) * scaling << " " << p1(1) * scaling << " "
+               << p1(2) * scaling << std::endl;
+            of << "        vertex " << p2(0) * scaling << " " << p2(1) * scaling << " "
+               << p2(2) * scaling << std::endl;
+            of << "        vertex " << p3(0) * scaling << " " << p3(1) * scaling << " "
+               << p3(2) * scaling << std::endl;
             of << "      endloop " << std::endl;
             of << "    endfacet " << std::endl;
         }
@@ -135,10 +149,8 @@ namespace VirtualRobot
         return true;
     }
 
-
-
-
-    ObstaclePtr ObjectIO::processObstacle(rapidxml::xml_node<char>* objectXMLNode, const std::string& basePath)
+    ObstaclePtr
+    ObjectIO::processObstacle(rapidxml::xml_node<char>* objectXMLNode, const std::string& basePath)
     {
         THROW_VR_EXCEPTION_IF(!objectXMLNode, "No <Obstacle> tag in XML definition");
 
@@ -181,7 +193,7 @@ namespace VirtualRobot
                 result->setName(objName);
             }
 
-            // update global pose           
+            // update global pose
             result->setGlobalPose(globalPose);
 
             return result;
@@ -197,23 +209,30 @@ namespace VirtualRobot
 
             if (nodeName == "visualization")
             {
-                THROW_VR_EXCEPTION_IF(visuProcessed, "Two visualization tags defined in Obstacle '" << objName << "'." << endl);
+                THROW_VR_EXCEPTION_IF(visuProcessed,
+                                      "Two visualization tags defined in Obstacle '"
+                                          << objName << "'." << endl);
                 visualizationNode = processVisualizationTag(node, objName, basePath, useAsColModel);
                 visuProcessed = true;
 
                 if (useAsColModel)
                 {
-                    THROW_VR_EXCEPTION_IF(colProcessed, "Two collision tags defined in Obstacle '" << objName << "'." << endl);
+                    THROW_VR_EXCEPTION_IF(colProcessed,
+                                          "Two collision tags defined in Obstacle '"
+                                              << objName << "'." << endl);
                     std::string colModelName = objName;
                     colModelName += "_VISU_ColModel";
                     // todo: ID?
-                    collisionModel.reset(new CollisionModel(visualizationNode, colModelName, CollisionCheckerPtr()));
+                    collisionModel.reset(
+                        new CollisionModel(visualizationNode, colModelName, CollisionCheckerPtr()));
                     colProcessed = true;
                 }
             }
             else if (nodeName == "collisionmodel")
             {
-                THROW_VR_EXCEPTION_IF(colProcessed, "Two collision tags defined in Obstacle '" << objName << "'." << endl);
+                THROW_VR_EXCEPTION_IF(colProcessed,
+                                      "Two collision tags defined in Obstacle '" << objName << "'."
+                                                                                 << endl);
                 collisionModel = processCollisionTag(node, objName, basePath);
                 colProcessed = true;
             }
@@ -223,7 +242,9 @@ namespace VirtualRobot
             }
             else if (nodeName == "physics")
             {
-                THROW_VR_EXCEPTION_IF(physicsDefined, "Two physics tags defined in Obstacle '" << objName << "'." << endl);
+                THROW_VR_EXCEPTION_IF(physicsDefined,
+                                      "Two physics tags defined in Obstacle '" << objName << "'."
+                                                                               << endl);
                 processPhysicsTag(node, objName, physics);
                 physicsDefined = true;
             }
@@ -233,7 +254,8 @@ namespace VirtualRobot
             }
             else
             {
-                THROW_VR_EXCEPTION("XML definition <" << nodeName << "> not supported in Obstacle <" << objName << ">." << endl);
+                THROW_VR_EXCEPTION("XML definition <" << nodeName << "> not supported in Obstacle <"
+                                                      << objName << ">." << endl);
             }
 
             node = node->next_sibling();
@@ -246,7 +268,9 @@ namespace VirtualRobot
         return object;
     }
 
-    VirtualRobot::ManipulationObjectPtr ObjectIO::createManipulationObjectFromString(const std::string& xmlString, const std::string& basePath /*= ""*/)
+    VirtualRobot::ManipulationObjectPtr
+    ObjectIO::createManipulationObjectFromString(const std::string& xmlString,
+                                                 const std::string& basePath /*= ""*/)
     {
         // copy string content to char array
         std::vector<char> y(xmlString.size() + 1);
@@ -258,18 +282,19 @@ namespace VirtualRobot
 
         try
         {
-            rapidxml::xml_document<char> doc;    // character type defaults to char
-            doc.parse<0>(y.data());    // 0 means default parse flags
+            rapidxml::xml_document<char> doc; // character type defaults to char
+            doc.parse<0>(y.data()); // 0 means default parse flags
             rapidxml::xml_node<char>* objectXMLNode = doc.first_node("ManipulationObject");
 
             obj = processManipulationObject(objectXMLNode, basePath);
-
         }
         catch (rapidxml::parse_error& e)
         {
-            THROW_VR_EXCEPTION("Could not parse data in xml definition" << endl
+            THROW_VR_EXCEPTION("Could not parse data in xml definition"
+                               << endl
                                << "Error message:" << e.what() << endl
-                               << "Position: " << endl << e.where<char>() << endl);
+                               << "Position: " << endl
+                               << e.where<char>() << endl);
             return ManipulationObjectPtr();
         }
         catch (VirtualRobot::VirtualRobotException&)
@@ -280,7 +305,8 @@ namespace VirtualRobot
         catch (std::exception& e)
         {
             THROW_VR_EXCEPTION("Error while parsing xml definition" << endl
-                               << "Error code:" << e.what() << endl);
+                                                                    << "Error code:" << e.what()
+                                                                    << endl);
             return ManipulationObjectPtr();
         }
         catch (...)
@@ -292,7 +318,9 @@ namespace VirtualRobot
         return obj;
     }
 
-    ManipulationObjectPtr ObjectIO::processManipulationObject(rapidxml::xml_node<char>* objectXMLNode, const std::string& basePath)
+    ManipulationObjectPtr
+    ObjectIO::processManipulationObject(rapidxml::xml_node<char>* objectXMLNode,
+                                        const std::string& basePath)
     {
         THROW_VR_EXCEPTION_IF(!objectXMLNode, "No <ManipulationObject> tag in XML definition");
 
@@ -305,7 +333,7 @@ namespace VirtualRobot
         bool physicsDefined = false;
         std::vector<GraspSetPtr> graspSets;
         Eigen::Matrix4f globalPose = Eigen::Matrix4f::Identity();
-        std::vector< rapidxml::xml_node<>* > sensorTags;
+        std::vector<rapidxml::xml_node<>*> sensorTags;
         SceneObject::PrimitiveApproximation primitiveApproximation;
         SceneObject::Affordances affordances;
 
@@ -343,8 +371,8 @@ namespace VirtualRobot
         }
 
 
-
-        THROW_VR_EXCEPTION_IF(objName.empty(), "ManipulationObject definition expects attribute 'name'");
+        THROW_VR_EXCEPTION_IF(objName.empty(),
+                              "ManipulationObject definition expects attribute 'name'");
 
         rapidxml::xml_node<>* node = objectXMLNode->first_node();
 
@@ -354,23 +382,30 @@ namespace VirtualRobot
 
             if (nodeName == "visualization")
             {
-                THROW_VR_EXCEPTION_IF(visuProcessed, "Two visualization tags defined in ManipulationObject '" << objName << "'." << endl);
+                THROW_VR_EXCEPTION_IF(visuProcessed,
+                                      "Two visualization tags defined in ManipulationObject '"
+                                          << objName << "'." << endl);
                 visualizationNode = processVisualizationTag(node, objName, basePath, useAsColModel);
                 visuProcessed = true;
 
                 if (useAsColModel)
                 {
-                    THROW_VR_EXCEPTION_IF(colProcessed, "Two collision tags defined in ManipulationObject '" << objName << "'." << endl);
+                    THROW_VR_EXCEPTION_IF(colProcessed,
+                                          "Two collision tags defined in ManipulationObject '"
+                                              << objName << "'." << endl);
                     std::string colModelName = objName;
                     colModelName += "_VISU_ColModel";
                     // todo: ID?
-                    collisionModel.reset(new CollisionModel(visualizationNode, colModelName, CollisionCheckerPtr()));
+                    collisionModel.reset(
+                        new CollisionModel(visualizationNode, colModelName, CollisionCheckerPtr()));
                     colProcessed = true;
                 }
             }
             else if (nodeName == "collisionmodel")
             {
-                THROW_VR_EXCEPTION_IF(colProcessed, "Two collision tags defined in ManipulationObject '" << objName << "'." << endl);
+                THROW_VR_EXCEPTION_IF(colProcessed,
+                                      "Two collision tags defined in ManipulationObject '"
+                                          << objName << "'." << endl);
                 collisionModel = processCollisionTag(node, objName, basePath);
                 colProcessed = true;
             }
@@ -380,7 +415,9 @@ namespace VirtualRobot
             }
             else if (nodeName == "physics")
             {
-                THROW_VR_EXCEPTION_IF(physicsDefined, "Two physics tags defined in ManipulationObject '" << objName << "'." << endl);
+                THROW_VR_EXCEPTION_IF(physicsDefined,
+                                      "Two physics tags defined in ManipulationObject '"
+                                          << objName << "'." << endl);
                 processPhysicsTag(node, objName, physics);
                 physicsDefined = true;
             }
@@ -389,7 +426,6 @@ namespace VirtualRobot
                 GraspSetPtr gs = processGraspSet(node, objName);
                 THROW_VR_EXCEPTION_IF(!gs, "Invalid grasp set in '" << objName << "'." << endl);
                 graspSets.push_back(gs);
-
             }
             else if (nodeName == "sensor")
             {
@@ -405,16 +441,18 @@ namespace VirtualRobot
             }
             else
             {
-                THROW_VR_EXCEPTION("XML definition <" << nodeName << "> not supported in ManipulationObject <" << objName << ">." << endl);
+                THROW_VR_EXCEPTION("XML definition <" << nodeName
+                                                      << "> not supported in ManipulationObject <"
+                                                      << objName << ">." << endl);
             }
 
             node = node->next_sibling();
         }
 
 
-
         // build object
-        ManipulationObjectPtr object(new ManipulationObject(objName, visualizationNode, collisionModel, physics));
+        ManipulationObjectPtr object(
+            new ManipulationObject(objName, visualizationNode, collisionModel, physics));
 
         // process sensors
         for (auto& sensorTag : sensorTags)
@@ -435,7 +473,9 @@ namespace VirtualRobot
         return object;
     }
 
-    VirtualRobot::ObstaclePtr ObjectIO::createObstacleFromString(const std::string& xmlString, const std::string& basePath /*= ""*/)
+    VirtualRobot::ObstaclePtr
+    ObjectIO::createObstacleFromString(const std::string& xmlString,
+                                       const std::string& basePath /*= ""*/)
     {
         // copy string content to char array
         char* y = new char[xmlString.size() + 1];
@@ -445,21 +485,20 @@ namespace VirtualRobot
 
         try
         {
-            rapidxml::xml_document<char> doc;    // character type defaults to char
-            doc.parse<0>(y);    // 0 means default parse flags
+            rapidxml::xml_document<char> doc; // character type defaults to char
+            doc.parse<0>(y); // 0 means default parse flags
             rapidxml::xml_node<char>* objectXMLNode = doc.first_node("Obstacle");
 
             obj = processObstacle(objectXMLNode, basePath);
-
-
-
         }
         catch (rapidxml::parse_error& e)
         {
             delete[] y;
-            THROW_VR_EXCEPTION("Could not parse data in xml definition" << endl
+            THROW_VR_EXCEPTION("Could not parse data in xml definition"
+                               << endl
                                << "Error message:" << e.what() << endl
-                               << "Position: " << endl << e.where<char>() << endl);
+                               << "Position: " << endl
+                               << e.where<char>() << endl);
             return ObstaclePtr();
         }
         catch (VirtualRobot::VirtualRobotException&)
@@ -472,7 +511,8 @@ namespace VirtualRobot
         {
             delete[] y;
             THROW_VR_EXCEPTION("Error while parsing xml definition" << endl
-                               << "Error code:" << e.what() << endl);
+                                                                    << "Error code:" << e.what()
+                                                                    << endl);
             return ObstaclePtr();
         }
         catch (...)
@@ -486,7 +526,8 @@ namespace VirtualRobot
         return obj;
     }
 
-    bool ObjectIO::saveManipulationObject(ManipulationObjectPtr object, const std::string& xmlFile)
+    bool
+    ObjectIO::saveManipulationObject(ManipulationObjectPtr object, const std::string& xmlFile)
     {
         THROW_VR_EXCEPTION_IF(!object, "NULL object");
 

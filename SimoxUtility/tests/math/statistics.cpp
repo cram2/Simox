@@ -6,18 +6,18 @@
 
 #define BOOST_TEST_MODULE SimoxUtility_DeltaAngleTest
 
-#include <random>
 #include <iostream>
+#include <random>
 
 #include <boost/test/included/unit_test.hpp>
 
 #include <SimoxUtility/math/statistics/measures.h>
 
-
 template <typename FloatT>
-void test_measures_unsorted_temp(bool sorted)
+void
+test_measures_unsorted_temp(bool sorted)
 {
-    std::vector<FloatT> values {10, 8, 5, 2, -5, -8, -10};
+    std::vector<FloatT> values{10, 8, 5, 2, -5, -8, -10};
     if (sorted)
     {
         std::sort(values.begin(), values.end());
@@ -28,16 +28,16 @@ void test_measures_unsorted_temp(bool sorted)
 
     BOOST_CHECK_EQUAL(simox::math::min(values, sorted), -10);
     BOOST_CHECK_EQUAL(simox::math::lower_quartile(values, sorted), -6.5);
-    BOOST_CHECK_EQUAL(simox::math::median(values, sorted),  2);
-    BOOST_CHECK_EQUAL(simox::math::upper_quartile(values, sorted),  6.5);
-    BOOST_CHECK_EQUAL(simox::math::max(values, sorted),  10);
+    BOOST_CHECK_EQUAL(simox::math::median(values, sorted), 2);
+    BOOST_CHECK_EQUAL(simox::math::upper_quartile(values, sorted), 6.5);
+    BOOST_CHECK_EQUAL(simox::math::max(values, sorted), 10);
 }
-
 
 BOOST_AUTO_TEST_CASE(test_measures_unsorted_float)
 {
     test_measures_unsorted_temp<float>(false);
 }
+
 BOOST_AUTO_TEST_CASE(test_measures_unsorted_double)
 {
     test_measures_unsorted_temp<double>(false);
@@ -47,11 +47,11 @@ BOOST_AUTO_TEST_CASE(test_measures_sorted_float)
 {
     test_measures_unsorted_temp<float>(true);
 }
+
 BOOST_AUTO_TEST_CASE(test_measures_sorted_double)
 {
     test_measures_unsorted_temp<double>(true);
 }
-
 
 BOOST_AUTO_TEST_CASE(test_measures_empty)
 {

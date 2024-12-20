@@ -1,20 +1,22 @@
-#include <Eigen/Geometry>
 #include "DifferentialIK.h"
-#include "../Robot.h"
-#include "../VirtualRobotException.h"
-#include "../Nodes/RobotNodePrismatic.h"
-#include "../Nodes/RobotNodeRevolute.h"
-#include "../VirtualRobotException.h"
-#include "../CollisionDetection/CollisionChecker.h"
-#include <VirtualRobot/Nodes/RobotNodeHemisphere.h>
-#include <VirtualRobot/Nodes/RobotNodeFourBar.h>
-#include <VirtualRobot/Nodes/RobotNodeHemisphere.h>
+
+#include <algorithm>
+#include <cfloat>
 
 #include <Eigen/Geometry>
 #include <Eigen/src/Core/Matrix.h>
 
-#include <algorithm>
-#include <cfloat>
+#include <VirtualRobot/Nodes/RobotNodeFourBar.h>
+#include <VirtualRobot/Nodes/RobotNodeHemisphere.h>
+
+#include "../CollisionDetection/CollisionChecker.h"
+#include "../Nodes/RobotNodePrismatic.h"
+#include "../Nodes/RobotNodeRevolute.h"
+#include "../Robot.h"
+#include "../VirtualRobotException.h"
+#include "VirtualRobot/Logging.h"
+#include "VirtualRobot/Nodes/RobotNode.h"
+#include "VirtualRobot/RobotNodeSet.h"
 
 //#define CHECK_PERFORMANCE
 
@@ -23,7 +25,10 @@ namespace VirtualRobot
     using std::cout;
     using std::endl;
 
-    DifferentialIK::DifferentialIK(RobotNodeSetPtr _rns, RobotNodePtr _coordSystem, JacobiProvider::InverseJacobiMethod invJacMethod, float invParam) :
+    DifferentialIK::DifferentialIK(RobotNodeSetPtr _rns,
+                                   RobotNodePtr _coordSystem,
+                                   JacobiProvider::InverseJacobiMethod invJacMethod,
+                                   float invParam) :
         JacobiProvider(_rns, invJacMethod), invParam(invParam), coordSystem(_coordSystem), nRows(0)
     {
         name = "DifferentialIK";
@@ -34,12 +39,13 @@ namespace VirtualRobot
         }
 
         checkImprovement = false;
-        nodes =  rns->getAllRobotNodes();
+        nodes = rns->getAllRobotNodes();
 
-        for (auto & node : nodes)
+        for (auto& node : nodes)
         {
             std::vector<RobotNodePtr> p = node->getAllParents(rns);
-            p.push_back(node);// if the tcp is not fixed, it must be considered for calculating the Jacobian
+            p.push_back(
+                node); // if the tcp is not fixed, it must be considered for calculating the Jacobian
             parents[node] = p;
         }
 
@@ -52,8 +58,13 @@ namespace VirtualRobot
         name = "DifferentialIK";
     }
 
-
-    void DifferentialIK::setGoal(const Eigen::Matrix4f& goal, SceneObjectPtr tcp, IKSolver::CartesianSelection mode, float tolerancePosition, float toleranceRotation, bool performInitialization)
+    void
+    DifferentialIK::setGoal(const Eigen::Matrix4f& goal,
+                            SceneObjectPtr tcp,
+                            IKSolver::CartesianSelection mode,
+                            float tolerancePosition,
+                            float toleranceRotation,
+                            bool performInitialization)
     {
         if (!tcp)
         {
@@ -61,7 +72,7 @@ namespace VirtualRobot
         }
 
         // tcp not in list yet?
-        if (find(tcp_set.begin(), tcp_set.end(), tcp)  == tcp_set.end())
+        if (find(tcp_set.begin(), tcp_set.end(), tcp) == tcp_set.end())
         {
             tcp_set.push_back(tcp);
         }
@@ -108,13 +119,15 @@ namespace VirtualRobot
         }
     }
 
-    Eigen::MatrixXf DifferentialIK::getJacobianMatrix()
+    Eigen::MatrixXf
+    DifferentialIK::getJacobianMatrix()
     {
         updateJacobianMatrix(currentJacobian);
         return currentJacobian;
     }
 
-    void DifferentialIK::updateJacobianMatrix(Eigen::MatrixXf& jacobian)
+    void
+    DifferentialIK::updateJacobianMatrix(Eigen::MatrixXf& jacobian)
     {
         VR_ASSERT(initialized);
 
@@ -126,7 +139,8 @@ namespace VirtualRobot
         }
 
 #endif
-        VR_ASSERT(static_cast<std::size_t>(jacobian.rows()) == nRows && static_cast<std::size_t>(jacobian.cols()) == nodes.size());
+        VR_ASSERT(static_cast<std::size_t>(jacobian.rows()) == nRows &&
+                  static_cast<std::size_t>(jacobian.cols()) == nodes.size());
 
         size_t index = 0;
 
@@ -138,7 +152,7 @@ namespace VirtualRobot
                 updateJacobianMatrix(partJacobians[tcp], tcp, mode);
                 //updatePartJacobian(tcp, mode, jacobian.block(index, 0,  partJacobians[tcp].rows(), nDoF));
                 //Eigen::MatrixXf partJacobian = this->getJacobianMatrix(tcp, mode);
-                jacobian.block(index, 0,  partJacobians[tcp].rows(), nDoF) =  partJacobians[tcp];
+                jacobian.block(index, 0, partJacobians[tcp].rows(), nDoF) = partJacobians[tcp];
 
                 if (mode & IKSolver::X)
                 {
@@ -162,18 +176,20 @@ namespace VirtualRobot
             }
             else
             {
-                VR_ERROR << "Internal error?!" << std::endl;    // Error
+                VR_ERROR << "Internal error?!" << std::endl; // Error
             }
         }
     }
 
-    Eigen::VectorXf DifferentialIK::getError(float stepSize)
+    Eigen::VectorXf
+    DifferentialIK::getError(float stepSize)
     {
         updateError(currentError, stepSize);
         return currentError;
     }
 
-    void DifferentialIK::updateError(Eigen::VectorXf& error, float stepSize)
+    void
+    DifferentialIK::updateError(Eigen::VectorXf& error, float stepSize)
     {
         VR_ASSERT(initialized);
 
@@ -233,26 +249,28 @@ namespace VirtualRobot
                     error.segment(index, 3) = tmpUpdateErrorDelta.tail(3) * stepSize;
                     index += 3;
                 }
-
             }
             else
             {
-                VR_ERROR << "Internal error?!" << std::endl;    // Error
+                VR_ERROR << "Internal error?!" << std::endl; // Error
             }
         }
     }
 
-    Eigen::MatrixXf DifferentialIK::getJacobianMatrix(SceneObjectPtr tcp)
+    Eigen::MatrixXf
+    DifferentialIK::getJacobianMatrix(SceneObjectPtr tcp)
     {
         return getJacobianMatrix(tcp, IKSolver::All);
     }
 
-    Eigen::MatrixXf DifferentialIK::getJacobianMatrix(IKSolver::CartesianSelection mode)
+    Eigen::MatrixXf
+    DifferentialIK::getJacobianMatrix(IKSolver::CartesianSelection mode)
     {
         return getJacobianMatrix(SceneObjectPtr(), mode);
     }
 
-    Eigen::MatrixXf DifferentialIK::getJacobianMatrix(SceneObjectPtr tcp, IKSolver::CartesianSelection mode)
+    Eigen::MatrixXf
+    DifferentialIK::getJacobianMatrix(SceneObjectPtr tcp, IKSolver::CartesianSelection mode)
     {
         if (!initialized)
         {
@@ -287,7 +305,10 @@ namespace VirtualRobot
         return jac;
     }
 
-    void DifferentialIK::updateJacobianMatrix(Eigen::MatrixXf& jac, SceneObjectPtr tcp, IKSolver::CartesianSelection mode)
+    void
+    DifferentialIK::updateJacobianMatrix(Eigen::MatrixXf& jac,
+                                         SceneObjectPtr tcp,
+                                         IKSolver::CartesianSelection mode)
     {
 
         if (!initialized)
@@ -326,7 +347,8 @@ namespace VirtualRobot
         }
 
 #endif
-        VR_ASSERT(static_cast<std::size_t>(jac.rows()) == size && static_cast<std::size_t>(jac.cols()) == nDoF);
+        VR_ASSERT(static_cast<std::size_t>(jac.rows()) == size &&
+                  static_cast<std::size_t>(jac.cols()) == nDoF);
 
         // Create matrices for the position and the orientation part of the jacobian.
 
@@ -379,7 +401,7 @@ namespace VirtualRobot
             clock_t startT = clock();
 #endif
 
-            const RobotNodePtr &dof = this->nodes[i];
+            const RobotNodePtr& dof = this->nodes[i];
             //std::vector<RobotNodePtr> parents = parents[tcp];//tcp->getAllParents(this->rns);
 
             //check if the tcp is affected by this DOF
@@ -391,8 +413,8 @@ namespace VirtualRobot
                 if (dof->isRotationalJoint())
                 {
                     // todo: find a better way of handling different joint types
-                    std::shared_ptr<RobotNodeRevolute> revolute
-                        = std::dynamic_pointer_cast<RobotNodeRevolute>(dof);
+                    std::shared_ptr<RobotNodeRevolute> revolute =
+                        std::dynamic_pointer_cast<RobotNodeRevolute>(dof);
                     THROW_VR_EXCEPTION_IF(!revolute, "Internal error: expecting revolute joint");
 
                     // get axis
@@ -404,13 +426,15 @@ namespace VirtualRobot
 
                         if (coordSystem)
                         {
-                            toTCP = coordSystem->toLocalCoordinateSystem(tcp->getGlobalPose()).block(0, 3, 3, 1)
-                                    - coordSystem->toLocalCoordinateSystem(dof->getGlobalPose()).block(0, 3, 3, 1);
+                            toTCP = coordSystem->toLocalCoordinateSystem(tcp->getGlobalPose())
+                                        .block(0, 3, 3, 1) -
+                                    coordSystem->toLocalCoordinateSystem(dof->getGlobalPose())
+                                        .block(0, 3, 3, 1);
                         }
                         else
                         {
-                            toTCP = tcp->getGlobalPose().block(0, 3, 3, 1)
-                                    - dof->getGlobalPose().block(0, 3, 3, 1);
+                            toTCP = tcp->getGlobalPose().block(0, 3, 3, 1) -
+                                    dof->getGlobalPose().block(0, 3, 3, 1);
                         }
 
                         if (convertMMtoM)
@@ -432,8 +456,8 @@ namespace VirtualRobot
                 else if (dof->isTranslationalJoint())
                 {
                     // -> prismatic joint
-                    std::shared_ptr<RobotNodePrismatic> prismatic
-                        = std::dynamic_pointer_cast<RobotNodePrismatic>(dof);
+                    std::shared_ptr<RobotNodePrismatic> prismatic =
+                        std::dynamic_pointer_cast<RobotNodePrismatic>(dof);
                     THROW_VR_EXCEPTION_IF(!prismatic, "Internal error: expecting prismatic joint");
                     // todo: find a better way of handling different joint types
                     axis = prismatic->getJointTranslationDirection(coordSystem);
@@ -450,8 +474,8 @@ namespace VirtualRobot
                 }
                 else if (dof->isHemisphereJoint())
                 {
-                    RobotNodeHemispherePtr hemisphere
-                            = std::dynamic_pointer_cast<RobotNodeHemisphere>(dof);
+                    RobotNodeHemispherePtr hemisphere =
+                        std::dynamic_pointer_cast<RobotNodeHemisphere>(dof);
 
                     if (hemisphere->isSecondHemisphereJointNode())
                     {
@@ -471,7 +495,8 @@ namespace VirtualRobot
                         Matrix3x2f rotAxesCoord = globalOri * rotAxes;
                         if (coordSystem)
                         {
-                            auto coordSystemInverseGlobalRot = coordSystem->getGlobalOrientation().transpose();
+                            auto coordSystemInverseGlobalRot =
+                                coordSystem->getGlobalOrientation().transpose();
 
                             velocitiesCoord = coordSystemInverseGlobalRot * velocitiesCoord;
                             rotAxesCoord = coordSystemInverseGlobalRot * rotAxesCoord;
@@ -493,13 +518,15 @@ namespace VirtualRobot
                 }
                 else if (dof->isFourBarJoint())
                 {
-                    VR_ASSERT( coordSystem == nullptr); // NOT implemented yet ...
+                    VR_ASSERT(coordSystem == nullptr); // NOT implemented yet ...
 
-                    const RobotNodeFourBar* fourBarJoint = dynamic_cast<RobotNodeFourBar*>(dof.get());
+                    const RobotNodeFourBar* fourBarJoint =
+                        dynamic_cast<RobotNodeFourBar*>(dof.get());
 
                     const Eigen::Vector3f global_P_tcp = tcp->getGlobalPosition().cast<float>();
 
-                    const four_bar::Joint::Jacobian jacobianInBaseD = fourBarJoint->getJacobian(global_P_tcp);
+                    const four_bar::Joint::Jacobian jacobianInBaseD =
+                        fourBarJoint->getJacobian(global_P_tcp);
                     Eigen::Vector3f jacobianInBase = jacobianInBaseD.cast<float>();
 
                     axis = fourBarJoint->getJointRotationAxis(coordSystem);
@@ -508,35 +535,41 @@ namespace VirtualRobot
                     if (mode & IKSolver::Position)
                     {
 
-                        const Eigen::Matrix3f global_R_base = fourBarJoint->baseFrame(nullptr).block<3,3>(0,0);
+                        const Eigen::Matrix3f global_R_base =
+                            fourBarJoint->baseFrame(nullptr).block<3, 3>(0, 0);
 
                         Eigen::Matrix3f ref_R_base;
 
                         if (coordSystem)
                         {
-                            const Eigen::Matrix3f global_R_ref = coordSystem->getGlobalOrientation();
+                            const Eigen::Matrix3f global_R_ref =
+                                coordSystem->getGlobalOrientation();
 
                             ref_R_base = global_R_ref.transpose() * global_R_base;
 
-                            toTCP = coordSystem->toLocalCoordinateSystem(tcp->getGlobalPose()).block(0, 3, 3, 1)
-                                    - coordSystem->toLocalCoordinateSystem(dof->getGlobalPose()).block(0, 3, 3, 1);
+                            toTCP = coordSystem->toLocalCoordinateSystem(tcp->getGlobalPose())
+                                        .block(0, 3, 3, 1) -
+                                    coordSystem->toLocalCoordinateSystem(dof->getGlobalPose())
+                                        .block(0, 3, 3, 1);
                         }
                         else
                         {
                             ref_R_base = global_R_base;
 
-                            toTCP = tcp->getGlobalPose().block(0, 3, 3, 1)
-                                    - dof->getGlobalPose().block(0, 3, 3, 1);
+                            toTCP = tcp->getGlobalPose().block(0, 3, 3, 1) -
+                                    dof->getGlobalPose().block(0, 3, 3, 1);
                         }
 
-                        const Eigen::Vector3f jacobianPosInBaseFrame{jacobianInBase(0), jacobianInBase(1), 0};
-                        const Eigen::Vector3f jacobianPosInRefFrame = ref_R_base * jacobianPosInBaseFrame;
+                        const Eigen::Vector3f jacobianPosInBaseFrame{
+                            jacobianInBase(0), jacobianInBase(1), 0};
+                        const Eigen::Vector3f jacobianPosInRefFrame =
+                            ref_R_base * jacobianPosInBaseFrame;
 
-                        tmpUpdateJacobianPosition.block<3,1>(0, i) = jacobianPosInRefFrame;
+                        tmpUpdateJacobianPosition.block<3, 1>(0, i) = jacobianPosInRefFrame;
 
                         if (convertMMtoM) // positional part
                         {
-                            tmpUpdateJacobianPosition.block<3,1>(0, i) /= 1000.f;
+                            tmpUpdateJacobianPosition.block<3, 1>(0, i) /= 1000.f;
                         }
                     }
 
@@ -545,8 +578,6 @@ namespace VirtualRobot
                     {
                         tmpUpdateJacobianOrientation.block(0, i, 3, 1) = axis * jacobianInBase(2);
                     }
-
-
                 }
             }
 
@@ -556,11 +587,11 @@ namespace VirtualRobot
 
             if (diffClock > 0.0f)
             {
-                std::cout << "Jacobi Loop " << i << ": RobotNode: " << dof->getName() << ", time:" << diffClock << std::endl;
+                std::cout << "Jacobi Loop " << i << ": RobotNode: " << dof->getName()
+                          << ", time:" << diffClock << std::endl;
             }
 
 #endif
-
         }
 
 #ifdef CHECK_PERFORMANCE
@@ -616,18 +647,21 @@ namespace VirtualRobot
         }*/
     }
 
-
-    Eigen::MatrixXf DifferentialIK::getPseudoInverseJacobianMatrix()
+    Eigen::MatrixXf
+    DifferentialIK::getPseudoInverseJacobianMatrix()
     {
         return getPseudoInverseJacobianMatrix(SceneObjectPtr());
     }
 
-    Eigen::MatrixXf DifferentialIK::getPseudoInverseJacobianMatrix(IKSolver::CartesianSelection mode)
+    Eigen::MatrixXf
+    DifferentialIK::getPseudoInverseJacobianMatrix(IKSolver::CartesianSelection mode)
     {
         return getPseudoInverseJacobianMatrix(SceneObjectPtr(), mode);
     }
 
-    Eigen::MatrixXf DifferentialIK::getPseudoInverseJacobianMatrix(SceneObjectPtr tcp, IKSolver::CartesianSelection mode)
+    Eigen::MatrixXf
+    DifferentialIK::getPseudoInverseJacobianMatrix(SceneObjectPtr tcp,
+                                                   IKSolver::CartesianSelection mode)
     {
 #ifdef CHECK_PERFORMANCE
         clock_t startT = clock();
@@ -641,17 +675,20 @@ namespace VirtualRobot
         clock_t endT = clock();
         float diffClock1 = (float)(((float)(startT2 - startT) / (float)CLOCKS_PER_SEC) * 1000.0f);
         float diffClock2 = (float)(((float)(endT - startT2) / (float)CLOCKS_PER_SEC) * 1000.0f);
-        std::cout << "getPseudoInverseJacobianMatrix time1:" << diffClock1 << ", time2: " << diffClock2 << std::endl;
+        std::cout << "getPseudoInverseJacobianMatrix time1:" << diffClock1
+                  << ", time2: " << diffClock2 << std::endl;
 #endif
         return res;
     }
 
-    void DifferentialIK::setNRows()
+    void
+    DifferentialIK::setNRows()
     {
         initialize();
     }
 
-    void DifferentialIK::initialize()
+    void
+    DifferentialIK::initialize()
     {
         this->nRows = 0;
         nDoF = nodes.size();
@@ -687,7 +724,6 @@ namespace VirtualRobot
 
             Eigen::MatrixXf jac(partSize, nDoF);
             partJacobians[tcp] = jac;
-
         }
 
         currentError.resize(nRows);
@@ -702,7 +738,8 @@ namespace VirtualRobot
         initialized = true;
     }
 
-    void DifferentialIK::print()
+    void
+    DifferentialIK::print()
     {
         JacobiProvider::print();
 
@@ -748,7 +785,8 @@ namespace VirtualRobot
                 std::cout << "unknown" << std::endl;
             }
 
-            std::cout << "** tolerances pos: " << this->tolerancePosition[tcp] << ", rot:" << this->toleranceRotation[tcp] << std::endl;
+            std::cout << "** tolerances pos: " << this->tolerancePosition[tcp]
+                      << ", rot:" << this->toleranceRotation[tcp] << std::endl;
             std::cout << "** Nodes:";
 
             // Iterate over all degrees of freedom
@@ -767,34 +805,47 @@ namespace VirtualRobot
         }
     }
 
-    void DifferentialIK::setGoal(const Eigen::Vector3f& goal, SceneObjectPtr tcp, IKSolver::CartesianSelection mode, float tolerancePosition, float toleranceRotation, bool performInitialization)
+    void
+    DifferentialIK::setGoal(const Eigen::Vector3f& goal,
+                            SceneObjectPtr tcp,
+                            IKSolver::CartesianSelection mode,
+                            float tolerancePosition,
+                            float toleranceRotation,
+                            bool performInitialization)
     {
         Eigen::Matrix4f trafo;
         trafo.setIdentity();
         trafo.block(0, 3, 3, 1) = goal;
-        this->setGoal(trafo, tcp, mode, tolerancePosition, toleranceRotation, performInitialization);
+        this->setGoal(
+            trafo, tcp, mode, tolerancePosition, toleranceRotation, performInitialization);
     }
 
-    RobotNodePtr DifferentialIK::getDefaultTCP()
+    RobotNodePtr
+    DifferentialIK::getDefaultTCP()
     {
         return rns->getTCP();
     }
 
-    Eigen::VectorXf DifferentialIK::getDeltaToGoal(SceneObjectPtr tcp)
+    Eigen::VectorXf
+    DifferentialIK::getDeltaToGoal(SceneObjectPtr tcp)
     {
         Eigen::VectorXf result(6);
         updateDeltaToGoal(result, tcp);
         return result;
     }
 
-    Eigen::VectorXf DifferentialIK::getDelta(const Eigen::Matrix4f& current, const Eigen::Matrix4f& goal, IKSolver::CartesianSelection mode)
+    Eigen::VectorXf
+    DifferentialIK::getDelta(const Eigen::Matrix4f& current,
+                             const Eigen::Matrix4f& goal,
+                             IKSolver::CartesianSelection mode)
     {
         Eigen::VectorXf result(6);
         updateDelta(result, current, goal, mode);
         return result;
     }
 
-    void DifferentialIK::updateDeltaToGoal(Eigen::VectorXf& delta, SceneObjectPtr tcp)
+    void
+    DifferentialIK::updateDeltaToGoal(Eigen::VectorXf& delta, SceneObjectPtr tcp)
     {
         if (!tcp)
         {
@@ -805,7 +856,11 @@ namespace VirtualRobot
         updateDelta(delta, tcp->getGlobalPose(), this->targets[tcp], this->modes[tcp]);
     }
 
-    void DifferentialIK::updateDelta(Eigen::VectorXf& delta, const Eigen::Matrix4f& current, const Eigen::Matrix4f& goal, IKSolver::CartesianSelection mode)
+    void
+    DifferentialIK::updateDelta(Eigen::VectorXf& delta,
+                                const Eigen::Matrix4f& current,
+                                const Eigen::Matrix4f& goal,
+                                IKSolver::CartesianSelection mode)
     {
 #ifdef ALLOW_RESIZE
 
@@ -846,7 +901,8 @@ namespace VirtualRobot
         }
     }
 
-    Eigen::VectorXf DifferentialIK::computeStep(float stepSize)
+    Eigen::VectorXf
+    DifferentialIK::computeStep(float stepSize)
     {
         VR_ASSERT(initialized);
 
@@ -874,11 +930,12 @@ namespace VirtualRobot
         return tmpComputeStepTheta;
     }
 
-    float DifferentialIK::getErrorPosition(SceneObjectPtr tcp)
+    float
+    DifferentialIK::getErrorPosition(SceneObjectPtr tcp)
     {
         if (modes[tcp] == IKSolver::Orientation)
         {
-            return 0.0f;    // ignoring position
+            return 0.0f; // ignoring position
         }
 
         if (!tcp)
@@ -886,7 +943,8 @@ namespace VirtualRobot
             tcp = getDefaultTCP();
         }
 
-        Eigen::Vector3f position = targets[tcp].block(0, 3, 3, 1) - tcp->getGlobalPose().block(0, 3, 3, 1);
+        Eigen::Vector3f position =
+            targets[tcp].block(0, 3, 3, 1) - tcp->getGlobalPose().block(0, 3, 3, 1);
         float result = 0.0f;
 
         if (modes[tcp] & IKSolver::X)
@@ -907,11 +965,12 @@ namespace VirtualRobot
         return sqrtf(result);
     }
 
-    float DifferentialIK::getErrorRotation(SceneObjectPtr tcp)
+    float
+    DifferentialIK::getErrorRotation(SceneObjectPtr tcp)
     {
         if (!(modes[tcp] & IKSolver::Orientation))
         {
-            return 0.0f;    // no error in this dimensions
+            return 0.0f; // no error in this dimensions
         }
 
         if (!tcp)
@@ -924,7 +983,8 @@ namespace VirtualRobot
         return aa.angle();
     }
 
-    float DifferentialIK::getMeanErrorPosition()
+    float
+    DifferentialIK::getMeanErrorPosition()
     {
         if (tcp_set.size() == 0)
         {
@@ -942,7 +1002,8 @@ namespace VirtualRobot
         return res;
     }
 
-    bool DifferentialIK::checkTolerances()
+    bool
+    DifferentialIK::checkTolerances()
     {
         bool result = true;
 
@@ -955,10 +1016,12 @@ namespace VirtualRobot
 
             if (verbose)
             {
-                VR_INFO << "TCP " << tcp->getName() << ", errPos:" << currentErrorPos << ", errRot:" << currentErrorRot << ", maxErrPos:" << maxErrorPos << ", maxErrorRot:" << maxErrorRot << std::endl;
+                VR_INFO << "TCP " << tcp->getName() << ", errPos:" << currentErrorPos
+                        << ", errRot:" << currentErrorRot << ", maxErrPos:" << maxErrorPos
+                        << ", maxErrorRot:" << maxErrorRot << std::endl;
             }
 
-            if (currentErrorPos > maxErrorPos  || currentErrorRot > maxErrorRot)
+            if (currentErrorPos > maxErrorPos || currentErrorRot > maxErrorRot)
             {
                 result = false;
                 //break;
@@ -968,12 +1031,14 @@ namespace VirtualRobot
         return result;
     }
 
-    void DifferentialIK::checkImprovements(bool enable)
+    void
+    DifferentialIK::checkImprovements(bool enable)
     {
         checkImprovement = enable;
     }
 
-    bool DifferentialIK::computeSteps(float stepSize, float minumChange, int maxNStep)
+    bool
+    DifferentialIK::computeSteps(float stepSize, float minumChange, int maxNStep)
     {
         VR_ASSERT(rns);
         VR_ASSERT(nodes.size() == rns->getSize());
@@ -1021,7 +1086,8 @@ namespace VirtualRobot
             {
                 if (verbose)
                 {
-                    VR_INFO << "Could not improve result any more (dTheta.norm()=" << d << "), loop:" << step << std::endl;
+                    VR_INFO << "Could not improve result any more (dTheta.norm()=" << d
+                            << "), loop:" << step << std::endl;
                 }
 
                 robot->setJointValues(rns, jvBest);
@@ -1034,7 +1100,9 @@ namespace VirtualRobot
             {
                 if (verbose)
                 {
-                    VR_INFO << "Could not improve result any more (current position error=" << posDist << ", last loop's error:" << lastDist << "), loop:" << step << std::endl;
+                    VR_INFO << "Could not improve result any more (current position error="
+                            << posDist << ", last loop's error:" << lastDist << "), loop:" << step
+                            << std::endl;
                 }
 
                 robot->setJointValues(rns, jvBest);
@@ -1057,22 +1125,28 @@ namespace VirtualRobot
         return false;
     }
 
-    bool DifferentialIK::solveIK(float stepSize /*= 0.2f*/, float minChange /*= 0.0f */, int maxSteps /*= 50*/)
+    bool
+    DifferentialIK::solveIK(float stepSize /*= 0.2f*/,
+                            float minChange /*= 0.0f */,
+                            int maxSteps /*= 50*/)
     {
         return computeSteps(stepSize, minChange, maxSteps);
     }
 
-    void DifferentialIK::convertModelScalingtoM(bool enable)
+    void
+    DifferentialIK::convertModelScalingtoM(bool enable)
     {
         convertMMtoM = enable;
     }
 
-    void DifferentialIK::setVerbose(bool enable)
+    void
+    DifferentialIK::setVerbose(bool enable)
     {
         verbose = enable;
     }
 
-    void DifferentialIK::setMaxPositionStep(float s)
+    void
+    DifferentialIK::setMaxPositionStep(float s)
     {
         positionMaxStep = s;
     }

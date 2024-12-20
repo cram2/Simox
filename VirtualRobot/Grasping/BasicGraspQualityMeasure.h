@@ -22,11 +22,13 @@
 */
 #pragma once
 
-#include "../VirtualRobot.h"
+#include <vector>
+
+#include <Eigen/Core>
+
 #include "../EndEffector/EndEffector.h"
 #include "../MathTools.h"
-#include <vector>
-#include <Eigen/Core>
+#include "../VirtualRobot.h"
 
 namespace VirtualRobot
 {
@@ -52,8 +54,10 @@ namespace VirtualRobot
             the contact points are normalized by subtracting the COM
             the contact normals are normalize to unit length
         */
-        virtual void setContactPoints(const VirtualRobot::EndEffector::ContactInfoVector& contactPoints);
-        virtual void setContactPoints(const std::vector<VirtualRobot::MathTools::ContactPoint>& contactPoints6d);
+        virtual void
+        setContactPoints(const VirtualRobot::EndEffector::ContactInfoVector& contactPoints);
+        virtual void
+        setContactPoints(const std::vector<VirtualRobot::MathTools::ContactPoint>& contactPoints6d);
 
         //! Returns calculated grasp quality
         virtual float getGraspQuality();
@@ -76,8 +80,6 @@ namespace VirtualRobot
         virtual bool isValid();
 
     protected:
-
-
         // Object relevant parameters
         Eigen::Vector3f centerOfModel;
         float objectLength;
@@ -88,10 +90,9 @@ namespace VirtualRobot
         VirtualRobot::SceneObjectPtr object;
 
         // object properties
-        std::vector<VirtualRobot::MathTools::ContactPoint> contactPoints;  // in MM
+        std::vector<VirtualRobot::MathTools::ContactPoint> contactPoints; // in MM
         std::vector<VirtualRobot::MathTools::ContactPoint> contactPointsM; // converted to M
         bool verbose;
     };
 
-} // namespace
-
+} // namespace VirtualRobot

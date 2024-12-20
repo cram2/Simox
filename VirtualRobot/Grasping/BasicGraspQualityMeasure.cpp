@@ -4,10 +4,13 @@
 * @copyright  2012 Nikolaus Vahrenkamp
 */
 #include "BasicGraspQualityMeasure.h"
-#include <VirtualRobot/VirtualRobotException.h>
-#include <VirtualRobot/SceneObject.h>
+
 #include <VirtualRobot/CollisionDetection/CollisionModel.h>
+#include <VirtualRobot/SceneObject.h>
+#include <VirtualRobot/VirtualRobotException.h>
 #include <VirtualRobot/Visualization/TriMeshModel.h>
+
+#include "Logging.h"
 
 using namespace std;
 using namespace VirtualRobot;
@@ -16,12 +19,13 @@ namespace VirtualRobot
 {
 
 
-    BasicGraspQualityMeasure::BasicGraspQualityMeasure(VirtualRobot::SceneObjectPtr object)
-        : object(object)
+    BasicGraspQualityMeasure::BasicGraspQualityMeasure(VirtualRobot::SceneObjectPtr object) :
+        object(object)
     {
         THROW_VR_EXCEPTION_IF(!object, "Need an object");
         THROW_VR_EXCEPTION_IF(!object->getCollisionModel(), "Need an object with collision model");
-        THROW_VR_EXCEPTION_IF(!object->getCollisionModel()->getTriMeshModel(), "Need an object with trimeshmodel");
+        THROW_VR_EXCEPTION_IF(!object->getCollisionModel()->getTriMeshModel(),
+                              "Need an object with trimeshmodel");
 
         //Member variable representing Grasp Quality ranging from 1 to 0
         graspQuality = 0.0;
@@ -49,7 +53,8 @@ namespace VirtualRobot
         maxContacts = 5;
     }
 
-    bool BasicGraspQualityMeasure::calculateGraspQuality()
+    bool
+    BasicGraspQualityMeasure::calculateGraspQuality()
     {
         graspQuality = static_cast<float>(contactPoints.size()) / static_cast<float>(maxContacts);
 
@@ -61,22 +66,25 @@ namespace VirtualRobot
         return true;
     }
 
-    float BasicGraspQualityMeasure::getGraspQuality()
+    float
+    BasicGraspQualityMeasure::getGraspQuality()
     {
         calculateGraspQuality();
         return graspQuality;
     }
 
-    BasicGraspQualityMeasure::~BasicGraspQualityMeasure()
-    = default;
+    BasicGraspQualityMeasure::~BasicGraspQualityMeasure() = default;
 
-    void BasicGraspQualityMeasure::setContactPoints(const std::vector<VirtualRobot::MathTools::ContactPoint>& /*contactPoints6d*/)
+    void
+    BasicGraspQualityMeasure::setContactPoints(
+        const std::vector<VirtualRobot::MathTools::ContactPoint>& /*contactPoints6d*/)
     {
         this->contactPoints.clear();
         this->contactPointsM.clear();
         std::vector<MathTools::ContactPoint>::const_iterator objPointsIter;
 
-        for (objPointsIter = contactPoints.begin(); objPointsIter != contactPoints.end(); objPointsIter++)
+        for (objPointsIter = contactPoints.begin(); objPointsIter != contactPoints.end();
+             objPointsIter++)
         {
             MathTools::ContactPoint point = (*objPointsIter);
             point.p -= centerOfModel;
@@ -94,7 +102,8 @@ namespace VirtualRobot
         }
     }
 
-    void BasicGraspQualityMeasure::setContactPoints(const EndEffector::ContactInfoVector& contactPoints)
+    void
+    BasicGraspQualityMeasure::setContactPoints(const EndEffector::ContactInfoVector& contactPoints)
     {
         this->contactPoints.clear();
         this->contactPointsM.clear();
@@ -114,7 +123,8 @@ namespace VirtualRobot
             point.n.normalize();
 
             // store force as projected component of approachDirection
-            const Eigen::Vector3f nGlob = objPoint.contactPointObstacleGlobal - objPoint.contactPointFingerGlobal;
+            const Eigen::Vector3f nGlob =
+                objPoint.contactPointObstacleGlobal - objPoint.contactPointFingerGlobal;
 
             if (nGlob.norm() > 1e-10f)
             {
@@ -134,8 +144,8 @@ namespace VirtualRobot
         }
     }
 
-
-    MathTools::ContactPoint BasicGraspQualityMeasure::getContactPointsCenter()
+    MathTools::ContactPoint
+    BasicGraspQualityMeasure::getContactPointsCenter()
     {
         MathTools::ContactPoint p;
         p.p.setZero();
@@ -146,11 +156,10 @@ namespace VirtualRobot
             return p;
         }
 
-        for (auto & contactPoint : contactPoints)
+        for (auto& contactPoint : contactPoints)
         {
             p.p += contactPoint.p;
             p.n += contactPoint.n;
-
         }
 
         p.p /= static_cast<float>(contactPoints.size());
@@ -159,32 +168,36 @@ namespace VirtualRobot
         return p;
     }
 
-    void BasicGraspQualityMeasure::setVerbose(bool enable)
+    void
+    BasicGraspQualityMeasure::setVerbose(bool enable)
     {
         verbose = enable;
     }
 
-    std::string BasicGraspQualityMeasure::getName()
+    std::string
+    BasicGraspQualityMeasure::getName()
     {
         std::string sName("BasicGraspQualityMeasure");
         return sName;
     }
 
-    Eigen::Vector3f BasicGraspQualityMeasure::getCoM()
+    Eigen::Vector3f
+    BasicGraspQualityMeasure::getCoM()
     {
         return centerOfModel;
     }
 
-    VirtualRobot::SceneObjectPtr BasicGraspQualityMeasure::getObject()
+    VirtualRobot::SceneObjectPtr
+    BasicGraspQualityMeasure::getObject()
     {
         return object;
     }
 
-    bool BasicGraspQualityMeasure::isValid()
+    bool
+    BasicGraspQualityMeasure::isValid()
     {
         return (contactPoints.size() >= 2);
-
     }
 
 
-} // namespace
+} // namespace VirtualRobot

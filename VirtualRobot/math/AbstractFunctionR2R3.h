@@ -21,20 +21,20 @@
 
 #pragma once
 
-#include "../VirtualRobot.h"
 #include "SimpleAbstractFunctionR2R3.h"
-
-
 
 namespace math
 {
 
 
-    class VIRTUAL_ROBOT_IMPORT_EXPORT AbstractFunctionR2R3:
-        public SimpleAbstractFunctionR2R3
+    class VIRTUAL_ROBOT_IMPORT_EXPORT AbstractFunctionR2R3 : public SimpleAbstractFunctionR2R3
     {
     public:
-        enum ProjectionType { SimpleProjection, FindClosestPointType };
+        enum ProjectionType
+        {
+            SimpleProjection,
+            FindClosestPointType
+        };
 
         AbstractFunctionR2R3();
 
@@ -51,9 +51,9 @@ namespace math
         Eigen::Vector3f GetNormal(Eigen::Vector2f uv);
         Eigen::Vector3f GetDdu(Eigen::Vector2f uv);
         Eigen::Vector3f GetDdv(Eigen::Vector2f uv);
-        Plane GetContactPlane(Eigen::Vector2f uv) ;
-        Contact GetContact(Eigen::Vector2f uv) ;
-        Eigen::Vector2f GetUVFromPos(Eigen::Vector3f pos) ;
+        Plane GetContactPlane(Eigen::Vector2f uv);
+        Contact GetContact(Eigen::Vector2f uv);
+        Eigen::Vector2f GetUVFromPos(Eigen::Vector3f pos);
         Eigen::Vector3f GetVector(Eigen::Vector2f pos, Eigen::Vector2f dir);
 
         float GetSquareDistance(Eigen::Vector3f pos, ProjectionType projection);
@@ -69,5 +69,4 @@ namespace math
     private:
         // void Step(Eigen::Vector3f pos, float u0, float v0, float& u1,  float& v1);
     };
-}
-
+} // namespace math

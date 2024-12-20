@@ -1,32 +1,36 @@
 
 #include "showSceneWindow.h"
-#include "VirtualRobot/EndEffector/EndEffector.h"
-#include "VirtualRobot/Workspace/Reachability.h"
-#include "VirtualRobot/ManipulationObject.h"
-#include "VirtualRobot/XML/ObjectIO.h"
-#include "VirtualRobot/Grasping/GraspSet.h"
-#include "VirtualRobot/Visualization/CoinVisualization/CoinVisualizationFactory.h"
+
+#include <cmath>
+#include <ctime>
+#include <iostream>
+#include <sstream>
+#include <vector>
 
 #include <QFileDialog>
+
 #include <Eigen/Geometry>
 
-#include <ctime>
-#include <vector>
-#include <iostream>
-#include <cmath>
-
 #include "Inventor/actions/SoLineHighlightRenderAction.h"
-#include <Inventor/nodes/SoShapeHints.h>
+#include "VirtualRobot/EndEffector/EndEffector.h"
+#include "VirtualRobot/Grasping/Grasp.h"
+#include "VirtualRobot/Grasping/GraspSet.h"
+#include "VirtualRobot/Logging.h"
+#include "VirtualRobot/ManipulationObject.h"
+#include "VirtualRobot/Scene.h"
+#include "VirtualRobot/Trajectory.h"
+#include "VirtualRobot/Visualization/CoinVisualization/CoinVisualizationFactory.h"
+#include "VirtualRobot/Workspace/Reachability.h"
+#include "VirtualRobot/XML/ObjectIO.h"
 #include <Inventor/nodes/SoLightModel.h>
-
-#include <sstream>
+#include <Inventor/nodes/SoMatrixTransform.h>
+#include <Inventor/nodes/SoShapeHints.h>
 using namespace std;
 using namespace VirtualRobot;
 
 float TIMER_MS = 30.0f;
 
-showSceneWindow::showSceneWindow(std::string& sSceneFile)
-    : QMainWindow(nullptr)
+showSceneWindow::showSceneWindow(std::string& sSceneFile) : QMainWindow(nullptr)
 {
     VR_INFO << " start " << std::endl;
 
@@ -47,15 +51,14 @@ showSceneWindow::showSceneWindow(std::string& sSceneFile)
     viewer->viewAll();
 }
 
-
 showSceneWindow::~showSceneWindow()
 {
     sceneSep->unref();
     delete viewer;
 }
 
-
-void showSceneWindow::setupUI()
+void
+showSceneWindow::setupUI()
 {
     UI.setupUi(this);
     viewer = new SoQtExaminerViewer(UI.frameViewer, "", TRUE, SoQtExaminerViewer::BUILD_POPUP);
@@ -97,10 +100,10 @@ void showSceneWindow::setupUI()
     connect(UI.comboBoxRobotNodeSet, SIGNAL(activated(int)), this, SLOT(selectRNS(int)));
     connect(UI.comboBoxJoint, SIGNAL(activated(int)), this, SLOT(selectJoint(int)));
     connect(UI.horizontalSliderPos, SIGNAL(valueChanged(int)), this, SLOT(jointValueChanged(int)));*/
-
 }
 
-QString showSceneWindow::formatString(const char* s, float f)
+QString
+showSceneWindow::formatString(const char* s, float f)
 {
     QString str1(s);
 
@@ -130,33 +133,34 @@ QString showSceneWindow::formatString(const char* s, float f)
     return str1;
 }
 
-
-void showSceneWindow::resetSceneryAll()
+void
+showSceneWindow::resetSceneryAll()
 {
     updateGui();
     buildVisu();
 }
 
-
-
-void showSceneWindow::closeEvent(QCloseEvent* event)
+void
+showSceneWindow::closeEvent(QCloseEvent* event)
 {
     quit();
     QMainWindow::closeEvent(event);
 }
 
-void showSceneWindow::colModel()
+void
+showSceneWindow::colModel()
 {
     buildVisu();
 }
 
-
-void showSceneWindow::showRoot()
+void
+showSceneWindow::showRoot()
 {
     buildVisu();
 }
 
-void showSceneWindow::buildVisu()
+void
+showSceneWindow::buildVisu()
 {
     if (!scene)
     {
@@ -171,7 +175,7 @@ void showSceneWindow::buildVisu()
         visuType = SceneObject::Collision;
     }
 
-    visualization = scene->getVisualization<CoinVisualization>(visuType);
+    visualization = scene->getVisualization(visuType);
     SoNode* visualisationNode = nullptr;
 
     if (visualization)
@@ -189,15 +193,15 @@ void showSceneWindow::buildVisu()
     if (UI.checkBoxRoot->isChecked())
     {
         std::string rootText = "ROOT";
-        coordVisu->addChild(CoinVisualizationFactory::CreateCoordSystemVisualization(2.0f, &rootText));
+        coordVisu->addChild(
+            CoinVisualizationFactory::CreateCoordSystemVisualization(2.0f, &rootText));
     }
 
     updateGraspVisu();
-
-
 }
 
-void showSceneWindow::updateGraspVisu()
+void
+showSceneWindow::updateGraspVisu()
 {
     // build grasp visu
     graspVisu->removeAllChildren();
@@ -219,23 +223,24 @@ void showSceneWindow::updateGraspVisu()
     }
 }
 
-int showSceneWindow::main()
+int
+showSceneWindow::main()
 {
     SoQt::show(this);
     SoQt::mainLoop();
     return 0;
 }
 
-
-void showSceneWindow::quit()
+void
+showSceneWindow::quit()
 {
     std::cout << "showSceneWindow: Closing" << std::endl;
     this->close();
     SoQt::exitMainLoop();
 }
 
-
-void showSceneWindow::sliderMoved(int pos)
+void
+showSceneWindow::sliderMoved(int pos)
 {
     if (!currentTrajectory)
     {
@@ -250,15 +255,17 @@ void showSceneWindow::sliderMoved(int pos)
     }
 }
 
-
-void showSceneWindow::selectScene()
+void
+showSceneWindow::selectScene()
 {
-    QString fi = QFileDialog::getOpenFileName(this, tr("Open Scene File"), QString(), tr("XML Files (*.xml)"));
+    QString fi = QFileDialog::getOpenFileName(
+        this, tr("Open Scene File"), QString(), tr("XML Files (*.xml)"));
     sceneFile = std::string(fi.toLatin1());
     loadScene();
 }
 
-void showSceneWindow::loadScene()
+void
+showSceneWindow::loadScene()
 {
     sceneVisuSep->removeAllChildren();
     currentEEF.reset();
@@ -299,7 +306,8 @@ void showSceneWindow::loadScene()
         }
         catch (VirtualRobotException& e)
         {
-            std::cout << "Could not find valid manipulation object in file " << sceneFile << std::endl;
+            std::cout << "Could not find valid manipulation object in file " << sceneFile
+                      << std::endl;
         }
     }
 
@@ -383,7 +391,8 @@ void showSceneWindow::loadScene()
     viewer->viewAll();
 }
 
-void showSceneWindow::selectRobot(int nr)
+void
+showSceneWindow::selectRobot(int nr)
 {
     UI.comboBoxRobotConfig->clear();
     UI.comboBoxTrajectory->clear();
@@ -405,7 +414,7 @@ void showSceneWindow::selectRobot(int nr)
 
     std::vector<VirtualRobot::RobotConfigPtr> roc = scene->getRobotConfigs(currentRobot);
 
-    for (auto & i : roc)
+    for (auto& i : roc)
     {
         QString rn = i->getName().c_str();
         UI.comboBoxRobotConfig->addItem(rn);
@@ -418,7 +427,7 @@ void showSceneWindow::selectRobot(int nr)
 
     std::vector<VirtualRobot::TrajectoryPtr> tr = scene->getTrajectories(currentRobot->getName());
 
-    for (auto & i : tr)
+    for (auto& i : tr)
     {
         QString rn = i->getName().c_str();
         UI.comboBoxTrajectory->addItem(rn);
@@ -432,7 +441,7 @@ void showSceneWindow::selectRobot(int nr)
 
     std::vector<VirtualRobot::EndEffectorPtr> eefs = currentRobot->getEndEffectors();
 
-    for (auto & eef : eefs)
+    for (auto& eef : eefs)
     {
         QString rn = eef->getName().c_str();
         UI.comboBoxEEF->addItem(rn);
@@ -445,7 +454,8 @@ void showSceneWindow::selectRobot(int nr)
     selectTrajectory(0);
 }
 
-void showSceneWindow::selectRobotConfig(int nr)
+void
+showSceneWindow::selectRobotConfig(int nr)
 {
     if (nr < 0 || nr >= UI.comboBoxRobotConfig->count() || !scene || !currentRobot)
     {
@@ -463,7 +473,8 @@ void showSceneWindow::selectRobotConfig(int nr)
     currentRobot->setJointValues(rc);
 }
 
-void showSceneWindow::selectTrajectory(int nr)
+void
+showSceneWindow::selectTrajectory(int nr)
 {
     UI.horizontalSlider->setSliderPosition(0);
 
@@ -480,7 +491,8 @@ void showSceneWindow::selectTrajectory(int nr)
     sliderMoved(0);
 }
 
-void showSceneWindow::selectEEF(int nr)
+void
+showSceneWindow::selectEEF(int nr)
 {
     if (nr < 0 || nr >= UI.comboBoxEEF->count() || !currentRobot)
     {
@@ -493,7 +505,8 @@ void showSceneWindow::selectEEF(int nr)
     updateGrasps();
 }
 
-void showSceneWindow::selectObject(int nr)
+void
+showSceneWindow::selectObject(int nr)
 {
     if (!scene || nr < 0 || nr >= UI.comboBoxObject->count())
     {
@@ -512,7 +525,8 @@ void showSceneWindow::selectObject(int nr)
     updateGrasps();
 }
 
-void showSceneWindow::selectGrasp(int nr)
+void
+showSceneWindow::selectGrasp(int nr)
 {
     currentGrasp.reset();
 
@@ -531,7 +545,8 @@ void showSceneWindow::selectGrasp(int nr)
     updateGraspVisu();
 }
 
-void showSceneWindow::updateGui()
+void
+showSceneWindow::updateGui()
 {
     UI.comboBoxObject->clear();
     UI.comboBoxRobot->clear();
@@ -549,7 +564,7 @@ void showSceneWindow::updateGui()
 
     std::vector<VirtualRobot::RobotPtr> robs = scene->getRobots();
 
-    for (auto & rob : robs)
+    for (auto& rob : robs)
     {
         QString rn = rob->getName().c_str();
         UI.comboBoxRobot->addItem(rn);
@@ -557,7 +572,7 @@ void showSceneWindow::updateGui()
 
     std::vector<VirtualRobot::ManipulationObjectPtr> mos = scene->getManipulationObjects();
 
-    for (auto & mo : mos)
+    for (auto& mo : mos)
     {
         QString mn = mo->getName().c_str();
         UI.comboBoxObject->addItem(mn);
@@ -565,7 +580,7 @@ void showSceneWindow::updateGui()
 
     std::vector<VirtualRobot::ObstaclePtr> obs = scene->getObstacles();
 
-    for (auto & ob : obs)
+    for (auto& ob : obs)
     {
         QString on = ob->getName().c_str();
         UI.comboBoxObject->addItem(on);
@@ -584,13 +599,15 @@ void showSceneWindow::updateGui()
     }
 }
 
-void showSceneWindow::updateGrasps()
+void
+showSceneWindow::updateGrasps()
 {
     currentGraspSet.reset();
     UI.comboBoxGrasp->clear();
     QString t("-");
     UI.comboBoxGrasp->addItem(t);
-    VirtualRobot::ManipulationObjectPtr mo = std::dynamic_pointer_cast<ManipulationObject>(currentObject);
+    VirtualRobot::ManipulationObjectPtr mo =
+        std::dynamic_pointer_cast<ManipulationObject>(currentObject);
 
     if (mo && currentEEF)
     {
@@ -608,7 +625,8 @@ void showSceneWindow::updateGrasps()
     selectGrasp(0);
 }
 
-void showSceneWindow::closeHand()
+void
+showSceneWindow::closeHand()
 {
     if (!currentEEF)
     {
@@ -634,7 +652,8 @@ void showSceneWindow::closeHand()
     currentEEF->closeActors(so);
 }
 
-void showSceneWindow::openHand()
+void
+showSceneWindow::openHand()
 {
     if (!currentEEF)
     {
@@ -643,4 +662,3 @@ void showSceneWindow::openHand()
 
     currentEEF->openActors();
 }
-

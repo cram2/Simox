@@ -1,21 +1,26 @@
 #include "Manipulability.h"
-#include <VirtualRobot/VirtualRobotException.h>
-#include <VirtualRobot/Robot.h>
-#include <VirtualRobot/RobotNodeSet.h>
+
+#include <algorithm>
+#include <cfloat>
+#include <climits>
+#include <cmath>
+#include <fstream>
+#include <thread>
+
 #include <VirtualRobot/CollisionDetection/CollisionChecker.h>
-#include <VirtualRobot/ManipulationObject.h>
 #include <VirtualRobot/Grasping/Grasp.h>
 #include <VirtualRobot/Grasping/GraspSet.h>
 #include <VirtualRobot/IK/PoseQualityExtendedManipulability.h>
-#include <VirtualRobot/XML/RobotIO.h>
+#include <VirtualRobot/ManipulationObject.h>
 #include <VirtualRobot/Random.h>
+#include <VirtualRobot/Robot.h>
+#include <VirtualRobot/RobotNodeSet.h>
+#include <VirtualRobot/VirtualRobotException.h>
+#include <VirtualRobot/XML/RobotIO.h>
 
-#include <fstream>
-#include <cmath>
-#include <cfloat>
-#include <climits>
-#include <algorithm>
-#include <thread>
+#include "VirtualRobot/Logging.h"
+#include "WorkspaceData.h"
+#include "XML/FileIO.h"
 
 // if enabled, not the global manipulability is considered, but the manipulability in terms of moving upwards
 //#define MANIPULABILITY_USE_UPRIGHT_DIRECTION
@@ -36,14 +41,17 @@ namespace VirtualRobot
         selfDistBeta = 1.0f;
     }
 
-
-
-    void Manipulability::addPose(const Eigen::Matrix4f& pose, PoseQualityMeasurementPtr qualMeasure)
+    void
+    Manipulability::addPose(const Eigen::Matrix4f& pose, PoseQualityMeasurementPtr qualMeasure)
     {
         addPose(pose, qualMeasure, selfDistStatic, selfDistDynamic);
     }
 
-    void Manipulability::addPose(const Eigen::Matrix4f& pose, PoseQualityMeasurementPtr qualMeasure, RobotNodeSetPtr selfDistSt, RobotNodeSetPtr selfDistDyn)
+    void
+    Manipulability::addPose(const Eigen::Matrix4f& pose,
+                            PoseQualityMeasurementPtr qualMeasure,
+                            RobotNodeSetPtr selfDistSt,
+                            RobotNodeSetPtr selfDistDyn)
     {
         Eigen::Matrix4f p = pose;
         toLocal(p);
@@ -79,7 +87,8 @@ namespace VirtualRobot
             {
                 if (mSc > 1.05)
                 {
-                    VR_WARNING << "Manipulability is larger than max value. Current Manip:" << m << ", maxManip:" << maxManip << ", percent:" << mSc << std::endl;
+                    VR_WARNING << "Manipulability is larger than max value. Current Manip:" << m
+                               << ", maxManip:" << maxManip << ", percent:" << mSc << std::endl;
                 }
 
                 mSc = 1.0f;
@@ -111,12 +120,16 @@ namespace VirtualRobot
         buildUpLoops++;
     }
 
-    void Manipulability::addPose(const Eigen::Matrix4f& pose)
+    void
+    Manipulability::addPose(const Eigen::Matrix4f& pose)
     {
         addPose(pose, measure);
     }
 
-    float Manipulability::getCurrentManipulability(PoseQualityMeasurementPtr qualMeasure, RobotNodeSetPtr selfDistSt, RobotNodeSetPtr selfDistDyn)
+    float
+    Manipulability::getCurrentManipulability(PoseQualityMeasurementPtr qualMeasure,
+                                             RobotNodeSetPtr selfDistSt,
+                                             RobotNodeSetPtr selfDistDyn)
     {
         if (!qualMeasure)
         {
@@ -134,7 +147,8 @@ namespace VirtualRobot
             int id2;
             Eigen::Vector3f p1;
             Eigen::Vector3f p2;
-            /*float d =*/ selfDistStatic->getCollisionChecker()->calculateDistance(selfDistStatic, selfDistDynamic, p1, p2, &id1, &id2);
+            /*float d =*/selfDistStatic->getCollisionChecker()->calculateDistance(
+                selfDistStatic, selfDistDynamic, p1, p2, &id1, &id2);
             //cout << "#### dist:" << d << ", ";
             Eigen::Matrix4f obstDistPos1 = Eigen::Matrix4f::Identity();
             Eigen::Matrix4f obstDistPos2 = Eigen::Matrix4f::Identity();
@@ -147,7 +161,6 @@ namespace VirtualRobot
             Eigen::Vector3f minDistVector = p1_tcp.block(0, 3, 3, 1) - p2_tcp.block(0, 3, 3, 1);
 
             qualMeasure->setObstacleDistanceVector(minDistVector);
-
         }
 
 #ifdef MANIPULABILITY_USE_UPRIGHT_DIRECTION
@@ -160,7 +173,8 @@ namespace VirtualRobot
         return qualMeasure->getPoseQuality();
     }
 
-    bool Manipulability::customStringRead(std::ifstream& file, std::string& res)
+    bool
+    Manipulability::customStringRead(std::ifstream& file, std::string& res)
     {
         int length;
         file.read((char*)&length, sizeof(int));
@@ -182,7 +196,8 @@ namespace VirtualRobot
         return false;
     }
 
-    bool Manipulability::customLoad(std::ifstream& file)
+    bool
+    Manipulability::customLoad(std::ifstream& file)
     {
         std::string res;
         //bool lOK = readString(res,file);
@@ -201,7 +216,9 @@ namespace VirtualRobot
             VR_WARNING << "Different manipulability measure implementations!" << std::endl;
             std::cout << "Manip File :" << res << std::endl;
             std::cout << "Instance:" << measure->getName() << std::endl;
-            std::cout << "-> This may cause problems if you intend to extend the manipulability representation." << std::endl;
+            std::cout << "-> This may cause problems if you intend to extend the manipulability "
+                         "representation."
+                      << std::endl;
             std::cout << "-> Otherwise you can ignore this warning." << std::endl;
         }
 
@@ -237,10 +254,11 @@ namespace VirtualRobot
         selfDistStatic.reset();
         selfDistDynamic.reset();
 
-        if (versionMajor>2 || (versionMajor == 2 && versionMinor >= 3))
+        if (versionMajor > 2 || (versionMajor == 2 && versionMinor >= 3))
         {
             // read self collision data
-            cjl = (int)(FileIO::read<ioIntTypeRead>(file));;
+            cjl = (int)(FileIO::read<ioIntTypeRead>(file));
+            ;
 
             //file.read((char *)&cjl, sizeof(int));
             if (cjl == 0)
@@ -281,11 +299,10 @@ namespace VirtualRobot
                     selfDistStatic.reset();
                 }
             }
-
         }
 
         // since 2.9: alpha and beta for self dist
-        if (versionMajor>2 || (versionMajor == 2 && versionMinor >= 9))
+        if (versionMajor > 2 || (versionMajor == 2 && versionMinor >= 9))
         {
             selfDistAlpha = FileIO::read<float>(file);
             selfDistBeta = FileIO::read<float>(file);
@@ -294,10 +311,12 @@ namespace VirtualRobot
         // init self dist
         if (considerSelfDist)
         {
-            PoseQualityExtendedManipulabilityPtr pqm = std::dynamic_pointer_cast<PoseQualityExtendedManipulability>(measure);
+            PoseQualityExtendedManipulabilityPtr pqm =
+                std::dynamic_pointer_cast<PoseQualityExtendedManipulability>(measure);
             if (pqm)
             {
-                VR_INFO << "Setting up self dist, alpha:" << selfDistAlpha << ", beta:" << selfDistBeta << std::endl;
+                VR_INFO << "Setting up self dist, alpha:" << selfDistAlpha
+                        << ", beta:" << selfDistBeta << std::endl;
                 pqm->considerObstacles(true, selfDistAlpha, selfDistBeta);
             }
         }
@@ -305,8 +324,8 @@ namespace VirtualRobot
         return true;
     }
 
-
-    bool Manipulability::customSave(std::ofstream& file)
+    bool
+    Manipulability::customSave(std::ofstream& file)
     {
         FileIO::writeString(file, measureName);
 
@@ -352,7 +371,8 @@ namespace VirtualRobot
         // since 2.9: alpha and beta for self dist
         float selfDistA = 0.0f;
         float selfDistB = 0.0f;
-        PoseQualityExtendedManipulabilityPtr pqm = std::dynamic_pointer_cast<PoseQualityExtendedManipulability>(measure);
+        PoseQualityExtendedManipulabilityPtr pqm =
+            std::dynamic_pointer_cast<PoseQualityExtendedManipulability>(measure);
         if (pqm)
         {
             pqm->getSelfDistParameters(selfDistA, selfDistB);
@@ -363,8 +383,8 @@ namespace VirtualRobot
         return true;
     }
 
-
-    void Manipulability::setManipulabilityMeasure(PoseQualityMeasurementPtr m)
+    void
+    Manipulability::setManipulabilityMeasure(PoseQualityMeasurementPtr m)
     {
         measure = m;
 
@@ -380,30 +400,32 @@ namespace VirtualRobot
         }
     }
 
-    PoseQualityMeasurementPtr Manipulability::getManipulabilityMeasure()
+    PoseQualityMeasurementPtr
+    Manipulability::getManipulabilityMeasure()
     {
         return measure;
     }
 
-    float Manipulability::measureCurrentPose()
+    float
+    Manipulability::measureCurrentPose()
     {
         return getCurrentManipulability(measure);
     }
 
-
-    std::string Manipulability::getMeasureName() const
+    std::string
+    Manipulability::getMeasureName() const
     {
         return measureName;
     }
 
-
-    bool Manipulability::consideringJointLimits() const
+    bool
+    Manipulability::consideringJointLimits() const
     {
         return considerJL;
     }
 
-
-    void Manipulability::customPrint()
+    void
+    Manipulability::customPrint()
     {
         std::cout << "Manipulability Measure: " << measureName << std::endl;
         std::cout << "Considered Joint Limits:";
@@ -417,14 +439,16 @@ namespace VirtualRobot
             std::cout << " no" << std::endl;
         }
 
-        std::cout << "Maximal manipulability (as defined on construction):" << maxManip << std::endl;
+        std::cout << "Maximal manipulability (as defined on construction):" << maxManip
+                  << std::endl;
         std::cout << "Considered Self-Distance:";
 
         if (considerSelfDist && selfDistStatic && selfDistDynamic)
         {
             std::cout << " yes" << std::endl;
             std::cout << " - Self Dist Col Model Static:" << selfDistStatic->getName() << std::endl;
-            std::cout << " - Self Dist Col Model Dynamic:" << selfDistDynamic->getName() << std::endl;
+            std::cout << " - Self Dist Col Model Dynamic:" << selfDistDynamic->getName()
+                      << std::endl;
         }
         else
         {
@@ -432,7 +456,8 @@ namespace VirtualRobot
         }
     }
 
-    void Manipulability::customInitialize()
+    void
+    Manipulability::customInitialize()
     {
         if (!measure)
         {
@@ -442,14 +467,14 @@ namespace VirtualRobot
         }
     }
 
-
-    void Manipulability::setMaxManipulability(float maximalManip)
+    void
+    Manipulability::setMaxManipulability(float maximalManip)
     {
         maxManip = maximalManip;
     }
 
-
-    float Manipulability::getManipulabilityAtPose(const Eigen::Matrix4f& globalPose)
+    float
+    Manipulability::getManipulabilityAtPose(const Eigen::Matrix4f& globalPose)
     {
         if (!data)
         {
@@ -460,7 +485,8 @@ namespace VirtualRobot
         // get voxels
         unsigned int v[6];
 
-        if (getVoxelFromPose(globalPose, v)) // assumes global_pose, transformation to  basenode is done
+        if (getVoxelFromPose(globalPose,
+                             v)) // assumes global_pose, transformation to  basenode is done
         {
             unsigned char e = data->get(v);
             float ef = (float)e / 255.0f;
@@ -471,10 +497,17 @@ namespace VirtualRobot
         return 0.0f;
     }
 
-
-    bool Manipulability::checkForParameters(RobotNodeSetPtr nodeSet, float steps, float storeMinBounds[6], float storeMaxBounds[6], float& storeMaxManipulability, RobotNodePtr baseNode /*= RobotNodePtr()*/, RobotNodePtr tcpNode /*= RobotNodePtr()*/)
+    bool
+    Manipulability::checkForParameters(RobotNodeSetPtr nodeSet,
+                                       float steps,
+                                       float storeMinBounds[6],
+                                       float storeMaxBounds[6],
+                                       float& storeMaxManipulability,
+                                       RobotNodePtr baseNode /*= RobotNodePtr()*/,
+                                       RobotNodePtr tcpNode /*= RobotNodePtr()*/)
     {
-        if (!WorkspaceRepresentation::checkForParameters(nodeSet, steps, storeMinBounds, storeMaxBounds, baseNode, tcpNode))
+        if (!WorkspaceRepresentation::checkForParameters(
+                nodeSet, steps, storeMinBounds, storeMaxBounds, baseNode, tcpNode))
         {
             return false;
         }
@@ -503,7 +536,7 @@ namespace VirtualRobot
             p(2) = 1.0f;
             float q = measure->getPoseQuality(p);
 #else
-//            float q = measure->getPoseQuality();
+            //            float q = measure->getPoseQuality();
             float q = getCurrentManipulability(measure);
 #endif
 
@@ -528,13 +561,13 @@ namespace VirtualRobot
         return true;
     }
 
-
-    std::vector< Manipulability::ManipulabiliyGrasp > Manipulability::analyseGrasps(GraspSetPtr grasps, ManipulationObjectPtr object)
+    std::vector<Manipulability::ManipulabiliyGrasp>
+    Manipulability::analyseGrasps(GraspSetPtr grasps, ManipulationObjectPtr object)
     {
         THROW_VR_EXCEPTION_IF(!object, "no object");
         THROW_VR_EXCEPTION_IF(!grasps, "no grasps");
 
-        std::vector< Manipulability::ManipulabiliyGrasp > result;
+        std::vector<Manipulability::ManipulabiliyGrasp> result;
 
         for (unsigned int i = 0; i < grasps->getSize(); i++)
         {
@@ -557,8 +590,8 @@ namespace VirtualRobot
         return result;
     }
 
-
-    Manipulability::ManipulabiliyGrasp Manipulability::analyseGrasp(GraspPtr grasp, ManipulationObjectPtr object)
+    Manipulability::ManipulabiliyGrasp
+    Manipulability::analyseGrasp(GraspPtr grasp, ManipulationObjectPtr object)
     {
         THROW_VR_EXCEPTION_IF(!object, "no object");
         THROW_VR_EXCEPTION_IF(!grasp, "no grasp");
@@ -570,16 +603,16 @@ namespace VirtualRobot
         return e;
     }
 
-
-    void Manipulability::initSelfDistanceCheck(RobotNodeSetPtr staticModel, RobotNodeSetPtr dynamicModel)
+    void
+    Manipulability::initSelfDistanceCheck(RobotNodeSetPtr staticModel, RobotNodeSetPtr dynamicModel)
     {
         considerSelfDist = (staticModel && dynamicModel);
         selfDistStatic = staticModel;
         selfDistDynamic = dynamicModel;
     }
 
-
-    bool Manipulability::smooth(unsigned int minNeighbors)
+    bool
+    Manipulability::smooth(unsigned int minNeighbors)
     {
         if (!data)
         {
@@ -632,7 +665,12 @@ namespace VirtualRobot
                                                     {
                                                         //unsigned int posTr,posRo;
                                                         //data->getPos(a+a2,b+b2,c+c2,d+d2,e+e2,f+f2, posTr,posRo);
-                                                        long entry = (long)data->get(a + a2, b + b2, c + c2, d + d2, e + e2, f + f2);
+                                                        long entry = (long)data->get(a + a2,
+                                                                                     b + b2,
+                                                                                     c + c2,
+                                                                                     d + d2,
+                                                                                     e + e2,
+                                                                                     f + f2);
 
                                                         if (entry > 0)
                                                         {
@@ -648,7 +686,8 @@ namespace VirtualRobot
 
                                 if (count >= (int)(minNeighbors))
                                 {
-                                    unsigned char newVal = (unsigned char)((double)v / (double)count);
+                                    unsigned char newVal =
+                                        (unsigned char)((double)v / (double)count);
 
                                     if (newVal > 0)
                                     {
@@ -668,13 +707,14 @@ namespace VirtualRobot
         return true;
     }
 
-
-    GraspSetPtr Manipulability::getReachableGrasps(GraspSetPtr grasps, ManipulationObjectPtr object)
+    GraspSetPtr
+    Manipulability::getReachableGrasps(GraspSetPtr grasps, ManipulationObjectPtr object)
     {
         THROW_VR_EXCEPTION_IF(!object, "no object");
         THROW_VR_EXCEPTION_IF(!grasps, "no grasps");
 
-        GraspSetPtr result(new GraspSet(grasps->getName(), grasps->getRobotType(), grasps->getEndEffector()));
+        GraspSetPtr result(
+            new GraspSet(grasps->getName(), grasps->getRobotType(), grasps->getEndEffector()));
 
         for (unsigned int i = 0; i < grasps->getSize(); i++)
         {
@@ -689,16 +729,18 @@ namespace VirtualRobot
         return result;
     }
 
-
-    void Manipulability::getSelfDistConfig(bool& storeConsiderSelfDist, RobotNodeSetPtr& storeStatic, RobotNodeSetPtr& storeDynamic)
+    void
+    Manipulability::getSelfDistConfig(bool& storeConsiderSelfDist,
+                                      RobotNodeSetPtr& storeStatic,
+                                      RobotNodeSetPtr& storeDynamic)
     {
         storeConsiderSelfDist = considerSelfDist;
         storeStatic = selfDistStatic;
         storeDynamic = selfDistDynamic;
     }
 
-
-    VirtualRobot::WorkspaceRepresentationPtr Manipulability::clone()
+    VirtualRobot::WorkspaceRepresentationPtr
+    Manipulability::clone()
     {
         VirtualRobot::ManipulabilityPtr res(new Manipulability(robot));
         res->setOrientationType(this->orientationType);
@@ -736,15 +778,19 @@ namespace VirtualRobot
         return res;
     }
 
-    float Manipulability::getMaxManipulability()
+    float
+    Manipulability::getMaxManipulability()
     {
         return maxManip;
     }
 
-
-    void Manipulability::addRandomTCPPoses(unsigned int loops, unsigned int numThreads, bool checkForSelfCollisions)
+    void
+    Manipulability::addRandomTCPPoses(unsigned int loops,
+                                      unsigned int numThreads,
+                                      bool checkForSelfCollisions)
     {
-        THROW_VR_EXCEPTION_IF(!data || !nodeSet || !tcpNode || !measure, "Workspace data not initialized");
+        THROW_VR_EXCEPTION_IF(!data || !nodeSet || !tcpNode || !measure,
+                              "Workspace data not initialized");
 
         if (numThreads > loops)
         {
@@ -759,92 +805,105 @@ namespace VirtualRobot
         {
             // each thread gets a cloned robot
             CollisionCheckerPtr cc(new CollisionChecker());
-            RobotPtr clonedRobot = VirtualRobot::RobotIO::loadRobot(this->robot->getFilename(), RobotIO::eCollisionModel);
-            threads[i] = std::thread([=, this] ()
-            {
-
-                clonedRobot->setUpdateVisualization(false);
-                RobotNodeSetPtr clonedNodeSet = clonedRobot->getRobotNodeSet(this->nodeSet->getName());
-                RobotNodePtr clonedTcpNode = clonedRobot->getRobotNode(this->tcpNode->getName());
-
-                SceneObjectSetPtr staticCollisionModel = this->staticCollisionModel;
-                if (staticCollisionModel && clonedRobot->hasRobotNodeSet(staticCollisionModel->getName()))
+            RobotPtr clonedRobot = VirtualRobot::RobotIO::loadRobot(this->robot->getFilename(),
+                                                                    RobotIO::eCollisionModel);
+            threads[i] = std::thread(
+                [=, this]()
                 {
-                    staticCollisionModel = clonedRobot->getRobotNodeSet(staticCollisionModel->getName());
-                }
+                    clonedRobot->setUpdateVisualization(false);
+                    RobotNodeSetPtr clonedNodeSet =
+                        clonedRobot->getRobotNodeSet(this->nodeSet->getName());
+                    RobotNodePtr clonedTcpNode =
+                        clonedRobot->getRobotNode(this->tcpNode->getName());
 
-                SceneObjectSetPtr dynamicCollisionModel = this->dynamicCollisionModel;
-                if (dynamicCollisionModel && clonedRobot->hasRobotNodeSet(dynamicCollisionModel->getName()))
-                {
-                    dynamicCollisionModel = clonedRobot->getRobotNodeSet(dynamicCollisionModel->getName());
-                }
-
-                RobotNodeSetPtr self_dist_static = this->selfDistStatic;
-                if (self_dist_static && clonedRobot->hasRobotNodeSet(self_dist_static->getName()))
-                {
-                    self_dist_static = clonedRobot->getRobotNodeSet(self_dist_static->getName());
-                }
-
-                RobotNodeSetPtr self_dist_dynamic = this->selfDistDynamic;
-                if (self_dist_dynamic && clonedRobot->hasRobotNodeSet(self_dist_dynamic->getName()))
-                {
-                    self_dist_dynamic = clonedRobot->getRobotNodeSet(self_dist_dynamic->getName());
-                }
-
-
-                // and a cloned pose quality
-                PoseQualityMeasurementPtr clonedMeasure  = this->measure->clone(clonedRobot);
-
-                // now sample some configs and add them to the workspace data
-                for (unsigned int j = 0; j < numPosesPerThread; j++)
-                {
-                    float rndValue;
-                    float minJ, maxJ;
-                    Eigen::VectorXf v(clonedNodeSet->getSize());
-                    float maxLoops = 1000;
-
-                    bool successfullyRandomized = false;
-
-                    for (int k = 0; k < maxLoops; k++)
+                    SceneObjectSetPtr staticCollisionModel = this->staticCollisionModel;
+                    if (staticCollisionModel &&
+                        clonedRobot->hasRobotNodeSet(staticCollisionModel->getName()))
                     {
-                        for (unsigned int l = 0; l < clonedNodeSet->getSize(); l++)
-                        {
-                            rndValue = RandomFloat(); // value from 0 to 1
-                            minJ = (*nodeSet)[l]->getJointLimitLo();
-                            maxJ = (*nodeSet)[l]->getJointLimitHi();
-                            v[l] = minJ + ((maxJ - minJ) * rndValue);
-                        }
-
-                        clonedRobot->setJointValues(clonedNodeSet, v);
-
-                        // check for collisions
-                        if (!checkForSelfCollisions || !staticCollisionModel || !dynamicCollisionModel)
-                        {
-                            successfullyRandomized = true;
-                            break;
-                        }
-
-                        if (!clonedRobot->getCollisionChecker()->checkCollision(staticCollisionModel, dynamicCollisionModel))
-                        {
-                            successfullyRandomized = true;
-                            break;
-                        }
-
-                        this->collisionConfigs++;
+                        staticCollisionModel =
+                            clonedRobot->getRobotNodeSet(staticCollisionModel->getName());
                     }
 
-                    if (successfullyRandomized)
+                    SceneObjectSetPtr dynamicCollisionModel = this->dynamicCollisionModel;
+                    if (dynamicCollisionModel &&
+                        clonedRobot->hasRobotNodeSet(dynamicCollisionModel->getName()))
                     {
-                        Eigen::Matrix4f p = clonedTcpNode->getGlobalPose();
-                        addPose(p, clonedMeasure, self_dist_static, self_dist_dynamic);
+                        dynamicCollisionModel =
+                            clonedRobot->getRobotNodeSet(dynamicCollisionModel->getName());
                     }
-                    else
+
+                    RobotNodeSetPtr self_dist_static = this->selfDistStatic;
+                    if (self_dist_static &&
+                        clonedRobot->hasRobotNodeSet(self_dist_static->getName()))
                     {
-                        VR_WARNING << "Could not find collision-free configuration...";
+                        self_dist_static =
+                            clonedRobot->getRobotNodeSet(self_dist_static->getName());
                     }
-                }
-                VR_INFO << "Thread " << i << " finished" << std::endl;
-            });
+
+                    RobotNodeSetPtr self_dist_dynamic = this->selfDistDynamic;
+                    if (self_dist_dynamic &&
+                        clonedRobot->hasRobotNodeSet(self_dist_dynamic->getName()))
+                    {
+                        self_dist_dynamic =
+                            clonedRobot->getRobotNodeSet(self_dist_dynamic->getName());
+                    }
+
+
+                    // and a cloned pose quality
+                    PoseQualityMeasurementPtr clonedMeasure = this->measure->clone(clonedRobot);
+
+                    // now sample some configs and add them to the workspace data
+                    for (unsigned int j = 0; j < numPosesPerThread; j++)
+                    {
+                        float rndValue;
+                        float minJ, maxJ;
+                        Eigen::VectorXf v(clonedNodeSet->getSize());
+                        float maxLoops = 1000;
+
+                        bool successfullyRandomized = false;
+
+                        for (int k = 0; k < maxLoops; k++)
+                        {
+                            for (unsigned int l = 0; l < clonedNodeSet->getSize(); l++)
+                            {
+                                rndValue = RandomFloat(); // value from 0 to 1
+                                minJ = (*nodeSet)[l]->getJointLimitLo();
+                                maxJ = (*nodeSet)[l]->getJointLimitHi();
+                                v[l] = minJ + ((maxJ - minJ) * rndValue);
+                            }
+
+                            clonedRobot->setJointValues(clonedNodeSet, v);
+
+                            // check for collisions
+                            if (!checkForSelfCollisions || !staticCollisionModel ||
+                                !dynamicCollisionModel)
+                            {
+                                successfullyRandomized = true;
+                                break;
+                            }
+
+                            if (!clonedRobot->getCollisionChecker()->checkCollision(
+                                    staticCollisionModel, dynamicCollisionModel))
+                            {
+                                successfullyRandomized = true;
+                                break;
+                            }
+
+                            this->collisionConfigs++;
+                        }
+
+                        if (successfullyRandomized)
+                        {
+                            Eigen::Matrix4f p = clonedTcpNode->getGlobalPose();
+                            addPose(p, clonedMeasure, self_dist_static, self_dist_dynamic);
+                        }
+                        else
+                        {
+                            VR_WARNING << "Could not find collision-free configuration...";
+                        }
+                    }
+                    VR_INFO << "Thread " << i << " finished" << std::endl;
+                });
         }
 
         // wait for all threads to finish

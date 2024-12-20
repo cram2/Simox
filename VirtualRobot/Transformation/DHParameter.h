@@ -23,8 +23,9 @@
 
 #pragma once
 
-#include "../VirtualRobot.h"
 #include <Eigen/Core>
+
+#include "../VirtualRobot.h"
 
 namespace VirtualRobot
 {
@@ -51,7 +52,8 @@ namespace VirtualRobot
             isSet = true;
         };
 
-        void setThetaRadian(float theta, bool isRadian)
+        void
+        setThetaRadian(float theta, bool isRadian)
         {
             _theta = theta;
 
@@ -62,17 +64,23 @@ namespace VirtualRobot
 
             updateThetaRotation();
         }
-        void setDInMM(float d)
+
+        void
+        setDInMM(float d)
         {
             _d = d;
             updateDTranslation();
         }
-        void setAInMM(float a)
+
+        void
+        setAInMM(float a)
         {
             _a = a;
             updateATranslation();
         }
-        void setAlphaRadian(float alpha, bool isRadian)
+
+        void
+        setAlphaRadian(float alpha, bool isRadian)
         {
             _alpha = alpha;
 
@@ -84,54 +92,66 @@ namespace VirtualRobot
             updateAlphaRotation();
         }
 
-        float thetaRadian() const
+        float
+        thetaRadian() const
         {
             return _theta;
         }
-        float dMM() const
+
+        float
+        dMM() const
         {
             return _d;
         }
-        float aMM() const
+
+        float
+        aMM() const
         {
             return _a;
         }
-        float alphaRadian() const
+
+        float
+        alphaRadian() const
         {
             return _alpha;
         }
 
-        const Eigen::Matrix4f& thetaRotationRadian() const
+        const Eigen::Matrix4f&
+        thetaRotationRadian() const
         {
             return _thetaRotation;
         }
 
-        const Eigen::Matrix4f& dTranslation() const
+        const Eigen::Matrix4f&
+        dTranslation() const
         {
             return _dTranslation;
         }
 
-        const Eigen::Matrix4f& aTranslation() const
+        const Eigen::Matrix4f&
+        aTranslation() const
         {
             return _aTranslation;
         }
 
-        const Eigen::Matrix4f& alphaRotationRadian() const
+        const Eigen::Matrix4f&
+        alphaRotationRadian() const
         {
             return _alphaRotation;
         }
 
         //! The complete transformation
-        Eigen::Matrix4f transformation() const
+        Eigen::Matrix4f
+        transformation() const
         {
             return _thetaRotation * _dTranslation * _aTranslation * _alphaRotation;
         }
 
-
-
         bool isSet;
+
     protected:
-        void updateTransformations()
+        void
+        updateTransformations()
         {
             updateThetaRotation();
             updateDTranslation();
@@ -139,7 +159,8 @@ namespace VirtualRobot
             updateAlphaRotation();
         }
 
-        void updateThetaRotation()
+        void
+        updateThetaRotation()
         {
             _thetaRotation = Eigen::Matrix4f::Identity();
             _thetaRotation(0, 0) = cos(_theta);
@@ -148,19 +169,22 @@ namespace VirtualRobot
             _thetaRotation(1, 1) = cos(_theta);
         }
 
-        void updateDTranslation()
+        void
+        updateDTranslation()
         {
             _dTranslation = Eigen::Matrix4f::Identity();
             _dTranslation(2, 3) = _d;
         }
 
-        void updateATranslation()
+        void
+        updateATranslation()
         {
             _aTranslation = Eigen::Matrix4f::Identity();
             _aTranslation(0, 3) = _a;
         }
 
-        void updateAlphaRotation()
+        void
+        updateAlphaRotation()
         {
             _alphaRotation = Eigen::Matrix4f::Identity();
             _alphaRotation(1, 1) = cos(_alpha);
@@ -181,4 +205,3 @@ namespace VirtualRobot
     };
 
 } // namespace VirtualRobot
-

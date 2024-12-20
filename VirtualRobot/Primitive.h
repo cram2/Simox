@@ -1,9 +1,8 @@
 #pragma once
 
-#include <VirtualRobot/VirtualRobot.h>
-
 #include <Eigen/Core>
 
+#include <VirtualRobot/VirtualRobot.h>
 
 namespace VirtualRobot
 {
@@ -25,32 +24,49 @@ namespace VirtualRobot
             virtual void scaleLinear(float scalingFactor) = 0;
 
         protected:
-            Primitive(int type) : type(type), transform(Eigen::Matrix4f::Identity()) {}
+            Primitive(int type) : type(type), transform(Eigen::Matrix4f::Identity())
+            {
+            }
+
             std::string getTransformString(int tabs = 0);
-            std::string getXMLString(const std::string& type, const std::string& params, int tabs = 0);
+            std::string
+            getXMLString(const std::string& type, const std::string& params, int tabs = 0);
+
         private:
-            Primitive() : type(TYPE) {}
+            Primitive() : type(TYPE)
+            {
+            }
         };
 
         class VIRTUAL_ROBOT_IMPORT_EXPORT Box : public Primitive
         {
         public:
             static const int TYPE = 1;
-            Box() : Primitive(TYPE) {}
-            Box(float width, float height, float depth) : Primitive(TYPE), width(width), height(height), depth(depth) {}
+
+            Box() : Primitive(TYPE)
+            {
+            }
+
+            Box(float width, float height, float depth) :
+                Primitive(TYPE), width(width), height(height), depth(depth)
+            {
+            }
+
             float width;
             float height;
             float depth;
             std::string toXMLString(int tabs = 0) override;
 
-            std::unique_ptr<Primitive> clone() const final
+            std::unique_ptr<Primitive>
+            clone() const final
             {
                 auto clone = std::make_unique<Box>(width, height, depth);
                 clone->transform = transform;
                 return clone;
             }
 
-            void scaleLinear(float scalingFactor) final
+            void
+            scaleLinear(float scalingFactor) final
             {
                 transform.block(0, 3, 3, 1) *= scalingFactor;
                 width *= scalingFactor;
@@ -63,19 +79,28 @@ namespace VirtualRobot
         {
         public:
             static const int TYPE = 2;
-            Sphere() : Primitive(TYPE) {}
-            Sphere(float radius) : Primitive(TYPE), radius(radius) {}
+
+            Sphere() : Primitive(TYPE)
+            {
+            }
+
+            Sphere(float radius) : Primitive(TYPE), radius(radius)
+            {
+            }
+
             float radius;
             std::string toXMLString(int tabs = 0) override;
 
-            std::unique_ptr<Primitive> clone() const final
+            std::unique_ptr<Primitive>
+            clone() const final
             {
                 auto clone = std::make_unique<Sphere>(radius);
                 clone->transform = transform;
                 return clone;
             }
 
-            void scaleLinear(float scalingFactor) final
+            void
+            scaleLinear(float scalingFactor) final
             {
                 transform.block(0, 3, 3, 1) *= scalingFactor;
                 radius *= scalingFactor;
@@ -86,20 +111,29 @@ namespace VirtualRobot
         {
         public:
             static const int TYPE = 3;
-            Cylinder() : Primitive(TYPE) {}
-            Cylinder(float radius, float height) : Primitive(TYPE), radius(radius), height(height) {}
+
+            Cylinder() : Primitive(TYPE)
+            {
+            }
+
+            Cylinder(float radius, float height) : Primitive(TYPE), radius(radius), height(height)
+            {
+            }
+
             float radius;
             float height;
             std::string toXMLString(int tabs = 0) override;
 
-            std::unique_ptr<Primitive> clone() const final
+            std::unique_ptr<Primitive>
+            clone() const final
             {
                 auto clone = std::make_unique<Cylinder>(radius, height);
                 clone->transform = transform;
                 return clone;
             }
 
-            void scaleLinear(float scalingFactor) final
+            void
+            scaleLinear(float scalingFactor) final
             {
                 transform.block(0, 3, 3, 1) *= scalingFactor;
                 height *= scalingFactor;
@@ -114,20 +148,29 @@ namespace VirtualRobot
         {
         public:
             static const int TYPE = 4;
-            Capsule() : Primitive(TYPE) {}
-            Capsule(float radius, float height) : Primitive(TYPE), radius(radius), height(height) {}
+
+            Capsule() : Primitive(TYPE)
+            {
+            }
+
+            Capsule(float radius, float height) : Primitive(TYPE), radius(radius), height(height)
+            {
+            }
+
             float radius;
             float height;
             std::string toXMLString(int tabs = 0) override;
 
-            std::unique_ptr<Primitive> clone() const final
+            std::unique_ptr<Primitive>
+            clone() const final
             {
                 auto clone = std::make_unique<Capsule>(radius, height);
                 clone->transform = transform;
                 return clone;
             }
 
-            void scaleLinear(float scalingFactor) final
+            void
+            scaleLinear(float scalingFactor) final
             {
                 transform.block(0, 3, 3, 1) *= scalingFactor;
                 height *= scalingFactor;
@@ -139,4 +182,3 @@ namespace VirtualRobot
 
     } //namespace Primitive
 } //namespace VirtualRobot
-

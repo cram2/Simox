@@ -4,7 +4,7 @@
 * @copyright  2019 Rainer Kartmann
 */
 
-#define BOOST_TEST_MODULE SimoxUtility/simox/SimoxPathTest
+#define BOOST_TEST_MODULE SimoxUtility / simox / SimoxPathTest
 
 #include <boost/test/included/unit_test.hpp>
 

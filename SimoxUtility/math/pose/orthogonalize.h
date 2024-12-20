@@ -2,17 +2,16 @@
 
 #include <Eigen/Core>
 
-
 namespace simox::math
 {
 
     /// Indicates whether the matrix is orthogonal, i.e. matrix * matrix.transpose = identity.
     template <typename Derived>
-    bool is_matrix_orthogonal(const Eigen::MatrixBase<Derived>& matrix, float precision = 1e-6f)
+    bool
+    is_matrix_orthogonal(const Eigen::MatrixBase<Derived>& matrix, float precision = 1e-6f)
     {
         return (matrix * matrix.transpose()).isIdentity(precision);
     }
-
 
     /// Compute the closest orthogonal matrix to the given matrix.
     /// (Note: All rotation matrices must be orthogonal.)
@@ -28,4 +27,4 @@ namespace simox::math
     /// Orthogonolize the orientation of the given pose, and sanitize its lower row.
     Eigen::Matrix4f orthogonalize_pose(const Eigen::Matrix4f& pose);
 
-}
+} // namespace simox::math

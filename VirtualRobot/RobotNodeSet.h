@@ -22,11 +22,11 @@
 */
 #pragma once
 
-#include "VirtualRobot.h"
-#include "Nodes/RobotNode.h"
-#include "SceneObjectSet.h"
 #include <string>
 #include <vector>
+
+#include "SceneObjectSet.h"
+#include "VirtualRobot.h"
 
 namespace VirtualRobot
 {
@@ -38,29 +38,47 @@ namespace VirtualRobot
         - the kinematic root (the topmost RobotNode of the Robot's kinematic tree that has to be updated in order to update all covered RobotNodes)
         - the Tool Center point (TCP)
     */
-    class VIRTUAL_ROBOT_IMPORT_EXPORT RobotNodeSet : public SceneObjectSet, public std::enable_shared_from_this<RobotNodeSet>
+    class VIRTUAL_ROBOT_IMPORT_EXPORT RobotNodeSet :
+        public SceneObjectSet,
+        public std::enable_shared_from_this<RobotNodeSet>
     {
     public:
         typedef std::vector<RobotNodePtr> NodeContainerT;
-        typedef NodeContainerT::iterator  NodeContainerIterT;
+        typedef NodeContainerT::iterator NodeContainerIterT;
 
         friend class RobotFactory;
 
         /*!
             Use this method to create and fully initialize an instance of RobotNodeSet.
         */
-        static RobotNodeSetPtr createRobotNodeSet(RobotPtr robot, const std::string& name, const std::vector< std::string >& robotNodeNames, const std::string& kinematicRootName = "", const std::string& tcpName = "", bool registerToRobot = false);
+        static RobotNodeSetPtr createRobotNodeSet(RobotPtr robot,
+                                                  const std::string& name,
+                                                  const std::vector<std::string>& robotNodeNames,
+                                                  const std::string& kinematicRootName = "",
+                                                  const std::string& tcpName = "",
+                                                  bool registerToRobot = false);
         /*!
             Use this method to create and fully initialize an instance of RobotNodeSet.
         */
-        static RobotNodeSetPtr createRobotNodeSet(RobotPtr robot, const std::string& name, const std::vector< RobotNodePtr >& robotNodes, const RobotNodePtr kinematicRoot = RobotNodePtr(), const RobotNodePtr tcp = RobotNodePtr(), bool registerToRobot = false);
+        static RobotNodeSetPtr createRobotNodeSet(RobotPtr robot,
+                                                  const std::string& name,
+                                                  const std::vector<RobotNodePtr>& robotNodes,
+                                                  const RobotNodePtr kinematicRoot = RobotNodePtr(),
+                                                  const RobotNodePtr tcp = RobotNodePtr(),
+                                                  bool registerToRobot = false);
         /// Merges the node sets (takes care of only adding each node once)
-        static RobotNodeSetPtr createRobotNodeSet(RobotPtr robot, const std::string& name, const std::vector< RobotNodeSetPtr >& robotNodes, const RobotNodePtr kinematicRoot = RobotNodePtr(), const RobotNodePtr tcp = RobotNodePtr(), bool registerToRobot = false);
+        static RobotNodeSetPtr createRobotNodeSet(RobotPtr robot,
+                                                  const std::string& name,
+                                                  const std::vector<RobotNodeSetPtr>& robotNodes,
+                                                  const RobotNodePtr kinematicRoot = RobotNodePtr(),
+                                                  const RobotNodePtr tcp = RobotNodePtr(),
+                                                  bool registerToRobot = false);
 
         /*!
             Registers a copy of this node set with the given robot
          */
-        RobotNodeSetPtr clone(RobotPtr newRobot, const RobotNodePtr newKinematicRoot = RobotNodePtr());
+        RobotNodeSetPtr clone(RobotPtr newRobot,
+                              const RobotNodePtr newKinematicRoot = RobotNodePtr());
 
         bool hasRobotNode(const RobotNodePtr& robotNode) const;
         bool hasRobotNode(const std::string& nodeName) const;
@@ -73,7 +91,7 @@ namespace VirtualRobot
         */
         const std::vector<RobotNodePtr>& getAllRobotNodes() const;
 
-        std::vector< std::string > getNodeNames() const;
+        std::vector<std::string> getNodeNames() const;
         std::vector<float> getNodeLimitsLo() const;
         std::vector<float> getNodeLimitsHi() const;
         /*!
@@ -103,7 +121,7 @@ namespace VirtualRobot
         void getJointValues(Eigen::VectorXf& fillVector) const;
         void getJointValues(RobotConfigPtr fillVector) const;
 
-        std::map< std::string, float > getJointValueMap() const;
+        std::map<std::string, float> getJointValueMap() const;
 
         /*!
         Cut
@@ -144,23 +162,32 @@ namespace VirtualRobot
         const RobotNodePtr& getNode(const std::string& nodeName) const;
 
         // implement container interface for easy access
-        inline auto begin()
+        inline auto
+        begin()
         {
             return robotNodes.begin();
         }
-        inline auto end()
+
+        inline auto
+        end()
         {
             return robotNodes.end();
         }
-        inline auto begin() const
+
+        inline auto
+        begin() const
         {
             return robotNodes.begin();
         }
-        inline auto end() const
+
+        inline auto
+        end() const
         {
             return robotNodes.end();
         }
-        inline unsigned int size() const 
+
+        inline unsigned int
+        size() const
         {
             return getSize();
         }
@@ -242,7 +269,11 @@ namespace VirtualRobot
                                     If not given, the first entry of robotNodes is used.
             \param tcp The tcp.
         */
-        RobotNodeSet(const std::string& name, RobotWeakPtr robot, const std::vector< RobotNodePtr >& robotNodes, const RobotNodePtr kinematicRoot = RobotNodePtr(), const RobotNodePtr tcp = RobotNodePtr());
+        RobotNodeSet(const std::string& name,
+                     RobotWeakPtr robot,
+                     const std::vector<RobotNodePtr>& robotNodes,
+                     const RobotNodePtr kinematicRoot = RobotNodePtr(),
+                     const RobotNodePtr tcp = RobotNodePtr());
         NodeContainerT robotNodes;
         RobotWeakPtr robot;
 

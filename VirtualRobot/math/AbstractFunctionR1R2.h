@@ -24,9 +24,6 @@
 #include "../VirtualRobot.h"
 #include "MathForwardDefinitions.h"
 
-
-
-
 namespace math
 {
 
@@ -39,5 +36,4 @@ namespace math
 
     private:
     };
-}
-
+} // namespace math

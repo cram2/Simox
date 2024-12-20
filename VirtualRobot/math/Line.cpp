@@ -20,41 +20,46 @@
  */
 
 #include "Line.h"
-#include "Triangle.h"
-#include "Primitive.h"
-#include "float.h"
-#include "Helpers.h"
 
 #include <Eigen/Geometry>
 
+#include "Helpers.h"
+#include "Primitive.h"
+#include "Triangle.h"
+#include "float.h"
+
 namespace math
 {
-    Line::Line(Eigen::Vector3f pos, Eigen::Vector3f dir)
-        : pos(pos), dir(dir)
+    Line::Line(Eigen::Vector3f pos, Eigen::Vector3f dir) : pos(pos), dir(dir)
     {
     }
 
-    Line Line::Normalized() const
+    Line
+    Line::Normalized() const
     {
         return Line(pos, dir.normalized());
     }
 
-    Eigen::Vector3f Line::Get(float t)
+    Eigen::Vector3f
+    Line::Get(float t)
     {
         return pos + t * dir;
     }
 
-    Eigen::Vector3f Line::GetDerivative(float)
+    Eigen::Vector3f
+    Line::GetDerivative(float)
     {
         return dir;
     }
 
-    Eigen::Vector3f Line::GetClosestPoint(Eigen::Vector3f p) const
+    Eigen::Vector3f
+    Line::GetClosestPoint(Eigen::Vector3f p) const
     {
         return pos - (pos - p).dot(dir) * dir / dir.squaredNorm();
     }
 
-    Eigen::Vector3f Line::GetDistanceToPoint(Eigen::Vector3f p) const
+    Eigen::Vector3f
+    Line::GetDistanceToPoint(Eigen::Vector3f p) const
     {
         const Eigen::Vector3f n = dir.normalized();
         const Eigen::Vector3f pInLine = (p - pos);
@@ -62,25 +67,26 @@ namespace math
         return pInLine - n * len;
     }
 
-    float Line::GetT(Eigen::Vector3f p) const
+    float
+    Line::GetT(Eigen::Vector3f p) const
     {
         return (p - pos).dot(dir) / dir.squaredNorm();
-
     }
 
-    std::string Line::ToString() const
+    std::string
+    Line::ToString() const
     {
         std::stringstream ss;
         ss << "(" << pos << ") (" << dir << ")";
         return ss.str();
     }
 
-
     //https://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm
-    bool Line::IntersectsTriangle(Triangle tri, float& out) const
+    bool
+    Line::IntersectsTriangle(Triangle tri, float& out) const
     {
         const float EPS = 0.000; //TODO
-        Eigen::Vector3f e1, e2;  //Edge1, Edge2
+        Eigen::Vector3f e1, e2; //Edge1, Edge2
         Eigen::Vector3f P, Q, T;
         float det, inv_det, u, v;
         float t;
@@ -120,14 +126,14 @@ namespace math
         //Calculate V parameter and test bound
         v = dir.dot(Q) * inv_det;
         //The intersection lies outside of the triangle
-        if (v < 0.f || u + v  > 1.f)
+        if (v < 0.f || u + v > 1.f)
         {
             return 0;
         }
 
         t = e2.dot(Q) * inv_det;
 
-        if (t > EPS)  //ray intersection
+        if (t > EPS) //ray intersection
         {
             out = t;
             return 1;
@@ -137,7 +143,8 @@ namespace math
         return 0;
     }
 
-    bool Line::IntersectsPrimitive(PrimitivePtr p, float& out) const
+    bool
+    Line::IntersectsPrimitive(PrimitivePtr p, float& out) const
     {
         float min = FLT_MAX;
         float t;
@@ -155,18 +162,21 @@ namespace math
         return out < FLT_MAX;
     }
 
-    Line Line::FromPoints(Eigen::Vector3f p1, Eigen::Vector3f p2)
+    Line
+    Line::FromPoints(Eigen::Vector3f p1, Eigen::Vector3f p2)
     {
         return Line(p1, p2 - p1);
     }
 
-    Line Line::FromPoses(const Eigen::Matrix4f& p1, const Eigen::Matrix4f& p2)
+    Line
+    Line::FromPoses(const Eigen::Matrix4f& p1, const Eigen::Matrix4f& p2)
     {
         return FromPoints(p1.block<3, 1>(0, 3), p2.block<3, 1>(0, 3));
     }
 
-    Line Line::Transform(const Eigen::Matrix4f& pose) const
+    Line
+    Line::Transform(const Eigen::Matrix4f& pose) const
     {
         return Line(Helpers::TransformPosition(pose, pos), Helpers::TransformDirection(pose, dir));
     }
-}
+} // namespace math

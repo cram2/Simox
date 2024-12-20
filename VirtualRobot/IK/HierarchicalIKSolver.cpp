@@ -4,17 +4,20 @@
 
 //#define DEBUG
 
-HierarchicalIKSolver::HierarchicalIKSolver(RobotNodeSetPtr allRobotNodes) : HierarchicalIK(allRobotNodes)
+HierarchicalIKSolver::HierarchicalIKSolver(RobotNodeSetPtr allRobotNodes) :
+    HierarchicalIK(allRobotNodes)
 {
     //rns = allRobotNodes;
 }
 
-bool HierarchicalIKSolver::solveIK(float stepSize, float minChange, int maxSteps)
+bool
+HierarchicalIKSolver::solveIK(float stepSize, float minChange, int maxSteps)
 {
     return computeSteps(stepSize, minChange, maxSteps);
 }
 
-bool HierarchicalIKSolver::computeSteps(float stepSize, float minChange, int maxSteps)
+bool
+HierarchicalIKSolver::computeSteps(float stepSize, float minChange, int maxSteps)
 {
     //std::vector<RobotNodePtr> rn = rns->getAllRobotNodes();
     //RobotPtr robot = rns->getRobot();
@@ -51,7 +54,8 @@ bool HierarchicalIKSolver::computeSteps(float stepSize, float minChange, int max
         if (delta.norm() < minChange)
         {
 #ifdef DEBUG
-            VR_INFO << "Could not improve result any more (dTheta.norm()=" << delta.norm() << "), loop:" << step << std::endl;
+            VR_INFO << "Could not improve result any more (dTheta.norm()=" << delta.norm()
+                    << "), loop:" << step << std::endl;
 #endif
             return false;
         }
@@ -62,9 +66,10 @@ bool HierarchicalIKSolver::computeSteps(float stepSize, float minChange, int max
     return false;
 }
 
-bool HierarchicalIKSolver::checkTolerances()
+bool
+HierarchicalIKSolver::checkTolerances()
 {
-    for (auto & jacobie : jacobies)
+    for (auto& jacobie : jacobies)
     {
         if (!jacobie->checkTolerances())
         {
@@ -75,12 +80,14 @@ bool HierarchicalIKSolver::checkTolerances()
     return true;
 }
 
-void HierarchicalIKSolver::addIK(JacobiProviderPtr jacProvider)
+void
+HierarchicalIKSolver::addIK(JacobiProviderPtr jacProvider)
 {
     jacobies.push_back(jacProvider);
 }
 
-void HierarchicalIKSolver::clearIKs()
+void
+HierarchicalIKSolver::clearIKs()
 {
     jacobies.clear();
 }

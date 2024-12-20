@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <iostream>
 
 #include <Eigen/Geometry>
 #include <Eigen/src/Geometry/AngleAxis.h>
@@ -10,12 +11,12 @@
 #include <SimoxUtility/math/pose/pose.h>
 #include <SimoxUtility/meta/enum/EnumNames.hpp>
 
+#include "Assert.h"
 #include "Nodes/FourBar/Joint.h"
 #include "Nodes/Sensor.h"
 #include "Robot.h"
 #include "VirtualRobot.h"
 #include "VirtualRobotException.h"
-
 
 namespace VirtualRobot
 {
@@ -27,7 +28,6 @@ namespace VirtualRobot
         };
 
     } // namespace four_bar
-
 
     VirtualRobot::RobotNodeFourBar::RobotNodeFourBar() = default;
 
@@ -67,7 +67,6 @@ namespace VirtualRobot
         localTransformation = preJointTransform;
         checkValidRobotNodeType();
     }
-
 
     RobotNodeFourBar::RobotNodeFourBar(RobotWeakPtr rob,
                                        const std::string& name,
@@ -142,7 +141,6 @@ namespace VirtualRobot
         }
     }
 
-
     void
     RobotNodeFourBar::setJointValue(float q)
     {
@@ -169,9 +167,7 @@ namespace VirtualRobot
         }
     }
 
-
     RobotNodeFourBar::~RobotNodeFourBar() = default;
-
 
     void
     RobotNodeFourBar::setXmlInfo(const XmlInfo& info)
@@ -193,7 +189,6 @@ namespace VirtualRobot
                 break;
         }
     }
-
 
     bool
     RobotNodeFourBar::initialize(SceneObjectPtr parent, const std::vector<SceneObjectPtr>& children)
@@ -268,7 +263,6 @@ namespace VirtualRobot
         return RobotNode::initialize(parent, children);
     }
 
-
     void
     RobotNodeFourBar::updateTransformationMatrices(const Eigen::Matrix4f& parentPose)
     {
@@ -291,8 +285,7 @@ namespace VirtualRobot
             // std::cout << "passive: joint value " << jV << std::endl;
             const float psi = this->getJointValue();
 
-            tmp.linear() = Eigen::AngleAxisf(psi, -Eigen::Vector3f::UnitZ())
-                               .toRotationMatrix();
+            tmp.linear() = Eigen::AngleAxisf(psi, -Eigen::Vector3f::UnitZ()).toRotationMatrix();
         }
 
 
@@ -336,7 +329,6 @@ namespace VirtualRobot
         // }
     }
 
-
     void
     RobotNodeFourBar::print(bool printChildren, bool printDecoration) const
     {
@@ -375,7 +367,6 @@ namespace VirtualRobot
             }
         }
     }
-
 
     RobotNodePtr
     RobotNodeFourBar::_clone(const RobotPtr newRobot,
@@ -431,7 +422,6 @@ namespace VirtualRobot
         return result;
     }
 
-
     bool
     RobotNodeFourBar::isFourBarJoint() const noexcept
     {
@@ -481,8 +471,12 @@ namespace VirtualRobot
     four_bar::Joint::Jacobian
     RobotNodeFourBar::getJacobian(const Eigen::Vector3f& global_P_eef) const
     {
-        const auto throwIfFalse = [](const bool exprResult){
-            if(not exprResult){throw VirtualRobotException("boom");}
+        const auto throwIfFalse = [](const bool exprResult)
+        {
+            if (not exprResult)
+            {
+                throw VirtualRobotException("boom");
+            }
         };
 
         throwIfFalse(active.has_value());
@@ -498,11 +492,10 @@ namespace VirtualRobot
 
         const four_bar::Joint::Jacobian J = active->math.joint.getJacobian(theta, base_P_eef_d);
 
-        // position part 
+        // position part
         // J.head<2>() *= 1000; // [mm] to [m]
         return J;
     }
-
 
     void
     RobotNodeFourBar::checkValidRobotNodeType()
@@ -511,7 +504,6 @@ namespace VirtualRobot
         THROW_VR_EXCEPTION_IF(nodeType == Body || nodeType == Transform,
                               "RobotNodeFourBar must be a JointNode or a GenericNode");
     }
-
 
     std::string
     RobotNodeFourBar::_toXML(const std::string& /*modelPath*/)
@@ -558,18 +550,18 @@ namespace VirtualRobot
         return active.has_value();
     }
 
-    RobotNodeFourBar::Second& 
+    RobotNodeFourBar::Second&
     RobotNodeFourBar::getActiveData()
     {
         if (not active)
         {
             throw VirtualRobotException("No active data");
         }
-        
+
         return active.value();
     }
 
-    const RobotNodeFourBar::Second& 
+    const RobotNodeFourBar::Second&
     RobotNodeFourBar::getActiveData() const
     {
         if (not active)
@@ -580,7 +572,7 @@ namespace VirtualRobot
         return active.value();
     }
 
-    const std::optional<RobotNodeFourBar::XmlInfo>& 
+    const std::optional<RobotNodeFourBar::XmlInfo>&
     RobotNodeFourBar::getXmlInfo() const
     {
         return xmlInfo;

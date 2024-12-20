@@ -2,7 +2,6 @@
 
 #include "Color.h"
 
-
 namespace simox::color::interpol
 {
 
@@ -12,6 +11,4 @@ namespace simox::color::interpol
     /// Interpolate linearly in HSV space. (`lhs` and `rhs` are expected to be RGB.)
     Color linear_hsv(float t, const Color& lhs, const Color& rhs);
 
-}
-
-
+} // namespace simox::color::interpol

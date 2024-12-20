@@ -42,27 +42,28 @@ This library can be used to simulate physical interactions and dynamic systems.
 
 #endif
 
-#include "VirtualRobot/VirtualRobot.h"
-#include "VirtualRobot/VirtualRobotException.h"
-
-
+#include <cmath>
 #include <iostream>
 #include <sstream>
-#include <cmath>
+
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
+#include "VirtualRobot/Logging.h"
+#include "VirtualRobot/VirtualRobot.h"
+#include "VirtualRobot/VirtualRobotException.h"
+
 #ifdef WIN32
-#  include <winsock2.h>
-#  include <windows.h>
-#  pragma warning ( disable : 4251 )
-#  if defined(SimDynamics_EXPORTS)
-#    define SIMDYNAMICS_IMPORT_EXPORT __declspec(dllexport)
-#  else
-#    define SIMDYNAMICS_IMPORT_EXPORT __declspec(dllimport)
-#  endif
+#include <windows.h>
+#include <winsock2.h>
+#pragma warning(disable : 4251)
+#if defined(SimDynamics_EXPORTS)
+#define SIMDYNAMICS_IMPORT_EXPORT __declspec(dllexport)
 #else
-#  define SIMDYNAMICS_IMPORT_EXPORT
+#define SIMDYNAMICS_IMPORT_EXPORT __declspec(dllimport)
+#endif
+#else
+#define SIMDYNAMICS_IMPORT_EXPORT
 #endif
 
 
@@ -84,13 +85,22 @@ namespace SimDynamics
 #define THROW_SIMDYNAMICS_EXCEPTION(a) THROW_VR_EXCEPTION(a)
 
 #ifdef _DEBUG
-#define SIMDYNAMICS_ASSERT(a) if (!(a)) {std::cout << "ASSERT failed (" << #a <<")"<<std::endl; THROW_SIMDYNAMICS_EXCEPTION( "ASSERT failed (" << #a << ")" )};
-#define SIMDYNAMICS_ASSERT_MESSAGE(a,b) if (!(a)) {std::cout << "ASSERT failed (" << #a <<"): "<<b<<std::endl; THROW_SIMDYNAMICS_EXCEPTION( "ASSERT failed (" << #a << "): " << b )};
+#define SIMDYNAMICS_ASSERT(a)                                                                      \
+    if (!(a))                                                                                      \
+    {                                                                                              \
+        std::cout << "ASSERT failed (" << #a << ")" << std::endl;                                  \
+        THROW_SIMDYNAMICS_EXCEPTION("ASSERT failed (" << #a << ")")                                \
+    };
+#define SIMDYNAMICS_ASSERT_MESSAGE(a, b)                                                           \
+    if (!(a))                                                                                      \
+    {                                                                                              \
+        std::cout << "ASSERT failed (" << #a << "): " << b << std::endl;                           \
+        THROW_SIMDYNAMICS_EXCEPTION("ASSERT failed (" << #a << "): " << b)                         \
+    };
 
 #else
 #define SIMDYNAMICS_ASSERT(a)
-#define SIMDYNAMICS_ASSERT_MESSAGE(a,b)
+#define SIMDYNAMICS_ASSERT_MESSAGE(a, b)
 #endif
 
-}
-
+} // namespace SimDynamics

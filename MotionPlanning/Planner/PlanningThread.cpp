@@ -4,6 +4,8 @@
 #include <ctime>
 #include <iostream>
 
+#include "VirtualRobot/Assert.h"
+
 using namespace std;
 
 namespace Saba
@@ -24,7 +26,8 @@ namespace Saba
         stop();
     }
 
-    void PlanningThread::start()
+    void
+    PlanningThread::start()
     {
         std::scoped_lock lock(mutex);
 
@@ -38,13 +41,11 @@ namespace Saba
         threadStarted = true;
         plannerFinished = false;
 
-        planningThread = std::thread([this]()
-        {
-            this->workingMethod();
-        });
+        planningThread = std::thread([this]() { this->workingMethod(); });
     }
 
-    void PlanningThread::interrupt(bool waitUntilStopped)
+    void
+    PlanningThread::interrupt(bool waitUntilStopped)
     {
         if (!isRunning())
         {
@@ -67,24 +68,27 @@ namespace Saba
         }
     }
 
-
-    void PlanningThread::stop()
+    void
+    PlanningThread::stop()
     {
         interrupt(true);
     }
 
-    bool PlanningThread::isRunning()
+    bool
+    PlanningThread::isRunning()
     {
         std::scoped_lock lock(mutex);
         return threadStarted;
     }
 
-    MotionPlannerPtr PlanningThread::getPlanner()
+    MotionPlannerPtr
+    PlanningThread::getPlanner()
     {
         return planner;
     }
 
-    void PlanningThread::workingMethod()
+    void
+    PlanningThread::workingMethod()
     {
         if (!threadStarted)
         {
@@ -101,5 +105,4 @@ namespace Saba
         mutex.unlock();
     }
 
-}
-
+} // namespace Saba

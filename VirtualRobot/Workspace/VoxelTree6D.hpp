@@ -22,13 +22,14 @@
 */
 #pragma once
 
-#include "../VirtualRobot.h"
-#include "../VirtualRobotException.h"
-#include "VoxelTree6DElement.hpp"
-
+#include <iomanip>
 #include <string>
 #include <vector>
-#include <iomanip>
+
+#include "../VirtualRobot.h"
+#include "../VirtualRobotException.h"
+#include "../Logging.h"
+#include "VoxelTree6DElement.hpp"
 
 namespace VirtualRobot
 {
@@ -37,10 +38,13 @@ namespace VirtualRobot
     class VoxelTree6D
     {
     public:
-
         /*!
         */
-        VoxelTree6D(float minExtend[6], float maxExtend[6], float discretizationTransl, float discretizationRot, bool verbose = false):
+        VoxelTree6D(float minExtend[6],
+                    float maxExtend[6],
+                    float discretizationTransl,
+                    float discretizationRot,
+                    bool verbose = false) :
             verbose(verbose)
         {
             memcpy(&(this->minExtend[0]), &(minExtend[0]), sizeof(float) * 6);
@@ -97,19 +101,21 @@ namespace VirtualRobot
 
                 for (int i = 0; i < 6; i++)
                 {
-                    std::cout << std::fixed << minExtend[i] << "," << maxExtend[i] << " -> " << size[i] << std::endl;
+                    std::cout << std::fixed << minExtend[i] << "," << maxExtend[i] << " -> "
+                              << size[i] << std::endl;
                 }
 
                 std::cout << std::resetiosflags(std::ios::fixed);
                 std::cout.precision(pr);
-                VR_INFO << "discretizationTransl:" << discretizationTransl << ". Max translation levels:" << steps << std::endl;
-                VR_INFO << "discretizationRot:" << discretizationRot << ". Max rotation levels:" << steps2 << std::endl;
+                VR_INFO << "discretizationTransl:" << discretizationTransl
+                        << ". Max translation levels:" << steps << std::endl;
+                VR_INFO << "discretizationRot:" << discretizationRot
+                        << ". Max rotation levels:" << steps2 << std::endl;
                 VR_INFO << "--> Max Levels:" << maxLevels << std::endl;
             }
 
             THROW_VR_EXCEPTION_IF(steps <= 0, "Invalid parameters...");
             root = new VoxelTree6DElement<T>(minExtend, size, 0, maxLevels);
-
         }
 
         virtual ~VoxelTree6D()
@@ -122,7 +128,8 @@ namespace VirtualRobot
             Creates a leaf if necessary. Existing entries are silently overwritten.
             A copy of e is created.
         */
-        bool setEntry(float pos[6], const T& e)
+        bool
+        setEntry(float pos[6], const T& e)
         {
             return root->setEntry(pos, e);
         }
@@ -130,22 +137,19 @@ namespace VirtualRobot
         /*!
             Returns entry at pos. If pos is outside the workspace representation or no data stored at pos, NULL is returned.
         */
-        T* getEntry(float pos[6])
+        T*
+        getEntry(float pos[6])
         {
             return root->getEntry(pos);
         }
 
     protected:
-
         float minExtend[6];
         float maxExtend[6];
         int maxLevels;
         bool verbose;
         VoxelTree6DElement<T>* root;
-
     };
 
 
-
-} // namespace
-
+} // namespace VirtualRobot

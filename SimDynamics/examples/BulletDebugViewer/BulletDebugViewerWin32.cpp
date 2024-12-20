@@ -1,24 +1,23 @@
 
+#include <VirtualRobot/Obstacle.h>
+#include <VirtualRobot/RuntimeEnvironment.h>
+#include <VirtualRobot/XML/ObjectIO.h>
+#include <VirtualRobot/XML/RobotIO.h>
+
+#include <SimDynamics/DynamicsEngine/BulletEngine/BulletEngineFactory.h>
 #include <SimDynamics/DynamicsEngine/BulletEngine/BulletOpenGLViewer.h>
 #include <SimDynamics/DynamicsWorld.h>
-#include <SimDynamics/DynamicsEngine/BulletEngine/BulletEngineFactory.h>
-
-#include <VirtualRobot/Obstacle.h>
-#include <VirtualRobot/XML/RobotIO.h>
-#include <VirtualRobot/XML/ObjectIO.h>
-#include <VirtualRobot/RuntimeEnvironment.h>
 
 using namespace std;
 using namespace VirtualRobot;
 using namespace SimDynamics;
 
-
 /*
 #ifdef WIN32
 
+#include "SimDynamics/DynamicsEngine/BulletEngine/BulletOpenGL/DemoApplication.h"
 #include <GL/gl.h>
 #include <GL/glut.h>
-#include "SimDynamics/DynamicsEngine/BulletEngine/BulletOpenGL/DemoApplication.h"
 
 //glut is C code, this global gDemoApplication links glut to the C++ demo
 static DemoApplication* gDemoApplication = 0;
@@ -123,7 +122,8 @@ int glutmain(int argc, char **argv, int width, int height, const char* title, De
 */
 
 
-DemoApplication*    createDemo()
+DemoApplication*
+createDemo()
 {
     /*VirtualRobot::RuntimeEnvironment::considerKey("robot");
     VirtualRobot::RuntimeEnvironment::processCommandLine(argc,argv);
@@ -148,7 +148,6 @@ DemoApplication*    createDemo()
         }
     }*/
     cout << "Using robot at " << robFile << endl;
-
 
 
     SimDynamics::DynamicsWorldPtr world = SimDynamics::DynamicsWorld::Init();

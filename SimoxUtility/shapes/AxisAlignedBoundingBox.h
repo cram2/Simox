@@ -2,12 +2,10 @@
 
 #include <Eigen/Core>
 
-
 namespace Eigen
 {
     using Matrix32f = Eigen::Matrix<float, 3, 2>;
 }
-
 
 namespace simox
 {
@@ -23,9 +21,16 @@ namespace simox
         /// Construct an AABB with minimal and maximal values.
         AxisAlignedBoundingBox(const Eigen::Vector3f& min, const Eigen::Vector3f& max);
         /// Construct an AABB with axis-wise limits.
-        AxisAlignedBoundingBox(const Eigen::Vector2f& limits_x, const Eigen::Vector2f& limits_y, const Eigen::Vector2f& limits_z);
+        AxisAlignedBoundingBox(const Eigen::Vector2f& limits_x,
+                               const Eigen::Vector2f& limits_y,
+                               const Eigen::Vector2f& limits_z);
         /// Construct an AABB with given limits.
-        AxisAlignedBoundingBox(float x_min, float x_max, float y_min, float y_max, float z_min, float z_max);
+        AxisAlignedBoundingBox(float x_min,
+                               float x_max,
+                               float y_min,
+                               float y_max,
+                               float z_min,
+                               float z_max);
         /// Construct an AABB with limits in a 3x2 matrix.
         AxisAlignedBoundingBox(const Eigen::Matrix32f& limits);
 
@@ -116,10 +121,12 @@ namespace simox
          * @see from_points()
          */
         template <class PointT>
-        void expand_to(const PointT& point)
+        void
+        expand_to(const PointT& point)
         {
             expand_to(Eigen::Vector3f(point.x, point.y, point.z));
         }
+
         void expand_to(const Eigen::Vector3f& point);
 
         /**
@@ -128,25 +135,24 @@ namespace simox
          * @see from_points()
          */
         template <class PointT>
-        void expanded_to(const PointT& point) const
+        void
+        expanded_to(const PointT& point) const
         {
             expanded_to(Eigen::Vector3f(point.x, point.y, point.z));
         }
+
         AxisAlignedBoundingBox expanded_to(const Eigen::Vector3f& point) const;
 
 
     private:
-
         /**
          * @brief Throw a simox::error::SimoxError() with the given message.
          * This avoids exposing the include in the header.
          */
-        [[noreturn]]
-        static void throwSimoxError(const std::string& msg);
+        [[noreturn]] static void throwSimoxError(const std::string& msg);
 
 
     private:
-
         /**
          * The limits structured as follows:
          *
@@ -158,49 +164,53 @@ namespace simox
          * @endcode
          */
         Eigen::Matrix32f _limits = Eigen::Matrix32f::Zero();
-
     };
-
 
     std::ostream& operator<<(std::ostream& os, const AxisAlignedBoundingBox rhs);
 
-
-namespace aabb
-{
-    template <class PointT>
-    AxisAlignedBoundingBox from_points(const std::vector<PointT>& points)
+    namespace aabb
     {
-        return AxisAlignedBoundingBox::from_points<PointT>(points);
-    }
-    inline AxisAlignedBoundingBox from_points(const std::vector<Eigen::Vector3f>& points)
-    {
-        return AxisAlignedBoundingBox::from_points(points);
-    }
+        template <class PointT>
+        AxisAlignedBoundingBox
+        from_points(const std::vector<PointT>& points)
+        {
+            return AxisAlignedBoundingBox::from_points<PointT>(points);
+        }
 
-    /// Return the distance between center of `lhs`'s and `rhs`'s centers.
-    float central_distance(const AxisAlignedBoundingBox& lhs, const AxisAlignedBoundingBox& rhs);
+        inline AxisAlignedBoundingBox
+        from_points(const std::vector<Eigen::Vector3f>& points)
+        {
+            return AxisAlignedBoundingBox::from_points(points);
+        }
 
-    /// Return the squared distance between `lhs`'s center and `rhs`'s centers.
-    float central_squared_distance(const AxisAlignedBoundingBox& lhs, const AxisAlignedBoundingBox& rhs);
+        /// Return the distance between center of `lhs`'s and `rhs`'s centers.
+        float central_distance(const AxisAlignedBoundingBox& lhs,
+                               const AxisAlignedBoundingBox& rhs);
 
-    /// Checks whether `lhs` is colliding (i.e. overlapping) with `rhs`.
-    bool is_colliding(const AxisAlignedBoundingBox& lhs, const AxisAlignedBoundingBox& rhs);
+        /// Return the squared distance between `lhs`'s center and `rhs`'s centers.
+        float central_squared_distance(const AxisAlignedBoundingBox& lhs,
+                                       const AxisAlignedBoundingBox& rhs);
 
-    /// Indicates whether `point` is inside `aabb`.
-    bool is_inside(const AxisAlignedBoundingBox& aabb, const Eigen::Vector3f& point);
+        /// Checks whether `lhs` is colliding (i.e. overlapping) with `rhs`.
+        bool is_colliding(const AxisAlignedBoundingBox& lhs, const AxisAlignedBoundingBox& rhs);
 
-    /// Indicates whether `point` is inside `aabb`.
-    /// `PointT` must have members variables x, y, z.
+        /// Indicates whether `point` is inside `aabb`.
+        bool is_inside(const AxisAlignedBoundingBox& aabb, const Eigen::Vector3f& point);
+
+        /// Indicates whether `point` is inside `aabb`.
+        /// `PointT` must have members variables x, y, z.
+        template <class PointT>
+        bool
+        is_inside(const AxisAlignedBoundingBox& aabb, const PointT& p)
+        {
+            return aabb.min_x() <= p.x and aabb.min_y() <= p.y and aabb.min_z() <= p.z and
+                   p.x <= aabb.max_x() and p.y <= aabb.max_y() and p.z <= aabb.max_z();
+        }
+    } // namespace aabb
+
     template <class PointT>
-    bool is_inside(const AxisAlignedBoundingBox& aabb, const PointT& p)
-    {
-        return aabb.min_x() <= p.x and aabb.min_y() <= p.y and aabb.min_z() <= p.z
-           and p.x <= aabb.max_x() and p.y <= aabb.max_y() and p.z <= aabb.max_z();
-    }
-}
-
-    template <class PointT>
-    AxisAlignedBoundingBox AxisAlignedBoundingBox::from_points(const std::vector<PointT>& points)
+    AxisAlignedBoundingBox
+    AxisAlignedBoundingBox::from_points(const std::vector<PointT>& points)
     {
         if (points.empty())
         {
@@ -217,9 +227,10 @@ namespace aabb
     }
 
     template <class PointT>
-    bool AxisAlignedBoundingBox::is_inside(const PointT& p) const
+    bool
+    AxisAlignedBoundingBox::is_inside(const PointT& p) const
     {
         return aabb::is_inside(*this, p);
     }
 
-}
+} // namespace simox

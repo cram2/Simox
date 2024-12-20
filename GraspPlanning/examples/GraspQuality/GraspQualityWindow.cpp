@@ -1,46 +1,44 @@
 
 #include "GraspQualityWindow.h"
-#include "GraspPlanning/Visualization/CoinVisualization/CoinConvexHullVisualization.h"
-#include "GraspPlanning/GraspQuality/GraspEvaluationPoseUncertainty.h"
-#include "VirtualRobot/EndEffector/EndEffector.h"
-#include "VirtualRobot/Workspace/Reachability.h"
-#include "VirtualRobot/ManipulationObject.h"
-#include "VirtualRobot/Grasping/Grasp.h"
-#include "VirtualRobot/IK/GenericIKSolver.h"
-#include "VirtualRobot/Grasping/GraspSet.h"
-#include "VirtualRobot/CollisionDetection/CDManager.h"
-#include "VirtualRobot/XML/ObjectIO.h"
-#include "VirtualRobot/XML/RobotIO.h"
+
+#include <cmath>
+#include <ctime>
+#include <iostream>
+#include <sstream>
+#include <vector>
+
+#include <QFileDialog>
+
+#include <Eigen/Geometry>
 
 #include <VirtualRobot/Visualization/VisualizationNode.h>
 
-#include "VirtualRobot/Visualization/CoinVisualization/CoinVisualizationFactory.h"
-#include <QFileDialog>
-#include <Eigen/Geometry>
-
-#include <ctime>
-#include <vector>
-#include <iostream>
-#include <cmath>
-
-
-
+#include "GraspPlanning/GraspQuality/GraspEvaluationPoseUncertainty.h"
+#include "GraspPlanning/Visualization/CoinVisualization/CoinConvexHullVisualization.h"
 #include "Inventor/actions/SoLineHighlightRenderAction.h"
-#include <Inventor/nodes/SoShapeHints.h>
-#include <Inventor/nodes/SoLightModel.h>
-#include <Inventor/sensors/SoTimerSensor.h>
+#include "VirtualRobot/CollisionDetection/CDManager.h"
+#include "VirtualRobot/EndEffector/EndEffector.h"
+#include "VirtualRobot/Grasping/Grasp.h"
+#include "VirtualRobot/Grasping/GraspSet.h"
+#include "VirtualRobot/IK/GenericIKSolver.h"
+#include "VirtualRobot/ManipulationObject.h"
+#include "VirtualRobot/Visualization/CoinVisualization/CoinVisualizationFactory.h"
+#include "VirtualRobot/Workspace/Reachability.h"
+#include "VirtualRobot/XML/ObjectIO.h"
+#include "VirtualRobot/XML/RobotIO.h"
 #include <Inventor/nodes/SoEventCallback.h>
+#include <Inventor/nodes/SoLightModel.h>
 #include <Inventor/nodes/SoMatrixTransform.h>
 #include <Inventor/nodes/SoScale.h>
-
-#include <sstream>
+#include <Inventor/nodes/SoShapeHints.h>
+#include <Inventor/sensors/SoTimerSensor.h>
 using namespace std;
 using namespace VirtualRobot;
 
 float TIMER_MS = 30.0f;
 
-GraspQualityWindow::GraspQualityWindow(std::string& robFile, std::string& objFile)
-    : QMainWindow(nullptr)
+GraspQualityWindow::GraspQualityWindow(std::string& robFile, std::string& objFile) :
+    QMainWindow(nullptr)
 {
     VR_INFO << " start " << std::endl;
 
@@ -80,14 +78,13 @@ GraspQualityWindow::GraspQualityWindow(std::string& robFile, std::string& objFil
     sensor_mgr->insertTimerSensor(timer);
 }
 
-
 GraspQualityWindow::~GraspQualityWindow()
 {
     sceneSep->unref();
 }
 
-
-void GraspQualityWindow::timerCB(void* data, SoSensor* /*sensor*/)
+void
+GraspQualityWindow::timerCB(void* data, SoSensor* /*sensor*/)
 {
     GraspQualityWindow* ikWindow = static_cast<GraspQualityWindow*>(data);
     float x[6];
@@ -110,8 +107,8 @@ void GraspQualityWindow::timerCB(void* data, SoSensor* /*sensor*/)
     }
 }
 
-
-void GraspQualityWindow::setupUI()
+void
+GraspQualityWindow::setupUI()
 {
     UI.setupUi(this);
     m_pExViewer = new SoQtExaminerViewer(UI.frameViewer, "", TRUE, SoQtExaminerViewer::BUILD_POPUP);
@@ -156,31 +153,32 @@ void GraspQualityWindow::setupUI()
     connect(UI.pushButtonEvaluateAll, SIGNAL(clicked()), this, SLOT(evalRobustnessAll()));
 }
 
-
-void GraspQualityWindow::resetSceneryAll()
+void
+GraspQualityWindow::resetSceneryAll()
 {
     //if (rns)
     //  rns->setJointValues(startConfig);
 }
 
-
-void GraspQualityWindow::closeEvent(QCloseEvent* event)
+void
+GraspQualityWindow::closeEvent(QCloseEvent* event)
 {
     quit();
     QMainWindow::closeEvent(event);
 }
 
-
-void GraspQualityWindow::buildVisu()
+void
+GraspQualityWindow::buildVisu()
 {
 
     robotSep->removeAllChildren();
     //bool colModel = (UI.checkBoxColModel->isChecked());
-    SceneObject::VisualizationType colModel = (UI.checkBoxColModel->isChecked()) ? SceneObject::Collision : SceneObject::Full;
+    SceneObject::VisualizationType colModel =
+        (UI.checkBoxColModel->isChecked()) ? SceneObject::Collision : SceneObject::Full;
 
     if (robot)
     {
-        visualizationRobot = robot->getVisualization<CoinVisualization>(colModel);
+        visualizationRobot = robot->getVisualization(colModel);
         SoNode* visualisationNode = visualizationRobot->getCoinVisualization();
 
         if (visualisationNode)
@@ -194,7 +192,8 @@ void GraspQualityWindow::buildVisu()
 
     if (object)
     {
-        SoNode* visualisationNode = CoinVisualizationFactory::getCoinVisualization(object, colModel);
+        SoNode* visualisationNode =
+            CoinVisualizationFactory::getCoinVisualization(object, colModel);
 
         if (visualisationNode)
         {
@@ -213,35 +212,37 @@ void GraspQualityWindow::buildVisu()
         {
             frictionConeSep->addChild(visualisationNode);
         }
-
     }
 
     m_pExViewer->scheduleRedraw();
 }
 
-int GraspQualityWindow::main()
+int
+GraspQualityWindow::main()
 {
     SoQt::show(this);
     SoQt::mainLoop();
     return 0;
 }
 
-
-void GraspQualityWindow::quit()
+void
+GraspQualityWindow::quit()
 {
     std::cout << "GraspQualityWindow: Closing" << std::endl;
     this->close();
     SoQt::exitMainLoop();
 }
 
-void GraspQualityWindow::evalRobustness()
+void
+GraspQualityWindow::evalRobustness()
 {
     int numSamples = UI.sbSamples->value();
     float varMM = UI.sbVariationMM->value();
     float varDeg = UI.sbVariationDeg->value();
     GraspStudio::GraspEvaluationPoseUncertainty::PoseUncertaintyConfig c;
     c.init(varMM, varDeg);
-    GraspStudio::GraspEvaluationPoseUncertaintyPtr eval(new GraspStudio::GraspEvaluationPoseUncertainty(c));
+    GraspStudio::GraspEvaluationPoseUncertaintyPtr eval(
+        new GraspStudio::GraspEvaluationPoseUncertainty(c));
 
     openEEF();
     closeEEF();
@@ -265,15 +266,18 @@ void GraspQualityWindow::evalRobustness()
     std::cout << "init col: " << re.initialCollision << std::endl;
     std::cout << "QUAL: " << re.quality << std::endl;
     */
-    GraspStudio::GraspEvaluationPoseUncertainty::PoseEvalResults re = eval->evaluatePoses(eef, object, evalPoses, qualityMeasure);
+    GraspStudio::GraspEvaluationPoseUncertainty::PoseEvalResults re =
+        eval->evaluatePoses(eef, object, evalPoses, qualityMeasure);
     if (eef && grasp)
     {
-        VR_INFO << "#### Robustness for eef " << eef->getName() << ", grasp " << grasp->getName() << std::endl;
+        VR_INFO << "#### Robustness for eef " << eef->getName() << ", grasp " << grasp->getName()
+                << std::endl;
     }
     re.print();
 }
 
-void GraspQualityWindow::evalRobustnessAll()
+void
+GraspQualityWindow::evalRobustnessAll()
 {
     int numSamples = UI.sbSamples->value();
     float varMM = UI.sbVariationMM->value();
@@ -288,10 +292,11 @@ void GraspQualityWindow::evalRobustnessAll()
         {
             GraspStudio::GraspEvaluationPoseUncertainty::PoseUncertaintyConfig c;
             c.init(varMM, varDeg);
-            GraspStudio::GraspEvaluationPoseUncertaintyPtr eval(new GraspStudio::GraspEvaluationPoseUncertainty(c));
+            GraspStudio::GraspEvaluationPoseUncertaintyPtr eval(
+                new GraspStudio::GraspEvaluationPoseUncertainty(c));
 
             VR_INFO << "Setting object pose to grasp " << grasp->getName() << std::endl;
-            Eigen::Matrix4f pos =  eef->getTcp()->getGlobalPose();
+            Eigen::Matrix4f pos = eef->getTcp()->getGlobalPose();
             pos = grasp->getObjectTargetPoseGlobal(pos);
             object->setGlobalPose(pos);
 
@@ -304,7 +309,8 @@ void GraspQualityWindow::evalRobustnessAll()
             {
                 continue;
             }
-            std::vector<Eigen::Matrix4f> evalPoses = eval->generatePoses(object->getGlobalPose(), contacts, numSamples);
+            std::vector<Eigen::Matrix4f> evalPoses =
+                eval->generatePoses(object->getGlobalPose(), contacts, numSamples);
 
             VR_INFO << evalPoses.size() << std::endl;
             if (evalPoses.size() == 0)
@@ -312,10 +318,12 @@ void GraspQualityWindow::evalRobustnessAll()
                 continue;
             }
 
-            GraspStudio::GraspEvaluationPoseUncertainty::PoseEvalResults re = eval->evaluatePoses(eef, object, evalPoses, qualityMeasure);
+            GraspStudio::GraspEvaluationPoseUncertainty::PoseEvalResults re =
+                eval->evaluatePoses(eef, object, evalPoses, qualityMeasure);
             if (eef && grasp)
             {
-                VR_INFO << "#### Robustness for eef " << eef->getName() << ", grasp " << grasp->getName() << std::endl;
+                VR_INFO << "#### Robustness for eef " << eef->getName() << ", grasp "
+                        << grasp->getName() << std::endl;
             }
             re.print();
 
@@ -326,14 +334,17 @@ void GraspQualityWindow::evalRobustnessAll()
     ObjectIO::saveManipulationObject(object, objectFile + "_new.xml");
 }
 
-void GraspQualityWindow::selectObject()
+void
+GraspQualityWindow::selectObject()
 {
-    QString fi = QFileDialog::getOpenFileName(this, tr("Open Object File"), QString(), tr("XML Files (*.xml)"));
+    QString fi = QFileDialog::getOpenFileName(
+        this, tr("Open Object File"), QString(), tr("XML Files (*.xml)"));
     objectFile = std::string(fi.toLatin1());
     loadObject();
 }
 
-void GraspQualityWindow::loadObject()
+void
+GraspQualityWindow::loadObject()
 {
     openEEF();
 
@@ -364,7 +375,8 @@ void GraspQualityWindow::loadObject()
     buildVisu();
 }
 
-void GraspQualityWindow::loadRobot()
+void
+GraspQualityWindow::loadRobot()
 {
     eefs.clear();
     robot.reset();
@@ -384,28 +396,30 @@ void GraspQualityWindow::loadRobot()
     buildVisu();
 }
 
-void GraspQualityWindow::objectToTCP()
+void
+GraspQualityWindow::objectToTCP()
 {
     if (object && eef && eef->getTcp())
     {
-        Eigen::Matrix4f pos =  eef->getTcp()->getGlobalPose();
+        Eigen::Matrix4f pos = eef->getTcp()->getGlobalPose();
         object->setGlobalPose(pos);
     }
 }
 
-
-void GraspQualityWindow::objectToGrasp()
+void
+GraspQualityWindow::objectToGrasp()
 {
     if (object && grasp && eef->getTcp())
     {
         VR_INFO << "Setting object pose to grasp " << grasp->getName() << std::endl;
-        Eigen::Matrix4f pos =  eef->getTcp()->getGlobalPose();
+        Eigen::Matrix4f pos = eef->getTcp()->getGlobalPose();
         pos = grasp->getObjectTargetPoseGlobal(pos);
         object->setGlobalPose(pos);
     }
 }
 
-void GraspQualityWindow::graspQuality()
+void
+GraspQualityWindow::graspQuality()
 {
     if (qualityMeasure && object && contacts.size() > 0)
     {
@@ -427,11 +441,11 @@ void GraspQualityWindow::graspQuality()
         {
             std::cout << "no" << std::endl;
         }
-
     }
 }
 
-void GraspQualityWindow::selectEEF(int nr)
+void
+GraspQualityWindow::selectEEF(int nr)
 {
     eef.reset();
 
@@ -448,7 +462,8 @@ void GraspQualityWindow::selectEEF(int nr)
     selectGrasp(0);
 }
 
-void GraspQualityWindow::selectGrasp(int nr)
+void
+GraspQualityWindow::selectGrasp(int nr)
 {
     grasp.reset();
 
@@ -462,7 +477,8 @@ void GraspQualityWindow::selectGrasp(int nr)
     objectToGrasp();
 }
 
-void GraspQualityWindow::setGraspComboBox()
+void
+GraspQualityWindow::setGraspComboBox()
 {
     UI.comboBoxGrasp->clear();
     grasp.reset();
@@ -490,8 +506,8 @@ void GraspQualityWindow::setGraspComboBox()
     }
 }
 
-
-void GraspQualityWindow::setEEFComboBox()
+void
+GraspQualityWindow::setEEFComboBox()
 {
     UI.comboBoxEEF->clear();
     eef.reset();
@@ -511,7 +527,8 @@ void GraspQualityWindow::setEEFComboBox()
     }
 }
 
-void GraspQualityWindow::closeEEF()
+void
+GraspQualityWindow::closeEEF()
 {
     contacts.clear();
 
@@ -523,7 +540,8 @@ void GraspQualityWindow::closeEEF()
     buildVisu();
 }
 
-void GraspQualityWindow::openEEF()
+void
+GraspQualityWindow::openEEF()
 {
     contacts.clear();
 
@@ -535,9 +553,8 @@ void GraspQualityWindow::openEEF()
     buildVisu();
 }
 
-
-
-void GraspQualityWindow::updateObject(float x[6])
+void
+GraspQualityWindow::updateObject(float x[6])
 {
     if (object)
     {
@@ -550,53 +567,61 @@ void GraspQualityWindow::updateObject(float x[6])
         object->setGlobalPose(m);
         std::cout << "object " << std::endl;
         std::cout << m << std::endl;
-
     }
 
     m_pExViewer->scheduleRedraw();
 }
 
-void GraspQualityWindow::sliderReleased_ObjectX()
+void
+GraspQualityWindow::sliderReleased_ObjectX()
 {
     UI.horizontalSliderX->setValue(0);
 }
 
-void GraspQualityWindow::sliderReleased_ObjectY()
+void
+GraspQualityWindow::sliderReleased_ObjectY()
 {
     UI.horizontalSliderY->setValue(0);
 }
 
-void GraspQualityWindow::sliderReleased_ObjectZ()
+void
+GraspQualityWindow::sliderReleased_ObjectZ()
 {
     UI.horizontalSliderZ->setValue(0);
 }
 
-void GraspQualityWindow::sliderReleased_ObjectA()
+void
+GraspQualityWindow::sliderReleased_ObjectA()
 {
     UI.horizontalSliderRo->setValue(0);
 }
 
-void GraspQualityWindow::sliderReleased_ObjectB()
+void
+GraspQualityWindow::sliderReleased_ObjectB()
 {
     UI.horizontalSliderPi->setValue(0);
 }
 
-void GraspQualityWindow::sliderReleased_ObjectG()
+void
+GraspQualityWindow::sliderReleased_ObjectG()
 {
     UI.horizontalSliderYa->setValue(0);
 }
 
-void GraspQualityWindow::frictionConeVisu()
+void
+GraspQualityWindow::frictionConeVisu()
 {
     buildVisu();
 }
 
-void GraspQualityWindow::colModel()
+void
+GraspQualityWindow::colModel()
 {
     buildVisu();
 }
 
-void GraspQualityWindow::showGWS()
+void
+GraspQualityWindow::showGWS()
 {
     gws1Sep->removeAllChildren();
     gws2Sep->removeAllChildren();
@@ -666,7 +691,7 @@ void GraspQualityWindow::showGWS()
         }*/
 }
 
-void GraspQualityWindow::showOWS()
+void
+GraspQualityWindow::showOWS()
 {
-
 }

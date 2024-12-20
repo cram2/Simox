@@ -1,13 +1,14 @@
 #include "LinkedCoordinate.h"
-#include "Robot.h"
 
 #include <Eigen/Dense>
+
+#include "Nodes/RobotNode.h"
+#include "Robot.h"
+#include "VirtualRobotException.h"
 
 
 using namespace VirtualRobot;
 using namespace std;
-
-
 
 LinkedCoordinate::LinkedCoordinate(const LinkedCoordinate& other)
 {
@@ -16,8 +17,7 @@ LinkedCoordinate::LinkedCoordinate(const LinkedCoordinate& other)
     frame = other.frame;
 }
 
-LinkedCoordinate& LinkedCoordinate::operator=(const LinkedCoordinate& other)
-= default;
+LinkedCoordinate& LinkedCoordinate::operator=(const LinkedCoordinate& other) = default;
 
 LinkedCoordinate::~LinkedCoordinate()
 {
@@ -25,7 +25,8 @@ LinkedCoordinate::~LinkedCoordinate()
     robot.reset();
 }
 
-void LinkedCoordinate::set(const RobotNodePtr& frame, const Eigen::Matrix4f& pose)
+void
+LinkedCoordinate::set(const RobotNodePtr& frame, const Eigen::Matrix4f& pose)
 {
     if (!frame)
     {
@@ -41,8 +42,8 @@ void LinkedCoordinate::set(const RobotNodePtr& frame, const Eigen::Matrix4f& pos
     this->frame = frame;
 }
 
-
-void LinkedCoordinate::set(const std::string& frame, const Eigen::Matrix4f& pose)
+void
+LinkedCoordinate::set(const std::string& frame, const Eigen::Matrix4f& pose)
 {
     if (!this->robot->hasRobotNode(frame))
     {
@@ -52,24 +53,24 @@ void LinkedCoordinate::set(const std::string& frame, const Eigen::Matrix4f& pose
     this->set(this->robot->getRobotNode(frame), pose);
 }
 
-
-void LinkedCoordinate::set(const std::string& frame, const Eigen::Vector3f& coordinate)
+void
+LinkedCoordinate::set(const std::string& frame, const Eigen::Vector3f& coordinate)
 {
     Eigen::Matrix4f pose = Eigen::Matrix4f::Identity();
     pose.block<3, 1>(0, 3) = coordinate;
     this->set(frame, pose);
 }
 
-
-void LinkedCoordinate::set(const RobotNodePtr& frame, const Eigen::Vector3f& coordinate)
+void
+LinkedCoordinate::set(const RobotNodePtr& frame, const Eigen::Vector3f& coordinate)
 {
     Eigen::Matrix4f pose = Eigen::Matrix4f::Identity();
     pose.block<3, 1>(0, 3) = coordinate;
     this->set(frame, pose);
 }
 
-
-void LinkedCoordinate::changeFrame(const RobotNodePtr& destination)
+void
+LinkedCoordinate::changeFrame(const RobotNodePtr& destination)
 {
     if (!destination)
     {
@@ -87,13 +88,16 @@ void LinkedCoordinate::changeFrame(const RobotNodePtr& destination)
     }
     else
     {
-        this->pose = LinkedCoordinate::getCoordinateTransformation(this->frame, destination, this->robot) * this->pose;
+        this->pose =
+            LinkedCoordinate::getCoordinateTransformation(this->frame, destination, this->robot) *
+            this->pose;
     }
 
     this->frame = destination;
 }
 
-void LinkedCoordinate::changeFrame(const std::string& destination)
+void
+LinkedCoordinate::changeFrame(const std::string& destination)
 {
     if (!this->robot->hasRobotNode(destination))
     {
@@ -103,7 +107,8 @@ void LinkedCoordinate::changeFrame(const std::string& destination)
     this->changeFrame(this->robot->getRobotNode(destination));
 }
 
-Eigen::Matrix4f LinkedCoordinate::getInFrame(const RobotNodePtr& destination) const
+Eigen::Matrix4f
+LinkedCoordinate::getInFrame(const RobotNodePtr& destination) const
 {
     if (!destination)
     {
@@ -115,24 +120,27 @@ Eigen::Matrix4f LinkedCoordinate::getInFrame(const RobotNodePtr& destination) co
         THROW_VR_EXCEPTION("Robot node not a member of robot");
     }
 
-    return LinkedCoordinate::getCoordinateTransformation(this->frame, destination, this->robot) * this->pose;
+    return LinkedCoordinate::getCoordinateTransformation(this->frame, destination, this->robot) *
+           this->pose;
 }
 
-
-Eigen::Matrix4f LinkedCoordinate::getInFrame(const std::string& destination) const
+Eigen::Matrix4f
+LinkedCoordinate::getInFrame(const std::string& destination) const
 {
     if (!this->robot->hasRobotNode(destination))
     {
         THROW_VR_EXCEPTION("Robot node not a member of robot");
     }
 
-    return LinkedCoordinate::getCoordinateTransformation(this->frame, this->robot->getRobotNode(destination), this->robot) * this->pose;
+    return LinkedCoordinate::getCoordinateTransformation(
+               this->frame, this->robot->getRobotNode(destination), this->robot) *
+           this->pose;
 }
 
-
-
-Eigen::Matrix4f LinkedCoordinate::getCoordinateTransformation(const RobotNodePtr& origin,
-        const RobotNodePtr& destination, const RobotPtr& robot)
+Eigen::Matrix4f
+LinkedCoordinate::getCoordinateTransformation(const RobotNodePtr& origin,
+                                              const RobotNodePtr& destination,
+                                              const RobotPtr& robot)
 {
 
     if (!destination)

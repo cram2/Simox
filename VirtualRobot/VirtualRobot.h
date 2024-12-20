@@ -22,13 +22,12 @@
 */
 #pragma once
 
-#include "VirtualRobotImportExport.h"
+#include <VirtualRobot/VirtualRobotImportExport.h>
 
 /*! \defgroup VirtualRobot The VirtualRobot Library
 * With the VirtualRobot library you can define complex robot structures,
 * perform collision detection, visualize robots and environments, do reachability analysis and generic IK solvers are provided.
 */
-
 
 
 /** \mainpage Simox: A simulation, motion and grasp planning toolbox.
@@ -120,12 +119,8 @@
 
 
 #include <memory>
-#include <vector>
-#include <deque>
-#include <queue>
 
 #include <Eigen/Core>
-
 
 namespace VirtualRobot
 {
@@ -143,6 +138,9 @@ namespace VirtualRobot
     class DHParameter;
     class RobotNode;
     class RobotNodeRevolute;
+    class RobotNodePrismatic;
+    class RobotNodeFixed;
+
     class RobotNodeFactory;
     class RobotNodeSet;
     class KinematicChain;
@@ -180,60 +178,64 @@ namespace VirtualRobot
     class ContactSensor;
     class Sensor;
     class LocalRobot;
+    class Color;
+    class BoundingBox;
+    class GazeIK;
 
-    typedef std::shared_ptr<CoMIK> CoMIKPtr;
-    typedef std::shared_ptr<HierarchicalIK> HierarchicalIKPtr;
-    typedef std::shared_ptr<DifferentialIK> DifferentialIKPtr;
-    typedef std::shared_ptr<Constraint> ConstraintPtr;
-    typedef std::shared_ptr<TSRConstraint> TSRConstraintPtr;
-    typedef std::shared_ptr<BalanceConstraint> BalanceConstraintPtr;
-    typedef std::shared_ptr<PoseConstraint> PoseConstraintPtr;
-    typedef std::shared_ptr<PositionConstraint> PositionConstraintPtr;
-    typedef std::shared_ptr<OrientationConstraint> OrientationConstraintPtr;
-    typedef std::shared_ptr<RobotNode> RobotNodePtr;
-    typedef std::shared_ptr<SupportPolygon> SupportPolygonPtr;
-    typedef std::shared_ptr<RobotNodeRevolute> RobotNodeRevolutePtr;
-    typedef std::shared_ptr<RobotNodeSet> RobotNodeSetPtr;
-    typedef std::shared_ptr<KinematicChain> KinematicChainPtr;
-    typedef std::weak_ptr<RobotNode> RobotNodeWeakPtr;
-    typedef std::shared_ptr<RobotNodeFactory> RobotNodeFactoryPtr;
-    typedef std::shared_ptr<Robot> RobotPtr;
-    typedef std::weak_ptr<Robot> RobotWeakPtr;
-    typedef std::shared_ptr<EndEffector> EndEffectorPtr;
-    typedef std::shared_ptr<EndEffectorActor> EndEffectorActorPtr;
-    typedef std::shared_ptr<CollisionModel> CollisionModelPtr;
-    typedef std::shared_ptr<CollisionChecker> CollisionCheckerPtr;
-    typedef std::shared_ptr<SceneObjectSet> SceneObjectSetPtr;
-    typedef std::shared_ptr<TriMeshModel> TriMeshModelPtr;
-    typedef std::shared_ptr<SceneObject> SceneObjectPtr;
-    typedef std::weak_ptr<SceneObject> SceneObjectWeakPtr;
-    typedef std::shared_ptr<Obstacle> ObstaclePtr;
-    typedef std::shared_ptr<Visualization> VisualizationPtr;
-    typedef std::shared_ptr<VisualizationNode> VisualizationNodePtr;
-    typedef std::shared_ptr<VisualizationFactory> VisualizationFactoryPtr;
-    typedef std::shared_ptr<WorkspaceData> WorkspaceDataPtr;
-    typedef std::shared_ptr<WorkspaceDataArray> WorkspaceDataArrayPtr;
-    typedef std::shared_ptr<WorkspaceRepresentation> WorkspaceRepresentationPtr;
-    typedef std::shared_ptr<Reachability> ReachabilityPtr;
-    typedef std::shared_ptr<Scene> ScenePtr;
-    typedef std::shared_ptr<RobotConfig> RobotConfigPtr;
-    typedef std::shared_ptr<Grasp> GraspPtr;
-    typedef std::shared_ptr<ChainedGrasp> ChainedGraspPtr;
-    typedef std::shared_ptr<GraspSet> GraspSetPtr;
-    typedef std::shared_ptr<GraspableSensorizedObject> GraspableSensorizedObjectPtr;
-    typedef std::weak_ptr<GraspableSensorizedObject> GraspableSensorizedObjectWeakPtr;
-    typedef std::shared_ptr<ManipulationObject> ManipulationObjectPtr;
-    typedef std::shared_ptr<CDManager> CDManagerPtr;
-    typedef std::shared_ptr<PoseQualityMeasurement> PoseQualityMeasurementPtr;
-    typedef std::shared_ptr<PoseQualityManipulability> PoseQualityManipulabilityPtr;
-    typedef std::shared_ptr<Trajectory> TrajectoryPtr;
-    typedef std::shared_ptr<SphereApproximator> SphereApproximatorPtr;
-    typedef std::shared_ptr<BasicGraspQualityMeasure> BasicGraspQualityMeasurePtr;
-    typedef std::shared_ptr<WorkspaceGrid> WorkspaceGridPtr;
-    typedef std::shared_ptr<ForceTorqueSensor> ForceTorqueSensorPtr;
-    typedef std::shared_ptr<ContactSensor> ContactSensorPtr;
-    typedef std::shared_ptr<Sensor> SensorPtr;
-    typedef std::shared_ptr<LocalRobot> LocalRobotPtr;
+    using CoMIKPtr = std::shared_ptr<CoMIK>;
+    using HierarchicalIKPtr = std::shared_ptr<HierarchicalIK>;
+    using DifferentialIKPtr = std::shared_ptr<DifferentialIK>;
+    using ConstraintPtr = std::shared_ptr<Constraint>;
+    using TSRConstraintPtr = std::shared_ptr<TSRConstraint>;
+    using BalanceConstraintPtr = std::shared_ptr<BalanceConstraint>;
+    using PoseConstraintPtr = std::shared_ptr<PoseConstraint>;
+    using PositionConstraintPtr = std::shared_ptr<PositionConstraint>;
+    using OrientationConstraintPtr = std::shared_ptr<OrientationConstraint>;
+    using RobotNodePtr = std::shared_ptr<RobotNode>;
+    using SupportPolygonPtr = std::shared_ptr<SupportPolygon>;
+    using RobotNodeRevolutePtr = std::shared_ptr<RobotNodeRevolute>;
+    using RobotNodePrismaticPtr = std::shared_ptr<RobotNodePrismatic>;
+    using RobotNodeSetPtr = std::shared_ptr<RobotNodeSet>;
+    using KinematicChainPtr = std::shared_ptr<KinematicChain>;
+    using RobotNodeWeakPtr = std::weak_ptr<RobotNode>;
+    using RobotNodeFactoryPtr = std::shared_ptr<RobotNodeFactory>;
+    using RobotPtr = std::shared_ptr<Robot>;
+    using RobotWeakPtr = std::weak_ptr<Robot>;
+    using EndEffectorPtr = std::shared_ptr<EndEffector>;
+    using EndEffectorActorPtr = std::shared_ptr<EndEffectorActor>;
+    using CollisionModelPtr = std::shared_ptr<CollisionModel>;
+    using CollisionCheckerPtr = std::shared_ptr<CollisionChecker>;
+    using SceneObjectSetPtr = std::shared_ptr<SceneObjectSet>;
+    using TriMeshModelPtr = std::shared_ptr<TriMeshModel>;
+    using SceneObjectPtr = std::shared_ptr<SceneObject>;
+    using SceneObjectWeakPtr = std::weak_ptr<SceneObject>;
+    using ObstaclePtr = std::shared_ptr<Obstacle>;
+    using VisualizationPtr = std::shared_ptr<Visualization>;
+    using VisualizationNodePtr = std::shared_ptr<VisualizationNode>;
+    using VisualizationFactoryPtr = std::shared_ptr<VisualizationFactory>;
+    using WorkspaceDataPtr = std::shared_ptr<WorkspaceData>;
+    using WorkspaceDataArrayPtr = std::shared_ptr<WorkspaceDataArray>;
+    using WorkspaceRepresentationPtr = std::shared_ptr<WorkspaceRepresentation>;
+    using ReachabilityPtr = std::shared_ptr<Reachability>;
+    using ScenePtr = std::shared_ptr<Scene>;
+    using RobotConfigPtr = std::shared_ptr<RobotConfig>;
+    using GraspPtr = std::shared_ptr<Grasp>;
+    using ChainedGraspPtr = std::shared_ptr<ChainedGrasp>;
+    using GraspSetPtr = std::shared_ptr<GraspSet>;
+    using GraspableSensorizedObjectPtr = std::shared_ptr<GraspableSensorizedObject>;
+    using GraspableSensorizedObjectWeakPtr = std::weak_ptr<GraspableSensorizedObject>;
+    using ManipulationObjectPtr = std::shared_ptr<ManipulationObject>;
+    using CDManagerPtr = std::shared_ptr<CDManager>;
+    using PoseQualityMeasurementPtr = std::shared_ptr<PoseQualityMeasurement>;
+    using PoseQualityManipulabilityPtr = std::shared_ptr<PoseQualityManipulability>;
+    using TrajectoryPtr = std::shared_ptr<Trajectory>;
+    using SphereApproximatorPtr = std::shared_ptr<SphereApproximator>;
+    using BasicGraspQualityMeasurePtr = std::shared_ptr<BasicGraspQualityMeasure>;
+    using WorkspaceGridPtr = std::shared_ptr<WorkspaceGrid>;
+    using ForceTorqueSensorPtr = std::shared_ptr<ForceTorqueSensor>;
+    using ContactSensorPtr = std::shared_ptr<ContactSensor>;
+    using SensorPtr = std::shared_ptr<Sensor>;
+    using LocalRobotPtr = std::shared_ptr<LocalRobot>;
 
     /*
      * Predefine for MathTools.h
@@ -247,7 +249,8 @@ namespace VirtualRobot
         struct ConvexHull3D;
         struct ConvexHull6D;
         struct Plane;
-        template<typename VectorT> struct BaseLine;
+        template <typename VectorT>
+        struct BaseLine;
         struct Segment;
         struct OOBB;
         struct ContactPoint;
@@ -260,39 +263,15 @@ namespace VirtualRobot
         typedef std::shared_ptr<ConvexHull3D> ConvexHull3DPtr;
         typedef std::shared_ptr<ConvexHull6D> ConvexHull6DPtr;
 
-   }
-
+    } // namespace MathTools
 
     /*!
     Initialize the runtime envionment. This method calls VisualizationFactory::init().
     */
-    void VIRTUAL_ROBOT_IMPORT_EXPORT init(int &argc, char* argv[], const std::string &appName);
-    void VIRTUAL_ROBOT_IMPORT_EXPORT init(const std::string &appName);
+    void VIRTUAL_ROBOT_IMPORT_EXPORT init(int& argc, char* argv[], const std::string& appName);
+    void VIRTUAL_ROBOT_IMPORT_EXPORT init(const std::string& appName);
 
     // init method is storing appName, since the c_string is passed by refrence to QT -> we must ensure that the string stays alive
     VIRTUAL_ROBOT_IMPORT_EXPORT extern std::string globalAppName;
 
-} // namespace
-
-#define VR_INFO std::cout <<__FILE__ << ":" << __LINE__ << ": "
-#define VR_WARNING std::cerr <<__FILE__ << ":" << __LINE__ << " -Warning- "
-#define VR_ERROR std::cerr <<__FILE__ << ":" << __LINE__ << " - ERROR - "
-
-
-#ifdef NDEBUG
-
-#define VR_ASSERT(a) do{}while(false)
-#define VR_ASSERT_MESSAGE(a,b) do{}while(false)
-
-#else
-
-#include <cassert>
-
-/*!
-This assert macro does nothing on RELEASE builds.
-*/
-#define VR_ASSERT( expr )  assert(expr)
-
-#define VR_ASSERT_MESSAGE(expr, msg) assert((expr)&&(msg))
-
-#endif
+} // namespace VirtualRobot

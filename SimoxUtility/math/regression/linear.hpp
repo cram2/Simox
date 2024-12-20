@@ -3,7 +3,6 @@
 #include <Eigen/Core>
 #include <Eigen/Dense>
 
-
 namespace simox::math
 {
 
@@ -47,7 +46,6 @@ namespace simox::math
     class LinearRegression
     {
     public:
-
         static constexpr int Dim = _Dim;
         using FloatT = _FloatT;
         using VectorT = typename Eigen::Matrix<FloatT, Dim, 1>;
@@ -55,7 +53,6 @@ namespace simox::math
 
 
     public:
-
         /**
          * The coefficients of the bias term (a_i) and input variable x (b_i)
          * [[ a_1  b_1 ]
@@ -66,7 +63,6 @@ namespace simox::math
 
         /// The input offset, so the virtual input x' = x + offset.
         FloatT inputOffset = 0;
-
 
         /**
          * @brief Fit a linear regression model to the given data.
@@ -80,9 +76,7 @@ namespace simox::math
          * @return The regression model.
          */
         static LinearRegression
-        Fit(const std::vector<FloatT>& xs,
-            const std::vector<VectorT>& ys,
-            bool offsetInput = false)
+        Fit(const std::vector<FloatT>& xs, const std::vector<VectorT>& ys, bool offsetInput = false)
         {
             using VectorX = typename Eigen::Matrix<FloatT, Eigen::Dynamic, 1>;
             using MatrixX2 = typename Eigen::Matrix<FloatT, Eigen::Dynamic, 2>;
@@ -90,7 +84,7 @@ namespace simox::math
 
             if (offsetInput and xs.at(0) != 0)
             {
-                FloatT offset = - xs.at(0);  // Move x_0 to 0.
+                FloatT offset = -xs.at(0); // Move x_0 to 0.
                 std::vector<FloatT> virtualXs = xs;
                 for (FloatT& x : virtualXs)
                 {
@@ -127,24 +121,22 @@ namespace simox::math
                 coeffs.row(dim) = qrDecomp.solve(coords);
             }
 
-            return LinearRegression { .coefficients = coeffs };
+            return LinearRegression{.coefficients = coeffs};
         }
-
 
         /**
          * @brief Predict the output variable of the given input variable.
          * @param x The input variable.
          * @return The predicted output variable.
          */
-        VectorT predict(FloatT x) const
+        VectorT
+        predict(FloatT x) const
         {
             Eigen::Matrix<FloatT, 2, 1> input;
             input << 1.0, x + inputOffset;
             return coefficients * input;
         }
-
     };
-
 
     template <int _Dim, typename _FloatT = double>
     std::ostream&
@@ -157,13 +149,11 @@ namespace simox::math
             {
                 os << " | ";
             }
-            os << "y_" << row
-               << " = " << r.coefficients(row, 0)
-               << " + " << r.coefficients(row, 1) << " * x"
-                  ;
+            os << "y_" << row << " = " << r.coefficients(row, 0) << " + " << r.coefficients(row, 1)
+               << " * x";
         }
         os << " ] and input offset " << r.inputOffset << ">";
         return os;
     }
 
-}
+} // namespace simox::math

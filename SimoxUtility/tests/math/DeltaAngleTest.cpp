@@ -6,8 +6,8 @@
 
 #define BOOST_TEST_MODULE SimoxUtility_DeltaAngleTest
 
-#include <random>
 #include <iostream>
+#include <random>
 
 #include <boost/test/included/unit_test.hpp>
 
@@ -25,11 +25,12 @@ BOOST_AUTO_TEST_CASE(test_delta_angle)
         const Eigen::Vector3f ax = Eigen::Vector3f::Random().normalized();
         const float d = deltaDist(gen);
         const float dcmp = std::abs(simox::math::periodic_clamp<float>(d, -M_PI, M_PI));
-        std::cout << "##########################\n##########################\nangle = " << d << '\n';
+        std::cout << "##########################\n##########################\nangle = " << d
+                  << '\n';
         const Eigen::AngleAxisf l{0, ax};
         const Eigen::AngleAxisf r{d, ax};
 
-        const auto check = [&](const auto & lhs, const auto & rhs)
+        const auto check = [&](const auto& lhs, const auto& rhs)
         {
             BOOST_CHECK_LT(std::abs(simox::math::delta_angle(lhs, rhs) - dcmp), eps);
             BOOST_CHECK_LT(std::abs(simox::math::delta_angle(rhs, lhs) - dcmp), eps);

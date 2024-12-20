@@ -23,15 +23,16 @@
 
 namespace math
 {
-    Index3::Index3(int x, int y, int z)
-        : x(x), y(y), z(z)
+    Index3::Index3(int x, int y, int z) : x(x), y(y), z(z)
     {
     }
 
-    std::string Index3::ToString()
+    std::string
+    Index3::ToString()
     {
         std::stringstream ss;
-        ss << x << " " << y << " " << " " << z;
+        ss << x << " " << y << " "
+           << " " << z;
         return ss.str();
     }
-}
+} // namespace math

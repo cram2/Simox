@@ -22,12 +22,9 @@
 */
 #pragma once
 
-#include "../VirtualRobot.h"
-
 #include <iostream>
-#include <string>
-#include <vector>
 
+#include "../VirtualRobot.h"
 
 namespace VirtualRobot
 {
@@ -77,7 +74,8 @@ namespace VirtualRobot
             Automatically checks if a new child element has to be created.
             A copy of e is stored.
         */
-        bool setEntry(float p[6], const T& e)
+        bool
+        setEntry(float p[6], const T& e)
         {
             if (!covers(p))
             {
@@ -106,7 +104,8 @@ namespace VirtualRobot
             Checks if there is an entry at the given position.
             True when this node is a leaf and the entry is set or the child at p exists and returns true on getChild(p)->hasEntry(p).
         */
-        bool hasEntry(float p[6])
+        bool
+        hasEntry(float p[6])
         {
             if (leaf)
             {
@@ -138,7 +137,8 @@ namespace VirtualRobot
         /*!
             Returns pointer to element when existing. NULL if not.
         */
-        T* getEntry(float p[6])
+        T*
+        getEntry(float p[6])
         {
             if (leaf)
             {
@@ -155,19 +155,22 @@ namespace VirtualRobot
             return children[indx]->getEntry(p);
         }
 
-        bool isLeaf()
+        bool
+        isLeaf()
         {
             return leaf;
         }
 
         //! if isLeaf the corresponding entry is returned
-        T* getEntry()
+        T*
+        getEntry()
         {
             return entry;
         }
-    protected:
 
-        VoxelTree6DElement<T>* createChild(float p[6])
+    protected:
+        VoxelTree6DElement<T>*
+        createChild(float p[6])
         {
             int indx = getChildIndx(p);
 
@@ -205,7 +208,8 @@ namespace VirtualRobot
             return children[indx];
         };
 
-        int getChildIndx(float p[6])
+        int
+        getChildIndx(float p[6])
         {
             if (!covers(p))
             {
@@ -233,7 +237,7 @@ namespace VirtualRobot
                         powI *= 2;
                     }
 
-                    res += powI;//pow(2,i) // no int version of pow
+                    res += powI; //pow(2,i) // no int version of pow
                 }
             }
 
@@ -247,7 +251,8 @@ namespace VirtualRobot
             return res;
         };
 
-        bool covers(float p[6])
+        bool
+        covers(float p[6])
         {
             for (int i = 0; i < 6; i++)
             {
@@ -272,5 +277,4 @@ namespace VirtualRobot
     };
 
 
-} // namespace
-
+} // namespace VirtualRobot

@@ -7,10 +7,10 @@
 
 #include "ColorMap.h"
 
+#include "Assert.h"
 
 namespace VirtualRobot
 {
-
 
 
     ColorMap::ColorMap(type t)
@@ -18,12 +18,12 @@ namespace VirtualRobot
         create(t);
     }
 
-    ColorMap::ColorMap()
-    = default;
+    ColorMap::ColorMap() = default;
 
-    ColorMap::~ColorMap()
-    = default;
-    void ColorMap::create(type t)
+    ColorMap::~ColorMap() = default;
+
+    void
+    ColorMap::create(type t)
     {
         colorKeys.clear();
         float DeltaPosition;
@@ -139,9 +139,12 @@ namespace VirtualRobot
         sort();
     }
 
-
-
-    bool ColorMap::addColorKey(const unsigned char R, const unsigned char G, const unsigned char B, const unsigned char A, const float Position)
+    bool
+    ColorMap::addColorKey(const unsigned char R,
+                          const unsigned char G,
+                          const unsigned char B,
+                          const unsigned char A,
+                          const float Position)
     {
         if ((Position < 0.0) || (Position > 1.0))
         {
@@ -159,7 +162,8 @@ namespace VirtualRobot
         return true;
     }
 
-    void ColorMap::sort()
+    void
+    ColorMap::sort()
     {
         size_t size = colorKeys.size();
 
@@ -176,19 +180,22 @@ namespace VirtualRobot
         }
     }
 
-    bool ColorMap::CompareColorKey(const ColorMap::ColorKey& lhs, const ColorMap::ColorKey& rhs)
+    bool
+    ColorMap::CompareColorKey(const ColorMap::ColorKey& lhs, const ColorMap::ColorKey& rhs)
     {
         return lhs.position < rhs.position;
     }
 
-    VirtualRobot::VisualizationFactory::Color ColorMap::getColor(float position) const
+    VirtualRobot::VisualizationFactory::Color
+    ColorMap::getColor(float position) const
     {
         VirtualRobot::VisualizationFactory::Color c;
         getColor(position, c);
         return c;
     }
 
-    bool ColorMap::getColor(float position, VirtualRobot::VisualizationFactory::Color& storeColor) const
+    bool
+    ColorMap::getColor(float position, VirtualRobot::VisualizationFactory::Color& storeColor) const
     {
         if ((position >= 0.0) && (position <= 1.0))
         {
@@ -210,11 +217,15 @@ namespace VirtualRobot
                         FB /= FT;
                     }
 
-                    storeColor.r = ((float(colorA.r) * FB) + (float(colorB.r) * FA)) / 255.0f;  // from [0...255] -> [0..1]
+                    storeColor.r = ((float(colorA.r) * FB) + (float(colorB.r) * FA)) /
+                                   255.0f; // from [0...255] -> [0..1]
                     storeColor.g = ((float(colorA.g) * FB) + (float(colorB.g) * FA)) / 255.0f;
                     storeColor.b = ((float(colorA.b) * FB) + (float(colorB.b) * FA)) / 255.0f;
                     // convert form alpha to transparency!
-                    storeColor.transparency = 1.0f - (((float(colorA.transparency) * FB) + (float(colorB.transparency) * FA)) / 255.0f);
+                    storeColor.transparency =
+                        1.0f -
+                        (((float(colorA.transparency) * FB) + (float(colorB.transparency) * FA)) /
+                         255.0f);
                     return true;
                 }
         }
@@ -223,16 +234,25 @@ namespace VirtualRobot
         return false;
     }
 
-    ColorMap ColorMap::customColorMap(std::vector< VirtualRobot::VisualizationFactory::Color > colors)
+    ColorMap
+    ColorMap::customColorMap(std::vector<VirtualRobot::VisualizationFactory::Color> colors)
     {
         VR_ASSERT(colors.size() > 0);
         ColorMap c;
 
-        c.addColorKey((unsigned char)(colors[0].r * 255.0f + 0.5f), (unsigned char)(colors[0].g * 255.0f + 0.5f), (unsigned char)(colors[0].b * 255.0f + 0.5f), 255 - (unsigned char)(colors[0].transparency * 255.0f + 0.5f), 0.0f);
+        c.addColorKey((unsigned char)(colors[0].r * 255.0f + 0.5f),
+                      (unsigned char)(colors[0].g * 255.0f + 0.5f),
+                      (unsigned char)(colors[0].b * 255.0f + 0.5f),
+                      255 - (unsigned char)(colors[0].transparency * 255.0f + 0.5f),
+                      0.0f);
 
         if (colors.size() == 1)
         {
-            c.addColorKey((unsigned char)(colors[0].r * 255.0f + 0.5f), (unsigned char)(colors[0].g * 255.0f + 0.5f), (unsigned char)(colors[0].b * 255.0f + 0.5f), 255 - (unsigned char)(colors[0].transparency * 255.0f + 0.5f), 1.0f);
+            c.addColorKey((unsigned char)(colors[0].r * 255.0f + 0.5f),
+                          (unsigned char)(colors[0].g * 255.0f + 0.5f),
+                          (unsigned char)(colors[0].b * 255.0f + 0.5f),
+                          255 - (unsigned char)(colors[0].transparency * 255.0f + 0.5f),
+                          1.0f);
             return c;
         }
 
@@ -242,13 +262,15 @@ namespace VirtualRobot
         for (size_t i = 1; i < colors.size(); i++)
         {
             act += step;
-            c.addColorKey((unsigned char)(colors[i].r * 255.0f + 0.5f), (unsigned char)(colors[i].g * 255.0f + 0.5f), (unsigned char)(colors[i].b * 255.0f + 0.5f), 255 - (unsigned char)(colors[i].transparency * 255.0f + 0.5f), act);
+            c.addColorKey((unsigned char)(colors[i].r * 255.0f + 0.5f),
+                          (unsigned char)(colors[i].g * 255.0f + 0.5f),
+                          (unsigned char)(colors[i].b * 255.0f + 0.5f),
+                          255 - (unsigned char)(colors[i].transparency * 255.0f + 0.5f),
+                          act);
         }
 
         return c;
     }
-
-
 
 
 } // namespace VirtualRobot

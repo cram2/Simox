@@ -1,11 +1,11 @@
 
 #include "PathProcessingThread.h"
 
-
-#include "PathProcessingThread.h"
-
 #include <ctime>
 #include <iostream>
+
+#include "PathProcessingThread.h"
+#include "VirtualRobot/Assert.h"
 
 using namespace std;
 
@@ -27,7 +27,8 @@ namespace Saba
         stop();
     }
 
-    void PathProcessingThread::start(int optimizeSteps)
+    void
+    PathProcessingThread::start(int optimizeSteps)
     {
         std::scoped_lock lock(mutex);
 
@@ -43,13 +44,16 @@ namespace Saba
         this->optimizeSteps = optimizeSteps;
         resultPath.reset();
 
-        processingThread = std::thread([this]()
-        {
-            this->workingMethod();;
-        });
+        processingThread = std::thread(
+            [this]()
+            {
+                this->workingMethod();
+                ;
+            });
     }
 
-    void PathProcessingThread::interrupt(bool waitUntilStopped)
+    void
+    PathProcessingThread::interrupt(bool waitUntilStopped)
     {
         if (!isRunning())
         {
@@ -72,24 +76,27 @@ namespace Saba
         }
     }
 
-
-    void PathProcessingThread::stop()
+    void
+    PathProcessingThread::stop()
     {
         interrupt(true);
     }
 
-    bool PathProcessingThread::isRunning()
+    bool
+    PathProcessingThread::isRunning()
     {
         std::scoped_lock lock(mutex);
         return threadStarted;
     }
 
-    PathProcessorPtr PathProcessingThread::getPathProcessor()
+    PathProcessorPtr
+    PathProcessingThread::getPathProcessor()
     {
         return pathProcessor;
     }
 
-    void PathProcessingThread::workingMethod()
+    void
+    PathProcessingThread::workingMethod()
     {
         if (!threadStarted)
         {
@@ -118,15 +125,15 @@ namespace Saba
         mutex.unlock();
     }
 
-    Saba::CSpacePathPtr PathProcessingThread::getProcessedPath()
+    Saba::CSpacePathPtr
+    PathProcessingThread::getProcessedPath()
     {
         if (isRunning())
         {
-            return Saba::CSpacePathPtr();    // no results yet
+            return Saba::CSpacePathPtr(); // no results yet
         }
 
         return resultPath;
     }
 
-}
-
+} // namespace Saba

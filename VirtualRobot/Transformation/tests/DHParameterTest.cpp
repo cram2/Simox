@@ -6,8 +6,8 @@
 
 #define BOOST_TEST_MODULE VirtualRobot_DHParameterTest
 
-#include <VirtualRobot/VirtualRobotTest.h>
 #include <VirtualRobot/Transformation/DHParameter.h>
+#include <VirtualRobot/VirtualRobotTest.h>
 
 BOOST_AUTO_TEST_SUITE(Transformation)
 

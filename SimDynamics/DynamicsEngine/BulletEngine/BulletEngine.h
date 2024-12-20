@@ -23,18 +23,20 @@
 #pragma once
 
 #include <VirtualRobot/SceneObject.h>
+
 #include "../DynamicsEngine.h"
 #include "BulletRobot.h"
-
+#include "VirtualRobot/Assert.h"
 #include "btBulletDynamicsCommon.h"
 
 namespace internal
 {
-    inline void suppressUnusedVariableBtInfinityMask()
+    inline void
+    suppressUnusedVariableBtInfinityMask()
     {
         (void)sizeof(btInfinityMask);
     }
-}
+} // namespace internal
 
 namespace SimDynamics
 {
@@ -46,7 +48,9 @@ namespace SimDynamics
     public:
         BulletEngineConfig();
 
-        ~BulletEngineConfig() override {}
+        ~BulletEngineConfig() override
+        {
+        }
 
         // global setup values
         btScalar bulletObjectRestitution;
@@ -57,8 +61,10 @@ namespace SimDynamics
         btScalar bulletObjectSleepingThresholdAngular;
         btScalar bulletObjectDeactivation;
         int bulletSolverIterations;
-        btScalar bulletSolverGlobalContactForceMixing; // allow to violate constraints (eg joint limits). A value>0 may increase stablity. (standard:0)
-        btScalar bulletSolverGlobalErrorReductionParameter; // How hard should the solver try to correct misaligned joints/constraints/links. (standard 0.2
+        btScalar
+            bulletSolverGlobalContactForceMixing; // allow to violate constraints (eg joint limits). A value>0 may increase stablity. (standard:0)
+        btScalar
+            bulletSolverGlobalErrorReductionParameter; // How hard should the solver try to correct misaligned joints/constraints/links. (standard 0.2
         btScalar bulletSolverSuccessiveOverRelaxation;
         //btScalar bulletSolverContactSurfaceLayer;
         btScalar bulletSolverSplitImpulsePenetrationThreshold;
@@ -70,7 +76,10 @@ namespace SimDynamics
         This class encapsulates all calls to the bullet physics engine.
         Usually there is no need to instantiate this object by your own, it is automatically created when calling DynamicsWorld::Init().
     */
-    class SIMDYNAMICS_IMPORT_EXPORT BulletEngine : public DynamicsEngine, public btActionInterface, public std::enable_shared_from_this<BulletEngine>
+    class SIMDYNAMICS_IMPORT_EXPORT BulletEngine :
+        public DynamicsEngine,
+        public btActionInterface,
+        public std::enable_shared_from_this<BulletEngine>
     {
     public:
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -81,7 +90,8 @@ namespace SimDynamics
             Constructor
             \param engineMutex Optionally, all engine access methods can be protected by an external mutex. If not set, an internal mutex is creeated.
         */
-        BulletEngine(std::shared_ptr <std::recursive_mutex> engineMutex = std::shared_ptr<std::recursive_mutex>());
+        BulletEngine(std::shared_ptr<std::recursive_mutex> engineMutex =
+                         std::shared_ptr<std::recursive_mutex>());
 
         /*!
         */
@@ -102,13 +112,16 @@ namespace SimDynamics
 
         virtual bool cleanup();
 
-        void updateConfig(BulletEngineConfigPtr newConfig);  /* Currently not available for DynamicsEngine */
+        void updateConfig(
+            BulletEngineConfigPtr newConfig); /* Currently not available for DynamicsEngine */
 
         /*!
             Set floor
             \param friction If <=0.0, the standard friction parameter for novel objects is used.
         */
-        void createFloorPlane(const Eigen::Vector3f& pos, const Eigen::Vector3f& up, float friction = 0.0f) override;
+        void createFloorPlane(const Eigen::Vector3f& pos,
+                              const Eigen::Vector3f& up,
+                              float friction = 0.0f) override;
 
         void removeFloorPlane() override;
         /*!
@@ -133,7 +146,9 @@ namespace SimDynamics
         */
         double getSimTime();
 
-        bool attachObjectToRobot(DynamicsRobotPtr r, const std::string& nodeName, DynamicsObjectPtr object) override;
+        bool attachObjectToRobot(DynamicsRobotPtr r,
+                                 const std::string& nodeName,
+                                 DynamicsObjectPtr object) override;
         bool detachObjectFromRobot(DynamicsRobotPtr r, DynamicsObjectPtr object) override;
 
 
@@ -147,6 +162,7 @@ namespace SimDynamics
         static Eigen::Vector3f getVecEigen(const btVector3& vec, bool scaling = true);
         static btMatrix3x3 getRotMatrix(const Eigen::Matrix4f& pose);
         static Eigen::Matrix4f getRotMatrix(const btMatrix3x3& pose);
+
     protected:
         // callback called each tick by bullet callback
         void updateRobots(btScalar timeStep);
@@ -158,18 +174,24 @@ namespace SimDynamics
             {
                 engine = e;
             }
-            bool needBroadphaseCollision(btBroadphaseProxy* proxy0, btBroadphaseProxy* proxy1) const override
+
+            bool
+            needBroadphaseCollision(btBroadphaseProxy* proxy0,
+                                    btBroadphaseProxy* proxy1) const override
             {
                 VR_ASSERT(engine);
                 VR_ASSERT(static_cast<btCollisionObject*>(proxy0->m_clientObject));
                 VR_ASSERT(static_cast<btCollisionObject*>(proxy1->m_clientObject));
                 btCollisionObject* bt0 = static_cast<btCollisionObject*>(proxy0->m_clientObject);
                 btCollisionObject* bt1 = static_cast<btCollisionObject*>(proxy1->m_clientObject);
-                SimDynamics::BulletObject* o0 = static_cast<SimDynamics::BulletObject*>(bt0->getUserPointer());
-                SimDynamics::BulletObject* o1 = static_cast<SimDynamics::BulletObject*>(bt1->getUserPointer());
+                SimDynamics::BulletObject* o0 =
+                    static_cast<SimDynamics::BulletObject*>(bt0->getUserPointer());
+                SimDynamics::BulletObject* o1 =
+                    static_cast<SimDynamics::BulletObject*>(bt1->getUserPointer());
                 return engine->checkCollisionEnabled(o0, o1);
                 //return true;//btOverlapFilterCallback::needBroadphaseCollision(proxy0,proxy1);
             }
+
         protected:
             BulletEngine* engine;
         };
@@ -205,4 +227,3 @@ namespace SimDynamics
     typedef std::shared_ptr<BulletEngine> BulletEnginePtr;
 
 } // namespace SimDynamics
-
