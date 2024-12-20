@@ -5,7 +5,7 @@
 #include <memory>
 #include <vector>
 
-#include "pugixml/pugixml.hpp"
+#include <pugixml.hpp>
 
 #define COLLADA_IMPORT_USE_SENSORS
 

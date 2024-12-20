@@ -697,7 +697,6 @@ if (Simox_VISUALIZATION AND Simox_USE_COIN_VISUALIZATION)
     Import/COLLADA-light/ColladaSimox.cpp
     Import/COLLADA-light/collada.cpp
     Import/COLLADA-light/inventor.cpp
-    Import/COLLADA-light/pugixml/pugixml.cpp
     Import/SimoxCOLLADAFactory.cpp
 #    Workspace/ReachabilityInversion/Visualization/InverseReachabilityCoinVisualization.cpp
     )
@@ -709,7 +708,6 @@ if (Simox_VISUALIZATION AND Simox_USE_COIN_VISUALIZATION)
     Visualization/CoinVisualization/CoinVisualization.h
     Import/COLLADA-light/ColladaSimox.h
     Import/COLLADA-light/collada.h
-    Import/COLLADA-light/pugixml/pugixml.hpp
     Import/SimoxCOLLADAFactory.cpp
     Import/COLLADA-light/inventor.h
     Import/SimoxCOLLADAFactory.h
@@ -719,6 +717,12 @@ if (Simox_VISUALIZATION AND Simox_USE_COIN_VISUALIZATION)
     if(BUILD_TESTING)
         ADD_SUBDIRECTORY(Visualization/CoinVisualization/tests)
     endif()
+
+
+    find_package(pugixml REQUIRED CONFIG)
+    target_link_libraries(VirtualRobot PUBLIC pugixml::pugixml)
+
+
 
 elseif (Simox_VISUALIZATION AND Simox_USE_OPENSCENEGRAPH_VISUALIZATION)
 
