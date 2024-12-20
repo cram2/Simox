@@ -34,6 +34,20 @@ if (Simox_USE_NLOPT)
 endif ()
 
 ##########################################
+#### Spacemouse
+
+find_package(SPNAV QUIET)
+
+if(${SPNAV_FOUND})
+    message(STATUS "SPNAV library found")
+    target_include_directories(VirtualRobot PRIVATE ${spnav_INCLUDE_DIR})
+    target_link_libraries(VirtualRobot PRIVATE ${spnav_LIBRARY})
+    target_compile_definitions(VirtualRobot PRIVATE SPNAV_AVAILABLE)
+endif()
+
+
+
+##########################################
 #### VISUALIZATION Coin3D+Qt+SoQt / OSG+Qt
 
 find_package(assimp REQUIRED)
