@@ -56,7 +56,6 @@ endif()
 
 # cmake 3.10 does not understand c++2a, so we tell it we will handle the standard flag
 set(CMAKE_CXX_STANDARD_DEFAULT)
-add_definitions(-std=c++2a)
 
 include(CheckCXXCompilerFlag)
 CHECK_CXX_COMPILER_FLAG("-std=c++2b" COMPILER_SUPPORTS_CXX2B)
@@ -64,7 +63,8 @@ if(COMPILER_SUPPORTS_CXX2B)
     message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has C++2b support.")
     add_definitions(-std=c++2b)
 else()
-    message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++2b support.")
+    message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++2b support. Using C++2a instead.")
+    add_definitions(-std=c++2a)
 endif()
 
 list(APPEND CMAKE_MODULE_PATH ${Simox_SOURCE_DIR}/CMakeModules)
