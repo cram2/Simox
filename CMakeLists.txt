@@ -68,6 +68,7 @@ else()
 endif()
 
 list(APPEND CMAKE_MODULE_PATH ${Simox_SOURCE_DIR}/CMakeModules)
+list(APPEND CMAKE_MODULE_PATH ${Simox_SOURCE_DIR}/CMakeModules/find_modules)
 MESSAGE (STATUS "** Module path: "  ${CMAKE_MODULE_PATH})
 
 # we want a global automoc

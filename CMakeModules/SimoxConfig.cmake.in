@@ -40,6 +40,7 @@ if(EXISTS "${Simox_CMAKE_DIR}/CMakeCache.txt")
     # Provide access to CMake helper scripts, e.g., Find... scripts.
     # They might be needed as they define specific targets.
     list(APPEND CMAKE_MODULE_PATH "${Simox_MACROS_INCLUDE_DIR}")
+    list(APPEND CMAKE_MODULE_PATH "${Simox_MACROS_INCLUDE_DIR}/find_modules")
 
 else()
     # Installed project
