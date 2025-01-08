@@ -137,12 +137,12 @@ namespace VirtualRobot
     {
         GraspEditorWindow* ikWindow = static_cast<GraspEditorWindow*>(data);
         float x[6];
-        x[0] = (float)ikWindow->UI->horizontalSliderX->value();
-        x[1] = (float)ikWindow->UI->horizontalSliderY->value();
-        x[2] = (float)ikWindow->UI->horizontalSliderZ->value();
-        x[3] = (float)ikWindow->UI->horizontalSliderRo->value();
-        x[4] = (float)ikWindow->UI->horizontalSliderPi->value();
-        x[5] = (float)ikWindow->UI->horizontalSliderYa->value();
+        x[0] = -(float)ikWindow->UI->horizontalSliderX->value();
+        x[1] = -(float)ikWindow->UI->horizontalSliderY->value();
+        x[2] = -(float)ikWindow->UI->horizontalSliderZ->value();
+        x[3] = -(float)ikWindow->UI->horizontalSliderRo->value();
+        x[4] = -(float)ikWindow->UI->horizontalSliderPi->value();
+        x[5] = -(float)ikWindow->UI->horizontalSliderYa->value();
         x[0] /= 10.0f;
         x[1] /= 10.0f;
         x[2] /= 10.0f;
@@ -757,7 +757,6 @@ namespace VirtualRobot
             std::dynamic_pointer_cast<ChainedGrasp>(currentGraspSet->getGrasp(n))->getName();
 
         bool isPrepose = simox::alg::ends_with(name, PREPOSE_SUFFIX);
-        //std::cout << "Is pre pose: " << isPrepose << std::endl;
         if (isPrepose)
         {
             std::string nameWithoutSuffix =
@@ -811,13 +810,12 @@ namespace VirtualRobot
         int associatedGraspNumber = getAssociatedGrasp(n);
         if (associatedGraspNumber > -1)
         {
-            std::cout << "#### Found associated grasp: " << associatedGraspNumber << std::endl;
+            //std::cout << Found associated grasp with index: " << associatedGraspNumber << std::endl;
             associatedGrasp = std::dynamic_pointer_cast<ChainedGrasp>(
                 currentGraspSet->getGrasp(associatedGraspNumber));
         }
         else
         {
-            std::cout << "#### Found no associated grasp." << std::endl;
             associatedGrasp = nullptr;
         }
 
