@@ -68,6 +68,7 @@ namespace VirtualRobot
         void saveObject();
         void selectRobotObject(int n);
         void selectEEF(int n);
+        int getAssociatedGrasp(int n);
         void selectGrasp(int n);
 
         void closeEEF();
@@ -107,6 +108,7 @@ namespace VirtualRobot
 
         static void timerCB(void* data, SoSensor* sensor);
         void setCurrentGrasp(Eigen::Matrix4f& p);
+        void setAssociatedGrasp(Eigen::Matrix4f& p);
 
         Ui::MainWindowGraspEditor* UI;
 
@@ -125,24 +127,23 @@ namespace VirtualRobot
 
         VirtualRobot::RobotPtr robot;
         VirtualRobot::RobotPtr robotEEF;
-        //  VirtualRobot::RobotPtr robotEEF...;
+        VirtualRobot::RobotPtr associatedRobotEEF;
 
         VirtualRobot::GraspableSensorizedObjectPtr object;
         VirtualRobot::RobotPtr robotObject;
         std::vector<VirtualRobot::EndEffectorPtr> eefs;
         VirtualRobot::EndEffectorPtr currentEEF; // the eef of robot
         VirtualRobot::EndEffectorPtr robotEEF_EEF; // the eef of robotEEF
+        VirtualRobot::EndEffectorPtr associatedRobotEEF_EEF;
 
         VirtualRobot::GraspSetPtr currentGraspSet;
         VirtualRobot::ChainedGraspPtr currentGrasp;
+        VirtualRobot::ChainedGraspPtr associatedGrasp;
 
         std::string robotFile;
         std::filesystem::path objectFile;
 
         SoTimerSensor* timer;
-
-
-        std::shared_ptr<VirtualRobot::CoinVisualization> visualizationAll;
 
         std::vector<RobotPtr> hands;
 
