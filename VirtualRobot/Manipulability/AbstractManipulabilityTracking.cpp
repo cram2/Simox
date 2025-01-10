@@ -255,7 +255,7 @@ namespace VirtualRobot
 
         for (int i = 0; i < manipulabilityJacobian.dimension(2); i++)
         {
-            Eigen::Tensor<double, 2> tensor = manipulabilityJacobian.chip(i, 2);
+            Eigen::Tensor<double, 2> tensor = manipulabilityJacobian.chip<2>(i);
             Eigen::MatrixXd sym_matrix = Tensor_to_Matrix(tensor, num_task_vars, num_task_vars);
             jm_red.col(i) = symMatrixToVector(sym_matrix);
         }

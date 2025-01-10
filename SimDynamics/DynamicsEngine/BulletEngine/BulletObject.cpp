@@ -233,9 +233,9 @@ namespace SimDynamics
 
         Eigen::Matrix4f comLoc;
         comLoc.setIdentity();
-        comLoc.block(0, 3, 3, 1) = sceneObject->getCoMGlobal();
+        comLoc.block<3, 1>(0, 3) = sceneObject->getCoMGlobal();
         comLoc = (sceneObject->getGlobalPose().inverse() * comLoc);
-        com = comLoc.block(0, 3, 3, 1);
+        com = comLoc.block<3, 1>(0, 3);
 
         double sc = ScaleFactor;
 
