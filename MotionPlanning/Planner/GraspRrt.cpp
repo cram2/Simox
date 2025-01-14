@@ -486,12 +486,12 @@ namespace Saba
 
         // a) get P1 in local grasping position coordinate system
         mMat.setIdentity();
-        mMat.block(0, 3, 3, 1) = P1;
+        mMat.block<3, 1>(0, 3) = P1;
         mMat = eef->getGCP()->toLocalCoordinateSystem(mMat);
 
         Eigen::Vector3f vecTarget_local;
         Eigen::Vector3f vecZ_local;
-        vecTarget_local = mMat.block(0, 3, 3, 1);
+        vecTarget_local = mMat.block<3, 1>(0, 3);
         vecZ_local[0] = 0.0f;
         vecZ_local[1] = 0.0f;
         vecZ_local[2] = 1.0f;
@@ -518,7 +518,7 @@ namespace Saba
 
         // construct global grasp pose
         mMat = eef->getGCP()->toGlobalCoordinateSystem(mRotMat);
-        mMat.block(0, 3, 3, 1) = P1;
+        mMat.block<3, 1>(0, 3) = P1;
 
         storeGoal = mMat;
         return true;

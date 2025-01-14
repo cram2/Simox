@@ -30,6 +30,8 @@ ENDIF(UNIX)
 
 MESSAGE(STATUS " ** ${PROJECT_NAME}  will be placed into " ${Simox_LIB_DIR})
 
+# Silence some warnings
+target_compile_options(${PROJECT_NAME} PRIVATE "-Wno-stringop-overflow")
 
 # .DLL path
 SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${Simox_BIN_DIR})

@@ -38,9 +38,9 @@ namespace SimDynamics
 
             Eigen::Matrix4f t;
             t.setIdentity();
-            t.block(0, 3, 3, 1) = rn->getCoMGlobal();
+            t.block<3, 1>(0, 3) = rn->getCoMGlobal();
             t = rn->getGlobalPose().inverse() * t;
-            com = t.block(0, 3, 3, 1);
+            com = t.block<3, 1>(0, 3);
         }
 
         _setCOM(com);

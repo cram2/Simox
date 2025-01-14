@@ -152,13 +152,13 @@ namespace VirtualRobot
             //cout << "#### dist:" << d << ", ";
             Eigen::Matrix4f obstDistPos1 = Eigen::Matrix4f::Identity();
             Eigen::Matrix4f obstDistPos2 = Eigen::Matrix4f::Identity();
-            obstDistPos1.block(0, 3, 3, 1) = p1;
-            obstDistPos2.block(0, 3, 3, 1) = p2;
+            obstDistPos1.block<3, 1>(0, 3) = p1;
+            obstDistPos2.block<3, 1>(0, 3) = p2;
 
             // transform to tcp
             Eigen::Matrix4f p1_tcp = tcpNode->toLocalCoordinateSystem(obstDistPos1);
             Eigen::Matrix4f p2_tcp = tcpNode->toLocalCoordinateSystem(obstDistPos2);
-            Eigen::Vector3f minDistVector = p1_tcp.block(0, 3, 3, 1) - p2_tcp.block(0, 3, 3, 1);
+            Eigen::Vector3f minDistVector = p1_tcp.block<3, 1>(0, 3) - p2_tcp.block<3, 1>(0, 3);
 
             qualMeasure->setObstacleDistanceVector(minDistVector);
         }
