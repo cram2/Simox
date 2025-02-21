@@ -160,7 +160,7 @@ xstow pugixml
 And now we can build simox itself.
 
 ```bash
-git clone https://git.h2t.iar.kit.edu/sw/simox/simox.git
+git clone git@github.com:cram2/Simox.git
 cd simox/
 mkdir build/
 cd build/
