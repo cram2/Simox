@@ -5,7 +5,7 @@
 #include <iterator>
 #include <numeric>
 
-#include <Eigen/Core>
+#include <eigen3/Eigen/Core>
 #include <Eigen/Geometry>
 
 #include <GeometricPlanning/ParametricPath.h>

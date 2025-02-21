@@ -10,7 +10,7 @@
 #include <fstream>
 #include <istream>
 
-#include <Eigen/Core>
+#include <eigen3/Eigen/Core>
 
 #include <VirtualRobot/Compression/CompressionBZip2.h>
 #include <VirtualRobot/VirtualRobotException.h>

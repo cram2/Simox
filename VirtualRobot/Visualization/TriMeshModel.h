@@ -25,7 +25,7 @@
 #include <utility>
 #include <vector>
 
-#include <Eigen/Core>
+#include <eigen3/Eigen/Core>
 
 #include "../BoundingBox.h"
 #include "../MathTools.h"

@@ -25,7 +25,7 @@
 #include <optional>
 #include <string>
 
-#include <Eigen/Core>
+#include <eigen3/Eigen/Core>
 
 #include <SimoxUtility/math/scale_value.h>
 

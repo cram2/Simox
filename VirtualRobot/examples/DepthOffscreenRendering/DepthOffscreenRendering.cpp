@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include <Eigen/Core>
+#include <eigen3/Eigen/Core>
 
 #include <SimoxUtility/math/convert/pos_rpy_to_mat4f.h>
 #include <VirtualRobot/Obstacle.h>

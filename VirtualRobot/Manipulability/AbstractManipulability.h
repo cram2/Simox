@@ -23,7 +23,7 @@
 */
 #pragma once
 
-#include <Eigen/Core>
+#include <eigen3/Eigen/Core>
 #include <Eigen/Dense>
 
 #include "VirtualRobot/IK/IKSolver.h"

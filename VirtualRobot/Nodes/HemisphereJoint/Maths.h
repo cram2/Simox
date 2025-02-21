@@ -2,7 +2,7 @@
 
 #include <optional>
 
-#include <Eigen/Core>
+#include <eigen3/Eigen/Core>
 
 #include "Expressions.h"
 

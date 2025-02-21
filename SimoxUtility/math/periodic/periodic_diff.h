@@ -3,7 +3,7 @@
 #include <cmath>
 #include <type_traits>
 
-#include <Eigen/Core>
+#include <eigen3/Eigen/Core>
 
 #include "periodic_clamp.h"
 

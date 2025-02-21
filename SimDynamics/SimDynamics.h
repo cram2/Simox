@@ -46,7 +46,7 @@ This library can be used to simulate physical interactions and dynamic systems.
 #include <iostream>
 #include <sstream>
 
-#include <Eigen/Core>
+#include <eigen3/Eigen/Core>
 #include <Eigen/Geometry>
 
 #include "VirtualRobot/Logging.h"

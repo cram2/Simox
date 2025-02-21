@@ -26,7 +26,7 @@
 #include <string>
 #include <vector>
 
-#include <Eigen/Core>
+#include <eigen3/Eigen/Core>
 
 #include "Assert.h"
 #include "VirtualRobot.h"

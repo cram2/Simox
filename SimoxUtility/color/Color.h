@@ -3,7 +3,7 @@
 #include <iosfwd>
 #include <type_traits>
 
-#include <Eigen/Core>
+#include <eigen3/Eigen/Core>
 
 #include "convert_byte_float.hpp"
 

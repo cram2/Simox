@@ -5,7 +5,7 @@
 #include <cmath>
 
 // Eigen
-#include <Eigen/Core>
+#include <eigen3/Eigen/Core>
 
 // Simox
 #include <SimoxUtility/math/similarity/cosine_similarity.h>

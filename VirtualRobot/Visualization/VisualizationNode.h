@@ -24,7 +24,7 @@
 
 #include <map>
 
-#include <Eigen/Core>
+#include <eigen3/Eigen/Core>
 
 #include "VirtualRobot/Primitive.h"
 #include "VirtualRobot/VirtualRobot.h"

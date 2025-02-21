@@ -4,7 +4,7 @@
 #include <filesystem>
 #include <iomanip>
 
-#include <Eigen/Core>
+#include <eigen3/Eigen/Core>
 
 #include <VirtualRobot/CollisionDetection/CollisionModel.h>
 #include <VirtualRobot/Nodes/Sensor.h>

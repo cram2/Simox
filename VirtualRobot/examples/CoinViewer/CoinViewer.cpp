@@ -4,7 +4,7 @@
 #include <cmath>
 #include <iostream>
 
-#include <Eigen/Core>
+#include <eigen3/Eigen/Core>
 
 #include <VirtualRobot/Obstacle.h>
 #include <VirtualRobot/Visualization/CoinVisualization/CoinVisualization.h>

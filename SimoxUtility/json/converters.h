@@ -3,7 +3,7 @@
 #include <map>
 #include <string>
 
-#include <Eigen/Core>
+#include <eigen3/Eigen/Core>
 
 #include "json.h"
 

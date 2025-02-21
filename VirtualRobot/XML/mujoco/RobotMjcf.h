@@ -2,7 +2,7 @@
 
 #include <filesystem>
 
-#include <Eigen/Core>
+#include <eigen3/Eigen/Core>
 
 #include <VirtualRobot/MJCF/Document.h>
 #include <VirtualRobot/Robot.h>

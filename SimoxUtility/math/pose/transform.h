@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Eigen/Core>
+#include <eigen3/Eigen/Core>
 
 #include <SimoxUtility/meta/eigen/enable_if_compile_time_size.h>
 

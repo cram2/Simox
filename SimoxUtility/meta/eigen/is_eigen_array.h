@@ -4,7 +4,7 @@
 #include <type_traits>
 
 // Eigen
-#include <Eigen/Core>
+#include <eigen3/Eigen/Core>
 
 namespace simox::meta
 {

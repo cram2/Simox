@@ -6,7 +6,7 @@
 
 #define BOOST_TEST_MODULE VirtualRobot_TransformationTest
 
-#include <Eigen/Core>
+#include <eigen3/Eigen/Core>
 
 #include <VirtualRobot/Transformation/Transformation.h>
 #include <VirtualRobot/VirtualRobotTest.h>

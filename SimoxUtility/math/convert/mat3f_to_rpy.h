@@ -2,7 +2,7 @@
 
 #include <cmath>
 
-#include <Eigen/Core>
+#include <eigen3/Eigen/Core>
 
 #include "../../meta/eigen/enable_if_compile_time_size.h"
 

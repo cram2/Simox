@@ -59,7 +59,7 @@ This installation is tested on Ubuntu 20.04. The simox library needs to be insta
 
 If you want to use xstow to install the dependencies from source follow these steps first. Xstow allows you to manage package installations easily and keep the installations of multiple packages separate, while making them appear to be installed in the same location. You can also install packages in the home directory and remove them cleanly if necessary.
 
-If you decide not to use xstow, `make install' will require root privileges and will install the packages in `/usr/local`.
+If you decide not to use xstow, `make install` will require root privileges and will install the packages in `/usr/local`.
 
 ```bash
 sudo apt instal xstow

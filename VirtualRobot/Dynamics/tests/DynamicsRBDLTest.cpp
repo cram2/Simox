@@ -6,7 +6,7 @@
 
 #define BOOST_TEST_MODULE VirtualRobot_DynamicsRBDLTest
 
-#include <Eigen/Core>
+#include <eigen3/Eigen/Core>
 
 #include <VirtualRobot/Dynamics/Dynamics.h>
 #include <VirtualRobot/MathTools.h>

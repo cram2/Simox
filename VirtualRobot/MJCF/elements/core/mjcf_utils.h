@@ -3,7 +3,7 @@
 #include <string>
 #include <type_traits>
 
-#include <Eigen/Core>
+#include <eigen3/Eigen/Core>
 #include <Eigen/Geometry>
 
 #include "exceptions.h"

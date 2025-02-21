@@ -29,7 +29,7 @@
 #include <type_traits>
 #include <vector>
 
-#include <Eigen/Core>
+#include <eigen3/Eigen/Core>
 
 #include "Affordances.h"
 #include "Primitive.h"

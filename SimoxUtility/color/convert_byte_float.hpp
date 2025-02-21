@@ -2,7 +2,7 @@
 
 #include <type_traits>
 
-#include <Eigen/Core>
+#include <eigen3/Eigen/Core>
 
 namespace simox::color
 {

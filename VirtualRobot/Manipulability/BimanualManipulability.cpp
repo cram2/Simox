@@ -24,7 +24,7 @@
 
 #include "BimanualManipulability.h"
 
-#include <Eigen/Core>
+#include <eigen3/Eigen/Core>
 #include <Eigen/Dense>
 
 #include <SimoxUtility/math/convert/pos_quat_to_mat4f.h>

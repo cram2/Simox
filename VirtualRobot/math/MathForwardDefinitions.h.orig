@@ -25,7 +25,7 @@
 #define HAPTIC_EXPLORATION_SCALE 40
 
 <<<<<<< HEAD
-#include <Eigen/Core>
+#include <eigen3/Eigen/Core>
 =======
 #ifndef Q_MOC_RUN // workaround for some bug in some QT/boost versions
 #include <boost/shared_ptr.hpp>

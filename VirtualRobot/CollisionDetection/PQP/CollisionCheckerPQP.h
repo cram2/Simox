@@ -28,7 +28,7 @@
 // #include "PQP++/PQP_Compile.h"
 // #include "PQP++/PQP.h"
 
-#include <Eigen/Core>
+#include <eigen3/Eigen/Core>
 #include <Eigen/Geometry>
 
 namespace PQP

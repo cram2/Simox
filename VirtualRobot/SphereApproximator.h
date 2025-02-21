@@ -26,7 +26,7 @@
 #include <map>
 #include <vector>
 
-#include <Eigen/Core>
+#include <eigen3/Eigen/Core>
 #include <Eigen/Geometry>
 
 #include "VirtualRobot.h"

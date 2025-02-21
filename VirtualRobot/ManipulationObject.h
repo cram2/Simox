@@ -24,7 +24,7 @@
 
 #include <string>
 
-#include <Eigen/Core>
+#include <eigen3/Eigen/Core>
 
 #include "Obstacle.h"
 #include "VirtualRobot.h"

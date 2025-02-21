@@ -38,7 +38,7 @@
 
 using namespace VirtualRobot;
 
-#include <Eigen/Core>
+#include <eigen3/Eigen/Core>
 #include <Eigen/Geometry>
 
 #include "ConstrainedIKWindow.h"

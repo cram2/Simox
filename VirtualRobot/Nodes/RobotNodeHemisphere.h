@@ -25,7 +25,7 @@
 #include <string>
 #include <vector>
 
-#include <Eigen/Core>
+#include <eigen3/Eigen/Core>
 
 #include <VirtualRobot/Nodes/HemisphereJoint/CachedMaths.h>
 #include <VirtualRobot/Nodes/HemisphereJoint/Maths.h>

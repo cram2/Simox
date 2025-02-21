@@ -17,7 +17,7 @@ using std::cout;
 using std::endl;
 using namespace VirtualRobot;
 
-#include <Eigen/Core>
+#include <eigen3/Eigen/Core>
 #include <Eigen/Geometry>
 
 #include <VirtualRobot/Grasping/GraspEditor/GraspEditorWindow.h>

@@ -6,7 +6,7 @@
 
 #define BOOST_TEST_MODULE VirtualRobot_VirtualRobotMjcfTest
 
-#include <Eigen/Core>
+#include <eigen3/Eigen/Core>
 #include <Eigen/Geometry>
 
 #include <VirtualRobot/MJCF/Document.h>

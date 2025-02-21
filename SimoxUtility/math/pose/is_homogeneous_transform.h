@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Eigen/Core>
+#include <eigen3/Eigen/Core>
 
 #include <SimoxUtility/math/isfinite.h>
 #include <SimoxUtility/math/pose/check_rotation_matrix.h>

@@ -9,7 +9,7 @@
 
 #include <string>
 
-#include <Eigen/Core>
+#include <eigen3/Eigen/Core>
 #include <Eigen/Geometry>
 
 #include <VirtualRobot/LinkedCoordinate.h>

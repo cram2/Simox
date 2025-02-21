@@ -28,7 +28,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include <Eigen/Core>
+#include <eigen3/Eigen/Core>
 
 #include "BoundingBox.h"
 #include "Nodes/ConditionedLock.h"

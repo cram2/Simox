@@ -22,7 +22,7 @@
 */
 #pragma once
 
-#include <Eigen/Core>
+#include <eigen3/Eigen/Core>
 #include <Eigen/Geometry>
 
 #include "../Saba.h"

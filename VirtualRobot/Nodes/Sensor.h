@@ -25,7 +25,7 @@
 #include <string>
 #include <vector>
 
-#include <Eigen/Core>
+#include <eigen3/Eigen/Core>
 
 #include "../SceneObject.h"
 #include "../VirtualRobot.h"

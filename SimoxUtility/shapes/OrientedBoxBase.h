@@ -23,7 +23,7 @@
 
 #include <stdexcept>
 
-#include <Eigen/Core>
+#include <eigen3/Eigen/Core>
 #include <Eigen/Geometry>
 
 namespace simox

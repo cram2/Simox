@@ -6,7 +6,7 @@
 
 #define BOOST_TEST_MODULE VirtualRobot_TriMeshModelTest
 
-#include <Eigen/Core>
+#include <eigen3/Eigen/Core>
 
 #include <VirtualRobot/VirtualRobotTest.h>
 #include <VirtualRobot/Visualization/TriMeshModel.h>

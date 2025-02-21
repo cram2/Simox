@@ -1,6 +1,6 @@
 #include "Safety.h"
 
-#include <Eigen/Core>
+#include <eigen3/Eigen/Core>
 #include <Eigen/Geometry>
 
 #include "MathTools.h"

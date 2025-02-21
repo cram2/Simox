@@ -25,7 +25,7 @@
 #include <fstream>
 #include <vector>
 
-#include <Eigen/Core>
+#include <eigen3/Eigen/Core>
 
 #include <VirtualRobot/VirtualRobotImportExport.h>
 

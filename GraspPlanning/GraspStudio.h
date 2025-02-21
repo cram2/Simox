@@ -46,7 +46,7 @@ implementation of the 6d wrench space algorithm for grasp quality measurement.
 #include <iostream>
 #include <sstream>
 
-#include <Eigen/Core>
+#include <eigen3/Eigen/Core>
 #include <Eigen/Geometry>
 
 #include "VirtualRobot/Logging.h"

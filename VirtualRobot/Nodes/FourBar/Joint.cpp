@@ -2,7 +2,7 @@
 
 #include <cmath>
 
-#include <Eigen/Core>
+#include <eigen3/Eigen/Core>
 #include <Eigen/Geometry>
 
 #include <SimoxUtility/math/convert/deg_to_rad.h>

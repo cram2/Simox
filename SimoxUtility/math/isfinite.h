@@ -2,7 +2,7 @@
 
 #include <cmath>
 
-#include <Eigen/Core>
+#include <eigen3/Eigen/Core>
 
 namespace simox::math
 {

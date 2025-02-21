@@ -735,6 +735,7 @@ if (Simox_VISUALIZATION AND Simox_USE_COIN_VISUALIZATION)
 
     find_package(pugixml REQUIRED CONFIG)
     target_link_libraries(VirtualRobot PUBLIC pugixml::pugixml)
+    # set_target_properties(VirtualRobot PROPERTIES INTERFACE_LINK_LIBRARIES pugixml::pugixml)
 
 
 

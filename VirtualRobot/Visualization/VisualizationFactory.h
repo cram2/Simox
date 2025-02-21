@@ -24,7 +24,7 @@
 
 #include <string>
 
-#include <Eigen/Core>
+#include <eigen3/Eigen/Core>
 
 #include "SimoxUtility/color/Color.h"
 #include "VirtualRobot/AbstractFactoryMethod.h"
