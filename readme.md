@@ -1,5 +1,12 @@
 # Simox
 
+## Disclaimer
+
+This fork of Simox is maintained by the Institute for Artificial Intelligence (IAI) at the University of Bremen.
+The original repository is hosted at the H2T GitLab at the Karlsruhe Institute of Technology (KIT) and can be found [here](https://git.h2t.iar.kit.edu/sw/simox/simox).
+
+## About Simox
+
 The aim of the lightweight platform independent C++ toolbox Simox is to provide a set of
 algorithms for 3D simulation of robot systems, sampling based motion planning and grasp planning.
 Simox consists of three libraries (Virtual Robot, Saba and Grasp Studio) and numerous
@@ -44,6 +51,125 @@ Further dependencies are encapsulated with interfaces, making it easy to exchang
 e.g. the collision engine or the visualization functionality.
 As a reference implementation, Simox offers Coin3D/SoQt-based visualization support.
 
+## Installation
+
+This installation is tested on Ubuntu 20.04. The simox library needs to be installed form source.
+
+### Xstow
+
+If you want to use xstow to install the dependencies from source follow these steps first. Xstow allows you to manage package installations easily and keep the installations of multiple packages separate, while making them appear to be installed in the same location. You can also install packages in the home directory and remove them cleanly if necessary.
+
+If you decide not to use xstow, `make install' will require root privileges and will install the packages in `/usr/local`.
+
+```bash
+sudo apt instal xstow
+```
+
+Add the following to you `${HOME} /.bashrc`.
+
+```bash
+export PATH=${HOME}/local/bin:${HOME}/local/sbin:${HOME}/local/usr/bin:${PATH}
+export LD_LIBRARY_PATH=${HOME}/local/lib:${HOME}/local/usr/lib:${LD_LIBRARY_PATH}
+export LIBRARY_PATH=${LD_LIBRARY_PATH}:${LIBRARY_PATH}
+export CPATH=${HOME}/local/include:${HOME}/local/usr/include:${CPATH}
+export LDFLAGS="-L${HOME}/local/lib ${LDFLAGS}"
+export PKG_CONFIG_PATH=${HOME}/local/lib/pkgconfig
+export CMAKE_INCLUDE_PATH=${CPATH}
+export CMAKE_LIBRARY_PATH=${LIBRARY_PATH}
+
+export PYTHON_VERSION=$(basename $(readlink -e $(which python2)))
+export PYTHON3_VERSION=$(basename $(readlink -e $(which python3)))
+export PYTHONPATH=${HOME}/local/lib/python/site-packages:${HOME}/local/lib/python3/site-packages:${HOME}/local/lib/${PYTHON_VERSION}/site-packages:${HOME}/local/lib/${PYTHON_VERSION}/dist-packages:${HOME}/local/lib/${PYTHON3_VERSION}/site-packages:${HOME}/local/lib/${PYTHON3_VERSION}/dist-packages:${HOME}/local/lib/python/dist-packages:${HOME}/local/lib/python3/dist-packages:${PYTHONPATH}
+```
+
+Finally create the directories
+
+```bash
+mkdir -p local/src
+mkdir -p local/DIR
+```
+
+### Install dependencies
+
+First make sure you have these dependencies installed in your system:
+
+- CMake >=2.8.3: A cross-platform, open-source build system. http://www.cmake.org/
+- Boost >=1.42: Provides free peer-reviewed portable C++ source libraries. http://www.boost.org
+- Eigen >=3.0: A header-only C++ template library for linear algebra: matrices, vectors, and numerical solvers. http://eigen.tuxfamily.org
+
+Then install:
+
+- nlohmann-json, needs to be installed from source on Ubuntu 20.04
+- libcoin-dev
+- libsoqt520-dev
+- libpugixml-dev
+- doxygen
+- libnlopt-dev
+- libnlopt-cxx-dev
+- rbdl, needs to be installed from source
+- pugixml, due to issues during the compilation, this needs to be installed from source
+
+```bash
+sudo apt install libcoin-dev libsoqt520-dev doxygen libnlopt-dev libnlopt-cxx-dev
+```
+
+Install `nlohmann-json` , `rbdl` and `pugixml` from source:
+
+```bash
+cd ${HOME}/local/src
+git clone https://github.com/nlohmann/json.git nlohmann-json/
+cd nlohmann-json/
+mkdir build/
+cd build/
+ccmake ..  # configure CMAKE_INSTALL_PREFIX to /home/[user]/local/DIR/nlohmann-json
+make
+make install  # or sudo make install, if you are not using xstow
+# in case of xstow, remember to configure the package
+cd ../../../DIR
+xstow nlohman-json
+```
+
+```bash
+git clone https://github.com/rbdl/rbdl.git
+cd rbdl/
+mkdir build/
+cd build/
+ccmake ..  # configure CMAKE_INSTALL_PREFIX to /home/[user]/local/DIR/rbdl
+make
+make install  # or sudo make install, if you are not using xstow
+# in case of xstow, remember to configure the package
+cd ../../../DIR
+xstow rbdl (install the binaries etc.)
+```
+
+```bash
+git clone https://github.com/zeux/pugixml.git
+cd pugixml/
+mkdir build/
+cd build/
+ccmake ..  # configure CMAKE_INSTALL_PREFIX to /home/[user]/local/DIR/pugixml
+make
+make install  # or sudo make install, if you are not using xstow
+# in case of xstow, remember to configure the package (install the binaries etc.)
+cd ../../../DIR
+xstow pugixml
+```
+
+And now we can build simox itself.
+
+```bash
+git clone https://git.h2t.iar.kit.edu/sw/simox/simox.git
+cd simox/
+mkdir build/
+cd build/
+ccmake ..  # configure CMAKE_INSTALL_PREFIX to /home/[user]/local/DIR/simox
+make
+make install  # or sudo make install, if you are not using xstow
+# in case of xstow, remember to configure the package (install the binaries etc.)
+cd ../../../DIR
+xstow simox
+```
+
 ## Documentation
 
 Wiki: https://git.h2t.iar.kit.edu/sw/simox/simox/-/wikis/home
@@ -75,6 +201,11 @@ pp. 585 - 594, 2012
 ```
 
 ## Contact
+The maintainer of this fork is the IAI at the University of Bremen.\
+Contact: Jeroen Schäfer, [jeroen.schaefer@uni-bremen.de](mailto:jeroen.schaefer@uni-bremen.de).
+
+Original Authors:
+
 Nikolaus Vahrenkamp
 vahrenkamp at kit dot edu
 
