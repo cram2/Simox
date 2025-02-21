@@ -62,7 +62,7 @@ If you want to use xstow to install the dependencies from source follow these st
 The following steps are from the Arcos-Lab at the University of Costa Rica which can be found [here](https://wiki.arcoslab.org/en/tutorials/using-xstow-for-local-installations).
 
 ```bash
-sudo apt instal xstow
+sudo apt install xstow
 ```
 
 Add the following to you `${HOME} /.bashrc`.
@@ -77,7 +77,7 @@ export PKG_CONFIG_PATH=${HOME}/local/lib/pkgconfig
 export CMAKE_INCLUDE_PATH=${CPATH}
 export CMAKE_LIBRARY_PATH=${LIBRARY_PATH}
 
-export PYTHON_VERSION=$(basename $(readlink -e $(which python2)))
+export PYTHON_VERSION=$(basename $(readlink -e $(which python2)))  # make sure python2 is installed, might be unnecessary in the future
 export PYTHON3_VERSION=$(basename $(readlink -e $(which python3)))
 export PYTHONPATH=${HOME}/local/lib/python/site-packages:${HOME}/local/lib/python3/site-packages:${HOME}/local/lib/${PYTHON_VERSION}/site-packages:${HOME}/local/lib/${PYTHON_VERSION}/dist-packages:${HOME}/local/lib/${PYTHON3_VERSION}/site-packages:${HOME}/local/lib/${PYTHON3_VERSION}/dist-packages:${HOME}/local/lib/python/dist-packages:${HOME}/local/lib/python3/dist-packages:${PYTHONPATH}
 ```
@@ -99,6 +99,10 @@ First make sure you have these dependencies installed in your system:
 - Boost >=1.42: Provides free peer-reviewed portable C++ source libraries. http://www.boost.org
 - Eigen >=3.0: A header-only C++ template library for linear algebra: matrices, vectors, and numerical solvers. http://eigen.tuxfamily.org
 
+```bash
+sudo apt install cmake cmake-curses-gui libboost-all-dev libeigen3-dev
+```
+
 Then install:
 
 - nlohmann-json, needs to be installed from source on Ubuntu 20.04
@@ -108,11 +112,13 @@ Then install:
 - doxygen
 - libnlopt-dev
 - libnlopt-cxx-dev
+- assimp
+- glut
 - rbdl, needs to be installed from source
 - pugixml, due to issues during the compilation, this needs to be installed from source
 
 ```bash
-sudo apt install libcoin-dev libsoqt520-dev doxygen libnlopt-dev libnlopt-cxx-dev
+sudo apt install libcoin-dev libsoqt520-dev doxygen libnlopt-dev libnlopt-cxx-dev freeglut3-dev libassimp-dev
 ```
 
 Install `nlohmann-json` , `rbdl` and `pugixml` from source:
@@ -128,10 +134,11 @@ make
 make install  # or sudo make install, if you are not using xstow
 # in case of xstow, remember to configure the package
 cd ../../../DIR
-xstow nlohman-json
+xstow nlohmann-json
 ```
 
 ```bash
+cd ${HOME}/local/src
 git clone https://github.com/rbdl/rbdl.git
 cd rbdl/
 mkdir build/
@@ -141,10 +148,11 @@ make
 make install  # or sudo make install, if you are not using xstow
 # in case of xstow, remember to configure the package
 cd ../../../DIR
-xstow rbdl (install the binaries etc.)
+xstow rbdl
 ```
 
 ```bash
+cd ${HOME}/local/src
 git clone https://github.com/zeux/pugixml.git
 cd pugixml/
 mkdir build/
@@ -160,6 +168,7 @@ xstow pugixml
 And now we can build simox itself.
 
 ```bash
+cd ${HOME}/local/src
 git clone git@github.com:cram2/Simox.git
 cd simox/
 mkdir build/
